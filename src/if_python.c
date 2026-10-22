@@ -34,7 +34,7 @@
 # undef _POSIX_THREADS
 #endif
 
-#if defined(MSWIN) && defined(HAVE_FCNTL_H)
+#ប្រសិនបើ defined(MSWIN) && defined(HAVE_FCNTL_H)
 # undef HAVE_FCNTL_H
 #endif
 
@@ -62,7 +62,7 @@
 
 #include <Python.h>
 
-#if !defined(PY_VERSION_HEX) || PY_VERSION_HEX < 0x02050000
+#ប្រសិនបើ !defined(PY_VERSION_HEX) || PY_VERSION_HEX < 0x02050000
 # undef PY_SSIZE_T_CLEAN
 #endif
 
@@ -79,11 +79,11 @@
 #define PyBytes_AsStringAndSize PyString_AsStringAndSize
 #define PyBytes_FromStringAndSize   PyString_FromStringAndSize
 
-#if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+#ប្រសិនបើ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
 # define PY_USE_CAPSULE
 #endif
 
-#if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02050000
+#ប្រសិនបើ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02050000
 # define PyInt Py_ssize_t
 # define PyInquiry lenfunc
 # define PyIntArgFunc ssizeargfunc
@@ -91,8 +91,8 @@
 # define PyIntObjArgProc ssizeobjargproc
 # define PyIntIntObjArgProc ssizessizeobjargproc
 # define Py_ssize_t_fmt "n"
-#else
-# define PyInt int
+#បើមិនដូច្នេះ
+# define PyInt ចំនួនគត់
 # define lenfunc inquiry
 # define PyInquiry inquiry
 # define PyIntArgFunc intargfunc
@@ -108,12 +108,12 @@
 #define file_input	257
 #define eval_input	258
 
-#if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x020300F0
+#ប្រសិនបើ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x020300F0
   // Python 2.3: can invoke ":python" recursively.
 # define PY_CAN_RECURSE
 #endif
 
-#if defined(DYNAMIC_PYTHON)
+#ប្រសិនបើ defined(DYNAMIC_PYTHON)
 # ifndef DYNAMIC_PYTHON
 #  define HINSTANCE long_u		// for generating prototypes
 # endif
@@ -123,13 +123,13 @@
 #  define close_dll FreeLibrary
 #  define symbol_from_dll GetProcAddress
 #  define load_dll_error GetWin32Error
-# else
+# បើមិនដូច្នេះ
 #  include <dlfcn.h>
 #  define FARPROC void*
 #  define HINSTANCE void*
-#  if defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)
+#  ប្រសិនបើ defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)
 #   define load_dll(n) dlopen((n), RTLD_LAZY)
-#  else
+#  បើមិនដូច្នេះ
 #   define load_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
 #  endif
 #  define close_dll dlclose
@@ -206,7 +206,7 @@
 # define PyDict_Type (*dll_PyDict_Type)
 # ifdef PyMapping_Keys
 #  define PY_NO_MAPPING_KEYS
-# else
+# បើមិនដូច្នេះ
 #  define PyMapping_Keys dll_PyMapping_Keys
 # endif
 # define PyObject_GetItem dll_PyObject_GetItem
@@ -261,11 +261,11 @@
 #  define Py_underscore_GC
 #  define _PyObject_GC_Del dll__PyObject_GC_Del
 #  define _PyObject_GC_UnTrack dll__PyObject_GC_UnTrack
-# else
+# បើមិនដូច្នេះ
 #  define PyObject_GC_Del dll_PyObject_GC_Del
 #  define PyObject_GC_UnTrack dll_PyObject_GC_UnTrack
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+# ប្រសិនបើ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
 #  define _PyObject_NextNotImplemented (*dll__PyObject_NextNotImplemented)
 # endif
 # define _Py_NoneStruct (*dll__Py_NoneStruct)
@@ -274,7 +274,7 @@
 # define PyObject_Init dll__PyObject_Init
 # define PyObject_GetIter dll_PyObject_GetIter
 # define PyObject_IsTrue dll_PyObject_IsTrue
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02020000
+# ប្រសិនបើ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02020000
 #  define PyType_IsSubtype dll_PyType_IsSubtype
 #  ifdef Py_DEBUG
 #   define _Py_NegativeRefcount dll__Py_NegativeRefcount
@@ -282,11 +282,11 @@
 #   define _Py_Dealloc dll__Py_Dealloc
 #  endif
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02030000
-#  if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+# ប្រសិនបើ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02030000
+#  ប្រសិនបើ defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
 #   define _PyObject_DebugMalloc dll__PyObject_DebugMalloc
 #   define _PyObject_DebugFree dll__PyObject_DebugFree
-#  else
+#  បើមិនដូច្នេះ
 #   define PyObject_Malloc dll_PyObject_Malloc
 #   define PyObject_Free dll_PyObject_Free
 #  endif
@@ -294,33 +294,33 @@
 # ifdef PY_USE_CAPSULE
 #  define PyCapsule_New dll_PyCapsule_New
 #  define PyCapsule_GetPointer dll_PyCapsule_GetPointer
-# else
+# បើមិនដូច្នេះ
 #  define PyCObject_FromVoidPtr dll_PyCObject_FromVoidPtr
 #  define PyCObject_AsVoidPtr dll_PyCObject_AsVoidPtr
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+# ប្រសិនបើ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
 #  define Py_NoSiteFlag (*dll_Py_NoSiteFlag)
 # endif
 
 /*
  * Pointers for dynamic link
  */
-static int(*dll_PyArg_Parse)(PyObject *, char *, ...);
-static int(*dll_PyArg_ParseTuple)(PyObject *, char *, ...);
+static ចំនួនគត់(*dll_PyArg_Parse)(PyObject *, var_na *, ...);
+static ចំនួនគត់(*dll_PyArg_ParseTuple)(PyObject *, var_na *, ...);
 static void(*dll_PyMem_Free)(void *);
 static void* (*dll_PyMem_Malloc)(size_t);
-static int(*dll_PyDict_SetItemString)(PyObject *dp, char *key, PyObject *item);
-static int(*dll_PyErr_BadArgument)(void);
-static PyObject *(*dll_PyErr_NewException)(char *, PyObject *, PyObject *);
+static ចំនួនគត់(*dll_PyDict_SetItemString)(PyObject *dp, var_na *key, PyObject *item);
+static ចំនួនគត់(*dll_PyErr_BadArgument)(void);
+static PyObject *(*dll_PyErr_NewException)(var_na *, PyObject *, PyObject *);
 static void(*dll_PyErr_Clear)(void);
-static PyObject*(*dll_PyErr_Format)(PyObject *, const char *, ...);
-static void(*dll_PyErr_PrintEx)(int);
+static PyObject*(*dll_PyErr_Format)(PyObject *, const var_na *, ...);
+static void(*dll_PyErr_PrintEx)(ចំនួនគត់);
 static PyObject*(*dll_PyErr_NoMemory)(void);
 static PyObject*(*dll_PyErr_Occurred)(void);
 static void(*dll_PyErr_SetNone)(PyObject *);
-static void(*dll_PyErr_SetString)(PyObject *, const char *);
+static void(*dll_PyErr_SetString)(PyObject *, const var_na *);
 static void(*dll_PyErr_SetObject)(PyObject *, PyObject *);
-static int(*dll_PyErr_ExceptionMatches)(PyObject *);
+static ចំនួនគត់(*dll_PyErr_ExceptionMatches)(PyObject *);
 static void(*dll_PyEval_InitThreads)(void);
 static void(*dll_PyEval_RestoreThread)(PyThreadState *);
 static PyThreadState*(*dll_PyEval_SaveThread)(void);
@@ -336,121 +336,121 @@ static PyTypeObject* dll_PyBool_Type;
 static PyTypeObject* dll_PyInt_Type;
 static PyTypeObject* dll_PyLong_Type;
 static PyObject*(*dll_PyList_GetItem)(PyObject *, PyInt);
-static int(*dll_PyList_Append)(PyObject *, PyObject *);
-static int(*dll_PyList_Insert)(PyObject *, PyInt, PyObject *);
+static ចំនួនគត់(*dll_PyList_Append)(PyObject *, PyObject *);
+static ចំនួនគត់(*dll_PyList_Insert)(PyObject *, PyInt, PyObject *);
 static PyObject*(*dll_PyList_New)(PyInt size);
-static int(*dll_PyList_SetItem)(PyObject *, PyInt, PyObject *);
+static ចំនួនគត់(*dll_PyList_SetItem)(PyObject *, PyInt, PyObject *);
 static PyInt(*dll_PyList_Size)(PyObject *);
 static PyTypeObject* dll_PyList_Type;
 static PyObject*(*dll_PyTuple_GetItem)(PyObject *, PyInt);
-static int(*dll_PyTuple_SetItem)(PyObject *, PyInt, PyObject *);
+static ចំនួនគត់(*dll_PyTuple_SetItem)(PyObject *, PyInt, PyObject *);
 static PyObject*(*dll_PyTuple_New)(PyInt size);
 static PyInt(*dll_PyTuple_Size)(PyObject *);
 static PyTypeObject* dll_PyTuple_Type;
-static int (*dll_PySequence_Check)(PyObject *);
+static ចំនួនគត់ (*dll_PySequence_Check)(PyObject *);
 static PyInt(*dll_PySequence_Size)(PyObject *);
 static PyObject*(*dll_PySequence_GetItem)(PyObject *, PyInt);
-static PyObject*(*dll_PySequence_Fast)(PyObject *, const char *);
-static int (*dll_PySlice_GetIndicesEx)(PySliceObject *r, PyInt length,
+static PyObject*(*dll_PySequence_Fast)(PyObject *, const var_na *);
+static ចំនួនគត់ (*dll_PySlice_GetIndicesEx)(PySliceObject *r, PyInt length,
 		     PyInt *start, PyInt *stop, PyInt *step,
 		     PyInt *slicelen);
-static PyObject*(*dll_PyImport_ImportModule)(const char *);
+static PyObject*(*dll_PyImport_ImportModule)(const var_na *);
 static PyObject*(*dll_PyDict_New)(void);
-static PyObject*(*dll_PyDict_GetItemString)(PyObject *, const char *);
-static int (*dll_PyDict_Next)(PyObject *, PyInt *, PyObject **, PyObject **);
+static PyObject*(*dll_PyDict_GetItemString)(PyObject *, const var_na *);
+static ចំនួនគត់ (*dll_PyDict_Next)(PyObject *, PyInt *, PyObject **, PyObject **);
 static PyTypeObject* dll_PyDict_Type;
 # ifndef PY_NO_MAPPING_KEYS
 static PyObject* (*dll_PyMapping_Keys)(PyObject *);
 # endif
 static PyObject* (*dll_PyObject_GetItem)(PyObject *, PyObject *);
-static PyObject* (*dll_PyObject_CallMethod)(PyObject *, char *, PyObject *);
-static int (*dll_PyMapping_Check)(PyObject *);
+static PyObject* (*dll_PyObject_CallMethod)(PyObject *, var_na *, PyObject *);
+static ចំនួនគត់ (*dll_PyMapping_Check)(PyObject *);
 static PyObject* (*dll_PyIter_Next)(PyObject *);
 static PyObject*(*dll_PyModule_GetDict)(PyObject *);
-static int(*dll_PyModule_AddObject)(PyObject *, const char *, PyObject *);
-static int(*dll_PyRun_SimpleString)(char *);
-static PyObject *(*dll_PyRun_String)(char *, int, PyObject *, PyObject *);
-static PyObject* (*dll_PyObject_GetAttrString)(PyObject *, const char *);
-static int (*dll_PyObject_HasAttrString)(PyObject *, const char *);
-static int (*dll_PyObject_SetAttrString)(PyObject *, const char *, PyObject *);
+static ចំនួនគត់(*dll_PyModule_AddObject)(PyObject *, const var_na *, PyObject *);
+static ចំនួនគត់(*dll_PyRun_SimpleString)(var_na *);
+static PyObject *(*dll_PyRun_String)(var_na *, ចំនួនគត់, PyObject *, PyObject *);
+static PyObject* (*dll_PyObject_GetAttrString)(PyObject *, const var_na *);
+static ចំនួនគត់ (*dll_PyObject_HasAttrString)(PyObject *, const var_na *);
+static ចំនួនគត់ (*dll_PyObject_SetAttrString)(PyObject *, const var_na *, PyObject *);
 static PyObject* (*dll_PyObject_CallFunctionObjArgs)(PyObject *, ...);
-static PyObject* (*dll_PyObject_CallFunction)(PyObject *, char *, ...);
+static PyObject* (*dll_PyObject_CallFunction)(PyObject *, var_na *, ...);
 static PyObject* (*dll_PyObject_Call)(PyObject *, PyObject *, PyObject *);
 static PyObject* (*dll_PyObject_Repr)(PyObject *);
-static char*(*dll_PyString_AsString)(PyObject *);
-static int(*dll_PyString_AsStringAndSize)(PyObject *, char **, PyInt *);
-static PyObject*(*dll_PyString_FromString)(const char *);
-static PyObject*(*dll_PyString_FromFormat)(const char *, ...);
-static PyObject*(*dll_PyString_FromStringAndSize)(const char *, PyInt);
+static var_na*(*dll_PyString_AsString)(PyObject *);
+static ចំនួនគត់(*dll_PyString_AsStringAndSize)(PyObject *, var_na **, PyInt *);
+static PyObject*(*dll_PyString_FromString)(const var_na *);
+static PyObject*(*dll_PyString_FromFormat)(const var_na *, ...);
+static PyObject*(*dll_PyString_FromStringAndSize)(const var_na *, PyInt);
 static PyInt(*dll_PyString_Size)(PyObject *);
 static PyTypeObject* dll_PyString_Type;
 static PyTypeObject* dll_PyUnicode_Type;
-static PyObject *(*py_PyUnicode_AsEncodedString)(PyObject *, char *, char *);
-static double(*dll_PyFloat_AsDouble)(PyObject *);
-static PyObject*(*dll_PyFloat_FromDouble)(double);
+static PyObject *(*py_PyUnicode_AsEncodedString)(PyObject *, var_na *, var_na *);
+static dviguu_na(*dll_PyFloat_AsDouble)(PyObject *);
+static PyObject*(*dll_PyFloat_FromDouble)(dviguu_na);
 static PyTypeObject* dll_PyFloat_Type;
-static int(*dll_PyNumber_Check)(PyObject *);
+static ចំនួនគត់(*dll_PyNumber_Check)(PyObject *);
 static PyObject*(*dll_PyNumber_Long)(PyObject *);
-static int(*dll_PySys_SetObject)(char *, PyObject *);
-static PyObject *(*dll_PySys_GetObject)(char *);
-static int(*dll_PySys_SetArgv)(int, char **);
+static ចំនួនគត់(*dll_PySys_SetObject)(var_na *, PyObject *);
+static PyObject *(*dll_PySys_GetObject)(var_na *);
+static ចំនួនគត់(*dll_PySys_SetArgv)(ចំនួនគត់, var_na **);
 static PyTypeObject* dll_PyType_Type;
 static PyTypeObject* dll_PyFile_Type;
 static PyTypeObject* dll_PySlice_Type;
-static int (*dll_PyType_Ready)(PyTypeObject *type);
+static ចំនួនគត់ (*dll_PyType_Ready)(PyTypeObject *type);
 static PyObject* (*dll_PyType_GenericAlloc)(PyTypeObject *type, PyInt nitems);
-static PyObject*(*dll_Py_BuildValue)(char *, ...);
-static PyObject*(*dll_Py_FindMethod)(struct PyMethodDef[], PyObject *, char *);
-static PyObject*(*dll_Py_InitModule4)(char *, struct PyMethodDef *, char *, PyObject *, int);
-static PyObject*(*dll_PyImport_AddModule)(char *);
-static void(*dll_Py_SetPythonHome)(char *home);
+static PyObject*(*dll_Py_BuildValue)(var_na *, ...);
+static PyObject*(*dll_Py_FindMethod)(sa_nracanaa PyMethodDef[], PyObject *, var_na *);
+static PyObject*(*dll_Py_InitModule4)(var_na *, sa_nracanaa PyMethodDef *, var_na *, PyObject *, ចំនួនគត់);
+static PyObject*(*dll_PyImport_AddModule)(var_na *);
+static void(*dll_Py_SetPythonHome)(var_na *home);
 static void(*dll_Py_Initialize)(void);
 static void(*dll_Py_Finalize)(void);
-static int(*dll_Py_IsInitialized)(void);
+static ចំនួនគត់(*dll_Py_IsInitialized)(void);
 static PyObject*(*dll__PyObject_New)(PyTypeObject *, PyObject *);
 static PyObject*(*dll__PyObject_GC_New)(PyTypeObject *);
 # ifdef Py_underscore_GC
 static void(*dll__PyObject_GC_Del)(void *);
 static void(*dll__PyObject_GC_UnTrack)(void *);
-# else
+# បើមិនដូច្នេះ
 static void(*dll_PyObject_GC_Del)(void *);
 static void(*dll_PyObject_GC_UnTrack)(void *);
 # endif
 static PyObject*(*dll__PyObject_Init)(PyObject *, PyTypeObject *);
 static PyObject* (*dll_PyObject_GetIter)(PyObject *);
-static int (*dll_PyObject_IsTrue)(PyObject *);
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+static ចំនួនគត់ (*dll_PyObject_IsTrue)(PyObject *);
+# ប្រសិនបើ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
 static iternextfunc dll__PyObject_NextNotImplemented;
 # endif
 static PyObject* dll__Py_NoneStruct;
 static PyObject* _Py_ZeroStruct;
 static PyObject* dll__Py_TrueStruct;
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02020000
-static int (*dll_PyType_IsSubtype)(PyTypeObject *, PyTypeObject *);
+# ប្រសិនបើ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02020000
+static ចំនួនគត់ (*dll_PyType_IsSubtype)(PyTypeObject *, PyTypeObject *);
 #  ifdef Py_DEBUG
-static void (*dll__Py_NegativeRefcount)(const char *fname, int lineno, PyObject *op);
+static void (*dll__Py_NegativeRefcount)(const var_na *fname, ចំនួនគត់ lineno, PyObject *op);
 static PyInt* dll__Py_RefTotal;
 static void (*dll__Py_Dealloc)(PyObject *obj);
 #  endif
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02030000
-#  if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+# ប្រសិនបើ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02030000
+#  ប្រសិនបើ defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
 static void (*dll__PyObject_DebugFree)(void*);
 static void* (*dll__PyObject_DebugMalloc)(size_t);
-#  else
+#  បើមិនដូច្នេះ
 static void* (*dll_PyObject_Malloc)(size_t);
 static void (*dll_PyObject_Free)(void*);
 #  endif
 # endif
 # ifdef PY_USE_CAPSULE
-static PyObject* (*dll_PyCapsule_New)(void *, char *, PyCapsule_Destructor);
-static void* (*dll_PyCapsule_GetPointer)(PyObject *, char *);
-# else
+static PyObject* (*dll_PyCapsule_New)(void *, var_na *, PyCapsule_Destructor);
+static void* (*dll_PyCapsule_GetPointer)(PyObject *, var_na *);
+# បើមិនដូច្នេះ
 static PyObject* (*dll_PyCObject_FromVoidPtr)(void *cobj, void (*destr)(void *));
 static void* (*dll_PyCObject_AsVoidPtr)(PyObject *);
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
-static int* dll_Py_NoSiteFlag;
+# ប្រសិនបើ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+static ចំនួនគត់* dll_Py_NoSiteFlag;
 # endif
 
 static HINSTANCE hinstPython = 0; // Instance of python.dll
@@ -482,9 +482,9 @@ static PyObject *imp_PyExc_OverflowError;
  * Table of name to function pointer of python.
  */
 # define PYTHON_PROC FARPROC
-static struct
+static sa_nracanaa
 {
-    char *name;
+    var_na *name;
     PYTHON_PROC *ptr;
 } python_funcname_table[] =
 {
@@ -492,7 +492,7 @@ static struct
     {"_PyArg_Parse_SizeT", (PYTHON_PROC*)&dll_PyArg_Parse},
     {"_PyArg_ParseTuple_SizeT", (PYTHON_PROC*)&dll_PyArg_ParseTuple},
     {"_Py_BuildValue_SizeT", (PYTHON_PROC*)&dll_Py_BuildValue},
-# else
+# បើមិនដូច្នេះ
     {"PyArg_Parse", (PYTHON_PROC*)&dll_PyArg_Parse},
     {"PyArg_ParseTuple", (PYTHON_PROC*)&dll_PyArg_ParseTuple},
     {"Py_BuildValue", (PYTHON_PROC*)&dll_Py_BuildValue},
@@ -597,20 +597,20 @@ static struct
 # ifdef Py_underscore_GC
     {"_PyObject_GC_Del", (PYTHON_PROC*)&dll__PyObject_GC_Del},
     {"_PyObject_GC_UnTrack", (PYTHON_PROC*)&dll__PyObject_GC_UnTrack},
-# else
+# បើមិនដូច្នេះ
     {"PyObject_GC_Del", (PYTHON_PROC*)&dll_PyObject_GC_Del},
     {"PyObject_GC_UnTrack", (PYTHON_PROC*)&dll_PyObject_GC_UnTrack},
 # endif
     {"PyObject_Init", (PYTHON_PROC*)&dll__PyObject_Init},
     {"PyObject_GetIter", (PYTHON_PROC*)&dll_PyObject_GetIter},
     {"PyObject_IsTrue", (PYTHON_PROC*)&dll_PyObject_IsTrue},
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+# ប្រសិនបើ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
     {"_PyObject_NextNotImplemented", (PYTHON_PROC*)&dll__PyObject_NextNotImplemented},
 # endif
     {"_Py_NoneStruct", (PYTHON_PROC*)&dll__Py_NoneStruct},
     {"_Py_ZeroStruct", (PYTHON_PROC*)&dll__Py_ZeroStruct},
     {"_Py_TrueStruct", (PYTHON_PROC*)&dll__Py_TrueStruct},
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02020000
+# ប្រសិនបើ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02020000
 #  ifdef Py_DEBUG
     {"_Py_NegativeRefcount", (PYTHON_PROC*)&dll__Py_NegativeRefcount},
     {"_Py_RefTotal", (PYTHON_PROC*)&dll__Py_RefTotal},
@@ -618,37 +618,37 @@ static struct
 #  endif
     {"PyType_IsSubtype", (PYTHON_PROC*)&dll_PyType_IsSubtype},
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02030000
-#  if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+# ប្រសិនបើ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02030000
+#  ប្រសិនបើ defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
     {"_PyObject_DebugFree", (PYTHON_PROC*)&dll__PyObject_DebugFree},
     {"_PyObject_DebugMalloc", (PYTHON_PROC*)&dll__PyObject_DebugMalloc},
-#  else
+#  បើមិនដូច្នេះ
     {"PyObject_Malloc", (PYTHON_PROC*)&dll_PyObject_Malloc},
     {"PyObject_Free", (PYTHON_PROC*)&dll_PyObject_Free},
 #  endif
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02050000 \
+# ប្រសិនបើ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02050000 \
 	&& SIZEOF_SIZE_T != VIM_SIZEOF_INT
 #  ifdef Py_DEBUG
     {"Py_InitModule4TraceRefs_64", (PYTHON_PROC*)&dll_Py_InitModule4},
-#  else
+#  បើមិនដូច្នេះ
     {"Py_InitModule4_64", (PYTHON_PROC*)&dll_Py_InitModule4},
 #  endif
-# else
+# បើមិនដូច្នេះ
 #  ifdef Py_DEBUG
     {"Py_InitModule4TraceRefs", (PYTHON_PROC*)&dll_Py_InitModule4},
-#  else
+#  បើមិនដូច្នេះ
     {"Py_InitModule4", (PYTHON_PROC*)&dll_Py_InitModule4},
 #  endif
 # endif
 # ifdef PY_USE_CAPSULE
     {"PyCapsule_New", (PYTHON_PROC*)&dll_PyCapsule_New},
     {"PyCapsule_GetPointer", (PYTHON_PROC*)&dll_PyCapsule_GetPointer},
-# else
+# បើមិនដូច្នេះ
     {"PyCObject_FromVoidPtr", (PYTHON_PROC*)&dll_PyCObject_FromVoidPtr},
     {"PyCObject_AsVoidPtr", (PYTHON_PROC*)&dll_PyCObject_AsVoidPtr},
 # endif
-# if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+# ប្រសិនបើ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
     {"Py_NoSiteFlag", (PYTHON_PROC*)&dll_Py_NoSiteFlag},
 # endif
     {"", NULL},
@@ -659,45 +659,45 @@ static struct
  * Parameter 'libname' provides name of DLL.
  * Return OK or FAIL.
  */
-    static int
-python_runtime_link_init(char *libname, int verbose)
+    static ចំនួនគត់
+python_runtime_link_init(var_na *libname, ចំនួនគត់ verbose)
 {
-    int i;
+    ចំនួនគត់ i;
     PYTHON_PROC *ucs_as_encoded_string =
 				   (PYTHON_PROC*)&py_PyUnicode_AsEncodedString;
 
-# if !(defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)) && defined(UNIX) && defined(FEAT_PYTHON3)
+# ប្រសិនបើ !(defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)) && defined(UNIX) && defined(FEAT_PYTHON3)
     // Can't have Python and Python3 loaded at the same time.
     // It causes a crash, because RTLD_GLOBAL is needed for
     // standard C extension libraries of one or both python versions.
-    if (python3_loaded())
+    ប្រសិនបើ (python3_loaded())
     {
-	if (verbose)
+	ប្រសិនបើ (verbose)
 	    emsg(_(e_this_vim_cannot_execute_python_after_using_py3));
-	return FAIL;
+	ត្រឡប់ FAIL;
     }
 # endif
 
-    if (hinstPython)
-	return OK;
+    ប្រសិនបើ (hinstPython)
+	ត្រឡប់ OK;
     hinstPython = load_dll(libname);
-    if (!hinstPython)
+    ប្រសិនបើ (!hinstPython)
     {
-	if (verbose)
+	ប្រសិនបើ (verbose)
 	    semsg(_(e_could_not_load_library_str_str), libname, load_dll_error());
-	return FAIL;
+	ត្រឡប់ FAIL;
     }
 
-    for (i = 0; python_funcname_table[i].ptr; ++i)
+    សម្រាប់ (i = 0; python_funcname_table[i].ptr; ++i)
     {
-	if ((*python_funcname_table[i].ptr = symbol_from_dll(hinstPython,
+	ប្រសិនបើ ((*python_funcname_table[i].ptr = symbol_from_dll(hinstPython,
 			python_funcname_table[i].name)) == NULL)
 	{
 	    close_dll(hinstPython);
 	    hinstPython = 0;
-	    if (verbose)
+	    ប្រសិនបើ (verbose)
 		semsg(_(e_could_not_load_library_function_str), python_funcname_table[i].name);
-	    return FAIL;
+	    ត្រឡប់ FAIL;
 	}
     }
 
@@ -705,29 +705,29 @@ python_runtime_link_init(char *libname, int verbose)
     // will be present in the library.
     *ucs_as_encoded_string = symbol_from_dll(hinstPython,
 					     "PyUnicodeUCS2_AsEncodedString");
-    if (*ucs_as_encoded_string == NULL)
+    ប្រសិនបើ (*ucs_as_encoded_string == NULL)
 	*ucs_as_encoded_string = symbol_from_dll(hinstPython,
 					     "PyUnicodeUCS4_AsEncodedString");
-    if (*ucs_as_encoded_string == NULL)
+    ប្រសិនបើ (*ucs_as_encoded_string == NULL)
     {
 	close_dll(hinstPython);
 	hinstPython = 0;
-	if (verbose)
+	ប្រសិនបើ (verbose)
 	    semsg(_(e_could_not_load_library_function_str), "PyUnicode_UCSX_*");
-	return FAIL;
+	ត្រឡប់ FAIL;
     }
 
-    return OK;
+    ត្រឡប់ OK;
 }
 
 /*
  * If python is enabled (there is installed python on Windows system) return
  * TRUE, else FALSE.
  */
-    int
-python_enabled(int verbose)
+    ចំនួនគត់
+python_enabled(ចំនួនគត់ verbose)
 {
-    return python_runtime_link_init((char *)p_pydll, verbose) == OK;
+    ត្រឡប់ python_runtime_link_init((var_na *)p_pydll, verbose) == OK;
 }
 
 /*
@@ -763,9 +763,9 @@ get_exceptions(void)
 }
 #endif // DYNAMIC_PYTHON
 
-static int initialised = 0;
+static ចំនួនគត់ initialised = 0;
 #define PYINITIALISED initialised
-static int python_end_called = FALSE;
+static ចំនួនគត់ python_end_called = FALSE;
 
 #define DESTRUCTOR_FINISH(self) self->ob_type->tp_free((PyObject*)self);
 
@@ -773,15 +773,15 @@ static int python_end_called = FALSE;
 #define BUF_PYTHON_REF(buf) buf->b_python_ref
 #define TAB_PYTHON_REF(tab) tab->tp_python_ref
 
-static PyObject *OutputGetattr(PyObject *, char *);
-static PyObject *BufferGetattr(PyObject *, char *);
-static PyObject *WindowGetattr(PyObject *, char *);
-static PyObject *TabPageGetattr(PyObject *, char *);
-static PyObject *RangeGetattr(PyObject *, char *);
-static PyObject *DictionaryGetattr(PyObject *, char*);
-static PyObject *ListGetattr(PyObject *, char *);
-static PyObject *TupleGetattr(PyObject *, char *);
-static PyObject *FunctionGetattr(PyObject *, char *);
+static PyObject *OutputGetattr(PyObject *, var_na *);
+static PyObject *BufferGetattr(PyObject *, var_na *);
+static PyObject *WindowGetattr(PyObject *, var_na *);
+static PyObject *TabPageGetattr(PyObject *, var_na *);
+static PyObject *RangeGetattr(PyObject *, var_na *);
+static PyObject *DictionaryGetattr(PyObject *, var_na*);
+static PyObject *ListGetattr(PyObject *, var_na *);
+static PyObject *TupleGetattr(PyObject *, var_na *);
+static PyObject *FunctionGetattr(PyObject *, var_na *);
 
 #ifndef Py_VISIT
 # define Py_VISIT(obj) visit(obj, arg)
@@ -794,16 +794,16 @@ static PyObject *FunctionGetattr(PyObject *, char *);
     }
 #endif
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#ប្រសិនបើ defined(HAVE_LOCALE_H) || defined(X_LOCALE)
     static void *
 py_memsave(void *p, size_t len)
 {
     void	*r;
 
-    if (!(r = PyMem_Malloc(len)))
-	return NULL;
+    ប្រសិនបើ (!(r = PyMem_Malloc(len)))
+	ត្រឡប់ NULL;
     mch_memmove(r, p, len);
-    return r;
+    ត្រឡប់ r;
 }
 
 # define PY_STRSAVE(s) ((char_u *) py_memsave(s, STRLEN(s) + 1))
@@ -820,7 +820,7 @@ typedef PySliceObject PySliceObject_T;
 ///////////////////////////////////////////////////////
 // Internal function prototypes.
 
-static int PythonMod_Init(void);
+static ចំនួនគត់ PythonMod_Init(void);
 
 
 ///////////////////////////////////////////////////////
@@ -854,31 +854,31 @@ Python_RestoreThread(void)
     void
 python_end(void)
 {
-    static int recurse = 0;
+    static ចំនួនគត់ recurse = 0;
 
     // If a crash occurs while doing this, don't try again.
-    if (recurse != 0)
-	return;
+    ប្រសិនបើ (recurse != 0)
+	ត្រឡប់;
 
     python_end_called = TRUE;
     ++recurse;
 
 #ifdef DYNAMIC_PYTHON
-    if (hinstPython && Py_IsInitialized())
+    ប្រសិនបើ (hinstPython && Py_IsInitialized())
     {
 # ifdef PY_CAN_RECURSE
 	PyGILState_Ensure();
-# else
+# បើមិនដូច្នេះ
 	Python_RestoreThread();	    // enter python
 # endif
 	Py_Finalize();
     }
-#else
-    if (Py_IsInitialized())
+#បើមិនដូច្នេះ
+    ប្រសិនបើ (Py_IsInitialized())
     {
 # ifdef PY_CAN_RECURSE
 	PyGILState_Ensure();
-# else
+# បើមិនដូច្នេះ
 	Python_RestoreThread();	    // enter python
 # endif
 	Py_Finalize();
@@ -888,48 +888,48 @@ python_end(void)
     --recurse;
 }
 
-#if defined(DYNAMIC_PYTHON) && defined(FEAT_PYTHON3)
-    int
+#ប្រសិនបើ defined(DYNAMIC_PYTHON) && defined(FEAT_PYTHON3)
+    ចំនួនគត់
 python_loaded(void)
 {
-    return (hinstPython != 0);
+    ត្រឡប់ (hinstPython != 0);
 }
 #endif
 
-static char *py_home_buf = NULL;
+static var_na *py_home_buf = NULL;
 
-    static int
+    static ចំនួនគត់
 Python_Init(void)
 {
-    if (!initialised)
+    ប្រសិនបើ (!initialised)
     {
-#if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+#ប្រសិនបើ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
 	PyObject *site;
 #endif
 
 #ifdef DYNAMIC_PYTHON
-	if (!python_enabled(TRUE))
+	ប្រសិនបើ (!python_enabled(TRUE))
 	{
 	    emsg(_(e_sorry_this_command_is_disabled_python_library_could_not_be_found));
 	    goto fail;
 	}
 #endif
 
-	if (*p_pyhome != NUL)
+	ប្រសិនបើ (*p_pyhome != NUL)
 	{
 	    // The string must not change later, make a copy in static memory.
-	    py_home_buf = (char *)vim_strsave(p_pyhome);
-	    if (py_home_buf != NULL)
+	    py_home_buf = (var_na *)vim_strsave(p_pyhome);
+	    ប្រសិនបើ (py_home_buf != NULL)
 		Py_SetPythonHome(py_home_buf);
 	}
 #ifdef PYTHON_HOME
-	else if (mch_getenv((char_u *)"PYTHONHOME") == NULL)
+	បើមិនដូច្នេះ ប្រសិនបើ (mch_getenv((char_u *)"PYTHONHOME") == NULL)
 	    Py_SetPythonHome(PYTHON_HOME);
 #endif
 
 	init_structs();
 
-#if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+#ប្រសិនបើ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
 	// Disable implicit 'import site', because it may cause Vim to exit
 	// when it can't be found.
 	Py_NoSiteFlag++;
@@ -937,10 +937,10 @@ Python_Init(void)
 
 	Py_Initialize();
 
-#if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
+#ប្រសិនបើ defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x02070000
 	// 'import site' explicitly.
 	site = PyImport_ImportModule("site");
-	if (site == NULL)
+	ប្រសិនបើ (site == NULL)
 	{
 	    emsg(_(e_sorry_this_command_is_disabled_python_site_module_could_not_be_loaded));
 	    goto fail;
@@ -957,10 +957,10 @@ Python_Init(void)
 	get_exceptions();
 #endif
 
-	if (PythonIO_Init_io())
+	ប្រសិនបើ (PythonIO_Init_io())
 	    goto fail;
 
-	if (PythonMod_Init())
+	ប្រសិនបើ (PythonMod_Init())
 	    goto fail;
 
 	globals = PyModule_GetDict(PyImport_AddModule("__main__"));
@@ -985,7 +985,7 @@ Python_Init(void)
 	initialised = 1;
     }
 
-    return 0;
+    ត្រឡប់ 0;
 
 fail:
     // We call PythonIO_Flush() here to print any Python errors.
@@ -993,7 +993,7 @@ fail:
     // if PythonIO_Init_io() has not completed successfully (it will
     // not do anything in this case).
     PythonIO_Flush();
-    return -1;
+    ត្រឡប់ -1;
 }
 
 /*
@@ -1001,60 +1001,60 @@ fail:
  */
     static void
 DoPyCommand(
-    const char		*cmd,
+    const var_na		*cmd,
     dict_T*		locals,
     rangeinitializer	init_range,
     runner		run,
     void		*arg)
 {
 #ifndef PY_CAN_RECURSE
-    static int		recursive = 0;
+    static ចំនួនគត់		recursive = 0;
 #endif
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
-    char		*saved_locale;
+#ប្រសិនបើ defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+    var_na		*saved_locale;
 #endif
 #ifdef PY_CAN_RECURSE
     PyGILState_STATE	pygilstate;
 #endif
 
 #ifndef PY_CAN_RECURSE
-    if (recursive)
+    ប្រសិនបើ (recursive)
     {
 	emsg(_(e_cannot_invoke_python_recursively));
-	return;
+	ត្រឡប់;
     }
     ++recursive;
 #endif
-    if (python_end_called)
-	return;
+    ប្រសិនបើ (python_end_called)
+	ត្រឡប់;
 
-    if (Python_Init())
+    ប្រសិនបើ (Python_Init())
 	goto theend;
 
     init_range(arg);
 
     Python_Release_Vim();	    // leave Vim
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#ប្រសិនបើ defined(HAVE_LOCALE_H) || defined(X_LOCALE)
     // Python only works properly when the LC_NUMERIC locale is "C".
     saved_locale = setlocale(LC_NUMERIC, NULL);
-    if (saved_locale == NULL || STRCMP(saved_locale, "C") == 0)
+    ប្រសិនបើ (saved_locale == NULL || STRCMP(saved_locale, "C") == 0)
 	saved_locale = NULL;
-    else
+    បើមិនដូច្នេះ
     {
 	// Need to make a copy, value may change when setting new locale.
-	saved_locale = (char *) PY_STRSAVE(saved_locale);
+	saved_locale = (var_na *) PY_STRSAVE(saved_locale);
 	(void)setlocale(LC_NUMERIC, "C");
     }
 #endif
 
 #ifdef PY_CAN_RECURSE
     pygilstate = PyGILState_Ensure();
-#else
+#បើមិនដូច្នេះ
     Python_RestoreThread();	    // enter python
 #endif
 
-    run((char *) cmd, locals, arg
+    run((var_na *) cmd, locals, arg
 #ifdef PY_CAN_RECURSE
 	    , &pygilstate
 #endif
@@ -1062,12 +1062,12 @@ DoPyCommand(
 
 #ifdef PY_CAN_RECURSE
     PyGILState_Release(pygilstate);
-#else
+#បើមិនដូច្នេះ
     Python_SaveThread();	    // leave python
 #endif
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
-    if (saved_locale != NULL)
+#ប្រសិនបើ defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+    ប្រសិនបើ (saved_locale != NULL)
     {
 	(void)setlocale(LC_NUMERIC, saved_locale);
 	PyMem_Free(saved_locale);
@@ -1081,7 +1081,7 @@ theend:
 #ifndef PY_CAN_RECURSE
     --recursive;
 #endif
-    return;
+    ត្រឡប់;
 }
 
 /*
@@ -1093,12 +1093,12 @@ ex_python(exarg_T *eap)
     char_u *script;
 
     script = script_get(eap, eap->arg);
-    if (!eap->skip)
+    ប្រសិនបើ (!eap->skip)
     {
-	if (p_pyx == 0)
+	ប្រសិនបើ (p_pyx == 0)
 	    p_pyx = 2;
 
-	DoPyCommand(script == NULL ? (char *) eap->arg : (char *) script,
+	DoPyCommand(script == NULL ? (var_na *) eap->arg : (var_na *) script,
 		NULL,
 		init_range_cmd,
 		(runner) run_cmd,
@@ -1115,11 +1115,11 @@ ex_python(exarg_T *eap)
     void
 ex_pyfile(exarg_T *eap)
 {
-    static char buffer[BUFFER_SIZE];
-    const char *file = (char *)eap->arg;
-    char *p;
+    static var_na buffer[BUFFER_SIZE];
+    const var_na *file = (var_na *)eap->arg;
+    var_na *p;
 
-    if (p_pyx == 0)
+    ប្រសិនបើ (p_pyx == 0)
 	p_pyx = 2;
 
     // Have to do it like this. PyRun_SimpleFile requires you to pass a
@@ -1133,16 +1133,16 @@ ex_pyfile(exarg_T *eap)
     strcpy(buffer, "execfile('");
     p = buffer + 10; // size of "execfile('"
 
-    while (*file && p < buffer + (BUFFER_SIZE - 3))
+    ខណៈពេល (*file && p < buffer + (BUFFER_SIZE - 3))
     {
-	if (*file == '\\' || *file == '\'')
+	ប្រសិនបើ (*file == '\\' || *file == '\'')
 	    *p++ = '\\';
 	*p++ = *file++;
     }
 
     // If we didn't finish the file name, we hit a buffer overflow
-    if (*file != '\0')
-	return;
+    ប្រសិនបើ (*file != '\0')
+	ត្រឡប់;
 
     // Put in the terminating "')" and a null
     *p++ = '\'';
@@ -1160,10 +1160,10 @@ ex_pyfile(exarg_T *eap)
     void
 ex_pydo(exarg_T *eap)
 {
-    if (p_pyx == 0)
+    ប្រសិនបើ (p_pyx == 0)
 	p_pyx = 2;
 
-    DoPyCommand((char *)eap->arg,
+    DoPyCommand((var_na *)eap->arg,
 	    NULL,
 	    init_range_cmd,
 	    (runner)run_do,
@@ -1176,17 +1176,17 @@ ex_pydo(exarg_T *eap)
 // Implementation functions
 
     static PyObject *
-OutputGetattr(PyObject *self, char *name)
+OutputGetattr(PyObject *self, var_na *name)
 {
-    if (strcmp(name, "softspace") == 0)
-	return PyInt_FromLong(((OutputObject *)(self))->softspace);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, OutputAttrs);
-    else if (strcmp(name, "errors") == 0)
-	return PyString_FromString("strict");
-    else if (strcmp(name, "encoding") == 0)
-	return PyString_FromString(ENC_OPT);
-    return Py_FindMethod(OutputMethods, self, name);
+    ប្រសិនបើ (strcmp(name, "softspace") == 0)
+	ត្រឡប់ PyInt_FromLong(((OutputObject *)(self))->softspace);
+    បើមិនដូច្នេះ ប្រសិនបើ (strcmp(name, "__members__") == 0)
+	ត្រឡប់ ObjectDir(NULL, OutputAttrs);
+    បើមិនដូច្នេះ ប្រសិនបើ (strcmp(name, "errors") == 0)
+	ត្រឡប់ PyString_FromString("strict");
+    បើមិនដូច្នេះ ប្រសិនបើ (strcmp(name, "encoding") == 0)
+	ត្រឡប់ PyString_FromString(ENC_OPT);
+    ត្រឡប់ Py_FindMethod(OutputMethods, self, name);
 }
 
 ///////////////////////////////////////////////////////
@@ -1202,16 +1202,16 @@ OutputGetattr(PyObject *self, char *name)
 
 #define BufferType_Check(obj) ((obj)->ob_type == &BufferType)
 
-static int BufferAssItem(PyObject *, PyInt, PyObject *);
-static int BufferAssSlice(PyObject *, PyInt, PyInt, PyObject *);
+static ចំនួនគត់ BufferAssItem(PyObject *, PyInt, PyObject *);
+static ចំនួនគត់ BufferAssSlice(PyObject *, PyInt, PyInt, PyObject *);
 
 // Line range type - Implementation functions
 // --------------------------------------
 
 #define RangeType_Check(obj) ((obj)->ob_type == &RangeType)
 
-static int RangeAssItem(PyObject *, PyInt, PyObject *);
-static int RangeAssSlice(PyObject *, PyInt, PyInt, PyObject *);
+static ចំនួនគត់ RangeAssItem(PyObject *, PyInt, PyObject *);
+static ចំនួនគត់ RangeAssSlice(PyObject *, PyInt, PyInt, PyObject *);
 
 // Current objects type - Implementation functions
 // -----------------------------------------------
@@ -1232,35 +1232,35 @@ static PySequenceMethods BufferAsSeq = {
 // Buffer object - Implementation
 
     static PyObject *
-BufferGetattr(PyObject *self, char *name)
+BufferGetattr(PyObject *self, var_na *name)
 {
     PyObject *r;
 
-    if ((r = BufferAttrValid((BufferObject *)(self), name)))
-	return r;
+    ប្រសិនបើ ((r = BufferAttrValid((BufferObject *)(self), name)))
+	ត្រឡប់ r;
 
-    if (CheckBuffer((BufferObject *)(self)))
-	return NULL;
+    ប្រសិនបើ (CheckBuffer((BufferObject *)(self)))
+	ត្រឡប់ NULL;
 
     r = BufferAttr((BufferObject *)(self), name);
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return Py_FindMethod(BufferMethods, self, name);
+    ប្រសិនបើ (r || PyErr_Occurred())
+	ត្រឡប់ r;
+    បើមិនដូច្នេះ
+	ត្រឡប់ Py_FindMethod(BufferMethods, self, name);
 }
 
 //////////////////
 
-    static int
+    static ចំនួនគត់
 BufferAssItem(PyObject *self, PyInt n, PyObject *val)
 {
-    return RBAsItem((BufferObject *)(self), n, val, 1, -1, NULL);
+    ត្រឡប់ RBAsItem((BufferObject *)(self), n, val, 1, -1, NULL);
 }
 
-    static int
+    static ចំនួនគត់
 BufferAssSlice(PyObject *self, PyInt lo, PyInt hi, PyObject *val)
 {
-    return RBAsSlice((BufferObject *)(self), lo, hi, val, 1, -1, NULL);
+    ត្រឡប់ RBAsSlice((BufferObject *)(self), lo, hi, val, 1, -1, NULL);
 }
 
 static PySequenceMethods RangeAsSeq = {
@@ -1272,7 +1272,7 @@ static PySequenceMethods RangeAsSeq = {
     (PyIntObjArgProc)	RangeAssItem,	      // sq_ass_item,  x[i]=v
     (PyIntIntObjArgProc) RangeAssSlice,	      // sq_ass_slice, x[i:j]=v
     (objobjproc)	0,
-#if PY_MAJOR_VERSION >= 2
+#ប្រសិនបើ PY_MAJOR_VERSION >= 2
     (binaryfunc)	0,
     0,
 #endif
@@ -1281,33 +1281,33 @@ static PySequenceMethods RangeAsSeq = {
 // Line range object - Implementation
 
     static PyObject *
-RangeGetattr(PyObject *self, char *name)
+RangeGetattr(PyObject *self, var_na *name)
 {
-    if (strcmp(name, "start") == 0)
-	return Py_BuildValue(Py_ssize_t_fmt, ((RangeObject *)(self))->start - 1);
-    else if (strcmp(name, "end") == 0)
-	return Py_BuildValue(Py_ssize_t_fmt, ((RangeObject *)(self))->end - 1);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, RangeAttrs);
-    else
-	return Py_FindMethod(RangeMethods, self, name);
+    ប្រសិនបើ (strcmp(name, "start") == 0)
+	ត្រឡប់ Py_BuildValue(Py_ssize_t_fmt, ((RangeObject *)(self))->start - 1);
+    បើមិនដូច្នេះ ប្រសិនបើ (strcmp(name, "end") == 0)
+	ត្រឡប់ Py_BuildValue(Py_ssize_t_fmt, ((RangeObject *)(self))->end - 1);
+    បើមិនដូច្នេះ ប្រសិនបើ (strcmp(name, "__members__") == 0)
+	ត្រឡប់ ObjectDir(NULL, RangeAttrs);
+    បើមិនដូច្នេះ
+	ត្រឡប់ Py_FindMethod(RangeMethods, self, name);
 }
 
 ////////////////
 
-    static int
+    static ចំនួនគត់
 RangeAssItem(PyObject *self, PyInt n, PyObject *val)
 {
-    return RBAsItem(((RangeObject *)(self))->buf, n, val,
+    ត្រឡប់ RBAsItem(((RangeObject *)(self))->buf, n, val,
 		     ((RangeObject *)(self))->start,
 		     ((RangeObject *)(self))->end,
 		     &((RangeObject *)(self))->end);
 }
 
-    static int
+    static ចំនួនគត់
 RangeAssSlice(PyObject *self, PyInt lo, PyInt hi, PyObject *val)
 {
-    return RBAsSlice(((RangeObject *)(self))->buf, lo, hi, val,
+    ត្រឡប់ RBAsSlice(((RangeObject *)(self))->buf, lo, hi, val,
 		      ((RangeObject *)(self))->start,
 		      ((RangeObject *)(self))->end,
 		      &((RangeObject *)(self))->end);
@@ -1316,41 +1316,41 @@ RangeAssSlice(PyObject *self, PyInt lo, PyInt hi, PyObject *val)
 // TabPage object - Implementation
 
     static PyObject *
-TabPageGetattr(PyObject *self, char *name)
+TabPageGetattr(PyObject *self, var_na *name)
 {
     PyObject *r;
 
-    if ((r = TabPageAttrValid((TabPageObject *)(self), name)))
-	return r;
+    ប្រសិនបើ ((r = TabPageAttrValid((TabPageObject *)(self), name)))
+	ត្រឡប់ r;
 
-    if (CheckTabPage((TabPageObject *)(self)))
-	return NULL;
+    ប្រសិនបើ (CheckTabPage((TabPageObject *)(self)))
+	ត្រឡប់ NULL;
 
     r = TabPageAttr((TabPageObject *)(self), name);
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return Py_FindMethod(TabPageMethods, self, name);
+    ប្រសិនបើ (r || PyErr_Occurred())
+	ត្រឡប់ r;
+    បើមិនដូច្នេះ
+	ត្រឡប់ Py_FindMethod(TabPageMethods, self, name);
 }
 
 // Window object - Implementation
 
     static PyObject *
-WindowGetattr(PyObject *self, char *name)
+WindowGetattr(PyObject *self, var_na *name)
 {
     PyObject *r;
 
-    if ((r = WindowAttrValid((WindowObject *)(self), name)))
-	return r;
+    ប្រសិនបើ ((r = WindowAttrValid((WindowObject *)(self), name)))
+	ត្រឡប់ r;
 
-    if (CheckWindow((WindowObject *)(self)))
-	return NULL;
+    ប្រសិនបើ (CheckWindow((WindowObject *)(self)))
+	ត្រឡប់ NULL;
 
     r = WindowAttr((WindowObject *)(self), name);
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return Py_FindMethod(WindowMethods, self, name);
+    ប្រសិនបើ (r || PyErr_Occurred())
+	ត្រឡប់ r;
+    បើមិនដូច្នេះ
+	ត្រឡប់ Py_FindMethod(WindowMethods, self, name);
 }
 
 // Tab page list object - Definitions
@@ -1364,7 +1364,7 @@ static PySequenceMethods TabListAsSeq = {
     (PyIntObjArgProc)	0,		    // sq_ass_item,  x[i]=v
     (PyIntIntObjArgProc) 0,		    // sq_ass_slice, x[i:j]=v
     (objobjproc)	0,
-#if PY_MAJOR_VERSION >= 2
+#ប្រសិនបើ PY_MAJOR_VERSION >= 2
     (binaryfunc)	0,
     0,
 #endif
@@ -1381,7 +1381,7 @@ static PySequenceMethods WinListAsSeq = {
     (PyIntObjArgProc)	0,		    // sq_ass_item,  x[i]=v
     (PyIntIntObjArgProc) 0,		    // sq_ass_slice, x[i:j]=v
     (objobjproc)	0,
-#if PY_MAJOR_VERSION >= 2
+#ប្រសិនបើ PY_MAJOR_VERSION >= 2
     (binaryfunc)	0,
     0,
 #endif
@@ -1393,8 +1393,8 @@ static PySequenceMethods WinListAsSeq = {
 python_buffer_free(buf_T *buf)
 {
     BufferObject *bp = BUF_PYTHON_REF(buf);
-    if (bp == NULL)
-	return;
+    ប្រសិនបើ (bp == NULL)
+	ត្រឡប់;
     bp->buf = INVALID_BUFFER_VALUE;
     BUF_PYTHON_REF(buf) = NULL;
 }
@@ -1403,8 +1403,8 @@ python_buffer_free(buf_T *buf)
 python_window_free(win_T *win)
 {
     WindowObject *wp = WIN_PYTHON_REF(win);
-    if (wp == NULL)
-	return;
+    ប្រសិនបើ (wp == NULL)
+	ត្រឡប់;
     wp->win = INVALID_WINDOW_VALUE;
     WIN_PYTHON_REF(win) = NULL;
 }
@@ -1413,34 +1413,34 @@ python_window_free(win_T *win)
 python_tabpage_free(tabpage_T *tab)
 {
     TabPageObject *tp = TAB_PYTHON_REF(tab);
-    if (tp == NULL)
-	return;
+    ប្រសិនបើ (tp == NULL)
+	ត្រឡប់;
     tp->tab = INVALID_TABPAGE_VALUE;
     TAB_PYTHON_REF(tab) = NULL;
 }
 
-    static int
+    static ចំនួនគត់
 PythonMod_Init(void)
 {
     // The special value is removed from sys.path in Python_Init().
-    static char	*(argv[2]) = {"/must>not&exist/foo", NULL};
+    static var_na	*(argv[2]) = {"/must>not&exist/foo", NULL};
 
-    if (init_types())
-	return -1;
+    ប្រសិនបើ (init_types())
+	ត្រឡប់ -1;
 
     // Set sys.argv[] to avoid a crash in warn().
     PySys_SetArgv(1, argv);
 
-    vim_module = Py_InitModule4("vim", VimMethods, (char *)NULL,
+    vim_module = Py_InitModule4("vim", VimMethods, (var_na *)NULL,
 				(PyObject *)NULL, PYTHON_API_VERSION);
 
-    if (populate_module(vim_module))
-	return -1;
+    ប្រសិនបើ (populate_module(vim_module))
+	ត្រឡប់ -1;
 
-    if (init_sys_path())
-	return -1;
+    ប្រសិនបើ (init_sys_path())
+	ត្រឡប់ -1;
 
-    return 0;
+    ត្រឡប់ 0;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1451,102 +1451,102 @@ PythonMod_Init(void)
 //
 // On errors, the Python exception data is set, and NULL is returned.
     static PyObject *
-LineToString(const char *str)
+LineToString(const var_na *str)
 {
     PyObject *result;
     PyInt len = strlen(str);
-    char *p;
+    var_na *p;
 
     // Allocate a Python string object, with uninitialised contents. We
     // must do it this way, so that we can modify the string in place
     // later. See the Python source, Objects/stringobject.c for details.
     result = PyString_FromStringAndSize(NULL, len);
-    if (result == NULL)
-	return NULL;
+    ប្រសិនបើ (result == NULL)
+	ត្រឡប់ NULL;
 
     p = PyString_AsString(result);
 
-    while (*str)
+    ខណៈពេល (*str)
     {
-	if (*str == '\n')
+	ប្រសិនបើ (*str == '\n')
 	    *p = '\0';
-	else
+	បើមិនដូច្នេះ
 	    *p = *str;
 
 	++p;
 	++str;
     }
 
-    return result;
+    ត្រឡប់ result;
 }
 
     static PyObject *
-DictionaryGetattr(PyObject *self, char *name)
+DictionaryGetattr(PyObject *self, var_na *name)
 {
     DictionaryObject	*this = ((DictionaryObject *) (self));
 
-    if (strcmp(name, "locked") == 0)
-	return PyInt_FromLong(this->dict->dv_lock);
-    else if (strcmp(name, "scope") == 0)
-	return PyInt_FromLong(this->dict->dv_scope);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, DictionaryAttrs);
+    ប្រសិនបើ (strcmp(name, "locked") == 0)
+	ត្រឡប់ PyInt_FromLong(this->dict->dv_lock);
+    បើមិនដូច្នេះ ប្រសិនបើ (strcmp(name, "scope") == 0)
+	ត្រឡប់ PyInt_FromLong(this->dict->dv_scope);
+    បើមិនដូច្នេះ ប្រសិនបើ (strcmp(name, "__members__") == 0)
+	ត្រឡប់ ObjectDir(NULL, DictionaryAttrs);
 
-    return Py_FindMethod(DictionaryMethods, self, name);
+    ត្រឡប់ Py_FindMethod(DictionaryMethods, self, name);
 }
 
     static PyObject *
-ListGetattr(PyObject *self, char *name)
+ListGetattr(PyObject *self, var_na *name)
 {
-    if (strcmp(name, "locked") == 0)
-	return PyInt_FromLong(((ListObject *)(self))->list->lv_lock);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, ListAttrs);
+    ប្រសិនបើ (strcmp(name, "locked") == 0)
+	ត្រឡប់ PyInt_FromLong(((ListObject *)(self))->list->lv_lock);
+    បើមិនដូច្នេះ ប្រសិនបើ (strcmp(name, "__members__") == 0)
+	ត្រឡប់ ObjectDir(NULL, ListAttrs);
 
-    return Py_FindMethod(ListMethods, self, name);
+    ត្រឡប់ Py_FindMethod(ListMethods, self, name);
 }
 
     static PyObject *
-TupleGetattr(PyObject *self, char *name)
+TupleGetattr(PyObject *self, var_na *name)
 {
-    if (strcmp(name, "locked") == 0)
-	return PyInt_FromLong(((TupleObject *)(self))->tuple->tv_lock);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, TupleAttrs);
+    ប្រសិនបើ (strcmp(name, "locked") == 0)
+	ត្រឡប់ PyInt_FromLong(((TupleObject *)(self))->tuple->tv_lock);
+    បើមិនដូច្នេះ ប្រសិនបើ (strcmp(name, "__members__") == 0)
+	ត្រឡប់ ObjectDir(NULL, TupleAttrs);
 
-    return Py_FindMethod(TupleMethods, self, name);
+    ត្រឡប់ Py_FindMethod(TupleMethods, self, name);
 }
 
     static PyObject *
-FunctionGetattr(PyObject *self, char *name)
+FunctionGetattr(PyObject *self, var_na *name)
 {
     PyObject	*r;
 
     r = FunctionAttr((FunctionObject *)(self), name);
 
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return Py_FindMethod(FunctionMethods, self, name);
+    ប្រសិនបើ (r || PyErr_Occurred())
+	ត្រឡប់ r;
+    បើមិនដូច្នេះ
+	ត្រឡប់ Py_FindMethod(FunctionMethods, self, name);
 }
 
     void
 do_pyeval(char_u *str, dict_T *locals, typval_T *rettv)
 {
-    DoPyCommand((char *) str,
+    DoPyCommand((var_na *) str,
 	    locals,
 	    init_range_eval,
 	    (runner) run_eval,
 	    (void *) rettv);
-    if (rettv->v_type == VAR_UNKNOWN)
+    ប្រសិនបើ (rettv->v_type == VAR_UNKNOWN)
     {
 	rettv->v_type = VAR_NUMBER;
 	rettv->vval.v_number = 0;
     }
 }
 
-    int
-set_ref_in_python(int copyID)
+    ចំនួនគត់
+set_ref_in_python(ចំនួនគត់ copyID)
 {
-    return set_ref_in_py(copyID);
+    ត្រឡប់ set_ref_in_py(copyID);
 }

@@ -27,30 +27,30 @@
  * Returns 0 on success and stores image and mask BITMAPS in "hImage" and
  * "hShape".
  */
-    int
+    ចំនួនគត់
 LoadXpmImage(
-    char    *filename,
+    var_na    *filename,
     HBITMAP *hImage,
     HBITMAP *hShape)
 {
     XImage	    *img;  // loaded image
     XImage	    *shp;  // shapeimage
     XpmAttributes   attr;
-    int		    res;
+    ចំនួនគត់		    res;
     HDC		    hdc = CreateCompatibleDC(NULL);
 
     attr.valuemask = 0;
     res = XpmReadFileToImage(&hdc, filename, &img, &shp, &attr);
     DeleteDC(hdc);
-    if (res < 0)
-	return -1;
-    if (shp == NULL)
+    ប្រសិនបើ (res < 0)
+	ត្រឡប់ -1;
+    ប្រសិនបើ (shp == NULL)
     {
-	if (img)
+	ប្រសិនបើ (img)
 	    XDestroyImage(img);
-	return -1;
+	ត្រឡប់ -1;
     }
     *hImage = img->bitmap;
     *hShape = shp->bitmap;
-    return 0;
+    ត្រឡប់ 0;
 }

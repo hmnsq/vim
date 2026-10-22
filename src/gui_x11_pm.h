@@ -48,7 +48,7 @@
 /*
  * Those are the pixmaps used for the default buttons.
  */
-static char **(built_in_pixmaps[]) =
+static var_na **(built_in_pixmaps[]) =
 {
     tb_new_xpm,
     tb_open_xpm,

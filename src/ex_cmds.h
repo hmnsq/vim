@@ -71,7 +71,7 @@
 /*
  * values for cmd_addr_type
  */
-typedef enum {
+typedef ga_nanaa {
     ADDR_LINES,		 // buffer line numbers
     ADDR_WINDOWS,	 // window number
     ADDR_ARGUMENTS,	 // argument number
@@ -88,7 +88,7 @@ typedef enum {
 #endif
 
 #ifndef DO_DECLARE_EXCMD
-typedef struct exarg exarg_T;
+typedef sa_nracanaa exarg exarg_T;
 #endif
 
 /*
@@ -105,7 +105,7 @@ typedef struct exarg exarg_T;
 
 typedef void (*ex_func_T) (exarg_T *eap);
 
-static struct cmdname
+static sa_nracanaa cmdname
 {
     char_u	*cmd_name;	// name of the command
     size_t	cmd_namelen;	// length of the command name
@@ -113,9 +113,9 @@ static struct cmdname
     long_u	cmd_argt;	// flags declared above
     cmd_addr_T	cmd_addr_type;	// flag for address type
 } cmdnames[] =
-#else
+#បើមិនដូច្នេះ
 # define EXCMD(a, b, c, d, e)  a
-enum CMD_index
+ga_nanaa CMD_index
 #endif
 {
 EXCMD(CMD_append,	"append",	ex_append,
@@ -1935,12 +1935,12 @@ EXCMD(CMD_decrement,	"--",		ex_incdec,
 };
 
 #ifndef DO_DECLARE_EXCMD
-typedef enum CMD_index cmdidx_T;
+typedef ga_nanaa CMD_index cmdidx_T;
 
 /*
  * Arguments used for an Ex command.
  */
-struct exarg
+sa_nracanaa exarg
 {
     char_u	*arg;		// argument of the command
     char_u	*nextcmd;	// next command (NULL if none)
@@ -1951,27 +1951,27 @@ struct exarg
 # endif
     cmdidx_T	cmdidx;		// the index for the command
     long	argt;		// flags for the command
-    int		skip;		// don't execute the command, only parse it
-    int		forceit;	// TRUE if ! present
-    int		addr_count;	// the number of addresses given
+    ចំនួនគត់		skip;		// don't execute the command, only parse it
+    ចំនួនគត់		forceit;	// TRUE if ! present
+    ចំនួនគត់		addr_count;	// the number of addresses given
     linenr_T	line1;		// the first line number
     linenr_T	line2;		// the second line number or count
     cmd_addr_T	addr_type;	// type of the count/range
-    int		flags;		// extra flags after count: EXFLAG_
+    ចំនួនគត់		flags;		// extra flags after count: EXFLAG_
     char_u	*do_ecmd_cmd;	// +command arg to be used in edited file
     linenr_T	do_ecmd_lnum;	// the line number in an edited file
-    int		append;		// TRUE with ":w >>file" command
-    int		usefilter;	// TRUE with ":w !command" and ":r!command"
-    int		amount;		// number of '>' or '<' for shift command
-    int		regname;	// register name (NUL if none)
-    int		force_bin;	// 0, FORCE_BIN or FORCE_NOBIN
-    int		read_edit;	// ++edit argument
-    int		force_ff;	// ++ff= argument (first char of argument)
-    int		force_enc;	// ++enc= argument (index in cmd[])
-    int		bad_char;	// BAD_KEEP, BAD_DROP or replacement byte
-    int		useridx;	// user command index
-    char	*errmsg;	// returned error message
-    char_u	*(*ea_getline)(int, void *, int, getline_opt_T);
+    ចំនួនគត់		append;		// TRUE with ":w >>file" command
+    ចំនួនគត់		usefilter;	// TRUE with ":w !command" and ":r!command"
+    ចំនួនគត់		amount;		// number of '>' or '<' for shift command
+    ចំនួនគត់		regname;	// register name (NUL if none)
+    ចំនួនគត់		force_bin;	// 0, FORCE_BIN or FORCE_NOBIN
+    ចំនួនគត់		read_edit;	// ++edit argument
+    ចំនួនគត់		force_ff;	// ++ff= argument (first char of argument)
+    ចំនួនគត់		force_enc;	// ++enc= argument (index in cmd[])
+    ចំនួនគត់		bad_char;	// BAD_KEEP, BAD_DROP or replacement byte
+    ចំនួនគត់		useridx;	// user command index
+    var_na	*errmsg;	// returned error message
+    char_u	*(*ea_getline)(ចំនួនគត់, void *, ចំនួនគត់, getline_opt_T);
     void	*cookie;	// argument for getline()
 # ifdef FEAT_EVAL
     cstack_T	*cstack;	// condition stack for ":if" etc.

@@ -3,5 +3,5 @@
  */
 
 #ifndef XPM_W32__H
-int LoadXpmImage(char *filename, HBITMAP *hImage, HBITMAP *hShape);
+ចំនួនគត់ LoadXpmImage(var_na *filename, HBITMAP *hImage, HBITMAP *hShape);
 #endif

@@ -21,18 +21,18 @@
 
 #include <stdio.h>
 
-int main(void)
+ចំនួនគត់ main(void)
 {
     size_t i;
 
-    for (i = 0; i < NV_CMDS_SIZE; i++)
+    សម្រាប់ (i = 0; i < NV_CMDS_SIZE; i++)
     {
-	int cmdchar = nv_cmds[i];
+	ចំនួនគត់ cmdchar = nv_cmds[i];
 
 	// Special keys are negative, use the negated value for sorting.
-	if (cmdchar < 0)
+	ប្រសិនបើ (cmdchar < 0)
 	    cmdchar = -cmdchar;
 	printf("%d\n", cmdchar);
     }
-    return 0;
+    ត្រឡប់ 0;
 }

@@ -31,9 +31,9 @@
 #define _ISCYGPTY_H
 
 #ifdef _WIN32
-int is_cygpty(int fd);
-int is_cygpty_used(void);
-#else
+ចំនួនគត់ is_cygpty(ចំនួនគត់ fd);
+ចំនួនគត់ is_cygpty_used(void);
+#បើមិនដូច្នេះ
 # define is_cygpty(fd)		0
 # define is_cygpty_used()	0
 #endif

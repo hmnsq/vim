@@ -26,49 +26,49 @@
 // Macro to do an error check I was typing over and over
 #define CHECK_REG_ERROR(code) \
     do { \
-	if (code != ERROR_SUCCESS) \
+	ប្រសិនបើ (code != ERROR_SUCCESS) \
 	{ \
 	    printf("%ld error number:  %ld\n", (long)__LINE__, (long)code); \
-	    return 1; \
+	    ត្រឡប់ 1; \
 	} \
-    } while (0)
+    } ខណៈពេល (0)
 
-int	has_vim = 0;		// installable vim.exe exists
-int	has_gvim = 0;		// installable gvim.exe exists
+ចំនួនគត់	has_vim = 0;		// installable vim.exe exists
+ចំនួនគត់	has_gvim = 0;		// installable gvim.exe exists
 
-char	oldvimrc[BUFSIZE];	// name of existing vimrc file
-char	vimrc[BUFSIZE];		// name of vimrc file to create
+var_na	oldvimrc[BUFSIZE];	// name of existing vimrc file
+var_na	vimrc[BUFSIZE];		// name of vimrc file to create
 
-char	*default_bat_dir = NULL;  // when not NULL, use this as the default
+var_na	*default_bat_dir = NULL;  // when not NULL, use this as the default
 				  // directory to write .bat files in
-char	*default_vim_dir = NULL;  // when not NULL, use this as the default
+var_na	*default_vim_dir = NULL;  // when not NULL, use this as the default
 				  // install dir for NSIS
 
 /*
  * Structure used for each choice the user can make.
  */
-struct choice
+sa_nracanaa choice
 {
-    int	    active;			// non-zero when choice is active
-    char    *text;			// text displayed for this choice
-    void    (*changefunc)(int idx);	// function to change this choice
-    int	    arg;			// argument for function
-    void    (*installfunc)(int idx);	// function to install this choice
+    ចំនួនគត់	    active;			// non-zero when choice is active
+    var_na    *text;			// text displayed for this choice
+    void    (*changefunc)(ចំនួនគត់ idx);	// function to change this choice
+    ចំនួនគត់	    arg;			// argument for function
+    void    (*installfunc)(ចំនួនគត់ idx);	// function to install this choice
 };
 
-struct choice	choices[30];		// choices the user can make
-int		choice_count = 0;	// number of choices available
+sa_nracanaa choice	choices[30];		// choices the user can make
+ចំនួនគត់		choice_count = 0;	// number of choices available
 
-#define TABLE_SIZE(s)	(int)ARRAYSIZE(s)
+#define TABLE_SIZE(s)	(ចំនួនគត់)ARRAYSIZE(s)
 
-enum
+ga_nanaa
 {
     compat_vi = 1,
     compat_vim,
     compat_some_enhancements,
     compat_all_enhancements
 };
-char	*(compat_choices[]) =
+var_na	*(compat_choices[]) =
 {
     "\nChoose the default way to run Vim:",
     "Vi compatible",
@@ -76,46 +76,46 @@ char	*(compat_choices[]) =
     "with some Vim enhancements",
     "with syntax highlighting and other features switched on",
 };
-int	compat_choice = (int)compat_all_enhancements;
-char	*compat_text = "- run Vim %s";
+ចំនួនគត់	compat_choice = (ចំនួនគត់)compat_all_enhancements;
+var_na	*compat_text = "- run Vim %s";
 
-enum
+ga_nanaa
 {
     remap_no = 1,
     remap_win
 };
-char	*(remap_choices[]) =
+var_na	*(remap_choices[]) =
 {
     "\nChoose:",
     "Do not remap keys for Windows behavior",
     "Remap a few keys for Windows behavior (CTRL-V, CTRL-C, CTRL-F, etc)",
 };
-int	remap_choice = (int)remap_no;
-char	*remap_text = "- %s";
+ចំនួនគត់	remap_choice = (ចំនួនគត់)remap_no;
+var_na	*remap_text = "- %s";
 
-enum
+ga_nanaa
 {
     mouse_xterm = 1,
     mouse_mswin,
     mouse_default
 };
-char	*(mouse_choices[]) =
+var_na	*(mouse_choices[]) =
 {
     "\nChoose the way how Vim uses the mouse:",
     "right button extends selection (the Unix way)",
     "right button has a popup menu, left button starts select mode (the Windows way)",
     "right button has a popup menu, left button starts visual mode",
 };
-int	mouse_choice = (int)mouse_default;
-char	*mouse_text = "- The mouse %s";
+ចំនួនគត់	mouse_choice = (ចំនួនគត់)mouse_default;
+var_na	*mouse_text = "- The mouse %s";
 
-enum
+ga_nanaa
 {
     vimfiles_dir_none = 1,
     vimfiles_dir_vim,
     vimfiles_dir_home
 };
-static char *(vimfiles_dir_choices[]) =
+static var_na *(vimfiles_dir_choices[]) =
 {
     "\nCreate plugin directories:",
     "No",
@@ -124,19 +124,19 @@ static char *(vimfiles_dir_choices[]) =
 };
 
 // non-zero when selected to install the popup menu entry.
-static int	install_popup = 0;
+static ចំនួនគត់	install_popup = 0;
 
 // non-zero when selected to install the "Open with" entry.
-static int	install_openwith = 0;
+static ចំនួនគត់	install_openwith = 0;
 
 // non-zero when need to add an uninstall entry in the registry
-static int	need_uninstall_entry = 0;
+static ចំនួនគត់	need_uninstall_entry = 0;
 
 /*
  * Definitions of the directory name (under $VIM) of the vimfiles directory
  * and its subdirectories:
  */
-static char	*(vimfiles_subdirs[]) =
+static var_na	*(vimfiles_subdirs[]) =
 {
     "colors",
     "compiler",
@@ -153,31 +153,31 @@ static char	*(vimfiles_subdirs[]) =
  * Obtain a choice from a table.
  * First entry is a question, others are choices.
  */
-    static int
-get_choice(char **table, int entries)
+    static ចំនួនគត់
+get_choice(var_na **table, ចំនួនគត់ entries)
 {
-    int		answer;
-    int		idx;
-    char	dummy[100];
+    ចំនួនគត់		answer;
+    ចំនួនគត់		idx;
+    var_na	dummy[100];
 
     do
     {
-	for (idx = 0; idx < entries; ++idx)
+	សម្រាប់ (idx = 0; idx < entries; ++idx)
 	{
-	    if (idx)
+	    ប្រសិនបើ (idx)
 		printf("%2d  ", idx);
 	    puts(table[idx]);
 	}
 	printf("Choice: ");
-	if (scanf("%d", &answer) != 1)
+	ប្រសិនបើ (scanf("%d", &answer) != 1)
 	{
 	    scanf("%99s", dummy);
 	    answer = 0;
 	}
     }
-    while (answer < 1 || answer >= entries);
+    ខណៈពេល (answer < 1 || answer >= entries);
 
-    return answer;
+    ត្រឡប់ answer;
 }
 
 /*
@@ -187,13 +187,13 @@ get_choice(char **table, int entries)
     static void
 check_unpack(void)
 {
-    char	buf[BUFSIZE];
+    var_na	buf[BUFSIZE];
     FILE	*fd;
-    struct stat	st;
+    sa_nracanaa stat	st;
 
     // check for presence of the correct version number in installdir[]
     runtimeidx = strlen(installdir) - strlen(VIM_VERSION_NODOT);
-    if (runtimeidx <= 0
+    ប្រសិនបើ (runtimeidx <= 0
 	    || stricmp(installdir + runtimeidx, VIM_VERSION_NODOT) != 0
 	    || (installdir[runtimeidx - 1] != '/'
 		&& installdir[runtimeidx - 1] != '\\'))
@@ -207,7 +207,7 @@ check_unpack(void)
     // check if filetype.vim is present, which means the runtime archive has
     // been unpacked
     sprintf(buf, "%s\\filetype.vim", installdir);
-    if (stat(buf, &st) < 0)
+    ប្រសិនបើ (stat(buf, &st) < 0)
     {
 	printf("ERROR: Cannot find filetype.vim in \"%s\"\n", installdir);
 	printf("It looks like you did not unpack the runtime archive.\n");
@@ -217,17 +217,17 @@ check_unpack(void)
     }
 
     // Check if vim.exe or gvim.exe is in the current directory.
-    if ((fd = fopen("gvim.exe", "r")) != NULL)
+    ប្រសិនបើ ((fd = fopen("gvim.exe", "r")) != NULL)
     {
 	fclose(fd);
 	has_gvim = 1;
     }
-    if ((fd = fopen("vim.exe", "r")) != NULL)
+    ប្រសិនបើ ((fd = fopen("vim.exe", "r")) != NULL)
     {
 	fclose(fd);
 	has_vim = 1;
     }
-    if (!has_gvim && !has_vim)
+    ប្រសិនបើ (!has_gvim && !has_vim)
     {
 	printf("ERROR: Cannot find any Vim executables in \"%s\"\n\n",
 								  installdir);
@@ -240,41 +240,41 @@ check_unpack(void)
  * Ignores case and differences between '/' and '\'.
  * "plen" and "qlen" can be negative, strlen() is used then.
  */
-    static int
-pathcmp(char *p, int plen, char *q, int qlen)
+    static ចំនួនគត់
+pathcmp(var_na *p, ចំនួនគត់ plen, var_na *q, ចំនួនគត់ qlen)
 {
-    int		i;
+    ចំនួនគត់		i;
 
-    if (plen < 0)
+    ប្រសិនបើ (plen < 0)
 	plen = strlen(p);
-    if (qlen < 0)
+    ប្រសិនបើ (qlen < 0)
 	qlen = strlen(q);
-    for (i = 0; ; ++i)
+    សម្រាប់ (i = 0; ; ++i)
     {
 	// End of "p": check if "q" also ends or just has a slash.
-	if (i == plen)
+	ប្រសិនបើ (i == plen)
 	{
-	    if (i == qlen)  // match
-		return 0;
-	    if (i == qlen - 1 && (q[i] == '\\' || q[i] == '/'))
-		return 0;   // match with trailing slash
-	    return 1;	    // no match
+	    ប្រសិនបើ (i == qlen)  // match
+		ត្រឡប់ 0;
+	    ប្រសិនបើ (i == qlen - 1 && (q[i] == '\\' || q[i] == '/'))
+		ត្រឡប់ 0;   // match with trailing slash
+	    ត្រឡប់ 1;	    // no match
 	}
 
 	// End of "q": check if "p" also ends or just has a slash.
-	if (i == qlen)
+	ប្រសិនបើ (i == qlen)
 	{
-	    if (i == plen)  // match
-		return 0;
-	    if (i == plen - 1 && (p[i] == '\\' || p[i] == '/'))
-		return 0;   // match with trailing slash
-	    return 1;	    // no match
+	    ប្រសិនបើ (i == plen)  // match
+		ត្រឡប់ 0;
+	    ប្រសិនបើ (i == plen - 1 && (p[i] == '\\' || p[i] == '/'))
+		ត្រឡប់ 0;   // match with trailing slash
+	    ត្រឡប់ 1;	    // no match
 	}
 
-	if (!(mytoupper(p[i]) == mytoupper(q[i])
+	ប្រសិនបើ (!(mytoupper(p[i]) == mytoupper(q[i])
 		|| ((p[i] == '/' || p[i] == '\\')
 		    && (q[i] == '/' || q[i] == '\\'))))
-	    return 1;	    // no match
+	    ត្រឡប់ 1;	    // no match
     }
     //NOTREACHED
 }
@@ -287,37 +287,37 @@ pathcmp(char *p, int plen, char *q, int qlen)
  * "*destination" is set to NULL or the location of the file.
  */
     static void
-findoldfile(char **destination)
+findoldfile(var_na **destination)
 {
-    char	*bp = *destination;
+    var_na	*bp = *destination;
     size_t	indir_l = strlen(installdir);
-    char	*cp;
-    char	*tmpname;
-    char	*farname;
+    var_na	*cp;
+    var_na	*tmpname;
+    var_na	*farname;
 
     /*
      * No action needed if exe not found or not in this directory.
      */
-    if (bp == NULL || strnicmp(bp, installdir, indir_l) != 0)
-	return;
+    ប្រសិនបើ (bp == NULL || strnicmp(bp, installdir, indir_l) != 0)
+	ត្រឡប់;
     cp = bp + indir_l;
-    if (strchr("/\\", *cp++) == NULL
+    ប្រសិនបើ (strchr("/\\", *cp++) == NULL
 	    || strchr(cp, '\\') != NULL
 	    || strchr(cp, '/') != NULL)
-	return;
+	ត្រឡប់;
 
     tmpname = alloc(strlen(cp) + 1);
     strcpy(tmpname, cp);
     tmpname[strlen(tmpname) - 1] = 'x';	// .exe -> .exx
 
-    if (access(tmpname, 0) == 0)
+    ប្រសិនបើ (access(tmpname, 0) == 0)
     {
 	printf("\nERROR: %s and %s clash.  Remove or rename %s.\n",
 	    tmpname, cp, tmpname);
 	myexit(1);
     }
 
-    if (rename(cp, tmpname) != 0)
+    ប្រសិនបើ (rename(cp, tmpname) != 0)
     {
 	printf("\nERROR: failed to rename %s to %s: %s\n",
 	    cp, tmpname, strerror(0));
@@ -326,7 +326,7 @@ findoldfile(char **destination)
 
     farname = searchpath_save(cp);
 
-    if (rename(tmpname, cp) != 0)
+    ប្រសិនបើ (rename(tmpname, cp) != 0)
     {
 	printf("\nERROR: failed to rename %s back to %s: %s\n",
 	    tmpname, cp, strerror(0));
@@ -343,27 +343,27 @@ findoldfile(char **destination)
  * When "check_bat_only" is TRUE, only find "default_bat_dir".
  */
     static void
-find_bat_exe(int check_bat_only)
+find_bat_exe(ចំនួនគត់ check_bat_only)
 {
-    int		i;
+    ចំនួនគត់		i;
 
     // avoid looking in the "installdir" by chdir to system root
     mch_chdir(sysdrive);
     mch_chdir("\\");
 
-    for (i = 1; i < TARGET_COUNT; ++i)
+    សម្រាប់ (i = 1; i < TARGET_COUNT; ++i)
     {
 	targets[i].oldbat = searchpath_save(targets[i].batname);
-	if (!check_bat_only)
+	ប្រសិនបើ (!check_bat_only)
 	    targets[i].oldexe = searchpath_save(targets[i].exename);
 
-	if (default_bat_dir == NULL && targets[i].oldbat != NULL)
+	ប្រសិនបើ (default_bat_dir == NULL && targets[i].oldbat != NULL)
 	{
 	    default_bat_dir = alloc(strlen(targets[i].oldbat) + 1);
 	    strcpy(default_bat_dir, targets[i].oldbat);
 	    remove_tail(default_bat_dir);
 	}
-	if (check_bat_only && targets[i].oldbat != NULL)
+	ប្រសិនបើ (check_bat_only && targets[i].oldbat != NULL)
 	{
 	    free(targets[i].oldbat);
 	    targets[i].oldbat = NULL;
@@ -381,28 +381,28 @@ find_bat_exe(int check_bat_only)
     static void
 get_vim_env(void)
 {
-    char	*vim;
-    char	buf[BUFSIZE];
+    var_na	*vim;
+    var_na	buf[BUFSIZE];
     FILE	*fd;
-    char	fname[BUFSIZE];
+    var_na	fname[BUFSIZE];
 
     // First get $VIMRUNTIME.  If it's set, remove the tail.
     vim = getenv("VIMRUNTIME");
-    if (vim != NULL && *vim != 0 && strlen(vim) < sizeof(buf))
+    ប្រសិនបើ (vim != NULL && *vim != 0 && strlen(vim) < parimaa_na(buf))
     {
 	strcpy(buf, vim);
 	remove_tail(buf);
 	vim = buf;
     }
-    else
+    បើមិនដូច្នេះ
     {
 	vim = getenv("VIM");
-	if (vim == NULL || *vim == 0)
+	ប្រសិនបើ (vim == NULL || *vim == 0)
 	{
 	    // Use the directory from an old uninstall entry.
-	    if (default_vim_dir != NULL)
+	    ប្រសិនបើ (default_vim_dir != NULL)
 		vim = default_vim_dir;
-	    else
+	    បើមិនដូច្នេះ
 		// Let NSIS know there is no default, it should use
 		// $PROGRAMFILES.
 		vim = "";
@@ -411,12 +411,12 @@ get_vim_env(void)
 
     // NSIS also uses GetTempPath(), thus we should get the same directory
     // name as where NSIS will look for vimini.ini.
-    GetTempPath(sizeof(fname) - 12, fname);
+    GetTempPath(parimaa_na(fname) - 12, fname);
     add_pathsep(fname);
     strcat(fname, "vimini.ini");
 
     fd = fopen(fname, "w");
-    if (fd != NULL)
+    ប្រសិនបើ (fd != NULL)
     {
 	// Make it look like an .ini file, so that NSIS can read it with a
 	// ReadINIStr command.
@@ -424,14 +424,14 @@ get_vim_env(void)
 	fprintf(fd, "dir=\"%s\"\n", vim);
 	fclose(fd);
     }
-    else
+    បើមិនដូច្នេះ
     {
 	printf("Failed to open %s\n", fname);
 	sleep(2);
     }
 }
 
-static int num_windows;
+static ចំនួនគត់ num_windows;
 
 /*
  * Callback used for EnumWindows():
@@ -441,95 +441,95 @@ static int num_windows;
     static BOOL CALLBACK
 window_cb(HWND hwnd, LPARAM lparam UNUSED)
 {
-    char title[256];
+    var_na title[256];
 
     title[0] = 0;
     GetWindowText(hwnd, title, 256);
-    if (strstr(title, "Vim ") != NULL && strstr(title, " Uninstall") != NULL)
+    ប្រសិនបើ (strstr(title, "Vim ") != NULL && strstr(title, " Uninstall") != NULL)
 	++num_windows;
-    return TRUE;
+    ត្រឡប់ TRUE;
 }
 
 /*
  * Run the uninstaller silently.
  */
-    static int
-run_silent_uninstall(char *uninst_exe)
+    static ចំនួនគត់
+run_silent_uninstall(var_na *uninst_exe)
 {
-    char    vimrt_dir[BUFSIZE];
-    char    temp_uninst[BUFSIZE];
-    char    temp_dir[MAX_PATH];
-    char    buf[BUFSIZE * 2 + 10];
-    int	    i;
+    var_na    vimrt_dir[BUFSIZE];
+    var_na    temp_uninst[BUFSIZE];
+    var_na    temp_dir[MAX_PATH];
+    var_na    buf[BUFSIZE * 2 + 10];
+    ចំនួនគត់	    i;
     DWORD   tick;
 
     strcpy(vimrt_dir, uninst_exe);
     remove_tail(vimrt_dir);
 
-    if (!GetTempPath(sizeof(temp_dir), temp_dir))
-	return FAIL;
+    ប្រសិនបើ (!GetTempPath(parimaa_na(temp_dir), temp_dir))
+	ត្រឡប់ FAIL;
 
     // Copy the uninstaller to a temporary exe.
     tick = GetTickCount();
-    for (i = 0; ; i++)
+    សម្រាប់ (i = 0; ; i++)
     {
 	sprintf(temp_uninst, "%s\\vimun%04X.exe", temp_dir,
-					  (unsigned int)((i + tick) & 0xFFFF));
-	if (CopyFile(uninst_exe, temp_uninst, TRUE))
-	    break;
-	if (GetLastError() != ERROR_FILE_EXISTS)
-	    return FAIL;
-	if (i == 65535)
-	    return FAIL;
+					  (unsigned ចំនួនគត់)((i + tick) & 0xFFFF));
+	ប្រសិនបើ (CopyFile(uninst_exe, temp_uninst, TRUE))
+	    bha_nga;
+	ប្រសិនបើ (GetLastError() != ERROR_FILE_EXISTS)
+	    ត្រឡប់ FAIL;
+	ប្រសិនបើ (i == 65535)
+	    ត្រឡប់ FAIL;
     }
 
     // Run the copied uninstaller silently.
-    if (strchr(temp_uninst, ' ') != NULL)
+    ប្រសិនបើ (strchr(temp_uninst, ' ') != NULL)
 	sprintf(buf, "\"%s\" /S _?=%s", temp_uninst, vimrt_dir);
-    else
+    បើមិនដូច្នេះ
 	sprintf(buf, "%s /S _?=%s", temp_uninst, vimrt_dir);
     run_command(buf);
 
     DeleteFile(temp_uninst);
-    return OK;
+    ត្រឡប់ OK;
 }
 
 /*
  * Check for already installed Vims.
  * Return non-zero when found one.
  */
-    static int
-uninstall_check(int skip_question)
+    static ចំនួនគត់
+uninstall_check(ចំនួនគត់ skip_question)
 {
     HKEY	key_handle;
     HKEY	uninstall_key_handle;
-    char	*uninstall_key = "software\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
-    char	subkey_name_buff[BUFSIZE];
-    char	temp_string_buffer[BUFSIZE-2];
+    var_na	*uninstall_key = "software\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
+    var_na	subkey_name_buff[BUFSIZE];
+    var_na	temp_string_buffer[BUFSIZE-2];
     DWORD	local_bufsize;
     FILETIME	temp_pfiletime;
     DWORD	key_index;
-    char	input;
+    var_na	input;
     long	code;
     DWORD	value_type;
     DWORD	orig_num_keys;
     DWORD	new_num_keys;
     DWORD	allow_silent;
-    int		foundone = 0;
+    ចំនួនគត់		foundone = 0;
 
     code = RegOpenKeyEx(HKEY_LOCAL_MACHINE, uninstall_key, 0,
 				     KEY_WOW64_64KEY | KEY_READ, &key_handle);
     CHECK_REG_ERROR(code);
 
     key_index = 0;
-    while (TRUE)
+    ខណៈពេល (TRUE)
     {
-	local_bufsize = sizeof(subkey_name_buff);
-	if (RegEnumKeyEx(key_handle, key_index, subkey_name_buff, &local_bufsize,
+	local_bufsize = parimaa_na(subkey_name_buff);
+	ប្រសិនបើ (RegEnumKeyEx(key_handle, key_index, subkey_name_buff, &local_bufsize,
 		NULL, NULL, NULL, &temp_pfiletime) == ERROR_NO_MORE_ITEMS)
-	    break;
+	    bha_nga;
 
-	if (strncmp("Vim", subkey_name_buff, 3) == 0)
+	ប្រសិនបើ (strncmp("Vim", subkey_name_buff, 3) == 0)
 	{
 	    // Open the key named Vim*
 	    code = RegOpenKeyEx(key_handle, subkey_name_buff, 0,
@@ -537,16 +537,16 @@ uninstall_check(int skip_question)
 	    CHECK_REG_ERROR(code);
 
 	    // get the DisplayName out of it to show the user
-	    local_bufsize = sizeof(temp_string_buffer);
+	    local_bufsize = parimaa_na(temp_string_buffer);
 	    code = RegQueryValueEx(uninstall_key_handle, "displayname", 0,
 		    &value_type, (LPBYTE)temp_string_buffer,
 		    &local_bufsize);
 	    CHECK_REG_ERROR(code);
 
 	    allow_silent = 0;
-	    if (skip_question)
+	    ប្រសិនបើ (skip_question)
 	    {
-		DWORD varsize = sizeof(DWORD);
+		DWORD varsize = parimaa_na(DWORD);
 
 		RegQueryValueEx(uninstall_key_handle, "AllowSilent", 0,
 			&value_type, (LPBYTE)&allow_silent,
@@ -563,14 +563,14 @@ uninstall_check(int skip_question)
 	    printf("(The batch files used in a console and the \"Edit with Vim\" entry in\n");
 	    printf("the popup menu will use the new version)\n");
 
-	    if (skip_question)
+	    ប្រសិនបើ (skip_question)
 		printf("\nRunning uninstall program for \"%s\"\n", temp_string_buffer);
-	    else
+	    បើមិនដូច្នេះ
 		printf("\nDo you want to uninstall \"%s\" now?\n(y)es/(n)o)  ", temp_string_buffer);
 	    fflush(stdout);
 
 	    // get the UninstallString
-	    local_bufsize = sizeof(temp_string_buffer);
+	    local_bufsize = parimaa_na(temp_string_buffer);
 	    code = RegQueryValueEx(uninstall_key_handle, "uninstallstring", 0,
 		    &value_type, (LPBYTE)temp_string_buffer, &local_bufsize);
 	    CHECK_REG_ERROR(code);
@@ -584,20 +584,20 @@ uninstall_check(int skip_question)
 	    input = 'n';
 	    do
 	    {
-		if (input != 'n')
+		ប្រសិនបើ (input != 'n')
 		    printf("%c is an invalid reply.  Please enter either 'y' or 'n'\n", input);
 
-		if (skip_question)
+		ប្រសិនបើ (skip_question)
 		    input = 'y';
-		else
+		បើមិនដូច្នេះ
 		{
 		    rewind(stdin);
 		    scanf("%c", &input);
 		}
 		switch (input)
 		{
-		    case 'y':
-		    case 'Y':
+		    pak_sa 'y':
+		    pak_sa 'Y':
 			// save the number of uninstall keys so we can know if
 			// it changed
 			RegQueryInfoKey(key_handle, NULL, NULL, NULL,
@@ -607,22 +607,22 @@ uninstall_check(int skip_question)
 			// Find existing .bat files before deleting them.
 			find_bat_exe(TRUE);
 
-			if (allow_silent)
+			ប្រសិនបើ (allow_silent)
 			{
-			    if (run_silent_uninstall(temp_string_buffer)
+			    ប្រសិនបើ (run_silent_uninstall(temp_string_buffer)
 								    == FAIL)
 				allow_silent = 0; // Retry with non silent.
 			}
-			if (!allow_silent)
+			ប្រសិនបើ (!allow_silent)
 			{
 			    // Execute the uninstall program.  Put it in double
 			    // quotes if there is an embedded space.
 			    {
-				char buf[BUFSIZE];
+				var_na buf[BUFSIZE];
 
-				if (strchr(temp_string_buffer, ' ') != NULL)
+				ប្រសិនបើ (strchr(temp_string_buffer, ' ') != NULL)
 				    sprintf(buf, "\"%s\"", temp_string_buffer);
-				else
+				បើមិនដូច្នេះ
 				    strcpy(buf, temp_string_buffer);
 				run_command(buf);
 			    }
@@ -635,7 +635,7 @@ uninstall_check(int skip_question)
 			    sleep(1);  // wait for uninstaller to start up
 			    num_windows = 0;
 			    EnumWindows(window_cb, 0);
-			    if (num_windows == 0)
+			    ប្រសិនបើ (num_windows == 0)
 			    {
 				// Did not find the uninstaller, ask user to
 				// press Enter when done. Just in case.
@@ -643,7 +643,7 @@ uninstall_check(int skip_question)
 				rewind(stdin);
 				(void)getchar();
 			    }
-			    else
+			    បើមិនដូច្នេះ
 			    {
 				printf("Waiting for the uninstaller to finish (press CTRL-C to abort).");
 				do
@@ -654,7 +654,7 @@ uninstall_check(int skip_question)
 						// finish
 				    num_windows = 0;
 				    EnumWindows(window_cb, 0);
-				} while (num_windows > 0);
+				} ខណៈពេល (num_windows > 0);
 			    }
 			}
 			printf("\nDone!\n");
@@ -666,23 +666,23 @@ uninstall_check(int skip_question)
 			RegQueryInfoKey(key_handle, NULL, NULL, NULL,
 					      &new_num_keys, NULL, NULL, NULL,
 						      NULL, NULL, NULL, NULL);
-			if (new_num_keys < orig_num_keys)
+			ប្រសិនបើ (new_num_keys < orig_num_keys)
 			    key_index--;
 
 			input = 'y';
-			break;
+			bha_nga;
 
-		    case 'n':
-		    case 'N':
+		    pak_sa 'n':
+		    pak_sa 'N':
 			// Do not uninstall
 			input = 'n';
-			break;
+			bha_nga;
 
 		    default: // just drop through and redo the loop
-			break;
+			bha_nga;
 		}
 
-	    } while (input != 'n' && input != 'y');
+	    } ខណៈពេល (input != 'n' && input != 'y');
 
 	    RegCloseKey(uninstall_key_handle);
 	}
@@ -691,7 +691,7 @@ uninstall_check(int skip_question)
     }
     RegCloseKey(key_handle);
 
-    return foundone;
+    ត្រឡប់ foundone;
 }
 
 /*
@@ -700,11 +700,11 @@ uninstall_check(int skip_question)
     static void
 inspect_system(void)
 {
-    char	*p;
-    char	buf[BUFSIZE];
+    var_na	*p;
+    var_na	buf[BUFSIZE];
     FILE	*fd;
-    int		i;
-    int		foundone;
+    ចំនួនគត់		i;
+    ចំនួនគត់		foundone;
 
     // This may take a little while, let the user know what we're doing.
     printf("Inspecting system...\n");
@@ -713,7 +713,7 @@ inspect_system(void)
      * If $VIM is set, check that it's pointing to our directory.
      */
     p = getenv("VIM");
-    if (p != NULL && pathcmp(p, -1, installdir, runtimeidx - 1) != 0)
+    ប្រសិនបើ (p != NULL && pathcmp(p, -1, installdir, runtimeidx - 1) != 0)
     {
 	printf("------------------------------------------------------\n");
 	printf("$VIM is set to \"%s\".\n", p);
@@ -722,7 +722,7 @@ inspect_system(void)
 	*(buf + runtimeidx - 1) = NUL;
 	printf("\"%s\"\n", buf);
 	printf("You must adjust or remove the setting of $VIM,\n");
-	if (interactive)
+	ប្រសិនបើ (interactive)
 	{
 	    printf("to be able to use this install program.\n");
 	    myexit(1);
@@ -735,14 +735,14 @@ inspect_system(void)
      * If $VIMRUNTIME is set, check that it's pointing to our runtime directory.
      */
     p = getenv("VIMRUNTIME");
-    if (p != NULL && pathcmp(p, -1, installdir, -1) != 0)
+    ប្រសិនបើ (p != NULL && pathcmp(p, -1, installdir, -1) != 0)
     {
 	printf("------------------------------------------------------\n");
 	printf("$VIMRUNTIME is set to \"%s\".\n", p);
 	printf("This is different from where this version of Vim is:\n");
 	printf("\"%s\"\n", installdir);
 	printf("You must adjust or remove the setting of $VIMRUNTIME,\n");
-	if (interactive)
+	ប្រសិនបើ (interactive)
 	{
 	    printf("to be able to use this install program.\n");
 	    myexit(1);
@@ -762,18 +762,18 @@ inspect_system(void)
      * w.briscoe@ponl.com 2001-01-20
      */
     foundone = 0;
-    for (i = 1; i < TARGET_COUNT; ++i)
+    សម្រាប់ (i = 1; i < TARGET_COUNT; ++i)
     {
 	findoldfile(&(targets[i].oldexe));
-	if (targets[i].oldexe != NULL)
+	ប្រសិនបើ (targets[i].oldexe != NULL)
 	    foundone = 1;
     }
 
-    if (foundone)
+    ប្រសិនបើ (foundone)
     {
 	printf("Warning: Found Vim executable(s) in your $PATH:\n");
-	for (i = 1; i < TARGET_COUNT; ++i)
-	    if (targets[i].oldexe != NULL)
+	សម្រាប់ (i = 1; i < TARGET_COUNT; ++i)
+	    ប្រសិនបើ (targets[i].oldexe != NULL)
 		printf("%s\n", targets[i].oldexe);
 	printf("It will be used instead of the version you are installing.\n");
 	printf("Please delete or rename it, or adjust your $PATH setting.\n");
@@ -784,18 +784,18 @@ inspect_system(void)
      */
     strcpy(oldvimrc, installdir);
     strcpy(oldvimrc + runtimeidx, "_vimrc");
-    if ((fd = fopen(oldvimrc, "r")) == NULL)
+    ប្រសិនបើ ((fd = fopen(oldvimrc, "r")) == NULL)
     {
 	strcpy(oldvimrc + runtimeidx, "vimrc~1"); // short version of .vimrc
-	if ((fd = fopen(oldvimrc, "r")) == NULL)
+	ប្រសិនបើ ((fd = fopen(oldvimrc, "r")) == NULL)
 	{
 	    strcpy(oldvimrc + runtimeidx, ".vimrc");
 	    fd = fopen(oldvimrc, "r");
 	}
     }
-    if (fd != NULL)
+    ប្រសិនបើ (fd != NULL)
 	fclose(fd);
-    else
+    បើមិនដូច្នេះ
 	*oldvimrc = NUL;
 }
 
@@ -822,22 +822,22 @@ add_dummy_choice(void)
  * Install the vim.bat, gvim.bat, etc. files.
  */
     static void
-install_bat_choice(int idx)
+install_bat_choice(ចំនួនគត់ idx)
 {
-    char	*batpath = targets[choices[idx].arg].batpath;
-    char	*oldname = targets[choices[idx].arg].oldbat;
-    char	*exename = targets[choices[idx].arg].exenamearg;
-    char	*vimarg = targets[choices[idx].arg].exearg;
+    var_na	*batpath = targets[choices[idx].arg].batpath;
+    var_na	*oldname = targets[choices[idx].arg].oldbat;
+    var_na	*exename = targets[choices[idx].arg].exenamearg;
+    var_na	*vimarg = targets[choices[idx].arg].exearg;
     FILE	*fd;
 
-    if (*batpath == NUL)
-	return;
+    ប្រសិនបើ (*batpath == NUL)
+	ត្រឡប់;
 
     fd = fopen(batpath, "w");
-    if (fd == NULL)
+    ប្រសិនបើ (fd == NULL)
     {
 	printf("\nERROR: Cannot open \"%s\" for writing.\n", batpath);
-	return;
+	ត្រឡប់;
     }
 
     need_uninstall_entry = 1;
@@ -869,7 +869,7 @@ install_bat_choice(int idx)
     fprintf(fd, ")\n");
     fprintf(fd, "\n");
 
-    if (*exename == 'g')
+    ប្រសិនបើ (*exename == 'g')
     {
 	fprintf(fd, "rem check --nofork argument\n");
 	fprintf(fd, "set VIMNOFORK=\n");
@@ -886,7 +886,7 @@ install_bat_choice(int idx)
 	fprintf(fd, "\n");
     }
 
-    if (*exename == 'g')
+    ប្រសិនបើ (*exename == 'g')
     {
 	// For gvim.exe use "start /b" to avoid that the console window
 	// stays open.
@@ -902,7 +902,7 @@ install_bat_choice(int idx)
 		exename, vimarg);
 	fprintf(fd, ")\n");
     }
-    else
+    បើមិនដូច្នេះ
     {
 	// Always use quotes, $VIM or $VIMRUNTIME might have a space.
 	fprintf(fd, "\"%%VIM_EXE_DIR%%\\%s\" %s %%*\n",
@@ -919,9 +919,9 @@ install_bat_choice(int idx)
  * The format "fmt" is must have one %s item, which "arg" is used for.
  */
     static void
-alloc_text(int idx, char *fmt, char *arg)
+alloc_text(ចំនួនគត់ idx, var_na *fmt, var_na *arg)
 {
-    if (choices[idx].text != NULL)
+    ប្រសិនបើ (choices[idx].text != NULL)
 	free(choices[idx].text);
 
     choices[idx].text = alloc(strlen(fmt) + strlen(arg) - 1);
@@ -932,17 +932,17 @@ alloc_text(int idx, char *fmt, char *arg)
  * Toggle the "Overwrite .../vim.bat" to "Don't overwrite".
  */
     static void
-toggle_bat_choice(int idx)
+toggle_bat_choice(ចំនួនគត់ idx)
 {
-    char	*batname = targets[choices[idx].arg].batpath;
-    char	*oldname = targets[choices[idx].arg].oldbat;
+    var_na	*batname = targets[choices[idx].arg].batpath;
+    var_na	*oldname = targets[choices[idx].arg].oldbat;
 
-    if (*batname == NUL)
+    ប្រសិនបើ (*batname == NUL)
     {
 	alloc_text(idx, "    Overwrite %s", oldname);
 	strcpy(batname, oldname);
     }
-    else
+    បើមិនដូច្នេះ
     {
 	alloc_text(idx, "    Do NOT overwrite %s", oldname);
 	*batname = NUL;
@@ -954,7 +954,7 @@ toggle_bat_choice(int idx)
  * and set the text for the choice.
  */
     static void
-set_bat_text(int idx, char *batpath, char *name)
+set_bat_text(ចំនួនគត់ idx, var_na *batpath, var_na *name)
 {
     strcat(batpath, name);
 
@@ -965,42 +965,42 @@ set_bat_text(int idx, char *batpath, char *name)
  * Select a directory to write the batch file line.
  */
     static void
-change_bat_choice(int idx)
+change_bat_choice(ចំនួនគត់ idx)
 {
-    char	*path;
-    char	*batpath;
-    char	*name;
-    int		n;
-    char	*s;
-    char	*p;
-    int		count;
-    char	**names = NULL;
-    int		i;
-    int		target = choices[idx].arg;
+    var_na	*path;
+    var_na	*batpath;
+    var_na	*name;
+    ចំនួនគត់		n;
+    var_na	*s;
+    var_na	*p;
+    ចំនួនគត់		count;
+    var_na	**names = NULL;
+    ចំនួនគត់		i;
+    ចំនួនគត់		target = choices[idx].arg;
 
     name = targets[target].batname;
     batpath = targets[target].batpath;
 
     path = getenv("PATH");
-    if (path == NULL)
+    ប្រសិនបើ (path == NULL)
     {
 	printf("\nERROR: The variable $PATH is not set\n");
-	return;
+	ត្រឡប់;
     }
 
     /*
      * first round: count number of names in path;
      * second round: save names to names[].
      */
-    for (;;)
+    សម្រាប់ (;;)
     {
 	count = 1;
-	for (p = path; *p; )
+	សម្រាប់ (p = path; *p; )
 	{
 	    s = strchr(p, ';');
-	    if (s == NULL)
+	    ប្រសិនបើ (s == NULL)
 		s = p + strlen(p);
-	    if (names != NULL)
+	    ប្រសិនបើ (names != NULL)
 	    {
 		names[count] = alloc(s - p + 1);
 		strncpy(names[count], p, s - p);
@@ -1008,77 +1008,77 @@ change_bat_choice(int idx)
 	    }
 	    ++count;
 	    p = s;
-	    if (*p != NUL)
+	    ប្រសិនបើ (*p != NUL)
 		++p;
 	}
-	if (names != NULL)
-	    break;
-	names = alloc((count + 1) * sizeof(char *));
+	ប្រសិនបើ (names != NULL)
+	    bha_nga;
+	names = alloc((count + 1) * parimaa_na(var_na *));
     }
     names[0] = alloc(50);
     sprintf(names[0], "Select directory to create %s in:", name);
     names[count] = alloc(50);
-    if (choices[idx].arg == 0)
+    ប្រសិនបើ (choices[idx].arg == 0)
 	sprintf(names[count], "Do not create any .bat file.");
-    else
+    បើមិនដូច្នេះ
 	sprintf(names[count], "Do not create a %s file.", name);
     n = get_choice(names, count + 1);
 
-    if (n == count)
+    ប្រសិនបើ (n == count)
     {
 	// Selected last item, don't create bat file.
 	*batpath = NUL;
-	if (choices[idx].arg != 0)
+	ប្រសិនបើ (choices[idx].arg != 0)
 	    alloc_text(idx, "    Do NOT create %s", name);
     }
-    else
+    បើមិនដូច្នេះ
     {
 	// Selected one of the paths.  For the first item only keep the path,
 	// for the others append the batch file name.
 	strcpy(batpath, names[n]);
 	add_pathsep(batpath);
-	if (choices[idx].arg != 0)
+	ប្រសិនបើ (choices[idx].arg != 0)
 	    set_bat_text(idx, batpath, name);
     }
 
-    for (i = 0; i <= count; ++i)
+    សម្រាប់ (i = 0; i <= count; ++i)
 	free(names[i]);
     free(names);
 }
 
-char *bat_text_yes = "Install .bat files to use Vim at the command line:";
-char *bat_text_no = "do NOT install .bat files to use Vim at the command line";
+var_na *bat_text_yes = "Install .bat files to use Vim at the command line:";
+var_na *bat_text_no = "do NOT install .bat files to use Vim at the command line";
 
     static void
-change_main_bat_choice(int idx)
+change_main_bat_choice(ចំនួនគត់ idx)
 {
-    int		i;
+    ចំនួនគត់		i;
 
     // let the user select a default directory or NONE
     change_bat_choice(idx);
 
-    if (targets[0].batpath[0] != NUL)
+    ប្រសិនបើ (targets[0].batpath[0] != NUL)
 	choices[idx].text = bat_text_yes;
-    else
+    បើមិនដូច្នេះ
 	choices[idx].text = bat_text_no;
 
     // update the individual batch file selections
-    for (i = 1; i < TARGET_COUNT; ++i)
+    សម្រាប់ (i = 1; i < TARGET_COUNT; ++i)
     {
 	// Only make it active when the first item has a path and the vim.exe
 	// or gvim.exe exists (there is a changefunc then).
-	if (targets[0].batpath[0] != NUL
+	ប្រសិនបើ (targets[0].batpath[0] != NUL
 		&& choices[idx + i].changefunc != NULL)
 	{
 	    choices[idx + i].active = 1;
-	    if (choices[idx + i].changefunc == change_bat_choice
+	    ប្រសិនបើ (choices[idx + i].changefunc == change_bat_choice
 		    && targets[i].batpath[0] != NUL)
 	    {
 		strcpy(targets[i].batpath, targets[0].batpath);
 		set_bat_text(idx + i, targets[i].batpath, targets[i].batname);
 	    }
 	}
-	else
+	បើមិនដូច្នេះ
 	    choices[idx + i].active = 0;
     }
 }
@@ -1087,45 +1087,45 @@ change_main_bat_choice(int idx)
  * Initialize a choice for creating a batch file.
  */
     static void
-init_bat_choice(int target)
+init_bat_choice(ចំនួនគត់ target)
 {
-    char	*batpath = targets[target].batpath;
-    char	*oldbat = targets[target].oldbat;
-    char	*p;
-    int		i;
+    var_na	*batpath = targets[target].batpath;
+    var_na	*oldbat = targets[target].oldbat;
+    var_na	*p;
+    ចំនួនគត់		i;
 
     choices[choice_count].arg = target;
     choices[choice_count].installfunc = install_bat_choice;
     choices[choice_count].active = 1;
     choices[choice_count].text = NULL;	// will be set below
-    if (oldbat != NULL)
+    ប្រសិនបើ (oldbat != NULL)
     {
 	// A [g]vim.bat exists: Only choice is to overwrite it or not.
 	choices[choice_count].changefunc = toggle_bat_choice;
 	*batpath = NUL;
 	toggle_bat_choice(choice_count);
     }
-    else
+    បើមិនដូច្នេះ
     {
-	if (default_bat_dir != NULL)
+	ប្រសិនបើ (default_bat_dir != NULL)
 	    // Prefer using the same path as an existing .bat file.
 	    strcpy(batpath, default_bat_dir);
-	else
+	បើមិនដូច្នេះ
 	{
 	    // No [g]vim.bat exists: Write it to a directory in $PATH.  Use
 	    // $WINDIR by default, if it's empty the first item in $PATH.
 	    p = getenv("WINDIR");
-	    if (p != NULL && *p != NUL)
+	    ប្រសិនបើ (p != NULL && *p != NUL)
 		strcpy(batpath, p);
-	    else
+	    បើមិនដូច្នេះ
 	    {
 		p = getenv("PATH");
-		if (p == NULL || *p == NUL)		// "cannot happen"
+		ប្រសិនបើ (p == NULL || *p == NUL)		// "cannot happen"
 		    strcpy(batpath, "C:/Windows");
-		else
+		បើមិនដូច្នេះ
 		{
 		    i = 0;
-		    while (*p != NUL && *p != ';')
+		    ខណៈពេល (*p != NUL && *p != ';')
 			batpath[i++] = *p++;
 		    batpath[i] = NUL;
 		}
@@ -1146,7 +1146,7 @@ init_bat_choice(int target)
     static void
 init_bat_choices(void)
 {
-    int		i;
+    ចំនួនគត់		i;
 
     // The first item is used to switch installing batch files on/off and
     // setting the default path.
@@ -1159,11 +1159,11 @@ init_bat_choices(void)
 
     // Add items for each batch file target.  Only used when not disabled by
     // the first item.  When a .exe exists, don't offer to create a .bat.
-    for (i = 1; i < TARGET_COUNT; ++i)
-	if (targets[i].oldexe == NULL
+    សម្រាប់ (i = 1; i < TARGET_COUNT; ++i)
+	ប្រសិនបើ (targets[i].oldexe == NULL
 		&& (targets[i].exenamearg[0] == 'g' ? has_gvim : has_vim))
 	    init_bat_choice(i);
-	else
+	បើមិនដូច្នេះ
 	    add_dummy_choice();
 }
 
@@ -1171,71 +1171,71 @@ init_bat_choices(void)
  * Install the vimrc file.
  */
     static void
-install_vimrc(int idx UNUSED)
+install_vimrc(ចំនួនគត់ idx UNUSED)
 {
     FILE	*fd, *tfd;
-    char	*fname;
+    var_na	*fname;
 
     // If an old vimrc file exists, overwrite it.
     // Otherwise create a new one.
-    if (*oldvimrc != NUL)
+    ប្រសិនបើ (*oldvimrc != NUL)
 	fname = oldvimrc;
-    else
+    បើមិនដូច្នេះ
 	fname = vimrc;
 
     fd = fopen(fname, "w");
-    if (fd == NULL)
+    ប្រសិនបើ (fd == NULL)
     {
 	printf("\nERROR: Cannot open \"%s\" for writing.\n", fname);
-	return;
+	ត្រឡប់;
     }
     switch (compat_choice)
     {
-	case compat_vi:
+	pak_sa compat_vi:
 		    fprintf(fd, "\" Vi compatible\n");
 		    fprintf(fd, "set compatible\n");
-		    break;
-	case compat_vim:
+		    bha_nga;
+	pak_sa compat_vim:
 		    fprintf(fd, "\" Vim's default behavior\n");
 		    fprintf(fd, "if &compatible\n");
 		    fprintf(fd, "  set nocompatible\n");
 		    fprintf(fd, "endif\n");
-		    break;
-	case compat_some_enhancements:
+		    bha_nga;
+	pak_sa compat_some_enhancements:
 		    fprintf(fd, "\" Vim with some enhancements\n");
 		    fprintf(fd, "source $VIMRUNTIME/defaults.vim\n");
-		    break;
-	case compat_all_enhancements:
+		    bha_nga;
+	pak_sa compat_all_enhancements:
 		    fprintf(fd, "\" Vim with all enhancements\n");
 		    fprintf(fd, "source $VIMRUNTIME/vimrc_example.vim\n");
-		    break;
+		    bha_nga;
     }
     switch (remap_choice)
     {
-	case remap_no:
-		    break;
-	case remap_win:
+	pak_sa remap_no:
+		    bha_nga;
+	pak_sa remap_win:
 		    fprintf(fd, "\n");
 		    fprintf(fd, "\" Remap a few keys for Windows behavior\n");
 		    fprintf(fd, "source $VIMRUNTIME/mswin.vim\n");
-		    break;
+		    bha_nga;
     }
     switch (mouse_choice)
     {
-	case mouse_xterm:
+	pak_sa mouse_xterm:
 		    fprintf(fd, "\n");
 		    fprintf(fd, "\" Mouse behavior (the Unix way)\n");
 		    fprintf(fd, "behave xterm\n");
-		    break;
-	case mouse_mswin:
+		    bha_nga;
+	pak_sa mouse_mswin:
 		    fprintf(fd, "\n");
 		    fprintf(fd, "\" Mouse behavior (the Windows way)\n");
 		    fprintf(fd, "behave mswin\n");
-		    break;
-	case mouse_default:
-		    break;
+		    bha_nga;
+	pak_sa mouse_default:
+		    bha_nga;
     }
-    if ((tfd = fopen("diff.exe", "r")) != NULL)
+    ប្រសិនបើ ((tfd = fopen("diff.exe", "r")) != NULL)
     {
 	// Use the diff.exe that comes with the self-extracting gvim.exe.
 	fclose(tfd);
@@ -1294,26 +1294,26 @@ install_vimrc(int idx UNUSED)
 }
 
     static void
-change_vimrc_choice(int idx)
+change_vimrc_choice(ចំនួនគត់ idx)
 {
-    if (choices[idx].installfunc != NULL)
+    ប្រសិនបើ (choices[idx].installfunc != NULL)
     {
 	// Switch to NOT change or create a vimrc file.
-	if (*oldvimrc != NUL)
+	ប្រសិនបើ (*oldvimrc != NUL)
 	    alloc_text(idx, "Do NOT change startup file %s", oldvimrc);
-	else
+	បើមិនដូច្នេះ
 	    alloc_text(idx, "Do NOT create startup file %s", vimrc);
 	choices[idx].installfunc = NULL;
 	choices[idx + 1].active = 0;
 	choices[idx + 2].active = 0;
 	choices[idx + 3].active = 0;
     }
-    else
+    បើមិនដូច្នេះ
     {
 	// Switch to change or create a vimrc file.
-	if (*oldvimrc != NUL)
+	ប្រសិនបើ (*oldvimrc != NUL)
 	    alloc_text(idx, "Overwrite startup file %s with:", oldvimrc);
-	else
+	បើមិនដូច្នេះ
 	    alloc_text(idx, "Create startup file %s with:", vimrc);
 	choices[idx].installfunc = install_vimrc;
 	choices[idx + 1].active = 1;
@@ -1326,7 +1326,7 @@ change_vimrc_choice(int idx)
  * Change the choice how to run Vim.
  */
     static void
-change_run_choice(int idx)
+change_run_choice(ចំនួនគត់ idx)
 {
     compat_choice = get_choice(compat_choices, TABLE_SIZE(compat_choices));
     alloc_text(idx, compat_text, compat_choices[compat_choice]);
@@ -1336,7 +1336,7 @@ change_run_choice(int idx)
  * Change the choice if keys are to be remapped.
  */
     static void
-change_remap_choice(int idx)
+change_remap_choice(ចំនួនគត់ idx)
 {
     remap_choice = get_choice(remap_choices, TABLE_SIZE(remap_choices));
     alloc_text(idx, remap_text, remap_choices[remap_choice]);
@@ -1346,7 +1346,7 @@ change_remap_choice(int idx)
  * Change the choice how to select text.
  */
     static void
-change_mouse_choice(int idx)
+change_mouse_choice(ចំនួនគត់ idx)
 {
     mouse_choice = get_choice(mouse_choices, TABLE_SIZE(mouse_choices));
     alloc_text(idx, mouse_text, mouse_choices[mouse_choice]);
@@ -1360,9 +1360,9 @@ init_vimrc_choices(void)
     strcpy(vimrc + runtimeidx, "_vimrc");
 
     // Set opposite value and then toggle it by calling change_vimrc_choice()
-    if (*oldvimrc == NUL)
+    ប្រសិនបើ (*oldvimrc == NUL)
 	choices[choice_count].installfunc = NULL;
-    else
+    បើមិនដូច្នេះ
 	choices[choice_count].installfunc = install_vimrc;
     choices[choice_count].text = NULL;
     change_vimrc_choice(choice_count);
@@ -1395,14 +1395,14 @@ init_vimrc_choices(void)
     static LONG
 reg_create_key(
     HKEY root,
-    const char *subkey,
+    const var_na *subkey,
     PHKEY phKey,
     DWORD flag)
 {
     DWORD disp;
 
     *phKey = NULL;
-    return RegCreateKeyEx(
+    ត្រឡប់ RegCreateKeyEx(
 		root, subkey,
 		0, NULL, REG_OPTION_NON_VOLATILE,
 		flag | KEY_WRITE,
@@ -1412,39 +1412,39 @@ reg_create_key(
     static LONG
 reg_set_string_value(
     HKEY hKey,
-    const char *value_name,
-    const char *data)
+    const var_na *value_name,
+    const var_na *data)
 {
-    return RegSetValueEx(hKey, value_name, 0, REG_SZ,
+    ត្រឡប់ RegSetValueEx(hKey, value_name, 0, REG_SZ,
 				     (LPBYTE)data, (DWORD)(1 + strlen(data)));
 }
 
     static LONG
 reg_create_key_and_value(
     HKEY hRootKey,
-    const char *subkey,
-    const char *value_name,
-    const char *data,
+    const var_na *subkey,
+    const var_na *value_name,
+    const var_na *data,
     DWORD flag)
 {
     HKEY hKey;
     LONG lRet = reg_create_key(hRootKey, subkey, &hKey, flag);
 
-    if (ERROR_SUCCESS == lRet)
+    ប្រសិនបើ (ERROR_SUCCESS == lRet)
     {
 	lRet = reg_set_string_value(hKey, value_name, data);
 	RegCloseKey(hKey);
     }
-    return lRet;
+    ត្រឡប់ lRet;
 }
 
     static LONG
 register_inproc_server(
     HKEY hRootKey,
-    const char *clsid,
-    const char *extname,
-    const char *module,
-    const char *threading_model,
+    const var_na *clsid,
+    const var_na *extname,
+    const var_na *module,
+    const var_na *threading_model,
     DWORD flag)
 {
     CHAR subkey[BUFSIZE];
@@ -1452,25 +1452,25 @@ register_inproc_server(
 
     sprintf(subkey, "CLSID\\%s", clsid);
     lRet = reg_create_key_and_value(hRootKey, subkey, NULL, extname, flag);
-    if (ERROR_SUCCESS == lRet)
+    ប្រសិនបើ (ERROR_SUCCESS == lRet)
     {
 	sprintf(subkey, "CLSID\\%s\\InProcServer32", clsid);
 	lRet = reg_create_key_and_value(hRootKey, subkey, NULL, module, flag);
-	if (ERROR_SUCCESS == lRet)
+	ប្រសិនបើ (ERROR_SUCCESS == lRet)
 	{
 	    lRet = reg_create_key_and_value(hRootKey, subkey,
 					   "ThreadingModel", threading_model, flag);
 	}
     }
-    return lRet;
+    ត្រឡប់ lRet;
 }
 
     static LONG
 register_shellex(
     HKEY hRootKey,
-    const char *clsid,
-    const char *name,
-    const char *exe_path,
+    const var_na *clsid,
+    const var_na *name,
+    const var_na *exe_path,
     DWORD flag)
 {
     LONG lRet = reg_create_key_and_value(
@@ -1480,7 +1480,7 @@ register_shellex(
 	    clsid,
 	    flag);
 
-    if (ERROR_SUCCESS == lRet)
+    ប្រសិនបើ (ERROR_SUCCESS == lRet)
     {
 	lRet = reg_create_key_and_value(
 		HKEY_LOCAL_MACHINE,
@@ -1489,7 +1489,7 @@ register_shellex(
 		name,
 		flag);
 
-	if (ERROR_SUCCESS == lRet)
+	ប្រសិនបើ (ERROR_SUCCESS == lRet)
 	{
 	    lRet = reg_create_key_and_value(
 		    HKEY_LOCAL_MACHINE,
@@ -1499,16 +1499,16 @@ register_shellex(
 		    flag);
 	}
     }
-    return lRet;
+    ត្រឡប់ lRet;
 }
 
     static LONG
 register_openwith(
     HKEY hRootKey,
-    const char *exe_path,
+    const var_na *exe_path,
     DWORD flag)
 {
-    char	exe_cmd[BUFSIZE];
+    var_na	exe_cmd[BUFSIZE];
     LONG	lRet;
 
     sprintf(exe_cmd, "\"%s\" \"%%1\"", exe_path);
@@ -1519,48 +1519,48 @@ register_openwith(
 	    exe_cmd,
 	    flag);
 
-    if (ERROR_SUCCESS == lRet)
+    ប្រសិនបើ (ERROR_SUCCESS == lRet)
     {
-	int i;
-	static const char *openwith[] = {
+	ចំនួនគត់ i;
+	static const var_na *openwith[] = {
 		".htm\\OpenWithList\\gvim.exe",
 		".vim\\OpenWithList\\gvim.exe",
 		"*\\OpenWithList\\gvim.exe",
 	};
 
-	for (i = 0; ERROR_SUCCESS == lRet && i < (int)ARRAYSIZE(openwith); i++)
+	សម្រាប់ (i = 0; ERROR_SUCCESS == lRet && i < (ចំនួនគត់)ARRAYSIZE(openwith); i++)
 	    lRet = reg_create_key_and_value(hRootKey, openwith[i], NULL, "", flag);
     }
 
-    return lRet;
+    ត្រឡប់ lRet;
 }
 
     static LONG
 register_uninstall(
     HKEY hRootKey,
-    const char *appname,
-    const char *display_name,
-    const char *uninstall_string,
-    const char *display_icon,
-    const char *display_version,
-    const char *publisher)
+    const var_na *appname,
+    const var_na *display_name,
+    const var_na *uninstall_string,
+    const var_na *display_icon,
+    const var_na *display_version,
+    const var_na *publisher)
 {
     LONG lRet = reg_create_key_and_value(hRootKey, appname,
 			     "DisplayName", display_name, KEY_WOW64_64KEY);
 
-    if (ERROR_SUCCESS == lRet)
+    ប្រសិនបើ (ERROR_SUCCESS == lRet)
 	lRet = reg_create_key_and_value(hRootKey, appname,
 		     "UninstallString", uninstall_string, KEY_WOW64_64KEY);
-    if (ERROR_SUCCESS == lRet)
+    ប្រសិនបើ (ERROR_SUCCESS == lRet)
 	lRet = reg_create_key_and_value(hRootKey, appname,
 		     "DisplayIcon", display_icon, KEY_WOW64_64KEY);
-    if (ERROR_SUCCESS == lRet)
+    ប្រសិនបើ (ERROR_SUCCESS == lRet)
 	lRet = reg_create_key_and_value(hRootKey, appname,
 		     "DisplayVersion", display_version, KEY_WOW64_64KEY);
-    if (ERROR_SUCCESS == lRet)
+    ប្រសិនបើ (ERROR_SUCCESS == lRet)
 	lRet = reg_create_key_and_value(hRootKey, appname,
 		     "Publisher", publisher, KEY_WOW64_64KEY);
-    return lRet;
+    ត្រឡប់ lRet;
 }
 
 /*
@@ -1570,38 +1570,38 @@ register_uninstall(
  * - to uninstall Vim
  */
 //ARGSUSED
-    static int
+    static ចំនួនគត់
 install_registry(void)
 {
     LONG	lRet = ERROR_SUCCESS;
-    const char	*vim_ext_ThreadingModel = "Apartment";
-    const char	*vim_ext_name = "Vim Shell Extension";
-    const char	*vim_ext_clsid = "{51EEE242-AD87-11d3-9C1E-0090278BBD99}";
-    char	vim_exe_path[MAX_PATH];
-    char	display_name[BUFSIZE];
-    char	uninstall_string[BUFSIZE];
-    char	icon_string[BUFSIZE];
-    char	version_string[BUFSIZE];
-    int		i;
-    int		loop_count = is_64bit_os() ? 2 : 1;
+    const var_na	*vim_ext_ThreadingModel = "Apartment";
+    const var_na	*vim_ext_name = "Vim Shell Extension";
+    const var_na	*vim_ext_clsid = "{51EEE242-AD87-11d3-9C1E-0090278BBD99}";
+    var_na	vim_exe_path[MAX_PATH];
+    var_na	display_name[BUFSIZE];
+    var_na	uninstall_string[BUFSIZE];
+    var_na	icon_string[BUFSIZE];
+    var_na	version_string[BUFSIZE];
+    ចំនួនគត់		i;
+    ចំនួនគត់		loop_count = is_64bit_os() ? 2 : 1;
     DWORD	flag;
 
     sprintf(vim_exe_path, "%s\\gvim.exe", installdir);
 
-    if (install_popup)
+    ប្រសិនបើ (install_popup)
     {
-	char	    bufg[BUFSIZE];
+	var_na	    bufg[BUFSIZE];
 
 	printf("Creating \"Edit with Vim\" popup menu entry\n");
 
-	for (i = 0; i < loop_count; i++)
+	សម្រាប់ (i = 0; i < loop_count; i++)
 	{
-	    if (i == 0)
+	    ប្រសិនបើ (i == 0)
 	    {
 		sprintf(bufg, "%s\\" GVIMEXT32_PATH, installdir);
 		flag = KEY_WOW64_32KEY;
 	    }
-	    else
+	    បើមិនដូច្នេះ
 	    {
 		sprintf(bufg, "%s\\" GVIMEXT64_PATH, installdir);
 		flag = KEY_WOW64_64KEY;
@@ -1610,30 +1610,30 @@ install_registry(void)
 	    lRet = register_inproc_server(
 		    HKEY_CLASSES_ROOT, vim_ext_clsid, vim_ext_name,
 		    bufg, vim_ext_ThreadingModel, flag);
-	    if (ERROR_SUCCESS != lRet)
-		return FAIL;
+	    ប្រសិនបើ (ERROR_SUCCESS != lRet)
+		ត្រឡប់ FAIL;
 	    lRet = register_shellex(
 		    HKEY_CLASSES_ROOT, vim_ext_clsid, vim_ext_name,
 		    vim_exe_path, flag);
-	    if (ERROR_SUCCESS != lRet)
-		return FAIL;
+	    ប្រសិនបើ (ERROR_SUCCESS != lRet)
+		ត្រឡប់ FAIL;
 	}
     }
 
-    if (install_openwith)
+    ប្រសិនបើ (install_openwith)
     {
 	printf("Creating \"Open with ...\" list entry\n");
 
-	for (i = 0; i < loop_count; i++)
+	សម្រាប់ (i = 0; i < loop_count; i++)
 	{
-	    if (i == 0)
+	    ប្រសិនបើ (i == 0)
 		flag = KEY_WOW64_32KEY;
-	    else
+	    បើមិនដូច្នេះ
 		flag = KEY_WOW64_64KEY;
 
 	    lRet = register_openwith(HKEY_CLASSES_ROOT, vim_exe_path, flag);
-	    if (ERROR_SUCCESS != lRet)
-		return FAIL;
+	    ប្រសិនបើ (ERROR_SUCCESS != lRet)
+		ត្រឡប់ FAIL;
 	}
     }
 
@@ -1647,9 +1647,9 @@ install_registry(void)
 	    );
 
     // For the NSIS installer use the generated uninstaller.
-    if (interactive)
+    ប្រសិនបើ (interactive)
 	sprintf(uninstall_string, "%s\\uninstall.exe", installdir);
-    else
+    បើមិនដូច្នេះ
 	sprintf(uninstall_string, "%s\\uninstall-gui.exe", installdir);
 
     sprintf(icon_string, "%s\\gvim.exe,0", installdir);
@@ -1664,21 +1664,21 @@ install_registry(void)
 	icon_string,
 	version_string,
 	"The Vim Project");
-    if (ERROR_SUCCESS != lRet)
-	return FAIL;
+    ប្រសិនបើ (ERROR_SUCCESS != lRet)
+	ត្រឡប់ FAIL;
 
-    return OK;
+    ត្រឡប់ OK;
 }
 
     static void
-change_popup_choice(int idx)
+change_popup_choice(ចំនួនគត់ idx)
 {
-    if (install_popup == 0)
+    ប្រសិនបើ (install_popup == 0)
     {
 	choices[idx].text = "Install an entry for Vim in the popup menu for the right\n    mouse button so that you can edit any file with Vim";
 	install_popup = 1;
     }
-    else
+    បើមិនដូច្នេះ
     {
 	choices[idx].text = "Do NOT install an entry for Vim in the popup menu for the\n    right mouse button to edit any file with Vim";
 	install_popup = 0;
@@ -1692,9 +1692,9 @@ change_popup_choice(int idx)
     static void
 init_popup_choice(void)
 {
-    struct stat	st;
+    sa_nracanaa stat	st;
 
-    if (has_gvim
+    ប្រសិនបើ (has_gvim
 	    && (stat(GVIMEXT32_PATH, &st) >= 0
 		|| stat(GVIMEXT64_PATH, &st) >= 0))
     {
@@ -1704,19 +1704,19 @@ init_popup_choice(void)
 	change_popup_choice(choice_count);  // set the text
 	++choice_count;
     }
-    else
+    បើមិនដូច្នេះ
 	add_dummy_choice();
 }
 
     static void
-change_openwith_choice(int idx)
+change_openwith_choice(ចំនួនគត់ idx)
 {
-    if (install_openwith == 0)
+    ប្រសិនបើ (install_openwith == 0)
     {
 	choices[idx].text = "Add Vim to the \"Open With...\" list in the popup menu for the right\n    mouse button so that you can edit any file with Vim";
 	install_openwith = 1;
     }
-    else
+    បើមិនដូច្នេះ
     {
 	choices[idx].text = "Do NOT add Vim to the \"Open With...\" list in the popup menu for the\n    right mouse button to edit any file with Vim";
 	install_openwith = 0;
@@ -1730,7 +1730,7 @@ change_openwith_choice(int idx)
     static void
 init_openwith_choice(void)
 {
-    if (has_gvim)
+    ប្រសិនបើ (has_gvim)
     {
 	choices[choice_count].changefunc = change_openwith_choice;
 	choices[choice_count].installfunc = NULL;
@@ -1738,7 +1738,7 @@ init_openwith_choice(void)
 	change_openwith_choice(choice_count);  // set the text
 	++choice_count;
     }
-    else
+    បើមិនដូច្នេះ
 	add_dummy_choice();
 }
 
@@ -1749,14 +1749,14 @@ init_openwith_choice(void)
  *
  * NOTE:  Currently untested with mingw.
  */
-    int
+    ចំនួនគត់
 create_shortcut(
-	const char *shortcut_name,
-	const char *iconfile_path,
-	int	    iconindex,
-	const char *shortcut_target,
-	const char *shortcut_args,
-	const char *workingdir
+	const var_na *shortcut_name,
+	const var_na *iconfile_path,
+	ចំនួនគត់	    iconindex,
+	const var_na *shortcut_target,
+	const var_na *shortcut_args,
+	const var_na *workingdir
 	)
 {
     IShellLink	    *shelllink_ptr;
@@ -1765,10 +1765,10 @@ create_shortcut(
 
     // Initialize COM library
     hres = CoInitialize(NULL);
-    if (!SUCCEEDED(hres))
+    ប្រសិនបើ (!SUCCEEDED(hres))
     {
 	printf("Error:  Could not open the COM library.  Not creating shortcut.\n");
-	return FAIL;
+	ត្រឡប់ FAIL;
     }
 
     // Instantiate a COM object for the ShellLink, store a pointer to it
@@ -1779,20 +1779,20 @@ create_shortcut(
 			   &IID_IShellLink,
 			   (void **) &shelllink_ptr);
 
-    if (SUCCEEDED(hres)) // If the instantiation was successful...
+    ប្រសិនបើ (SUCCEEDED(hres)) // If the instantiation was successful...
     {
 	// ...Then build a PersistFile interface for the ShellLink so we can
 	// save it as a file after we build it.
 	hres = shelllink_ptr->lpVtbl->QueryInterface(shelllink_ptr,
 		&IID_IPersistFile, (void **) &persistfile_ptr);
 
-	if (SUCCEEDED(hres))
+	ប្រសិនបើ (SUCCEEDED(hres))
 	{
 	    wchar_t wsz[BUFSIZE];
 
 	    // translate the (possibly) multibyte shortcut filename to windows
 	    // Unicode so it can be used as a file name.
-	    MultiByteToWideChar(CP_ACP, 0, shortcut_name, -1, wsz, sizeof(wsz)/sizeof(wsz[0]));
+	    MultiByteToWideChar(CP_ACP, 0, shortcut_name, -1, wsz, parimaa_na(wsz)/parimaa_na(wsz[0]));
 
 	    // set the attributes
 	    shelllink_ptr->lpVtbl->SetPath(shelllink_ptr, shortcut_target);
@@ -1806,22 +1806,22 @@ create_shortcut(
 	    persistfile_ptr->lpVtbl->Save(persistfile_ptr, wsz, 1);
 	    persistfile_ptr->lpVtbl->Release(persistfile_ptr);
 	}
-	else
+	បើមិនដូច្នេះ
 	{
 	    printf("QueryInterface Error\n");
-	    return FAIL;
+	    ត្រឡប់ FAIL;
 	}
 
 	// Return the ShellLink object
 	shelllink_ptr->lpVtbl->Release(shelllink_ptr);
     }
-    else
+    បើមិនដូច្នេះ
     {
-	printf("CoCreateInstance Error - hres = %08x\n", (int)hres);
-	return FAIL;
+	printf("CoCreateInstance Error - hres = %08x\n", (ចំនួនគត់)hres);
+	ត្រឡប់ FAIL;
     }
 
-    return OK;
+    ត្រឡប់ OK;
 }
 
 /*
@@ -1829,19 +1829,19 @@ create_shortcut(
  *
  * Return 0 on error, non-zero on success
  */
-   int
+   ចំនួនគត់
 build_link_name(
-	char	   *link_path,
-	const char *link_name,
-	const char *shell_folder_name)
+	var_na	   *link_path,
+	const var_na *link_name,
+	const var_na *shell_folder_name)
 {
-    char	shell_folder_path[MAX_PATH];
+    var_na	shell_folder_path[MAX_PATH];
 
-    if (get_shell_folder_path(shell_folder_path, shell_folder_name) == FAIL)
+    ប្រសិនបើ (get_shell_folder_path(shell_folder_path, shell_folder_name) == FAIL)
     {
 	printf("An error occurred while attempting to find the path to %s.\n",
 							   shell_folder_name);
-	return FAIL;
+	ត្រឡប់ FAIL;
     }
 
     // Make sure the directory exists (create Start Menu\Programs\Vim).
@@ -1851,32 +1851,32 @@ build_link_name(
     // build the path to the shortcut and the path to gvim.exe
     sprintf(link_path, "%s\\%s.lnk", shell_folder_path, link_name);
 
-    return OK;
+    ត្រឡប់ OK;
 }
 
-    static int
+    static ចំនួនគត់
 build_shortcut(
-	const char *name,	// Name of the shortcut
-	const char *exename,	// Name of the executable (e.g., vim.exe)
-	const char *args,
-	const char *shell_folder,
-	const char *workingdir)
+	const var_na *name,	// Name of the shortcut
+	const var_na *exename,	// Name of the executable (e.g., vim.exe)
+	const var_na *args,
+	const var_na *shell_folder,
+	const var_na *workingdir)
 {
-    char	executable_path[BUFSIZE];
-    char	link_name[BUFSIZE];
+    var_na	executable_path[BUFSIZE];
+    var_na	link_name[BUFSIZE];
 
     sprintf(executable_path, "%s\\%s", installdir, exename);
 
-    if (build_link_name(link_name, name, shell_folder) == FAIL)
+    ប្រសិនបើ (build_link_name(link_name, name, shell_folder) == FAIL)
     {
 	printf("An error has occurred.  A shortcut to %s will not be created %s.\n",
 		name,
 		*shell_folder == 'd' ? "on the desktop" : "in the Start menu");
-	return FAIL;
+	ត្រឡប់ FAIL;
     }
 
     // Create the shortcut:
-    return create_shortcut(link_name, executable_path, 0,
+    ត្រឡប់ create_shortcut(link_name, executable_path, 0,
 					   executable_path, args, workingdir);
 }
 
@@ -1892,78 +1892,78 @@ build_shortcut(
  * Create shortcut(s) in the Start Menu\Programs\Vim folder.
  */
     static void
-install_start_menu(int idx UNUSED)
+install_start_menu(ចំនួនគត់ idx UNUSED)
 {
     need_uninstall_entry = 1;
     printf("Creating start menu\n");
-    if (has_vim)
+    ប្រសិនបើ (has_vim)
     {
-	if (build_shortcut("Vim", "vim.exe", "",
+	ប្រសិនបើ (build_shortcut("Vim", "vim.exe", "",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	    return;
-	if (build_shortcut("Vim Read-only", "vim.exe", "-R",
+	    ត្រឡប់;
+	ប្រសិនបើ (build_shortcut("Vim Read-only", "vim.exe", "-R",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	    return;
-	if (build_shortcut("Vim Diff", "vim.exe", "-d",
+	    ត្រឡប់;
+	ប្រសិនបើ (build_shortcut("Vim Diff", "vim.exe", "-d",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	    return;
+	    ត្រឡប់;
     }
-    if (has_gvim)
+    ប្រសិនបើ (has_gvim)
     {
-	if (build_shortcut("gVim", "gvim.exe", "",
+	ប្រសិនបើ (build_shortcut("gVim", "gvim.exe", "",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	    return;
-	if (build_shortcut("gVim Easy", "gvim.exe", "-y",
+	    ត្រឡប់;
+	ប្រសិនបើ (build_shortcut("gVim Easy", "gvim.exe", "-y",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	    return;
-	if (build_shortcut("gVim Read-only", "gvim.exe", "-R",
+	    ត្រឡប់;
+	ប្រសិនបើ (build_shortcut("gVim Read-only", "gvim.exe", "-R",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	    return;
-	if (build_shortcut("gVim Diff", "gvim.exe", "-d",
+	    ត្រឡប់;
+	ប្រសិនបើ (build_shortcut("gVim Diff", "gvim.exe", "-d",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	    return;
+	    ត្រឡប់;
     }
-    if (build_shortcut("Uninstall",
+    ប្រសិនបើ (build_shortcut("Uninstall",
 		interactive ? "uninstall.exe" : "uninstall-gui.exe", "",
 					   VIM_STARTMENU, installdir) == FAIL)
-	return;
+	ត្រឡប់;
     // For Windows NT the working dir of the vimtutor.bat must be right,
     // otherwise gvim.exe won't be found and using gvimbat doesn't work.
-    if (build_shortcut("Vim tutor", "vimtutor.bat", "",
+    ប្រសិនបើ (build_shortcut("Vim tutor", "vimtutor.bat", "",
 					   VIM_STARTMENU, installdir) == FAIL)
-	return;
-    if (build_shortcut("Help", has_gvim ? "gvim.exe" : "vim.exe", "-c h",
+	ត្រឡប់;
+    ប្រសិនបើ (build_shortcut("Help", has_gvim ? "gvim.exe" : "vim.exe", "-c h",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	return;
+	ត្រឡប់;
     {
-	char	shell_folder_path[BUFSIZE];
+	var_na	shell_folder_path[BUFSIZE];
 
 	// Creating the URL shortcut works a bit differently...
-	if (get_shell_folder_path(shell_folder_path, VIM_STARTMENU) == FAIL)
+	ប្រសិនបើ (get_shell_folder_path(shell_folder_path, VIM_STARTMENU) == FAIL)
 	{
 	    printf("Finding the path of the Start menu failed\n");
-	    return ;
+	    ត្រឡប់ ;
 	}
 	add_pathsep(shell_folder_path);
 	strcat(shell_folder_path, "Vim Online.url");
-	if (!WritePrivateProfileString("InternetShortcut", "URL",
+	ប្រសិនបើ (!WritePrivateProfileString("InternetShortcut", "URL",
 				    "https://www.vim.org/", shell_folder_path))
 	{
 	    printf("Creating the Vim online URL failed\n");
-	    return;
+	    ត្រឡប់;
 	}
     }
 }
 
     static void
-toggle_startmenu_choice(int idx)
+toggle_startmenu_choice(ចំនួនគត់ idx)
 {
-    if (choices[idx].installfunc == NULL)
+    ប្រសិនបើ (choices[idx].installfunc == NULL)
     {
 	choices[idx].installfunc = install_start_menu;
 	choices[idx].text = "Add Vim to the Start menu";
     }
-    else
+    បើមិនដូច្នេះ
     {
 	choices[idx].installfunc = NULL;
 	choices[idx].text = "Do NOT add Vim to the Start menu";
@@ -1980,10 +1980,10 @@ toggle_startmenu_choice(int idx)
  *      drag and drop onto the shortcut).
  */
     void
-install_shortcut_gvim(int idx)
+install_shortcut_gvim(ចំនួនគត់ idx)
 {
     // Create shortcut(s) on the desktop
-    if (choices[idx].arg)
+    ប្រសិនបើ (choices[idx].arg)
     {
 	(void)build_shortcut(icon_names[0], "gvim.exe",
 						      "", "desktop", WORKDIR);
@@ -1992,9 +1992,9 @@ install_shortcut_gvim(int idx)
 }
 
     void
-install_shortcut_evim(int idx)
+install_shortcut_evim(ចំនួនគត់ idx)
 {
-    if (choices[idx].arg)
+    ប្រសិនបើ (choices[idx].arg)
     {
 	(void)build_shortcut(icon_names[1], "gvim.exe",
 						    "-y", "desktop", WORKDIR);
@@ -2003,9 +2003,9 @@ install_shortcut_evim(int idx)
 }
 
     void
-install_shortcut_gview(int idx)
+install_shortcut_gview(ចំនួនគត់ idx)
 {
-    if (choices[idx].arg)
+    ប្រសិនបើ (choices[idx].arg)
     {
 	(void)build_shortcut(icon_names[2], "gvim.exe",
 						    "-R", "desktop", WORKDIR);
@@ -2014,22 +2014,22 @@ install_shortcut_gview(int idx)
 }
 
     void
-toggle_shortcut_choice(int idx)
+toggle_shortcut_choice(ចំនួនគត់ idx)
 {
-    char	*arg;
+    var_na	*arg;
 
-    if (choices[idx].installfunc == install_shortcut_gvim)
+    ប្រសិនបើ (choices[idx].installfunc == install_shortcut_gvim)
 	arg = "gVim";
-    else if (choices[idx].installfunc == install_shortcut_evim)
+    បើមិនដូច្នេះ ប្រសិនបើ (choices[idx].installfunc == install_shortcut_evim)
 	arg = "gVim Easy";
-    else
+    បើមិនដូច្នេះ
 	arg = "gVim Read-only";
-    if (choices[idx].arg)
+    ប្រសិនបើ (choices[idx].arg)
     {
 	choices[idx].arg = 0;
 	alloc_text(idx, "Do NOT create a desktop icon for %s", arg);
     }
-    else
+    បើមិនដូច្នេះ
     {
 	choices[idx].arg = 1;
 	alloc_text(idx, "Create a desktop icon for %s", arg);
@@ -2087,7 +2087,7 @@ init_shortcut_choices(void)
    static void
 install_OLE_register(void)
 {
-    char register_command_string[BUFSIZE + 30];
+    var_na register_command_string[BUFSIZE + 30];
 
     printf("\n--- Attempting to register Vim with OLE ---\n");
     printf("(There is no message whether this works or not.)\n");
@@ -2101,9 +2101,9 @@ install_OLE_register(void)
  * result in "to[]".
  */
     static void
-dir_remove_last(const char *path, char to[MAX_PATH])
+dir_remove_last(const var_na *path, var_na to[MAX_PATH])
 {
-    char c;
+    var_na c;
     long last_char_to_copy;
     long path_length = strlen(path);
 
@@ -2111,7 +2111,7 @@ dir_remove_last(const char *path, char to[MAX_PATH])
     last_char_to_copy = path_length - 2;
     c = path[last_char_to_copy];
 
-    while (c != '\\')
+    ខណៈពេល (c != '\\')
     {
 	last_char_to_copy--;
 	c = path[last_char_to_copy];
@@ -2122,13 +2122,13 @@ dir_remove_last(const char *path, char to[MAX_PATH])
 }
 
     static void
-set_directories_text(int idx)
+set_directories_text(ចំនួនគត់ idx)
 {
-    int vimfiles_dir_choice = choices[idx].arg;
+    ចំនួនគត់ vimfiles_dir_choice = choices[idx].arg;
 
-    if (vimfiles_dir_choice == (int)vimfiles_dir_none)
+    ប្រសិនបើ (vimfiles_dir_choice == (ចំនួនគត់)vimfiles_dir_none)
 	alloc_text(idx, "Do NOT create plugin directories%s", "");
-    else
+    បើមិនដូច្នេះ
 	alloc_text(idx, "Create plugin directories: %s",
 				   vimfiles_dir_choices[vimfiles_dir_choice]);
 }
@@ -2141,15 +2141,15 @@ set_directories_text(int idx)
  *
  * This code is based on init_homedir() in misc1.c, keep in sync!
  */
-static char *homedir = NULL;
+static var_na *homedir = NULL;
 
     void
 init_homedir(void)
 {
-    char    *var;
-    char    buf[MAX_PATH];
+    var_na    *var;
+    var_na    buf[MAX_PATH];
 
-    if (homedir != NULL)
+    ប្រសិនបើ (homedir != NULL)
     {
 	free(homedir);
 	homedir = NULL;
@@ -2163,24 +2163,24 @@ init_homedir(void)
      * platforms, $HOMEDRIVE and $HOMEPATH are automatically defined for
      * each user.  Try constructing $HOME from these.
      */
-    if (var == NULL || *var == NUL)
+    ប្រសិនបើ (var == NULL || *var == NUL)
     {
-	char	*homedrive, *homepath;
+	var_na	*homedrive, *homepath;
 
 	homedrive = getenv("HOMEDRIVE");
 	homepath = getenv("HOMEPATH");
-	if (homepath == NULL || *homepath == NUL)
+	ប្រសិនបើ (homepath == NULL || *homepath == NUL)
 	    homepath = "\\";
-	if (homedrive != NULL
-		   && strlen(homedrive) + strlen(homepath) < sizeof(buf))
+	ប្រសិនបើ (homedrive != NULL
+		   && strlen(homedrive) + strlen(homepath) < parimaa_na(buf))
 	{
-	    if (snprintf(buf, sizeof(buf), "%s%s", homedrive, homepath) > 0
+	    ប្រសិនបើ (snprintf(buf, parimaa_na(buf), "%s%s", homedrive, homepath) > 0
 		&& buf[0] != NUL)
 		var = buf;
 	}
     }
 
-    if (var == NULL)
+    ប្រសិនបើ (var == NULL)
 	var = getenv("USERPROFILE");
 
     /*
@@ -2188,32 +2188,32 @@ init_homedir(void)
      * variable, esp. "%USERPROFILE%".  Happens when $USERPROFILE isn't set
      * when $HOME is being set.
      */
-    if (var != NULL && *var == '%')
+    ប្រសិនបើ (var != NULL && *var == '%')
     {
-	char	*p;
-	char	*exp;
+	var_na	*p;
+	var_na	*exp;
 
 	p = strchr(var + 1, '%');
-	if (p != NULL)
+	ប្រសិនបើ (p != NULL)
 	{
 	    strncpy(buf, var + 1, p - (var + 1));
 	    buf[p - (var + 1)] = NUL;
 	    exp = getenv(buf);
-	    if (exp != NULL && *exp != NUL
-				&& strlen(exp) + strlen(p) < sizeof(buf))
+	    ប្រសិនបើ (exp != NULL && *exp != NUL
+				&& strlen(exp) + strlen(p) < parimaa_na(buf))
 	    {
-		snprintf(buf, sizeof(buf), "%s%s", exp, p + 1);
+		snprintf(buf, parimaa_na(buf), "%s%s", exp, p + 1);
 		var = buf;
 	    }
 	}
     }
 
-    if (var != NULL && *var == NUL)	// empty is same as not set
+    ប្រសិនបើ (var != NULL && *var == NUL)	// empty is same as not set
 	var = NULL;
 
-    if (var == NULL)
+    ប្រសិនបើ (var == NULL)
 	homedir = NULL;
-    else
+    បើមិនដូច្នេះ
 	homedir = _strdup(var);
 }
 
@@ -2222,12 +2222,12 @@ init_homedir(void)
  * $HOME, $VIM or nowhere.
  */
     static void
-change_directories_choice(int idx)
+change_directories_choice(ចំនួនគត់ idx)
 {
-    int	    choice_count = TABLE_SIZE(vimfiles_dir_choices);
+    ចំនួនគត់	    choice_count = TABLE_SIZE(vimfiles_dir_choices);
 
     // Don't offer the $HOME choice if $HOME isn't set.
-    if (homedir == NULL)
+    ប្រសិនបើ (homedir == NULL)
 	--choice_count;
     choices[idx].arg = get_choice(vimfiles_dir_choices, choice_count);
     set_directories_text(idx);
@@ -2238,48 +2238,48 @@ change_directories_choice(int idx)
  */
 //ARGSUSED
     static void
-install_vimfilesdir(int idx)
+install_vimfilesdir(ចំនួនគត់ idx)
 {
-    int i;
-    int vimfiles_dir_choice = choices[idx].arg;
-    char *p;
-    char vimdir_path[MAX_PATH];
-    char vimfiles_path[MAX_PATH + 9];
-    char tmp_dirname[BUFSIZE];
+    ចំនួនគត់ i;
+    ចំនួនគត់ vimfiles_dir_choice = choices[idx].arg;
+    var_na *p;
+    var_na vimdir_path[MAX_PATH];
+    var_na vimfiles_path[MAX_PATH + 9];
+    var_na tmp_dirname[BUFSIZE];
 
     // switch on the location that the user wants the plugin directories
     // built in
     switch (vimfiles_dir_choice)
     {
-	case vimfiles_dir_vim:
+	pak_sa vimfiles_dir_vim:
 	{
 	    // Go to the %VIM% directory - check env first, then go one dir
 	    //	   below installdir if there is no %VIM% environment variable.
 	    //	   The accuracy of $VIM is checked in inspect_system(), so we
 	    //	   can be sure it is ok to use here.
 	    p = getenv("VIM");
-	    if (p == NULL) // No $VIM in path
+	    ប្រសិនបើ (p == NULL) // No $VIM in path
 		dir_remove_last(installdir, vimdir_path);
-	    else
+	    បើមិនដូច្នេះ
 		strcpy(vimdir_path, p);
-	    break;
+	    bha_nga;
 	}
-	case vimfiles_dir_home:
+	pak_sa vimfiles_dir_home:
 	{
 	    // Find the $HOME directory.  Its existence was already checked.
 	    p = homedir;
-	    if (p == NULL)
+	    ប្រសិនបើ (p == NULL)
 	    {
 		printf("Internal error: $HOME is NULL\n");
 		p = "c:\\";
 	    }
 	    strcpy(vimdir_path, p);
-	    break;
+	    bha_nga;
 	}
-	case vimfiles_dir_none:
+	pak_sa vimfiles_dir_none:
 	{
 	    // Do not create vim plugin directory.
-	    return;
+	    ត្រឡប់;
 	}
     }
 
@@ -2289,7 +2289,7 @@ install_vimfilesdir(int idx)
     vim_mkdir(vimfiles_path, 0755);
 
     printf("Creating the following directories in \"%s\":\n", vimfiles_path);
-    for (i = 0; i < TABLE_SIZE(vimfiles_subdirs); i++)
+    សម្រាប់ (i = 0; i < TABLE_SIZE(vimfiles_subdirs); i++)
     {
 	sprintf(tmp_dirname, "%s\\%s", vimfiles_path, vimfiles_subdirs[i]);
 	printf("  %s", vimfiles_subdirs[i]);
@@ -2304,10 +2304,10 @@ install_vimfilesdir(int idx)
     static void
 init_directories_choice(void)
 {
-    struct stat	st;
-    char	tmp_dirname[BUFSIZE];
-    char	*p;
-    int		vimfiles_dir_choice;
+    sa_nracanaa stat	st;
+    var_na	tmp_dirname[BUFSIZE];
+    var_na	*p;
+    ចំនួនគត់		vimfiles_dir_choice;
 
     choices[choice_count].text = alloc(150);
     choices[choice_count].changefunc = change_directories_choice;
@@ -2317,24 +2317,24 @@ init_directories_choice(void)
     // Check if the "compiler" directory already exists.  That's a good
     // indication that the plugin directories were already created.
     p = getenv("HOME");
-    if (p != NULL)
+    ប្រសិនបើ (p != NULL)
     {
-	vimfiles_dir_choice = (int)vimfiles_dir_home;
+	vimfiles_dir_choice = (ចំនួនគត់)vimfiles_dir_home;
 	sprintf(tmp_dirname, "%s\\vimfiles\\compiler", p);
-	if (stat(tmp_dirname, &st) == 0)
-	    vimfiles_dir_choice = (int)vimfiles_dir_none;
+	ប្រសិនបើ (stat(tmp_dirname, &st) == 0)
+	    vimfiles_dir_choice = (ចំនួនគត់)vimfiles_dir_none;
     }
-    else
+    បើមិនដូច្នេះ
     {
-	vimfiles_dir_choice = (int)vimfiles_dir_vim;
+	vimfiles_dir_choice = (ចំនួនគត់)vimfiles_dir_vim;
 	p = getenv("VIM");
-	if (p == NULL)  // No $VIM in path, use the install dir.
+	ប្រសិនបើ (p == NULL)  // No $VIM in path, use the install dir.
 	    dir_remove_last(installdir, tmp_dirname);
-	else
+	បើមិនដូច្នេះ
 	    strcpy(tmp_dirname, p);
 	strcat(tmp_dirname, "\\vimfiles\\compiler");
-	if (stat(tmp_dirname, &st) == 0)
-	    vimfiles_dir_choice = (int)vimfiles_dir_none;
+	ប្រសិនបើ (stat(tmp_dirname, &st) == 0)
+	    vimfiles_dir_choice = (ចំនួនគត់)vimfiles_dir_none;
     }
 
     choices[choice_count].arg = vimfiles_dir_choice;
@@ -2405,125 +2405,125 @@ print_cmd_line_help(void)
  * Setup installation choices based on command line switches
  */
     static void
-command_line_setup_choices(int argc, char **argv)
+command_line_setup_choices(ចំនួនគត់ argc, var_na **argv)
 {
-    int i, j;
+    ចំនួនគត់ i, j;
 
-    for (i = 1; i < argc; i++)
+    សម្រាប់ (i = 1; i < argc; i++)
     {
-	if (strcmp(argv[i], "-create-batfiles") == 0)
+	ប្រសិនបើ (strcmp(argv[i], "-create-batfiles") == 0)
 	{
-	    if (i + 1 == argc)
+	    ប្រសិនបើ (i + 1 == argc)
 		continue;
-	    while (argv[i + 1][0] != '-' && i < argc)
+	    ខណៈពេល (argv[i + 1][0] != '-' && i < argc)
 	    {
 		i++;
-		for (j = 1; j < TARGET_COUNT; ++j)
-		    if ((targets[j].exenamearg[0] == 'g' ? has_gvim : has_vim)
+		សម្រាប់ (j = 1; j < TARGET_COUNT; ++j)
+		    ប្រសិនបើ ((targets[j].exenamearg[0] == 'g' ? has_gvim : has_vim)
 			    && strcmp(argv[i], targets[j].name) == 0)
 		    {
 			init_bat_choice(j);
-			break;
+			bha_nga;
 		    }
-		if (j == TARGET_COUNT)
+		ប្រសិនបើ (j == TARGET_COUNT)
 		    printf("%s is not a valid choice for -create-batfiles\n",
 								     argv[i]);
 
-		if (i + 1 == argc)
-		    break;
+		ប្រសិនបើ (i + 1 == argc)
+		    bha_nga;
 	    }
 	}
-	else if (strcmp(argv[i], "-create-vimrc") == 0)
+	បើមិនដូច្នេះ ប្រសិនបើ (strcmp(argv[i], "-create-vimrc") == 0)
 	{
 	    // Setup default vimrc choices.  If there is already a _vimrc file,
 	    // it will NOT be overwritten.
 	    init_vimrc_choices();
 	}
-	else if (strcmp(argv[i], "-vimrc-remap") == 0)
+	បើមិនដូច្នេះ ប្រសិនបើ (strcmp(argv[i], "-vimrc-remap") == 0)
 	{
-	    if (i + 1 == argc)
-		break;
+	    ប្រសិនបើ (i + 1 == argc)
+		bha_nga;
 	    i++;
-	    if (strcmp(argv[i], "no") == 0)
+	    ប្រសិនបើ (strcmp(argv[i], "no") == 0)
 		remap_choice = remap_no;
-	    else if (strcmp(argv[i], "win") == 0)
+	    បើមិនដូច្នេះ ប្រសិនបើ (strcmp(argv[i], "win") == 0)
 		remap_choice = remap_win;
 	}
-	else if (strcmp(argv[i], "-vimrc-behave") == 0)
+	បើមិនដូច្នេះ ប្រសិនបើ (strcmp(argv[i], "-vimrc-behave") == 0)
 	{
-	    if (i + 1 == argc)
-		break;
+	    ប្រសិនបើ (i + 1 == argc)
+		bha_nga;
 	    i++;
-	    if (strcmp(argv[i], "unix") == 0)
+	    ប្រសិនបើ (strcmp(argv[i], "unix") == 0)
 		mouse_choice = mouse_xterm;
-	    else if (strcmp(argv[i], "mswin") == 0)
+	    បើមិនដូច្នេះ ប្រសិនបើ (strcmp(argv[i], "mswin") == 0)
 		mouse_choice = mouse_mswin;
-	    else if (strcmp(argv[i], "default") == 0)
+	    បើមិនដូច្នេះ ប្រសិនបើ (strcmp(argv[i], "default") == 0)
 		mouse_choice = mouse_default;
 	}
-	else if (strcmp(argv[i], "-vimrc-compat") == 0)
+	បើមិនដូច្នេះ ប្រសិនបើ (strcmp(argv[i], "-vimrc-compat") == 0)
 	{
-	    if (i + 1 == argc)
-		break;
+	    ប្រសិនបើ (i + 1 == argc)
+		bha_nga;
 	    i++;
-	    if (strcmp(argv[i], "vi") == 0)
+	    ប្រសិនបើ (strcmp(argv[i], "vi") == 0)
 		compat_choice = compat_vi;
-	    else if (strcmp(argv[i], "vim") == 0)
+	    បើមិនដូច្នេះ ប្រសិនបើ (strcmp(argv[i], "vim") == 0)
 		compat_choice = compat_vim;
-	    else if (strcmp(argv[i], "defaults") == 0)
+	    បើមិនដូច្នេះ ប្រសិនបើ (strcmp(argv[i], "defaults") == 0)
 		compat_choice = compat_some_enhancements;
-	    else if (strcmp(argv[i], "all") == 0)
+	    បើមិនដូច្នេះ ប្រសិនបើ (strcmp(argv[i], "all") == 0)
 		compat_choice = compat_all_enhancements;
 	}
-	else if (strcmp(argv[i], "-install-popup") == 0)
+	បើមិនដូច្នេះ ប្រសិនបើ (strcmp(argv[i], "-install-popup") == 0)
 	{
 	    init_popup_choice();
 	}
-	else if (strcmp(argv[i], "-install-openwith") == 0)
+	បើមិនដូច្នេះ ប្រសិនបើ (strcmp(argv[i], "-install-openwith") == 0)
 	{
 	    init_openwith_choice();
 	}
-	else if (strcmp(argv[i], "-add-start-menu") == 0)
+	បើមិនដូច្នេះ ប្រសិនបើ (strcmp(argv[i], "-add-start-menu") == 0)
 	{
 	    init_startmenu_choice();
 	}
-	else if (strcmp(argv[i], "-install-icons") == 0)
+	បើមិនដូច្នេះ ប្រសិនបើ (strcmp(argv[i], "-install-icons") == 0)
 	{
 	    init_shortcut_choices();
 	}
-	else if (strcmp(argv[i], "-create-directories") == 0)
+	បើមិនដូច្នេះ ប្រសិនបើ (strcmp(argv[i], "-create-directories") == 0)
 	{
-	    int vimfiles_dir_choice = (int)vimfiles_dir_none;
+	    ចំនួនគត់ vimfiles_dir_choice = (ចំនួនគត់)vimfiles_dir_none;
 
 	    init_directories_choice();
-	    if (i + 1 < argc && argv[i + 1][0] != '-')
+	    ប្រសិនបើ (i + 1 < argc && argv[i + 1][0] != '-')
 	    {
 		i++;
-		if (strcmp(argv[i], "vim") == 0)
-		    vimfiles_dir_choice = (int)vimfiles_dir_vim;
-		else if (strcmp(argv[i], "home") == 0)
+		ប្រសិនបើ (strcmp(argv[i], "vim") == 0)
+		    vimfiles_dir_choice = (ចំនួនគត់)vimfiles_dir_vim;
+		បើមិនដូច្នេះ ប្រសិនបើ (strcmp(argv[i], "home") == 0)
 		{
-		    if (homedir == NULL)  // No $HOME in environment
-			vimfiles_dir_choice = (int)vimfiles_dir_none;
-		    else
-			vimfiles_dir_choice = (int)vimfiles_dir_home;
+		    ប្រសិនបើ (homedir == NULL)  // No $HOME in environment
+			vimfiles_dir_choice = (ចំនួនគត់)vimfiles_dir_none;
+		    បើមិនដូច្នេះ
+			vimfiles_dir_choice = (ចំនួនគត់)vimfiles_dir_home;
 		}
-		else
+		បើមិនដូច្នេះ
 		{
 		    printf("Unknown argument for -create-directories: %s\n",
 								     argv[i]);
 		    print_cmd_line_help();
 		}
 	    }
-	    else // No choice specified, default to vim directory
-		vimfiles_dir_choice = (int)vimfiles_dir_vim;
+	    បើមិនដូច្នេះ // No choice specified, default to vim directory
+		vimfiles_dir_choice = (ចំនួនគត់)vimfiles_dir_vim;
 	    choices[choice_count - 1].arg = vimfiles_dir_choice;
 	}
-	else if (strcmp(argv[i], "-register-OLE") == 0)
+	បើមិនដូច្នេះ ប្រសិនបើ (strcmp(argv[i], "-register-OLE") == 0)
 	{
 	    // This is always done when gvim is found
 	}
-	else // Unknown switch
+	បើមិនដូច្នេះ // Unknown switch
 	{
 	    printf("Got unknown argument argv[%d] = %s\n", i, argv[i]);
 	    print_cmd_line_help();
@@ -2538,7 +2538,7 @@ command_line_setup_choices(int argc, char **argv)
     static void
 show_help(void)
 {
-    static char *(items[]) =
+    static var_na *(items[]) =
     {
 "Installing .bat files\n"
 "---------------------\n"
@@ -2636,26 +2636,26 @@ show_help(void)
 ,
 NULL
     };
-    int		i;
-    int		c;
+    ចំនួនគត់		i;
+    ចំនួនគត់		c;
 
     rewind(stdin);
     printf("\n");
-    for (i = 0; items[i] != NULL; ++i)
+    សម្រាប់ (i = 0; items[i] != NULL; ++i)
     {
 	puts(items[i]);
 	printf("Hit Enter to continue, b (back) or q (quit help): ");
 	c = getchar();
 	rewind(stdin);
-	if (c == 'b' || c == 'B')
+	ប្រសិនបើ (c == 'b' || c == 'B')
 	{
-	    if (i == 0)
+	    ប្រសិនបើ (i == 0)
 		--i;
-	    else
+	    បើមិនដូច្នេះ
 		i -= 2;
 	}
-	if (c == 'q' || c == 'Q')
-	    break;
+	ប្រសិនបើ (c == 'q' || c == 'Q')
+	    bha_nga;
 	printf("\n");
     }
 }
@@ -2666,22 +2666,22 @@ NULL
     static void
 install(void)
 {
-    int		i;
+    ចំនួនគត់		i;
 
     // Install the selected choices.
-    for (i = 0; i < choice_count; ++i)
-	if (choices[i].installfunc != NULL && choices[i].active)
+    សម្រាប់ (i = 0; i < choice_count; ++i)
+	ប្រសិនបើ (choices[i].installfunc != NULL && choices[i].active)
 	    (choices[i].installfunc)(i);
 
     // Add some entries to the registry, if needed.
-    if (install_popup
+    ប្រសិនបើ (install_popup
 	    || install_openwith
 	    || (need_uninstall_entry && interactive)
 	    || !interactive)
 	install_registry();
 
     // Register gvim with OLE.
-    if (has_gvim)
+    ប្រសិនបើ (has_gvim)
 	install_OLE_register();
 }
 
@@ -2691,35 +2691,35 @@ install(void)
     static void
 request_choice(void)
 {
-    int		      i;
+    ចំនួនគត់		      i;
 
     printf("\n\nInstall will do for you:\n");
-    for (i = 0; i < choice_count; ++i)
-	if (choices[i].active)
+    សម្រាប់ (i = 0; i < choice_count; ++i)
+	ប្រសិនបើ (choices[i].active)
 	    printf("%2d  %s\n", i + 1, choices[i].text);
     printf("To change an item, enter its number\n\n");
     printf("Enter item number, h (help), d (do it) or q (quit): ");
 }
 
-    int
-main(int argc, char **argv)
+    ចំនួនគត់
+main(ចំនួនគត់ argc, var_na **argv)
 {
-    int		i;
-    char	buf[BUFSIZE];
+    ចំនួនគត់		i;
+    var_na	buf[BUFSIZE];
 
     /*
      * Run interactively if there are no command line arguments.
      */
-    if (argc > 1)
+    ប្រសិនបើ (argc > 1)
 	interactive = 0;
-    else
+    បើមិនដូច្នេះ
 	interactive = 1;
 
     // Initialize this program.
     do_inits(argv);
     init_homedir();
 
-    if (argc > 1 && strcmp(argv[1], "-uninstall-check") == 0)
+    ប្រសិនបើ (argc > 1 && strcmp(argv[1], "-uninstall-check") == 0)
     {
 	// Only check for already installed Vims.  Used by NSIS installer.
 	i = uninstall_check(1);
@@ -2730,7 +2730,7 @@ main(int argc, char **argv)
 
 	// When nothing found exit quietly.  If something found wait for
 	// a little while, so that the user can read the messages.
-	if (i && _isatty(1))
+	ប្រសិនបើ (i && _isatty(1))
 	    sleep(3);
 	exit(0);
     }
@@ -2742,59 +2742,59 @@ main(int argc, char **argv)
     check_unpack();
 
     // Check for already installed Vims.
-    if (interactive)
+    ប្រសិនបើ (interactive)
 	uninstall_check(0);
 
     // Find out information about the system.
     inspect_system();
 
-    if (interactive)
+    ប្រសិនបើ (interactive)
     {
 	// Setup all the choices.
 	setup_choices();
 
 	// Let the user change choices and finally install (or quit).
-	for (;;)
+	សម្រាប់ (;;)
 	{
 	    request_choice();
 	    rewind(stdin);
-	    if (scanf("%99s", buf) == 1)
+	    ប្រសិនបើ (scanf("%99s", buf) == 1)
 	    {
-		if (isdigit((unsigned char)buf[0]))
+		ប្រសិនបើ (isdigit((unsigned var_na)buf[0]))
 		{
 		    // Change a choice.
 		    i = atoi(buf);
-		    if (i > 0 && i <= choice_count && choices[i - 1].active)
+		    ប្រសិនបើ (i > 0 && i <= choice_count && choices[i - 1].active)
 			(choices[i - 1].changefunc)(i - 1);
-		    else
+		    បើមិនដូច្នេះ
 			printf("\nIllegal choice\n");
 		}
-		else if (buf[0] == 'h' || buf[0] == 'H')
+		បើមិនដូច្នេះ ប្រសិនបើ (buf[0] == 'h' || buf[0] == 'H')
 		{
 		    // Help
 		    show_help();
 		}
-		else if (buf[0] == 'd' || buf[0] == 'D')
+		បើមិនដូច្នេះ ប្រសិនបើ (buf[0] == 'd' || buf[0] == 'D')
 		{
 		    // Install!
 		    install();
 		    printf("\nThat finishes the installation.  Happy Vimming!\n");
-		    break;
+		    bha_nga;
 		}
-		else if (buf[0] == 'q' || buf[0] == 'Q')
+		បើមិនដូច្នេះ ប្រសិនបើ (buf[0] == 'q' || buf[0] == 'Q')
 		{
 		    // Quit
 		    printf("\nExiting without anything done\n");
-		    break;
+		    bha_nga;
 		}
-		else
+		បើមិនដូច្នេះ
 		    printf("\nIllegal choice\n");
 	    }
 	}
 	printf("\n");
 	myexit(0);
     }
-    else
+    បើមិនដូច្នេះ
     {
 	/*
 	 * Run non-interactive - setup according to the command line switches
@@ -2807,5 +2807,5 @@ main(int argc, char **argv)
 	sleep(2);
     }
 
-    return 0;
+    ត្រឡប់ 0;
 }

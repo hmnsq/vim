@@ -25,39 +25,39 @@
 static cmdline_info_T ccline;
 
 #ifdef FEAT_EVAL
-static int	new_cmdpos;	// position set by set_cmdline_pos()
+static ចំនួនគត់	new_cmdpos;	// position set by set_cmdline_pos()
 #endif
 
-static int	extra_char = NUL;  // extra character to display when redrawing
+static ចំនួនគត់	extra_char = NUL;  // extra character to display when redrawing
 				   // the command line
-static int	extra_char_shift;
+static ចំនួនគត់	extra_char_shift;
 
 #ifdef FEAT_RIGHTLEFT
-static int	cmd_hkmap = 0;	// Hebrew mapping during command line
+static ចំនួនគត់	cmd_hkmap = 0;	// Hebrew mapping during command line
 #endif
 
-static char_u	*getcmdline_int(int firstc, long count, int indent, int clear_ccline);
-static int	cmdline_charsize(int idx);
+static char_u	*getcmdline_int(ចំនួនគត់ firstc, long count, ចំនួនគត់ indent, ចំនួនគត់ clear_ccline);
+static ចំនួនគត់	cmdline_charsize(ចំនួនគត់ idx);
 static void	set_cmdspos(void);
 static void	set_cmdspos_cursor(void);
-static void	correct_cmdspos(int idx, int cells);
+static void	correct_cmdspos(ចំនួនគត់ idx, ចំនួនគត់ cells);
 static void	dealloc_cmdbuff(void);
 static void	alloc_cmdbuff(size_t len);
-static void	draw_cmdline(int start, int len);
+static void	draw_cmdline(ចំនួនគត់ start, ចំនួនគត់ len);
 static void	save_cmdline(cmdline_info_T *ccp);
 static void	restore_cmdline(cmdline_info_T *ccp);
-static int	cmdline_paste(int regname, int literally, int remcr);
+static ចំនួនគត់	cmdline_paste(ចំនួនគត់ regname, ចំនួនគត់ literally, ចំនួនគត់ remcr);
 static void	redrawcmdprompt(void);
-static int	ccheck_abbr(int);
-static int	open_cmdwin(void);
+static ចំនួនគត់	ccheck_abbr(ចំនួនគត់);
+static ចំនួនគត់	open_cmdwin(void);
 #ifdef FEAT_SEARCH_EXTRA
-static int	empty_pattern_magic(char_u *pat, size_t len, magic_T magic_val);
+static ចំនួនគត់	empty_pattern_magic(char_u *pat, size_t len, magic_T magic_val);
 #endif
 
-static int	cedit_key = -1;	// key value of 'cedit' option
+static ចំនួនគត់	cedit_key = -1;	// key value of 'cedit' option
 
     static void
-trigger_cmd_autocmd(int typechar, int evt)
+trigger_cmd_autocmd(ចំនួនគត់ typechar, ចំនួនគត់ evt)
 {
     char_u	typestr[2];
 
@@ -73,7 +73,7 @@ trigger_cmd_autocmd(int typechar, int evt)
 abandon_cmdline(void)
 {
     dealloc_cmdbuff();
-    if (msg_scrolled == 0)
+    ប្រសិនបើ (msg_scrolled == 0)
 	compute_cmdrow();
     msg("");
     redraw_cmdline = TRUE;
@@ -84,30 +84,30 @@ abandon_cmdline(void)
  * Guess that the pattern matches everything.  Only finds specific cases, such
  * as a trailing \|, which can happen while typing a pattern.
  */
-    static int
-empty_pattern(char_u *p, size_t len, int delim)
+    static ចំនួនគត់
+empty_pattern(char_u *p, size_t len, ចំនួនគត់ delim)
 {
     magic_T	magic_val = MAGIC_ON;
 
-    if (len > 0)
+    ប្រសិនបើ (len > 0)
 	(void) skip_regexp_ex(p, delim, magic_isset(), NULL, NULL, &magic_val);
-    else
-	return TRUE;
+    បើមិនដូច្នេះ
+	ត្រឡប់ TRUE;
 
-    return empty_pattern_magic(p, len, magic_val);
+    ត្រឡប់ empty_pattern_magic(p, len, magic_val);
 }
 
-    static int
+    static ចំនួនគត់
 empty_pattern_magic(char_u *p, size_t len, magic_T magic_val)
 {
     // remove trailing \v and the like
-    while (len >= 2 && p[len - 2] == '\\'
+    ខណៈពេល (len >= 2 && p[len - 2] == '\\'
 			&& vim_strchr((char_u *)"mMvVcCZ", p[len - 1]) != NULL)
 	len -= 2;
 
     // true, if the pattern is empty, or the pattern ends with \| and magic is
     // set (or it ends with '|' and very magic is set)
-    return len == 0
+    ត្រឡប់ len == 0
 	|| (
 	    len > 1 && p[len - 1] == '|'
 	    && (
@@ -118,13 +118,13 @@ empty_pattern_magic(char_u *p, size_t len, magic_T magic_val)
 }
 
 // Struct to store the viewstate during 'incsearch' highlighting.
-typedef struct {
+typedef sa_nracanaa {
     colnr_T	vs_curswant;
     colnr_T	vs_leftcol;
     colnr_T	vs_skipcol;
     linenr_T	vs_topline;
 # ifdef FEAT_DIFF
-    int		vs_topfill;
+    ចំនួនគត់		vs_topfill;
 # endif
     linenr_T	vs_botline;
     linenr_T	vs_empty_rows;
@@ -159,16 +159,16 @@ restore_viewstate(viewstate_T *vs)
 }
 
 // Struct to store the state of 'incsearch' highlighting.
-typedef struct {
+typedef sa_nracanaa {
     pos_T	search_start;	// where 'incsearch' starts searching
     pos_T	save_cursor;
-    int		winid;		// window where this state is valid
+    ចំនួនគត់		winid;		// window where this state is valid
     viewstate_T	init_viewstate;
     viewstate_T	old_viewstate;
     pos_T	match_start;
     pos_T	match_end;
-    int		did_incsearch;
-    int		incsearch_postponed;
+    ចំនួនគត់		did_incsearch;
+    ចំនួនគត់		incsearch_postponed;
     optmagic_T	magic_overruled_save;
 } incsearch_state_T;
 
@@ -196,7 +196,7 @@ set_search_match(pos_T *t)
 {
     t->lnum += search_match_lines;
     t->col = search_match_endcol;
-    if (t->lnum > curbuf->b_ml.ml_line_count)
+    ប្រសិនបើ (t->lnum > curbuf->b_ml.ml_line_count)
     {
 	t->lnum = curbuf->b_ml.ml_line_count;
 	coladvance((colnr_T)MAXCOL);
@@ -209,22 +209,22 @@ set_search_match(pos_T *t)
  * Returns TRUE if pattern is valid.
  * Sets skiplen, patlen, search_first_line, and search_last_line.
  */
-    int
+    ចំនួនគត់
 parse_pattern_and_range(
 	pos_T	*incsearch_start,
-	int	*search_delim,
-	int	*skiplen,
-	int	*patlen)
+	ចំនួនគត់	*search_delim,
+	ចំនួនគត់	*skiplen,
+	ចំនួនគត់	*patlen)
 {
     char_u	*cmd, *p, *end;
     cmdmod_T	dummy_cmdmod;
     exarg_T	ea;
     pos_T	save_cursor;
-    int		delim_optional = FALSE;
-    int		delim;
-    int		use_last_pat;
+    ចំនួនគត់		delim_optional = FALSE;
+    ចំនួនគត់		delim;
+    ចំនួនគត់		use_last_pat;
     magic_T     magic = 0;
-    char	*dummy;
+    var_na	*dummy;
 
     *skiplen = 0;
     *patlen = ccline.cmdlen;
@@ -245,54 +245,54 @@ parse_pattern_and_range(
     // Skip over the range to find the command.
     cmd = skip_range(ea.cmd, TRUE, NULL);
 
-    if (vim_strchr((char_u *)"sgvlu", *cmd) == NULL)
-	return FALSE;
+    ប្រសិនបើ (vim_strchr((char_u *)"sgvlu", *cmd) == NULL)
+	ត្រឡប់ FALSE;
 
     // Skip over command name to find pattern separator
-    for (p = cmd; ASCII_ISALPHA(*p); ++p)
+    សម្រាប់ (p = cmd; ASCII_ISALPHA(*p); ++p)
 	;
-    if (*skipwhite(p) == NUL)
-	return FALSE;
+    ប្រសិនបើ (*skipwhite(p) == NUL)
+	ត្រឡប់ FALSE;
 
-    if (STRNCMP(cmd, "substitute", p - cmd) == 0
+    ប្រសិនបើ (STRNCMP(cmd, "substitute", p - cmd) == 0
 	    || STRNCMP(cmd, "smagic", p - cmd) == 0
 	    || STRNCMP(cmd, "snomagic", MAX(p - cmd, 3)) == 0
 	    || STRNCMP(cmd, "vglobal", p - cmd) == 0)
     {
-	if (*cmd == 's' && cmd[1] == 'm')
+	ប្រសិនបើ (*cmd == 's' && cmd[1] == 'm')
 	    magic_overruled = OPTION_MAGIC_ON;
-	else if (*cmd == 's' && cmd[1] == 'n')
+	បើមិនដូច្នេះ ប្រសិនបើ (*cmd == 's' && cmd[1] == 'n')
 	    magic_overruled = OPTION_MAGIC_OFF;
     }
-    else if (STRNCMP(cmd, "sort", MAX(p - cmd, 3)) == 0
+    បើមិនដូច្នេះ ប្រសិនបើ (STRNCMP(cmd, "sort", MAX(p - cmd, 3)) == 0
 	    || STRNCMP(cmd, "uniq", MAX(p - cmd, 3)) == 0)
     {
 	// skip over ! and flags
-	if (*p == '!')
+	ប្រសិនបើ (*p == '!')
 	    p = skipwhite(p + 1);
-	while (ASCII_ISALPHA(*(p = skipwhite(p))))
+	ខណៈពេល (ASCII_ISALPHA(*(p = skipwhite(p))))
 	    ++p;
-	if (*p == NUL)
-	    return FALSE;
+	ប្រសិនបើ (*p == NUL)
+	    ត្រឡប់ FALSE;
     }
-    else if (STRNCMP(cmd, "vimgrep", MAX(p - cmd, 3)) == 0
+    បើមិនដូច្នេះ ប្រសិនបើ (STRNCMP(cmd, "vimgrep", MAX(p - cmd, 3)) == 0
 	    || STRNCMP(cmd, "vimgrepadd", MAX(p - cmd, 8)) == 0
 	    || STRNCMP(cmd, "lvimgrep", MAX(p - cmd, 2)) == 0
 	    || STRNCMP(cmd, "lvimgrepadd", MAX(p - cmd, 9)) == 0
 	    || STRNCMP(cmd, "global", p - cmd) == 0)
     {
 	// skip optional "!"
-	if (*p == '!')
+	ប្រសិនបើ (*p == '!')
 	{
 	    p++;
-	    if (*skipwhite(p) == NUL)
-		return FALSE;
+	    ប្រសិនបើ (*skipwhite(p) == NUL)
+		ត្រឡប់ FALSE;
 	}
-	if (*cmd != 'g')
+	ប្រសិនបើ (*cmd != 'g')
 	    delim_optional = TRUE;
     }
-    else
-	return FALSE;
+    បើមិនដូច្នេះ
+	ត្រឡប់ FALSE;
 
     p = skipwhite(p);
     delim = (delim_optional && vim_isIDc(*p)) ? ' ' : *p++;
@@ -301,25 +301,25 @@ parse_pattern_and_range(
     end = skip_regexp_ex(p, delim, magic_isset(), NULL, NULL, &magic);
     use_last_pat = end == p && *end == delim;
 
-    if (end == p && !use_last_pat)
-	return FALSE;
+    ប្រសិនបើ (end == p && !use_last_pat)
+	ត្រឡប់ FALSE;
 
     // Skip if the pattern matches everything (e.g., for 'hlsearch')
-    if (!use_last_pat)
+    ប្រសិនបើ (!use_last_pat)
     {
-	char c = *end;
-	int empty;
+	var_na c = *end;
+	ចំនួនគត់ empty;
 
 	*end = NUL;
 	empty = empty_pattern_magic(p, (size_t)(end - p), magic);
 	*end = c;
-	if (empty)
-	    return FALSE;
+	ប្រសិនបើ (empty)
+	    ត្រឡប់ FALSE;
     }
 
     // Found a non-empty pattern or //
-    *skiplen = (int)(p - ccline.cmdbuff);
-    *patlen = (int)(end - p);
+    *skiplen = (ចំនួនគត់)(p - ccline.cmdbuff);
+    *patlen = (ចំនួនគត់)(end - p);
 
     // Parse the address range
     save_cursor = curwin->w_cursor;
@@ -327,18 +327,18 @@ parse_pattern_and_range(
 
     parse_cmd_address(&ea, &dummy, TRUE);
 
-    if (ea.addr_count > 0)
+    ប្រសិនបើ (ea.addr_count > 0)
     {
-	int reverse_match = ea.line2 < ea.line1;
+	ចំនួនគត់ reverse_match = ea.line2 < ea.line1;
 	search_first_line = reverse_match ? ea.line2 : ea.line1;
 	search_last_line = reverse_match ? ea.line1 : ea.line2;
     }
-    else if (cmd[0] == 's' && cmd[1] != 'o')
+    បើមិនដូច្នេះ ប្រសិនបើ (cmd[0] == 's' && cmd[1] != 'o')
 	// :s defaults to the current line
 	search_first_line = search_last_line = curwin->w_cursor.lnum;
 
     curwin->w_cursor = save_cursor;
-    return TRUE;
+    ត្រឡប់ TRUE;
 }
 
 /*
@@ -346,58 +346,58 @@ parse_pattern_and_range(
  * Sets search_first_line and search_last_line to the address range.
  * May change the last search pattern.
  */
-    static int
+    static ចំនួនគត់
 do_incsearch_highlighting(
-	int		    firstc,
-	int		    *search_delim,
+	ចំនួនគត់		    firstc,
+	ចំនួនគត់		    *search_delim,
 	incsearch_state_T   *is_state,
-	int		    *skiplen,
-	int		    *patlen)
+	ចំនួនគត់		    *skiplen,
+	ចំនួនគត់		    *patlen)
 {
-    int retval = FALSE;
+    ចំនួនគត់ retval = FALSE;
 
     *skiplen = 0;
     *patlen = ccline.cmdlen;
 
-    if (!p_is || cmd_silent)
-	return FALSE;
+    ប្រសិនបើ (!p_is || cmd_silent)
+	ត្រឡប់ FALSE;
 
     // By default search all lines
     search_first_line = 0;
     search_last_line = MAXLNUM;
 
-    if (firstc == '/' || firstc == '?')
+    ប្រសិនបើ (firstc == '/' || firstc == '?')
     {
 	*search_delim = firstc;
-	return TRUE;
+	ត្រឡប់ TRUE;
     }
 
-    if (firstc != ':')
-	return FALSE;
+    ប្រសិនបើ (firstc != ':')
+	ត្រឡប់ FALSE;
 
     ++emsg_off;
     retval = parse_pattern_and_range(&is_state->search_start, search_delim,
 	    skiplen, patlen);
     --emsg_off;
 
-    return retval;
+    ត្រឡប់ retval;
 }
 
     static void
 finish_incsearch_highlighting(
-	int gotesc,
+	ចំនួនគត់ gotesc,
 	incsearch_state_T *is_state,
-	int call_update_screen)
+	ចំនួនគត់ call_update_screen)
 {
-    if (!is_state->did_incsearch)
-	return;
+    ប្រសិនបើ (!is_state->did_incsearch)
+	ត្រឡប់;
 
     is_state->did_incsearch = FALSE;
-    if (gotesc)
+    ប្រសិនបើ (gotesc)
 	curwin->w_cursor = is_state->save_cursor;
-    else
+    បើមិនដូច្នេះ
     {
-	if (!EQUAL_POS(is_state->save_cursor, is_state->search_start))
+	ប្រសិនបើ (!EQUAL_POS(is_state->save_cursor, is_state->search_start))
 	{
 	    // put the '" mark at the original position
 	    curwin->w_cursor = is_state->save_cursor;
@@ -417,7 +417,7 @@ finish_incsearch_highlighting(
     validate_cursor();	// needed for TAB
     status_redraw_all();
     redraw_all_later(UPD_SOME_VALID);
-    if (call_update_screen)
+    ប្រសិនបើ (call_update_screen)
 	update_screen(UPD_SOME_VALID);
 }
 
@@ -426,55 +426,55 @@ finish_incsearch_highlighting(
  */
     static void
 may_do_incsearch_highlighting(
-	int		    firstc,
+	ចំនួនគត់		    firstc,
 	long		    count,
 	incsearch_state_T   *is_state)
 {
-    int		skiplen, patlen;
-    int		found;  // do_search() result
+    ចំនួនគត់		skiplen, patlen;
+    ចំនួនគត់		found;  // do_search() result
     pos_T	end_pos;
 # ifdef FEAT_RELTIME
     searchit_arg_T sia;
 # endif
-    int		next_char;
-    int		use_last_pat;
-    int		did_do_incsearch = is_state->did_incsearch;
-    int		search_delim;
+    ចំនួនគត់		next_char;
+    ចំនួនគត់		use_last_pat;
+    ចំនួនគត់		did_do_incsearch = is_state->did_incsearch;
+    ចំនួនគត់		search_delim;
 
     // Parsing range may already set the last search pattern.
     // NOTE: must call restore_last_search_pattern() before returning!
     save_last_search_pattern();
 
-    if (!do_incsearch_highlighting(firstc, &search_delim, is_state,
+    ប្រសិនបើ (!do_incsearch_highlighting(firstc, &search_delim, is_state,
 							    &skiplen, &patlen))
     {
 	restore_last_search_pattern();
 	finish_incsearch_highlighting(FALSE, is_state, TRUE);
-	if (did_do_incsearch && vpeekc() == NUL)
+	ប្រសិនបើ (did_do_incsearch && vpeekc() == NUL)
 	    // may have skipped a redraw, do it now
 	    redrawcmd();
-	return;
+	ត្រឡប់;
     }
 
     // If there is a character waiting, search and redraw later.
-    if (char_avail())
+    ប្រសិនបើ (char_avail())
     {
 	restore_last_search_pattern();
 	is_state->incsearch_postponed = TRUE;
-	return;
+	ត្រឡប់;
     }
     is_state->incsearch_postponed = FALSE;
 
-    if (search_first_line == 0)
+    ប្រសិនបើ (search_first_line == 0)
 	// start at the original cursor position
 	curwin->w_cursor = is_state->search_start;
-    else if (search_first_line > curbuf->b_ml.ml_line_count)
+    បើមិនដូច្នេះ ប្រសិនបើ (search_first_line > curbuf->b_ml.ml_line_count)
     {
 	// start after the last line
 	curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
 	curwin->w_cursor.col = MAXCOL;
     }
-    else
+    បើមិនដូច្នេះ
     {
 	// start at the first line in the range
 	curwin->w_cursor.lnum = search_first_line;
@@ -487,22 +487,22 @@ may_do_incsearch_highlighting(
 				   && ccline.cmdbuff[skiplen - 1] == next_char;
 
     // If there is no pattern, don't do anything.
-    if (patlen == 0 && !use_last_pat)
+    ប្រសិនបើ (patlen == 0 && !use_last_pat)
     {
 	found = 0;
 	set_no_hlsearch(TRUE); // turn off previous highlight
 	redraw_all_later(UPD_SOME_VALID);
     }
-    else
+    បើមិនដូច្នេះ
     {
-	int search_flags = SEARCH_OPT + SEARCH_NOOF + SEARCH_PEEK;
+	ចំនួនគត់ search_flags = SEARCH_OPT + SEARCH_NOOF + SEARCH_PEEK;
 
 	cursor_off();	// so the user knows we're busy
 	out_flush();
 	++emsg_off;	// so it doesn't beep if bad expr
-	if (!p_hls)
+	ប្រសិនបើ (!p_hls)
 	    search_flags += SEARCH_KEEP;
-	if (search_first_line != 0)
+	ប្រសិនបើ (search_first_line != 0)
 	    search_flags += SEARCH_START;
 	ccline.cmdbuff[skiplen + patlen] = NUL;
 # ifdef FEAT_RELTIME
@@ -514,14 +514,14 @@ may_do_incsearch_highlighting(
 				 ccline.cmdbuff + skiplen, patlen, count, search_flags,
 # ifdef FEAT_RELTIME
 		&sia
-# else
+# បើមិនដូច្នេះ
 		NULL
 # endif
 		);
 	ccline.cmdbuff[skiplen + patlen] = next_char;
 	--emsg_off;
 
-	if (curwin->w_cursor.lnum < search_first_line
+	ប្រសិនបើ (curwin->w_cursor.lnum < search_first_line
 		|| curwin->w_cursor.lnum > search_last_line)
 	{
 	    // match outside of address range
@@ -530,19 +530,19 @@ may_do_incsearch_highlighting(
 	}
 
 	// if interrupted while searching, behave like it failed
-	if (got_int)
+	ប្រសិនបើ (got_int)
 	{
 	    (void)vpeekc();	// remove <C-C> from input stream
 	    got_int = FALSE;	// don't abandon the command line
 	    found = 0;
 	}
-	else if (char_avail())
+	បើមិនដូច្នេះ ប្រសិនបើ (char_avail())
 	    // cancelled searching because a char was typed
 	    is_state->incsearch_postponed = TRUE;
     }
-    if (found != 0)
+    ប្រសិនបើ (found != 0)
 	highlight_match = TRUE;		// highlight position
-    else
+    បើមិនដូច្នេះ
 	highlight_match = FALSE;	// remove highlight
 
     // First restore the old curwin values, so the screen is positioned in the
@@ -551,7 +551,7 @@ may_do_incsearch_highlighting(
     changed_cline_bef_curs();
     update_topline();
 
-    if (found != 0)
+    ប្រសិនបើ (found != 0)
     {
 	pos_T	    save_pos = curwin->w_cursor;
 
@@ -562,16 +562,16 @@ may_do_incsearch_highlighting(
 	is_state->match_end = end_pos;
 	curwin->w_cursor = save_pos;
     }
-    else
+    បើមិនដូច្នេះ
 	end_pos = curwin->w_cursor; // shutup gcc 4
 
     // Disable 'hlsearch' highlighting if the pattern matches everything.
     // Avoids a flash when typing "foo\|".
-    if (!use_last_pat)
+    ប្រសិនបើ (!use_last_pat)
     {
 	next_char = ccline.cmdbuff[skiplen + patlen];
 	ccline.cmdbuff[skiplen + patlen] = NUL;
-	if (empty_pattern(ccline.cmdbuff + skiplen, (size_t)patlen, search_delim)
+	ប្រសិនបើ (empty_pattern(ccline.cmdbuff + skiplen, (size_t)patlen, search_delim)
 							       && !no_hlsearch)
 	{
 	    redraw_all_later(UPD_SOME_VALID);
@@ -583,7 +583,7 @@ may_do_incsearch_highlighting(
     validate_cursor();
 
     // May redraw the status line to show the cursor position.
-    if (p_ru && curwin->w_status_height > 0)
+    ប្រសិនបើ (p_ru && curwin->w_status_height > 0)
 	curwin->w_redr_status = true;
 
     update_screen(UPD_SOME_VALID);
@@ -592,9 +592,9 @@ may_do_incsearch_highlighting(
 
     // Leave it at the end to make CTRL-R CTRL-W work.  But not when beyond the
     // end of the pattern, e.g. for ":s/pat/".
-    if (ccline.cmdbuff[skiplen + patlen] != NUL)
+    ប្រសិនបើ (ccline.cmdbuff[skiplen + patlen] != NUL)
 	curwin->w_cursor = is_state->search_start;
-    else if (found != 0)
+    បើមិនដូច្នេះ ប្រសិនបើ (found != 0)
 	curwin->w_cursor = end_pos;
 
     msg_starthere();
@@ -607,14 +607,14 @@ may_do_incsearch_highlighting(
  * or previous match.
  * Returns FAIL when jumping to cmdline_not_changed;
  */
-    static int
+    static ចំនួនគត់
 may_adjust_incsearch_highlighting(
-	int			firstc,
+	ចំនួនគត់			firstc,
 	long			count,
 	incsearch_state_T	*is_state,
-	int			c)
+	ចំនួនគត់			c)
 {
-    int		skiplen, patlen;
+    ចំនួនគត់		skiplen, patlen;
     pos_T	t;
     char_u	*pat;
     char_u	*dircp = NULL;
@@ -623,24 +623,24 @@ may_adjust_incsearch_highlighting(
     size_t	searchstrlen;
     size_t	patlen_s;
     soffset_T	offset;
-    int		search_flags = SEARCH_NOOF;
-    int		i;
-    int		search_delim;
+    ចំនួនគត់		search_flags = SEARCH_NOOF;
+    ចំនួនគត់		i;
+    ចំនួនគត់		search_delim;
 
     // Parsing range may already set the last search pattern.
     // NOTE: must call restore_last_search_pattern() before returning!
     save_last_search_pattern();
 
-    if (!do_incsearch_highlighting(firstc, &search_delim, is_state,
+    ប្រសិនបើ (!do_incsearch_highlighting(firstc, &search_delim, is_state,
 							    &skiplen, &patlen))
     {
 	restore_last_search_pattern();
-	return OK;
+	ត្រឡប់ OK;
     }
-    if (patlen == 0 && ccline.cmdbuff[skiplen] == NUL)
+    ប្រសិនបើ (patlen == 0 && ccline.cmdbuff[skiplen] == NUL)
     {
 	restore_last_search_pattern();
-	return FAIL;
+	ត្រឡប់ FAIL;
     }
 
     pat = ccline.cmdbuff + skiplen;
@@ -656,76 +656,76 @@ may_adjust_incsearch_highlighting(
 
     cursor_off();
     out_flush();
-    if (c == Ctrl_G)
+    ប្រសិនបើ (c == Ctrl_G)
     {
 	t = is_state->match_end;
-	if (LT_POS(is_state->match_start, is_state->match_end))
+	ប្រសិនបើ (LT_POS(is_state->match_start, is_state->match_end))
 	    // Start searching at the end of the match not at the beginning of
 	    // the next column.
 	    (void)decl(&t);
 	search_flags += SEARCH_COL;
     }
-    else
+    បើមិនដូច្នេះ
 	t = is_state->match_start;
-    if (!p_hls)
+    ប្រសិនបើ (!p_hls)
 	search_flags += SEARCH_KEEP;
     ++emsg_off;
     i = searchit(curwin, curbuf, &t, NULL,
 		 c == Ctrl_G ? FORWARD : BACKWARD,
 		 searchstr, searchstrlen, count, search_flags, RE_SEARCH, NULL);
     --emsg_off;
-    if (dircp != NULL)
+    ប្រសិនបើ (dircp != NULL)
 	*dircp = search_delim;
-    if (i)
+    ប្រសិនបើ (i)
     {
 	pos_T	match_start = is_state->match_start;
 	pos_T	match_end = is_state->match_end;
 	long	off = offset.off;
 
 	is_state->search_start = match_start;
-	if (!offset.line && (offset.end || off != 0))
+	ប្រសិនបើ (!offset.line && (offset.end || off != 0))
 	{
-	    if (offset.end)
+	    ប្រសិនបើ (offset.end)
 	    {
 		is_state->search_start = match_end;
 		(void)decl(&is_state->search_start);
 	    }
-	    while (off > 0)
+	    ខណៈពេល (off > 0)
 	    {
-		if (incl(&is_state->search_start) == -1)
-		    break;
+		ប្រសិនបើ (incl(&is_state->search_start) == -1)
+		    bha_nga;
 		--off;
 	    }
-	    while (off < 0)
+	    ខណៈពេល (off < 0)
 	    {
-		if (decl(&is_state->search_start) == -1)
-		    break;
+		ប្រសិនបើ (decl(&is_state->search_start) == -1)
+		    bha_nga;
 		++off;
 	    }
 	}
 	is_state->match_end = t;
 	is_state->match_start = t;
-	if (c == Ctrl_T && firstc != '?')
+	ប្រសិនបើ (c == Ctrl_T && firstc != '?')
 	{
 	    // Move just before the current match, so that when nv_search
 	    // finishes the cursor will be put back on the match.
 	    is_state->search_start = t;
 	    (void)decl(&is_state->search_start);
 	}
-	else if (c == Ctrl_G && firstc == '?')
+	បើមិនដូច្នេះ ប្រសិនបើ (c == Ctrl_G && firstc == '?')
 	{
 	    // Move just after the current match, so that when nv_search
 	    // finishes the cursor will be put back on the match.
 	    is_state->search_start = t;
 	    (void)incl(&is_state->search_start);
 	}
-	if (LT_POS(t, is_state->search_start) && c == Ctrl_G)
+	ប្រសិនបើ (LT_POS(t, is_state->search_start) && c == Ctrl_G)
 	{
 	    // wrap around
 	    is_state->search_start = t;
-	    if (firstc == '?')
+	    ប្រសិនបើ (firstc == '?')
 		(void)incl(&is_state->search_start);
-	    else
+	    បើមិនដូច្នេះ
 		(void)decl(&is_state->search_start);
 	}
 
@@ -741,11 +741,11 @@ may_adjust_incsearch_highlighting(
 	redrawcmdline();
 	curwin->w_cursor = is_state->match_end;
     }
-    else
+    បើមិនដូច្នេះ
 	vim_beep(BO_ERROR);
     vim_free(strcopy);
     restore_last_search_pattern();
-    return FAIL;
+    ត្រឡប់ FAIL;
 }
 
 /*
@@ -753,36 +753,36 @@ may_adjust_incsearch_highlighting(
  * May set "*c" to the added character.
  * Return OK when jumping to cmdline_not_changed.
  */
-    static int
-may_add_char_to_search(int firstc, int *c, incsearch_state_T *is_state)
+    static ចំនួនគត់
+may_add_char_to_search(ចំនួនគត់ firstc, ចំនួនគត់ *c, incsearch_state_T *is_state)
 {
-    int		skiplen, patlen, search_delim;
+    ចំនួនគត់		skiplen, patlen, search_delim;
 
     // Parsing range may already set the last search pattern.
     // NOTE: must call restore_last_search_pattern() before returning!
     save_last_search_pattern();
 
-    if (!do_incsearch_highlighting(firstc, &search_delim, is_state,
+    ប្រសិនបើ (!do_incsearch_highlighting(firstc, &search_delim, is_state,
 							    &skiplen, &patlen))
     {
 	restore_last_search_pattern();
-	return FAIL;
+	ត្រឡប់ FAIL;
     }
     restore_last_search_pattern();
 
     // Add a character from under the cursor for 'incsearch'.
-    if (is_state->did_incsearch)
+    ប្រសិនបើ (is_state->did_incsearch)
     {
 	curwin->w_cursor = is_state->match_end;
 	*c = gchar_cursor();
-	if (*c != NUL)
+	ប្រសិនបើ (*c != NUL)
 	{
 	    // If 'ignorecase' and 'smartcase' are set and the
 	    // command line has no uppercase characters, convert
 	    // the character to lowercase.
-	    if (p_ic && p_scs && !pat_has_uppercase(ccline.cmdbuff + skiplen))
+	    ប្រសិនបើ (p_ic && p_scs && !pat_has_uppercase(ccline.cmdbuff + skiplen))
 		*c = MB_TOLOWER(*c);
-	    if (*c == search_delim || vim_strchr((char_u *)(
+	    ប្រសិនបើ (*c == search_delim || vim_strchr((char_u *)(
 			     magic_isset() ? "\\~^$.*[" : "\\^$"), *c) != NULL)
 	    {
 		// put a backslash before special characters
@@ -790,11 +790,11 @@ may_add_char_to_search(int firstc, int *c, incsearch_state_T *is_state)
 		*c = '\\';
 	    }
 	    // add any composing characters
-	    if (mb_char2len(*c) != mb_ptr2len(ml_get_cursor()))
+	    ប្រសិនបើ (mb_char2len(*c) != mb_ptr2len(ml_get_cursor()))
 	    {
-		int save_c = *c;
+		ចំនួនគត់ save_c = *c;
 
-		while (mb_char2len(*c) != mb_ptr2len(ml_get_cursor()))
+		ខណៈពេល (mb_char2len(*c) != mb_ptr2len(ml_get_cursor()))
 		{
 		    curwin->w_cursor.col += mb_char2len(*c);
 		    *c = gchar_cursor();
@@ -802,10 +802,10 @@ may_add_char_to_search(int firstc, int *c, incsearch_state_T *is_state)
 		}
 		*c = save_c;
 	    }
-	    return FAIL;
+	    ត្រឡប់ FAIL;
 	}
     }
-    return OK;
+    ត្រឡប់ OK;
 }
 #endif
 
@@ -814,27 +814,27 @@ may_add_char_to_search(int firstc, int *c, incsearch_state_T *is_state)
  * Return TRUE if the command line has an Arabic character at or after "start"
  * for "len" bytes.
  */
-    static int
-cmdline_has_arabic(int start, int len)
+    static ចំនួនគត់
+cmdline_has_arabic(ចំនួនគត់ start, ចំនួនគត់ len)
 {
-    int	    j;
-    int	    mb_l;
-    int	    u8c;
+    ចំនួនគត់	    j;
+    ចំនួនគត់	    mb_l;
+    ចំនួនគត់	    u8c;
     char_u  *p;
-    int	    u8cc[MAX_MCO];
+    ចំនួនគត់	    u8cc[MAX_MCO];
 
-    if (!enc_utf8)
-	return FALSE;
+    ប្រសិនបើ (!enc_utf8)
+	ត្រឡប់ FALSE;
 
-    for (j = start; j < start + len; j += mb_l)
+    សម្រាប់ (j = start; j < start + len; j += mb_l)
     {
 	p = ccline.cmdbuff + j;
 	u8c = utfc_ptr2char_len(p, u8cc, start + len - j);
 	mb_l = utfc_ptr2len_len(p, start + len - j);
-	if (ARABIC_CHAR(u8c))
-	    return TRUE;
+	ប្រសិនបើ (ARABIC_CHAR(u8c))
+	    ត្រឡប់ TRUE;
     }
-    return FALSE;
+    ត្រឡប់ FALSE;
 }
 #endif
 
@@ -850,8 +850,8 @@ cmdline_init(void)
  * - CTRL-\ CTRL-G goes to Insert mode when 'insertmode' is set
  * - CTRL-\ e prompts for an expression.
  */
-    static int
-cmdline_handle_ctrl_bsl(int c, int *gotesc)
+    static ចំនួនគត់
+cmdline_handle_ctrl_bsl(ចំនួនគត់ c, ចំនួនគត់ *gotesc)
 {
     ++no_mapping;
     ++allow_keys;
@@ -861,7 +861,7 @@ cmdline_handle_ctrl_bsl(int c, int *gotesc)
 
     // CTRL-\ e doesn't work when obtaining an expression, unless it
     // is in a mapping.
-    if (c != Ctrl_N && c != Ctrl_G && (c != 'e'
+    ប្រសិនបើ (c != Ctrl_N && c != Ctrl_G && (c != 'e'
 		|| (ccline.cmdfirstc == '=' && KeyTyped)
 #ifdef FEAT_EVAL
 		|| cmdline_star > 0
@@ -869,23 +869,23 @@ cmdline_handle_ctrl_bsl(int c, int *gotesc)
 		))
     {
 	vungetc(c);
-	return PROCESS_NEXT_KEY;
+	ត្រឡប់ PROCESS_NEXT_KEY;
     }
 
 #ifdef FEAT_EVAL
-    if (c == 'e')
+    ប្រសិនបើ (c == 'e')
     {
 	/*
 	 * Replace the command line with the result of an expression.
 	 * This will call getcmdline() recursively in get_expr_register().
 	 */
-	if (ccline.cmdpos == ccline.cmdlen)
+	ប្រសិនបើ (ccline.cmdpos == ccline.cmdlen)
 	    new_cmdpos = 99999;	// keep it at the end
-	else
+	បើមិនដូច្នេះ
 	    new_cmdpos = ccline.cmdpos;
 
 	c = get_expr_register();
-	if (c == '=')
+	ប្រសិនបើ (c == '=')
 	{
 	    char_u	*p = NULL;
 
@@ -895,11 +895,11 @@ cmdline_handle_ctrl_bsl(int c, int *gotesc)
 	    p = get_expr_line();
 	    --textlock;
 
-	    if (p != NULL)
+	    ប្រសិនបើ (p != NULL)
 	    {
-		int len = (int)STRLEN(p);
+		ចំនួនគត់ len = (ចំនួនគត់)STRLEN(p);
 
-		if (realloc_cmdbuff(len + 1) == OK)
+		ប្រសិនបើ (realloc_cmdbuff(len + 1) == OK)
 		{
 		    ccline.cmdlen = len;
 		    STRCPY(ccline.cmdbuff, p);
@@ -907,14 +907,14 @@ cmdline_handle_ctrl_bsl(int c, int *gotesc)
 
 		    // Restore the cursor or use the position set with
 		    // set_cmdline_pos().
-		    if (new_cmdpos > ccline.cmdlen)
+		    ប្រសិនបើ (new_cmdpos > ccline.cmdlen)
 			ccline.cmdpos = ccline.cmdlen;
-		    else
+		    បើមិនដូច្នេះ
 			ccline.cmdpos = new_cmdpos;
 
 		    KeyTyped = FALSE;	// Don't do p_wc completion.
 		    redrawcmd();
-		    return CMDLINE_CHANGED;
+		    ត្រឡប់ CMDLINE_CHANGED;
 		}
 		vim_free(p);
 	    }
@@ -924,15 +924,15 @@ cmdline_handle_ctrl_bsl(int c, int *gotesc)
 	did_emsg = FALSE;
 	emsg_on_display = FALSE;
 	redrawcmd();
-	return CMDLINE_NOT_CHANGED;
+	ត្រឡប់ CMDLINE_NOT_CHANGED;
     }
 #endif
 
-    if (c == Ctrl_G && p_im && restart_edit == 0)
+    ប្រសិនបើ (c == Ctrl_G && p_im && restart_edit == 0)
 	restart_edit = 'a';
     *gotesc = TRUE;	// will free ccline.cmdbuff after putting it
 			// in history
-    return GOTO_NORMAL_MODE;
+    ត្រឡប់ GOTO_NORMAL_MODE;
 }
 
 /*
@@ -942,30 +942,30 @@ cmdline_handle_ctrl_bsl(int c, int *gotesc)
  *   typed, not when it comes from a macro
  * Returns CMDLINE_CHANGED if command line is changed or CMDLINE_NOT_CHANGED.
  */
-    static int
+    static ចំនួនគត់
 cmdline_wildchar_complete(
-	int		c,
-	int		escape,
-	int		*did_wild_list,
-	int		*wim_index_p,
+	ចំនួនគត់		c,
+	ចំនួនគត់		escape,
+	ចំនួនគត់		*did_wild_list,
+	ចំនួនគត់		*wim_index_p,
 	expand_T	*xp,
-	int		*gotesc,
-	int		redraw_if_menu_empty,
+	ចំនួនគត់		*gotesc,
+	ចំនួនគត់		redraw_if_menu_empty,
 	pos_T		*pre_incsearch_pos)
 {
-    int		wim_index = *wim_index_p;
-    int		res;
-    int		cmdpos_before;
-    int		options = WILD_NO_BEEP;
-    int		wim_noselect = p_wmnu && (wim_flags[0] & WIM_NOSELECT);
-    int		wim_noinsert = p_wmnu && (wim_flags[0] & WIM_NOINSERT);
+    ចំនួនគត់		wim_index = *wim_index_p;
+    ចំនួនគត់		res;
+    ចំនួនគត់		cmdpos_before;
+    ចំនួនគត់		options = WILD_NO_BEEP;
+    ចំនួនគត់		wim_noselect = p_wmnu && (wim_flags[0] & WIM_NOSELECT);
+    ចំនួនគត់		wim_noinsert = p_wmnu && (wim_flags[0] & WIM_NOINSERT);
 
-    if (wim_flags[wim_index] & WIM_BUFLASTUSED)
+    ប្រសិនបើ (wim_flags[wim_index] & WIM_BUFLASTUSED)
 	options |= WILD_BUFLASTUSED;
-    if (xp->xp_numfiles > 0)   // typed p_wc at least twice
+    ប្រសិនបើ (xp->xp_numfiles > 0)   // typed p_wc at least twice
     {
 	// If "list" is present, list matches unless already listed
-	if (xp->xp_numfiles > 1
+	ប្រសិនបើ (xp->xp_numfiles > 1
 		&& !*did_wild_list
 		&& (wim_flags[wim_index] & WIM_LIST))
 	{
@@ -974,120 +974,120 @@ cmdline_wildchar_complete(
 	    redrawcmd();
 	    *did_wild_list = TRUE;
 	}
-	if (wim_flags[wim_index] & WIM_LONGEST)
+	ប្រសិនបើ (wim_flags[wim_index] & WIM_LONGEST)
 	    res = nextwild(xp, WILD_LONGEST, options, escape);
-	else if (wim_flags[wim_index] & WIM_FULL)
+	បើមិនដូច្នេះ ប្រសិនបើ (wim_flags[wim_index] & WIM_FULL)
 	    res = nextwild(xp, WILD_NEXT, options, escape);
-	else
+	បើមិនដូច្នេះ
 	    res = OK;	    // don't insert 'wildchar' now
     }
-    else		    // typed p_wc first time
+    បើមិនដូច្នេះ		    // typed p_wc first time
     {
-	int wim_longest = (wim_flags[0] & WIM_LONGEST);
-	int wim_list = (wim_flags[0] & WIM_LIST);
-	int wim_full = (wim_flags[0] & WIM_FULL);
+	ចំនួនគត់ wim_longest = (wim_flags[0] & WIM_LONGEST);
+	ចំនួនគត់ wim_list = (wim_flags[0] & WIM_LIST);
+	ចំនួនគត់ wim_full = (wim_flags[0] & WIM_FULL);
 
 	wim_index = 0;
-	if (c == p_wc || c == p_wcm || c == K_WILD)
+	ប្រសិនបើ (c == p_wc || c == p_wcm || c == K_WILD)
 	{
 	    options |= WILD_MAY_EXPAND_PATTERN;
-	    if (c == K_WILD)
+	    ប្រសិនបើ (c == K_WILD)
 		options |= WILD_FUNC_TRIGGER;
-	    if (pre_incsearch_pos)
+	    ប្រសិនបើ (pre_incsearch_pos)
 		xp->xp_pre_incsearch_pos = *pre_incsearch_pos;
-	    else
+	    បើមិនដូច្នេះ
 		xp->xp_pre_incsearch_pos = curwin->w_cursor;
 	}
 	cmdpos_before = ccline.cmdpos;
 
 	// if 'wildmode' first contains "longest", get longest
 	// common part
-	if (wim_longest)
+	ប្រសិនបើ (wim_longest)
 	    res = nextwild(xp, WILD_LONGEST, options, escape);
-	else
+	បើមិនដូច្នេះ
 	{
-	    if (wim_noselect || (wim_list && !wim_full))
+	    ប្រសិនបើ (wim_noselect || (wim_list && !wim_full))
 		options |= WILD_NOSELECT;
-	    if (wim_noinsert)
+	    ប្រសិនបើ (wim_noinsert)
 		options |= WILD_NOINSERT;
 	    res = nextwild(xp, WILD_EXPAND_KEEP, options, escape);
 	}
 
 	// Remove popup window if no completion items are available
-	if (redraw_if_menu_empty && xp->xp_numfiles <= 0)
+	ប្រសិនបើ (redraw_if_menu_empty && xp->xp_numfiles <= 0)
 	{
 	    update_screen(0);
 	    redrawcmd();  // Ensure initial pasted text appears on cmdline
 	}
 
 	// if interrupted while completing, behave like it failed
-	if (got_int)
+	ប្រសិនបើ (got_int)
 	{
 	    (void)vpeekc();	// remove <C-C> from input stream
 	    got_int = FALSE;	// don't abandon the command line
 	    (void)ExpandOne(xp, NULL, NULL, 0, WILD_FREE);
 	    xp->xp_context = EXPAND_NOTHING;
 	    *wim_index_p = wim_index;
-	    return CMDLINE_CHANGED;
+	    ត្រឡប់ CMDLINE_CHANGED;
 	}
 
 	// Display matches
-	if (res == OK && xp->xp_numfiles > ((wim_noselect || wim_noinsert) ? 0 : 1))
+	ប្រសិនបើ (res == OK && xp->xp_numfiles > ((wim_noselect || wim_noinsert) ? 0 : 1))
 	{
-	    if (wim_longest)
+	    ប្រសិនបើ (wim_longest)
 	    {
-		int found_longest_prefix = (ccline.cmdpos != cmdpos_before);
-		int show_menu = p_wmnu && wim_full;
+		ចំនួនគត់ found_longest_prefix = (ccline.cmdpos != cmdpos_before);
+		ចំនួនគត់ show_menu = p_wmnu && wim_full;
 
-		if (wim_list || show_menu)
+		ប្រសិនបើ (wim_list || show_menu)
 		    (void)showmatches(xp, show_menu, wim_list, WIM_NOSELECT);
-		else if (!found_longest_prefix)
+		បើមិនដូច្នេះ ប្រសិនបើ (!found_longest_prefix)
 		{
-		    int wim_list_next = (wim_flags[1] & WIM_LIST);
-		    int wim_full_next = (wim_flags[1] & WIM_FULL);
-		    int wim_noselect_next = (wim_flags[1] & WIM_NOSELECT);
-		    int wim_noinsert_next = (wim_flags[1] & WIM_NOINSERT);
-		    if (wim_list_next || (p_wmnu && (wim_full_next
+		    ចំនួនគត់ wim_list_next = (wim_flags[1] & WIM_LIST);
+		    ចំនួនគត់ wim_full_next = (wim_flags[1] & WIM_FULL);
+		    ចំនួនគត់ wim_noselect_next = (wim_flags[1] & WIM_NOSELECT);
+		    ចំនួនគត់ wim_noinsert_next = (wim_flags[1] & WIM_NOINSERT);
+		    ប្រសិនបើ (wim_list_next || (p_wmnu && (wim_full_next
 				    || wim_noselect_next || wim_noinsert_next)))
 		    {
-			if (wim_full_next && !wim_noselect_next && !wim_noinsert_next)
+			ប្រសិនបើ (wim_full_next && !wim_noselect_next && !wim_noinsert_next)
 			    nextwild(xp, WILD_NEXT, options, escape);
-			else
+			បើមិនដូច្នេះ
 			    (void)showmatches(xp, p_wmnu && (wim_noselect_next
 					|| wim_noinsert_next), wim_list_next,
 				    p_wmnu ? wim_flags[1] : 0);
 
-			if (wim_list_next)
+			ប្រសិនបើ (wim_list_next)
 			    *did_wild_list = TRUE;
 		    }
 		}
 	    }
-	    else
+	    បើមិនដូច្នេះ
 	    {
-		int show_menu = p_wmnu && (wim_full || wim_noselect
+		ចំនួនគត់ show_menu = p_wmnu && (wim_full || wim_noselect
 							    || wim_noinsert);
 
-		if (wim_list || show_menu)
+		ប្រសិនបើ (wim_list || show_menu)
 		    (void)showmatches(xp, show_menu, wim_list,
 			    p_wmnu ? wim_flags[0] : 0);
-		else
+		បើមិនដូច្នេះ
 		    vim_beep(BO_WILD);
 	    }
 
 	    redrawcmd();
-	    if (wim_list)
+	    ប្រសិនបើ (wim_list)
 		*did_wild_list = TRUE;
 	}
-	else if (xp->xp_numfiles == -1)
+	បើមិនដូច្នេះ ប្រសិនបើ (xp->xp_numfiles == -1)
 	    xp->xp_context = EXPAND_NOTHING;
     }
-    if (wim_index < 3)
+    ប្រសិនបើ (wim_index < 3)
 	++wim_index;
-    if (c == ESC)
+    ប្រសិនបើ (c == ESC)
 	*gotesc = TRUE;
 
     *wim_index_p = wim_index;
-    return (res == OK) ? CMDLINE_CHANGED : CMDLINE_NOT_CHANGED;
+    ត្រឡប់ (res == OK) ? CMDLINE_CHANGED : CMDLINE_NOT_CHANGED;
 }
 
 /*
@@ -1097,74 +1097,74 @@ cmdline_wildchar_complete(
  *  CMDLINE_CHANGED - if the command line is changed
  *  GOTO_NORMAL_MODE - go back to normal mode
  */
-    static int
+    static ចំនួនគត់
 cmdline_erase_chars(
-	int c,
-	int indent
+	ចំនួនគត់ c,
+	ចំនួនគត់ indent
 #ifdef FEAT_SEARCH_EXTRA
 	, incsearch_state_T *isp
 #endif
 	)
 {
-    int		i;
-    int		j;
+    ចំនួនគត់		i;
+    ចំនួនគត់		j;
 
-    if (c == K_KDEL)
+    ប្រសិនបើ (c == K_KDEL)
 	c = K_DEL;
 
     /*
      * Delete current character is the same as backspace on next
      * character, except at end of line.
      */
-    if (c == K_DEL && ccline.cmdpos != ccline.cmdlen)
+    ប្រសិនបើ (c == K_DEL && ccline.cmdpos != ccline.cmdlen)
 	++ccline.cmdpos;
-    if (has_mbyte && c == K_DEL)
+    ប្រសិនបើ (has_mbyte && c == K_DEL)
 	ccline.cmdpos += mb_off_next(ccline.cmdbuff,
 		ccline.cmdbuff + ccline.cmdpos);
-    if (ccline.cmdpos > 0)
+    ប្រសិនបើ (ccline.cmdpos > 0)
     {
 	char_u *p;
 
 	j = ccline.cmdpos;
 	p = ccline.cmdbuff + j;
-	if (has_mbyte)
+	ប្រសិនបើ (has_mbyte)
 	{
 	    p = mb_prevptr(ccline.cmdbuff, p);
-	    if (c == Ctrl_W)
+	    ប្រសិនបើ (c == Ctrl_W)
 	    {
-		while (p > ccline.cmdbuff && vim_isspace(*p))
+		ខណៈពេល (p > ccline.cmdbuff && vim_isspace(*p))
 		    p = mb_prevptr(ccline.cmdbuff, p);
 		i = mb_get_class(p);
-		while (p > ccline.cmdbuff && mb_get_class(p) == i)
+		ខណៈពេល (p > ccline.cmdbuff && mb_get_class(p) == i)
 		    p = mb_prevptr(ccline.cmdbuff, p);
-		if (mb_get_class(p) != i)
+		ប្រសិនបើ (mb_get_class(p) != i)
 		    p += (*mb_ptr2len)(p);
 	    }
 	}
-	else if (c == Ctrl_W)
+	បើមិនដូច្នេះ ប្រសិនបើ (c == Ctrl_W)
 	{
-	    while (p > ccline.cmdbuff && vim_isspace(p[-1]))
+	    ខណៈពេល (p > ccline.cmdbuff && vim_isspace(p[-1]))
 		--p;
-	    if (p > ccline.cmdbuff)
+	    ប្រសិនបើ (p > ccline.cmdbuff)
 	    {
 		i = vim_iswordc(p[-1]);
-		while (p > ccline.cmdbuff && !vim_isspace(p[-1])
+		ខណៈពេល (p > ccline.cmdbuff && !vim_isspace(p[-1])
 			&& vim_iswordc(p[-1]) == i)
 		    --p;
 	    }
 	}
-	else
+	បើមិនដូច្នេះ
 	    --p;
-	ccline.cmdpos = (int)(p - ccline.cmdbuff);
+	ccline.cmdpos = (ចំនួនគត់)(p - ccline.cmdbuff);
 	ccline.cmdlen -= j - ccline.cmdpos;
 	i = ccline.cmdpos;
-	while (i < ccline.cmdlen)
+	ខណៈពេល (i < ccline.cmdlen)
 	    ccline.cmdbuff[i++] = ccline.cmdbuff[j++];
 
 	// Truncate at the end, required for multi-byte chars.
 	ccline.cmdbuff[ccline.cmdlen] = NUL;
 #ifdef FEAT_SEARCH_EXTRA
-	if (ccline.cmdlen == 0)
+	ប្រសិនបើ (ccline.cmdlen == 0)
 	{
 	    isp->search_start = isp->save_cursor;
 	    // save view settings, so that the screen
@@ -1174,25 +1174,25 @@ cmdline_erase_chars(
 #endif
 	redrawcmd();
     }
-    else if (ccline.cmdlen == 0 && c != Ctrl_W
+    បើមិនដូច្នេះ ប្រសិនបើ (ccline.cmdlen == 0 && c != Ctrl_W
 	    && ccline.cmdprompt == NULL && indent == 0)
     {
 	// In ex and debug mode it doesn't make sense to return.
-	if (exmode_active
+	ប្រសិនបើ (exmode_active
 #ifdef FEAT_EVAL
 		|| ccline.cmdfirstc == '>'
 #endif
 	   )
-	    return CMDLINE_NOT_CHANGED;
+	    ត្រឡប់ CMDLINE_NOT_CHANGED;
 
 	dealloc_cmdbuff();	// no commandline to return
 
-	if (!cmd_silent)
+	ប្រសិនបើ (!cmd_silent)
 	{
 #ifdef FEAT_RIGHTLEFT
-	    if (cmdmsg_rl)
+	    ប្រសិនបើ (cmdmsg_rl)
 		msg_col = cmdline_width;
-	    else
+	    បើមិនដូច្នេះ
 #endif
 		msg_col = 0;
 	    msg_putchar(' ');		// delete ':'
@@ -1201,9 +1201,9 @@ cmdline_erase_chars(
 	isp->search_start = isp->save_cursor;
 #endif
 	redraw_cmdline = TRUE;
-	return GOTO_NORMAL_MODE;
+	ត្រឡប់ GOTO_NORMAL_MODE;
     }
-    return CMDLINE_CHANGED;
+    ត្រឡប់ CMDLINE_CHANGED;
 }
 
 /*
@@ -1213,53 +1213,53 @@ cmdline_erase_chars(
     static void
 cmdline_toggle_langmap(long *b_im_ptr)
 {
-    if (map_to_exists_mode((char_u *)"", MODE_LANGMAP, FALSE))
+    ប្រសិនបើ (map_to_exists_mode((char_u *)"", MODE_LANGMAP, FALSE))
     {
 	// ":lmap" mappings exists, toggle use of mappings.
 	State ^= MODE_LANGMAP;
 #ifdef HAVE_INPUT_METHOD
 	im_set_active(FALSE);	// Disable input method
 #endif
-	if (b_im_ptr != NULL)
+	ប្រសិនបើ (b_im_ptr != NULL)
 	{
-	    if (State & MODE_LANGMAP)
+	    ប្រសិនបើ (State & MODE_LANGMAP)
 		*b_im_ptr = B_IMODE_LMAP;
-	    else
+	    បើមិនដូច្នេះ
 		*b_im_ptr = B_IMODE_NONE;
 	}
     }
 #ifdef HAVE_INPUT_METHOD
-    else
+    បើមិនដូច្នេះ
     {
 	// There are no ":lmap" mappings, toggle IM.  When
 	// 'imdisable' is set don't try getting the status, it's
 	// always off.
-	if ((p_imdisable && b_im_ptr != NULL)
+	ប្រសិនបើ ((p_imdisable && b_im_ptr != NULL)
 		? *b_im_ptr == B_IMODE_IM : im_get_status())
 	{
 	    im_set_active(FALSE);	// Disable input method
-	    if (b_im_ptr != NULL)
+	    ប្រសិនបើ (b_im_ptr != NULL)
 		*b_im_ptr = B_IMODE_NONE;
 	}
-	else
+	បើមិនដូច្នេះ
 	{
 	    im_set_active(TRUE);	// Enable input method
-	    if (b_im_ptr != NULL)
+	    ប្រសិនបើ (b_im_ptr != NULL)
 		*b_im_ptr = B_IMODE_IM;
 	}
     }
 #endif
-    if (b_im_ptr != NULL)
+    ប្រសិនបើ (b_im_ptr != NULL)
     {
-	if (b_im_ptr == &curbuf->b_p_iminsert)
+	ប្រសិនបើ (b_im_ptr == &curbuf->b_p_iminsert)
 	    set_iminsert_global();
-	else
+	បើមិនដូច្នេះ
 	    set_imsearch_global();
     }
 #ifdef CURSOR_SHAPE
     ui_cursor_shape();	// may show different cursor shape
 #endif
-#if defined(FEAT_KEYMAP)
+#ប្រសិនបើ defined(FEAT_KEYMAP)
     // Show/unshow value of 'keymap' in status lines later.
     status_redraw_curbuf();
 #endif
@@ -1269,14 +1269,14 @@ cmdline_toggle_langmap(long *b_im_ptr)
  * Handle the CTRL-R key in the command-line mode and insert the contents of a
  * numbered or named register.
  */
-    static int
-cmdline_insert_reg(int *gotesc UNUSED)
+    static ចំនួនគត់
+cmdline_insert_reg(ចំនួនគត់ *gotesc UNUSED)
 {
-    int		i;
-    int		c;
-    int		literally = FALSE;
+    ចំនួនគត់		i;
+    ចំនួនគត់		c;
+    ចំនួនគត់		literally = FALSE;
 #ifdef FEAT_EVAL
-    int		save_new_cmdpos = new_cmdpos;
+    ចំនួនគត់		save_new_cmdpos = new_cmdpos;
 #endif
 
 #ifdef USE_ON_FLY_SCROLL
@@ -1286,9 +1286,9 @@ cmdline_insert_reg(int *gotesc UNUSED)
     ++no_mapping;
     ++allow_keys;
     i = c = plain_vgetc();	// CTRL-R <char>
-    if (i == Ctrl_O)
+    ប្រសិនបើ (i == Ctrl_O)
 	i = Ctrl_R;		// CTRL-R CTRL-O == CTRL-R CTRL-R
-    if (i == Ctrl_R)
+    ប្រសិនបើ (i == Ctrl_R)
 	c = plain_vgetc();	// CTRL-R CTRL-R <char>
     extra_char = NUL;
     --no_mapping;
@@ -1298,19 +1298,19 @@ cmdline_insert_reg(int *gotesc UNUSED)
      * Insert the result of an expression.
      */
     new_cmdpos = -1;
-    if (c == '=')
+    ប្រសិនបើ (c == '=')
     {
-	if (ccline.cmdfirstc == '='  // can't do this recursively
+	ប្រសិនបើ (ccline.cmdfirstc == '='  // can't do this recursively
 		|| cmdline_star > 0) // or when typing a password
 	{
 	    beep_flush();
 	    c = ESC;
 	}
-	else
+	បើមិនដូច្នេះ
 	    c = get_expr_register();
     }
 #endif
-    if (c != ESC)	    // use ESC to cancel inserting register
+    ប្រសិនបើ (c != ESC)	    // use ESC to cancel inserting register
     {
 	literally = i == Ctrl_R
 #ifdef FEAT_CLIPBOARD
@@ -1323,21 +1323,21 @@ cmdline_insert_reg(int *gotesc UNUSED)
 #ifdef FEAT_EVAL
 	// When there was a serious error abort getting the
 	// command line.
-	if (aborting())
+	ប្រសិនបើ (aborting())
 	{
 	    *gotesc = TRUE;  // will free ccline.cmdbuff after
 	    // putting it in history
-	    return GOTO_NORMAL_MODE;
+	    ត្រឡប់ GOTO_NORMAL_MODE;
 	}
 #endif
 	KeyTyped = FALSE;	// Don't do p_wc completion.
 #ifdef FEAT_EVAL
-	if (new_cmdpos >= 0)
+	ប្រសិនបើ (new_cmdpos >= 0)
 	{
 	    // set_cmdline_pos() was used
-	    if (new_cmdpos > ccline.cmdlen)
+	    ប្រសិនបើ (new_cmdpos > ccline.cmdlen)
 		ccline.cmdpos = ccline.cmdlen;
-	    else
+	    បើមិនដូច្នេះ
 		ccline.cmdpos = new_cmdpos;
 	}
 #endif
@@ -1351,36 +1351,36 @@ cmdline_insert_reg(int *gotesc UNUSED)
 
     // With "literally": the command line has already changed.
     // Else: the text has been stuffed, but the command line didn't change yet.
-    return literally ? CMDLINE_CHANGED : CMDLINE_NOT_CHANGED;
+    ត្រឡប់ literally ? CMDLINE_CHANGED : CMDLINE_NOT_CHANGED;
 }
 
 /*
  * Handle the Left and Right mouse clicks in the command-line mode.
  */
     static void
-cmdline_left_right_mouse(int c, int *ignore_drag_release)
+cmdline_left_right_mouse(ចំនួនគត់ c, ចំនួនគត់ *ignore_drag_release)
 {
-    if (c == K_LEFTRELEASE || c == K_RIGHTRELEASE)
+    ប្រសិនបើ (c == K_LEFTRELEASE || c == K_RIGHTRELEASE)
 	*ignore_drag_release = TRUE;
-    else
+    បើមិនដូច្នេះ
 	*ignore_drag_release = FALSE;
 #ifdef FEAT_GUI
     // When GUI is active, also move when 'mouse' is empty
-    if (!gui.in_use)
+    ប្រសិនបើ (!gui.in_use)
 #endif
-	if (!mouse_has(MOUSE_COMMAND))
-	    return;
+	ប្រសិនបើ (!mouse_has(MOUSE_COMMAND))
+	    ត្រឡប់;
 #ifdef FEAT_CLIPBOARD
-    if (mouse_row < cmdline_row && (clip_star.available || clip_plus.available))
+    ប្រសិនបើ (mouse_row < cmdline_row && (clip_star.available || clip_plus.available))
     {
-	int	    button, is_click, is_drag;
+	ចំនួនគត់	    button, is_click, is_drag;
 
 	/*
 	 * Handle modeless selection.
 	 */
 	button = get_mouse_button(KEY2TERMCAP1(c),
 		&is_click, &is_drag);
-	if (mouse_model_popup() && button == MOUSE_LEFT
+	ប្រសិនបើ (mouse_model_popup() && button == MOUSE_LEFT
 		&& (mod_mask & MOD_MASK_SHIFT))
 	{
 	    // Translate shift-left to right button.
@@ -1388,21 +1388,21 @@ cmdline_left_right_mouse(int c, int *ignore_drag_release)
 	    mod_mask &= ~MOD_MASK_SHIFT;
 	}
 	clip_modeless(button, is_click, is_drag);
-	return;
+	ត្រឡប់;
     }
 #endif
 
     set_cmdspos();
-    for (ccline.cmdpos = 0; ccline.cmdpos < ccline.cmdlen;
+    សម្រាប់ (ccline.cmdpos = 0; ccline.cmdpos < ccline.cmdlen;
 	    ++ccline.cmdpos)
     {
-	int	i;
+	ចំនួនគត់	i;
 
 	i = cmdline_charsize(ccline.cmdpos);
-	if (mouse_row <= cmdline_row + ccline.cmdspos / cmdline_width
+	ប្រសិនបើ (mouse_row <= cmdline_row + ccline.cmdspos / cmdline_width
 		&& mouse_col < ccline.cmdspos % cmdline_width + i)
-	    break;
-	if (has_mbyte)
+	    bha_nga;
+	ប្រសិនបើ (has_mbyte)
 	{
 	    // Count ">" for double-wide char that doesn't fit.
 	    correct_cmdspos(ccline.cmdpos, i);
@@ -1421,148 +1421,148 @@ cmdline_left_right_mouse(int c, int *ignore_drag_release)
  *  CMDLINE_CHANGED - if the command line is changed
  *  GOTO_NORMAL_MODE - go back to normal mode
  */
-    static int
+    static ចំនួនគត់
 cmdline_browse_history(
-	int	c,
-	int	firstc,
+	ចំនួនគត់	c,
+	ចំនួនគត់	firstc,
 	char_u	**curcmdstr,
 	size_t	*curcmdstrlen,
-	int	histype,
-	int	*hiscnt_p,
+	ចំនួនគត់	histype,
+	ចំនួនគត់	*hiscnt_p,
 	expand_T *xp)
 {
-    int		orig_hiscnt;
-    int		hiscnt = orig_hiscnt = *hiscnt_p;
+    ចំនួនគត់		orig_hiscnt;
+    ចំនួនគត់		hiscnt = orig_hiscnt = *hiscnt_p;
     char_u	*lookfor = *curcmdstr;
     size_t	lookforlen = *curcmdstrlen;
-    int		res;
+    ចំនួនគត់		res;
 
-    if (get_hislen() == 0 || firstc == NUL)	// no history
-	return CMDLINE_NOT_CHANGED;
+    ប្រសិនបើ (get_hislen() == 0 || firstc == NUL)	// no history
+	ត្រឡប់ CMDLINE_NOT_CHANGED;
 
     // save current command string so it can be restored later
-    if (lookfor == NULL)
+    ប្រសិនបើ (lookfor == NULL)
     {
-	if ((lookfor = vim_strnsave(ccline.cmdbuff, ccline.cmdlen)) == NULL)
-	    return CMDLINE_NOT_CHANGED;
+	ប្រសិនបើ ((lookfor = vim_strnsave(ccline.cmdbuff, ccline.cmdlen)) == NULL)
+	    ត្រឡប់ CMDLINE_NOT_CHANGED;
 	lookfor[ccline.cmdpos] = NUL;
 	lookforlen = ccline.cmdpos;
     }
 
-    for (;;)
+    សម្រាប់ (;;)
     {
 	// one step backwards
-	if (c == K_UP || c == K_S_UP || c == Ctrl_P
+	ប្រសិនបើ (c == K_UP || c == K_S_UP || c == Ctrl_P
 		|| c == K_PAGEUP || c == K_KPAGEUP)
 	{
-	    if (hiscnt == get_hislen())	// first time
+	    ប្រសិនបើ (hiscnt == get_hislen())	// first time
 		hiscnt = *get_hisidx(histype);
-	    else if (hiscnt == 0 && *get_hisidx(histype)
+	    បើមិនដូច្នេះ ប្រសិនបើ (hiscnt == 0 && *get_hisidx(histype)
 		    != get_hislen() - 1)
 		hiscnt = get_hislen() - 1;
-	    else if (hiscnt != *get_hisidx(histype) + 1)
+	    បើមិនដូច្នេះ ប្រសិនបើ (hiscnt != *get_hisidx(histype) + 1)
 		--hiscnt;
-	    else			// at top of list
+	    បើមិនដូច្នេះ			// at top of list
 	    {
 		hiscnt = orig_hiscnt;
-		break;
+		bha_nga;
 	    }
 	}
-	else    // one step forwards
+	បើមិនដូច្នេះ    // one step forwards
 	{
 	    // on last entry, clear the line
-	    if (hiscnt == *get_hisidx(histype))
+	    ប្រសិនបើ (hiscnt == *get_hisidx(histype))
 	    {
 		hiscnt = get_hislen();
-		break;
+		bha_nga;
 	    }
 
 	    // not on a history line, nothing to do
-	    if (hiscnt == get_hislen())
-		break;
-	    if (hiscnt == get_hislen() - 1)   // wrap around
+	    ប្រសិនបើ (hiscnt == get_hislen())
+		bha_nga;
+	    ប្រសិនបើ (hiscnt == get_hislen() - 1)   // wrap around
 		hiscnt = 0;
-	    else
+	    បើមិនដូច្នេះ
 		++hiscnt;
 	}
-	if (hiscnt < 0 || get_histentry(histype)[hiscnt].hisstr
+	ប្រសិនបើ (hiscnt < 0 || get_histentry(histype)[hiscnt].hisstr
 		== NULL)
 	{
 	    hiscnt = orig_hiscnt;
-	    break;
+	    bha_nga;
 	}
-	if ((c != K_UP && c != K_DOWN)
+	ប្រសិនបើ ((c != K_UP && c != K_DOWN)
 		|| hiscnt == orig_hiscnt
 		|| STRNCMP(get_histentry(histype)[hiscnt].hisstr,
 		    lookfor, lookforlen) == 0)
-	    break;
+	    bha_nga;
     }
 
-    if (hiscnt != orig_hiscnt)	// jumped to other entry
+    ប្រសិនបើ (hiscnt != orig_hiscnt)	// jumped to other entry
     {
 	char_u	*p;
 	size_t	plen;
-	int	old_firstc;
+	ចំនួនគត់	old_firstc;
 
 	dealloc_cmdbuff();
 
 	xp->xp_context = EXPAND_NOTHING;
-	if (hiscnt == get_hislen())
+	ប្រសិនបើ (hiscnt == get_hislen())
 	{
 	    p = lookfor;	// back to the old one
 	    plen = lookforlen;
 	}
-	else
+	បើមិនដូច្នេះ
 	{
 	    p = get_histentry(histype)[hiscnt].hisstr;
 	    plen = get_histentry(histype)[hiscnt].hisstrlen;
 	}
 
-	if (histype == HIST_SEARCH
+	ប្រសិនបើ (histype == HIST_SEARCH
 		&& p != lookfor
 		&& (old_firstc = p[plen + 1]) != firstc)
 	{
-	    int     i;
-	    int     j;
+	    ចំនួនគត់     i;
+	    ចំនួនគត់     j;
 	    size_t  len;
 
 	    // Correct for the separator character used when
 	    // adding the history entry vs the one used now.
 	    // First loop: count length.
 	    // Second loop: copy the characters.
-	    for (i = 0; i <= 1; ++i)
+	    សម្រាប់ (i = 0; i <= 1; ++i)
 	    {
 		len = 0;
-		for (j = 0; p[j] != NUL; ++j)
+		សម្រាប់ (j = 0; p[j] != NUL; ++j)
 		{
 		    // Replace old sep with new sep, unless it is
 		    // escaped.
-		    if (p[j] == old_firstc
+		    ប្រសិនបើ (p[j] == old_firstc
 			    && (j == 0 || p[j - 1] != '\\'))
 		    {
-			if (i > 0)
+			ប្រសិនបើ (i > 0)
 			    ccline.cmdbuff[len] = firstc;
 		    }
-		    else
+		    បើមិនដូច្នេះ
 		    {
 			// Escape new sep, unless it is already
 			// escaped.
-			if (p[j] == firstc
+			ប្រសិនបើ (p[j] == firstc
 				&& (j == 0 || p[j - 1] != '\\'))
 			{
-			    if (i > 0)
+			    ប្រសិនបើ (i > 0)
 				ccline.cmdbuff[len] = '\\';
 			    ++len;
 			}
-			if (i > 0)
+			ប្រសិនបើ (i > 0)
 			    ccline.cmdbuff[len] = p[j];
 		    }
 		    ++len;
 		}
-		if (i == 0)
+		ប្រសិនបើ (i == 0)
 		{
 		    alloc_cmdbuff(len);
-		    if (ccline.cmdbuff == NULL)
+		    ប្រសិនបើ (ccline.cmdbuff == NULL)
 		    {
 			res = GOTO_NORMAL_MODE;
 			goto done;
@@ -1570,18 +1570,18 @@ cmdline_browse_history(
 		}
 	    }
 	    ccline.cmdbuff[len] = NUL;
-	    ccline.cmdpos = ccline.cmdlen = (int)len;
+	    ccline.cmdpos = ccline.cmdlen = (ចំនួនគត់)len;
 	}
-	else
+	បើមិនដូច្នេះ
 	{
 	    alloc_cmdbuff(plen);
-	    if (ccline.cmdbuff == NULL)
+	    ប្រសិនបើ (ccline.cmdbuff == NULL)
 	    {
 		res = GOTO_NORMAL_MODE;
 		goto done;
 	    }
 	    STRCPY(ccline.cmdbuff, p);
-	    ccline.cmdpos = ccline.cmdlen = (int)plen;
+	    ccline.cmdpos = ccline.cmdlen = (ចំនួនគត់)plen;
 	}
 
 	redrawcmd();
@@ -1595,14 +1595,14 @@ done:
     *curcmdstr = lookfor;
     *curcmdstrlen = lookforlen;
     *hiscnt_p = hiscnt;
-    return res;
+    ត្រឡប់ res;
 }
 
 /*
  * Initialize the current command-line info.
  */
-    static int
-init_ccline(int firstc, int indent)
+    static ចំនួនគត់
+init_ccline(ចំនួនគត់ firstc, ចំនួនគត់ indent)
 {
     ccline.overstrike = FALSE;		    // always start in insert mode
 
@@ -1615,16 +1615,16 @@ init_ccline(int firstc, int indent)
     // alloc initial ccline.cmdbuff
     alloc_cmdbuff(indent + 50);
     ccline.cmdlen = ccline.cmdpos = 0;
-    if (ccline.cmdbuff == NULL)
+    ប្រសិនបើ (ccline.cmdbuff == NULL)
     {
 	ccline.cmdbufflen = 0;
-	return FAIL;
+	ត្រឡប់ FAIL;
     }
     ccline.cmdbuff[0] = NUL;
     sb_text_start_cmdline();
 
     // autoindent for :insert and :append
-    if (firstc <= 0)
+    ប្រសិនបើ (firstc <= 0)
     {
 	vim_memset(ccline.cmdbuff, ' ', indent);
 	ccline.cmdbuff[indent] = NUL;
@@ -1633,7 +1633,7 @@ init_ccline(int firstc, int indent)
 	ccline.cmdlen = indent;
     }
 
-    return OK;
+    ត្រឡប់ OK;
 }
 
 /*
@@ -1657,72 +1657,72 @@ init_ccline(int firstc, int indent)
  */
     char_u *
 getcmdline(
-    int		  firstc,
+    ចំនួនគត់		  firstc,
     long	  count,	// only used for incremental search
-    int		  indent,	// indent for inside conditionals
+    ចំនួនគត់		  indent,	// indent for inside conditionals
     getline_opt_T do_concat UNUSED)
 {
-    return getcmdline_int(firstc, count, indent, TRUE);
+    ត្រឡប់ getcmdline_int(firstc, count, indent, TRUE);
 }
 
     static char_u *
 getcmdline_int(
-    int		firstc,
+    ចំនួនគត់		firstc,
     long	count UNUSED,	// only used for incremental search
-    int		indent,		// indent for inside conditionals
-    int		clear_ccline)	// clear ccline first
+    ចំនួនគត់		indent,		// indent for inside conditionals
+    ចំនួនគត់		clear_ccline)	// clear ccline first
 {
-    static int	depth = 0;	    // call depth
-    int		c = 0;
-    int		i;
-    int		j;
-    int		gotesc = FALSE;		// TRUE when <ESC> just typed
-    int		do_abbr;		// when TRUE check for abbr.
+    static ចំនួនគត់	depth = 0;	    // call depth
+    ចំនួនគត់		c = 0;
+    ចំនួនគត់		i;
+    ចំនួនគត់		j;
+    ចំនួនគត់		gotesc = FALSE;		// TRUE when <ESC> just typed
+    ចំនួនគត់		do_abbr;		// when TRUE check for abbr.
     char_u	*lookfor = NULL;	// string to match
     size_t	lookforlen = 0;
-    int		hiscnt;			// current history line in use
-    int		histype;		// history type to be used
+    ចំនួនគត់		hiscnt;			// current history line in use
+    ចំនួនគត់		histype;		// history type to be used
 #ifdef FEAT_SEARCH_EXTRA
     incsearch_state_T	is_state;
 #endif
-    int		did_wild_list = FALSE;	// did wild_list() recently
-    int		wim_index = 0;		// index in wim_flags[]
-    int		res;
-    int		save_msg_scroll = msg_scroll;
-    int		save_State = State;	// remember State when called
-    int		some_key_typed = FALSE;	// one of the keys was typed
+    ចំនួនគត់		did_wild_list = FALSE;	// did wild_list() recently
+    ចំនួនគត់		wim_index = 0;		// index in wim_flags[]
+    ចំនួនគត់		res;
+    ចំនួនគត់		save_msg_scroll = msg_scroll;
+    ចំនួនគត់		save_State = State;	// remember State when called
+    ចំនួនគត់		some_key_typed = FALSE;	// one of the keys was typed
     // mouse drag and release events are ignored, unless they are
     // preceded with a mouse down event
-    int		ignore_drag_release = TRUE;
+    ចំនួនគត់		ignore_drag_release = TRUE;
 #ifdef FEAT_EVAL
-    int		break_ctrl_c = FALSE;
+    ចំនួនគត់		break_ctrl_c = FALSE;
 #endif
     expand_T	xpc;
     long	*b_im_ptr = NULL;
     buf_T	*b_im_ptr_buf = NULL;	// buffer where b_im_ptr is valid
     cmdline_info_T save_ccline;
-    int		did_save_ccline = FALSE;
-    int		cmdline_type;
-    int		wild_type = 0;
-    int		event_cmdlineleavepre_triggered = FALSE;
+    ចំនួនគត់		did_save_ccline = FALSE;
+    ចំនួនគត់		cmdline_type;
+    ចំនួនគត់		wild_type = 0;
+    ចំនួនគត់		event_cmdlineleavepre_triggered = FALSE;
     char_u	*prev_cmdbuff = NULL;
-    int		did_hist_navigate = FALSE;
+    ចំនួនគត់		did_hist_navigate = FALSE;
 
     // one recursion level deeper
     ++depth;
 
-    if (ccline.cmdbuff != NULL)
+    ប្រសិនបើ (ccline.cmdbuff != NULL)
     {
 	// Being called recursively.  Since ccline is global, we need to save
 	// the current buffer and restore it when returning.
 	save_cmdline(&save_ccline);
 	did_save_ccline = TRUE;
     }
-    if (clear_ccline)
+    ប្រសិនបើ (clear_ccline)
 	CLEAR_FIELD(ccline);
 
 #ifdef FEAT_EVAL
-    if (firstc == -1)
+    ប្រសិនបើ (firstc == -1)
     {
 	firstc = NUL;
 	break_ctrl_c = TRUE;
@@ -1730,7 +1730,7 @@ getcmdline_int(
 #endif
 #ifdef FEAT_RIGHTLEFT
     // start without Hebrew mapping for a command line
-    if (firstc == ':' || firstc == '=' || firstc == '>')
+    ប្រសិនបើ (firstc == ':' || firstc == '=' || firstc == '>')
 	cmd_hkmap = 0;
 #endif
 
@@ -1738,10 +1738,10 @@ getcmdline_int(
     init_incsearch_state(&is_state);
 #endif
 
-    if (init_ccline(firstc, indent) != OK)
+    ប្រសិនបើ (init_ccline(firstc, indent) != OK)
 	goto theend;	// out of memory
 
-    if (depth == 50)
+    ប្រសិនបើ (depth == 50)
     {
 	// Somehow got into a loop recursively calling getcmdline(), bail out.
 	emsg(_(e_command_too_recursive));
@@ -1753,15 +1753,15 @@ getcmdline_int(
     clear_cmdline_orig();
 
 #ifdef FEAT_RIGHTLEFT
-    if (curwin->w_p_rl && *curwin->w_p_rlc == 's'
+    ប្រសិនបើ (curwin->w_p_rl && *curwin->w_p_rlc == 's'
 					  && (firstc == '/' || firstc == '?'))
 	cmdmsg_rl = TRUE;
-    else
+    បើមិនដូច្នេះ
 	cmdmsg_rl = FALSE;
 #endif
 
     redir_off = TRUE;		// don't redirect the typed command
-    if (!cmd_silent)
+    ប្រសិនបើ (!cmd_silent)
     {
 	i = msg_scrolled;
 	msg_scrolled = 0;		// avoid wait_return() message
@@ -1776,8 +1776,8 @@ getcmdline_int(
     xpc.xp_shell = FALSE;
 #endif
 
-#if defined(FEAT_EVAL)
-    if (ccline.input_fn)
+#ប្រសិនបើ defined(FEAT_EVAL)
+    ប្រសិនបើ (ccline.input_fn)
     {
 	xpc.xp_context = ccline.xp_context;
 	xpc.xp_pattern = ccline.cmdbuff;
@@ -1793,22 +1793,22 @@ getcmdline_int(
 
     State = MODE_CMDLINE;
 
-    if (firstc == '/' || firstc == '?' || firstc == '@')
+    ប្រសិនបើ (firstc == '/' || firstc == '?' || firstc == '@')
     {
 	// Use ":lmap" mappings for search pattern and input().
-	if (curbuf->b_p_imsearch == B_IMODE_USE_INSERT)
+	ប្រសិនបើ (curbuf->b_p_imsearch == B_IMODE_USE_INSERT)
 	    b_im_ptr = &curbuf->b_p_iminsert;
-	else
+	បើមិនដូច្នេះ
 	    b_im_ptr = &curbuf->b_p_imsearch;
 	b_im_ptr_buf = curbuf;
-	if (*b_im_ptr == B_IMODE_LMAP)
+	ប្រសិនបើ (*b_im_ptr == B_IMODE_LMAP)
 	    State |= MODE_LANGMAP;
 #ifdef HAVE_INPUT_METHOD
 	im_set_active(*b_im_ptr == B_IMODE_IM);
 #endif
     }
 #ifdef HAVE_INPUT_METHOD
-    else if (p_imcmdline)
+    បើមិនដូច្នេះ ប្រសិនបើ (p_imcmdline)
 	im_set_active(TRUE);
 #endif
 
@@ -1825,7 +1825,7 @@ getcmdline_int(
     cmdline_type = firstc == NUL ? '-' : firstc;
     trigger_cmd_autocmd(cmdline_type, EVENT_CMDLINEENTER);
 #ifdef FEAT_EVAL
-    if (!debug_mode)
+    ប្រសិនបើ (!debug_mode)
 	may_trigger_modechanged();
 #endif
 
@@ -1839,31 +1839,31 @@ getcmdline_int(
 
     // If something above caused an error, reset the flags, we do want to type
     // and execute commands. Display may be messed up a bit.
-    if (did_emsg)
+    ប្រសិនបើ (did_emsg)
 	redrawcmd();
 
 #ifdef FEAT_STL_OPT
     // Redraw the statusline in case it uses the current mode using the mode()
     // function.
-    if (!cmd_silent && msg_scrolled == 0)
+    ប្រសិនបើ (!cmd_silent && msg_scrolled == 0)
     {
-	int	found_one = FALSE;
+	ចំនួនគត់	found_one = FALSE;
 	win_T	*wp;
 
 	FOR_ALL_WINDOWS(wp)
-	    if (*p_stl != NUL || *wp->w_p_stl != NUL)
+	    ប្រសិនបើ (*p_stl != NUL || *wp->w_p_stl != NUL)
 	    {
 		wp->w_redr_status = true;
 		found_one = TRUE;
 	    }
 
-	if (*p_tal != NUL)
+	ប្រសិនបើ (*p_tal != NUL)
 	{
 	    redraw_tabline = TRUE;
 	    found_one = TRUE;
 	}
 
-	if (found_one)
+	ប្រសិនបើ (found_one)
 	    redraw_statuslines();
     }
 #endif
@@ -1874,12 +1874,12 @@ getcmdline_int(
     /*
      * Collect the command string, handling editing keys.
      */
-    for (;;)
+    សម្រាប់ (;;)
     {
-	int	trigger_cmdlinechanged = TRUE;
-	int	end_wildmenu;
-	int	prev_cmdpos = ccline.cmdpos;
-	int	skip_pum_redraw = FALSE;
+	ចំនួនគត់	trigger_cmdlinechanged = TRUE;
+	ចំនួនគត់	end_wildmenu;
+	ចំនួនគត់	prev_cmdpos = ccline.cmdpos;
+	ចំនួនគត់	skip_pum_redraw = FALSE;
 
 	VIM_CLEAR(prev_cmdbuff);
 
@@ -1895,7 +1895,7 @@ getcmdline_int(
 				// that occurs while typing a command should
 				// cause the command not to be executed.
 
-	if (ex_normal_busy == 0 && stuff_empty() && typebuf.tb_len == 0)
+	ប្រសិនបើ (ex_normal_busy == 0 && stuff_empty() && typebuf.tb_len == 0)
 	    // There is no pending input from sources other than user input, so
 	    // Vim is going to wait for the user to type a key.  Consider the
 	    // command line typed even if next key will trigger a mapping.
@@ -1904,15 +1904,15 @@ getcmdline_int(
 	// Trigger SafeState if nothing is pending.
 	may_trigger_safestate(xpc.xp_numfiles <= 0);
 
-	if (ccline.cmdbuff != NULL)
+	ប្រសិនបើ (ccline.cmdbuff != NULL)
 	{
 	    prev_cmdbuff = vim_strsave(ccline.cmdbuff);
-	    if (prev_cmdbuff == NULL)
+	    ប្រសិនបើ (prev_cmdbuff == NULL)
 		goto returncmd;
 	}
 
 	// Defer screen update to avoid pum flicker during wildtrigger()
-	if (c == K_WILD && firstc != '@')
+	ប្រសិនបើ (c == K_WILD && firstc != '@')
 	    skip_pum_redraw = TRUE;
 
 	// Get a character.  Ignore K_IGNORE and K_NOP, they should not do
@@ -1921,14 +1921,14 @@ getcmdline_int(
 	{
 	    cursorcmd();		// set the cursor on the right spot
 	    c = safe_vgetc();
-	} while (c == K_IGNORE || c == K_NOP);
+	} ខណៈពេល (c == K_IGNORE || c == K_NOP);
 
 	// If the cmdline was replaced externally (e.g. by setcmdline()
 	// during an <expr> mapping), clean up the wildmenu completion
 	// state to avoid using stale completion data.
-	if (ccline.cmdbuff_replaced && xpc.xp_numfiles > 0)
+	ប្រសិនបើ (ccline.cmdbuff_replaced && xpc.xp_numfiles > 0)
 	{
-	    if (cmdline_pum_active())
+	    ប្រសិនបើ (cmdline_pum_active())
 		cmdline_pum_remove(&ccline, FALSE);
 	    (void)ExpandOne(&xpc, NULL, NULL, 0, WILD_FREE);
 	    did_wild_list = FALSE;
@@ -1939,48 +1939,48 @@ getcmdline_int(
 	ccline.cmdbuff_replaced = FALSE;
 
 	// Skip wildmenu during history navigation via Up/Down keys
-	if (c == K_WILD && did_hist_navigate)
+	ប្រសិនបើ (c == K_WILD && did_hist_navigate)
 	{
 	    did_hist_navigate = FALSE;
 	    continue;
 	}
 
-	if (c == K_COMMAND || c == K_SCRIPT_COMMAND)
+	ប្រសិនបើ (c == K_COMMAND || c == K_SCRIPT_COMMAND)
 	{
-	    int	    clen = ccline.cmdlen;
-	    int	    cc_count = aucmd_cmdline_changed_count;
+	    ចំនួនគត់	    clen = ccline.cmdlen;
+	    ចំនួនគត់	    cc_count = aucmd_cmdline_changed_count;
 
-	    if (do_cmdkey_command(c, DOCMD_NOWAIT) == OK)
+	    ប្រសិនបើ (do_cmdkey_command(c, DOCMD_NOWAIT) == OK)
 	    {
 		// Do not trigger CmdlineChanged below if:
 		// - the length of the command line didn't change
 		// - the <Cmd> mapping already triggered the event
-		if (clen == ccline.cmdlen
+		ប្រសិនបើ (clen == ccline.cmdlen
 				    || cc_count != aucmd_cmdline_changed_count)
 		    trigger_cmdlinechanged = FALSE;
 		goto cmdline_changed;
 	    }
 	}
 
-	if (KeyTyped)
+	ប្រសិនបើ (KeyTyped)
 	{
 	    some_key_typed = TRUE;
 #ifdef FEAT_RIGHTLEFT
-	    if (cmd_hkmap)
+	    ប្រសិនបើ (cmd_hkmap)
 		c = hkmap(c);
-	    if (cmdmsg_rl && !KeyStuffed)
+	    ប្រសិនបើ (cmdmsg_rl && !KeyStuffed)
 	    {
 		// Invert horizontal movements and operations.  Only when
 		// typed by the user directly, not when the result of a
 		// mapping.
 		switch (c)
 		{
-		    case K_RIGHT:   c = K_LEFT; break;
-		    case K_S_RIGHT: c = K_S_LEFT; break;
-		    case K_C_RIGHT: c = K_C_LEFT; break;
-		    case K_LEFT:    c = K_RIGHT; break;
-		    case K_S_LEFT:  c = K_S_RIGHT; break;
-		    case K_C_LEFT:  c = K_C_RIGHT; break;
+		    pak_sa K_RIGHT:   c = K_LEFT; bha_nga;
+		    pak_sa K_S_RIGHT: c = K_S_LEFT; bha_nga;
+		    pak_sa K_C_RIGHT: c = K_C_LEFT; bha_nga;
+		    pak_sa K_LEFT:    c = K_RIGHT; bha_nga;
+		    pak_sa K_S_LEFT:  c = K_S_RIGHT; bha_nga;
+		    pak_sa K_C_LEFT:  c = K_C_RIGHT; bha_nga;
 		}
 	    }
 #endif
@@ -1992,12 +1992,12 @@ getcmdline_int(
 	 * ":g/pat/normal /pat" (without the <CR>).
 	 * Don't ignore it for the input() function.
 	 */
-	if ((c == Ctrl_C
+	ប្រសិនបើ ((c == Ctrl_C
 #ifdef UNIX
 		|| c == intr_char
 #endif
 				)
-#if defined(FEAT_EVAL) || defined(FEAT_CRYPT)
+#ប្រសិនបើ defined(FEAT_EVAL) || defined(FEAT_CRYPT)
 		&& firstc != '@'
 #endif
 #ifdef FEAT_EVAL
@@ -2009,7 +2009,7 @@ getcmdline_int(
 
 	// free old command line when finished moving around in the history
 	// list
-	if (lookfor != NULL
+	ប្រសិនបើ (lookfor != NULL
 		&& c != K_S_DOWN && c != K_S_UP
 		&& c != K_DOWN && c != K_UP
 		&& c != K_PAGEDOWN && c != K_PAGEUP
@@ -2025,30 +2025,30 @@ getcmdline_int(
 	 * When there are matching completions to select <S-Tab> works like
 	 * CTRL-P (unless 'wc' is <S-Tab>).
 	 */
-	if (c != p_wc && c == K_S_TAB && xpc.xp_numfiles > 0)
+	ប្រសិនបើ (c != p_wc && c == K_S_TAB && xpc.xp_numfiles > 0)
 	    c = Ctrl_P;
 
-	if (p_wmnu)
+	ប្រសិនបើ (p_wmnu)
 	    c = wildmenu_translate_key(&ccline, c, &xpc, did_wild_list);
 
-	int key_is_wc = (c == p_wc && KeyTyped) || c == p_wcm;
-	if ((cmdline_pum_active() || wild_menu_showing || did_wild_list)
+	ចំនួនគត់ key_is_wc = (c == p_wc && KeyTyped) || c == p_wcm;
+	ប្រសិនបើ ((cmdline_pum_active() || wild_menu_showing || did_wild_list)
 		&& !key_is_wc && xpc.xp_numfiles > 0)
 	{
 	    // Ctrl-Y: Accept the current selection and close the popup menu.
 	    // Ctrl-E: cancel the cmdline popup menu and return the original
 	    // text.
-	    if (c == Ctrl_E || c == Ctrl_Y)
+	    ប្រសិនបើ (c == Ctrl_E || c == Ctrl_Y)
 	    {
 		wild_type = (c == Ctrl_E) ? WILD_CANCEL : WILD_APPLY;
-		if (nextwild(&xpc, wild_type, WILD_NO_BEEP,
+		ប្រសិនបើ (nextwild(&xpc, wild_type, WILD_NO_BEEP,
 							firstc != '@') == FAIL)
-		    break;
+		    bha_nga;
 	    }
 	}
 
 	// Trigger CmdlineLeavePre autocommand
-	if (KeyTyped && (c == '\n' || c == '\r' || c == K_KENTER || c == ESC
+	ប្រសិនបើ (KeyTyped && (c == '\n' || c == '\r' || c == K_KENTER || c == ESC
 #ifdef UNIX
 		    || c == intr_char
 #endif
@@ -2059,8 +2059,8 @@ getcmdline_int(
 #endif
 	    trigger_cmd_autocmd(cmdline_type, EVENT_CMDLINELEAVEPRE);
 	    event_cmdlineleavepre_triggered = TRUE;
-#if defined(FEAT_SEARCH_EXTRA)
-	    if ((c == ESC || c == Ctrl_C) && (wim_flags[0] & WIM_LIST))
+#ប្រសិនបើ defined(FEAT_SEARCH_EXTRA)
+	    ប្រសិនបើ ((c == ESC || c == Ctrl_C) && (wim_flags[0] & WIM_LIST))
 		set_no_hlsearch(TRUE);
 #endif
 	}
@@ -2083,9 +2083,9 @@ getcmdline_int(
 				 && (mod_mask & MOD_MASK_CTRL))));
 
 	// free expanded names when finished walking through matches
-	if (end_wildmenu)
+	ប្រសិនបើ (end_wildmenu)
 	{
-	    if (cmdline_pum_active())
+	    ប្រសិនបើ (cmdline_pum_active())
 	    {
 		skip_pum_redraw = skip_pum_redraw && !key_is_wc
 		    && !VIM_ISWHITE(c)
@@ -2094,37 +2094,37 @@ getcmdline_int(
 			|| c == K_KDEL || c == Ctrl_W || c == Ctrl_U);
 		cmdline_pum_remove(&ccline, skip_pum_redraw);
 	    }
-	    if (xpc.xp_numfiles != -1)
+	    ប្រសិនបើ (xpc.xp_numfiles != -1)
 		(void)ExpandOne(&xpc, NULL, NULL, 0, WILD_FREE);
 	    did_wild_list = FALSE;
-	    if (!p_wmnu || (c != K_UP && c != K_DOWN))
+	    ប្រសិនបើ (!p_wmnu || (c != K_UP && c != K_DOWN))
 		xpc.xp_context = EXPAND_NOTHING;
 	    wim_index = 0;
 	    wildmenu_cleanup(&ccline);
 	}
 
-	if (p_wmnu)
+	ប្រសិនបើ (p_wmnu)
 	    c = wildmenu_process_key(&ccline, c, &xpc);
 
 	// CTRL-\ CTRL-N goes to Normal mode, CTRL-\ CTRL-G goes to Insert
 	// mode when 'insertmode' is set, CTRL-\ e prompts for an expression.
-	if (c == Ctrl_BSL)
+	ប្រសិនបើ (c == Ctrl_BSL)
 	{
 	    res = cmdline_handle_ctrl_bsl(c, &gotesc);
-	    if (res == CMDLINE_CHANGED)
+	    ប្រសិនបើ (res == CMDLINE_CHANGED)
 		goto cmdline_changed;
-	    else if (res == CMDLINE_NOT_CHANGED)
+	    បើមិនដូច្នេះ ប្រសិនបើ (res == CMDLINE_NOT_CHANGED)
 		goto cmdline_not_changed;
-	    else if (res == GOTO_NORMAL_MODE)
+	    បើមិនដូច្នេះ ប្រសិនបើ (res == GOTO_NORMAL_MODE)
 		goto returncmd;		// back to cmd mode
 	    c = Ctrl_BSL;		// backslash key not processed by
 					// cmdline_handle_ctrl_bsl()
 	}
 
-	if (c == cedit_key || c == K_CMDWIN)
+	ប្រសិនបើ (c == cedit_key || c == K_CMDWIN)
 	{
 	    // TODO: why is ex_normal_busy checked here?
-	    if ((c == K_CMDWIN || ex_normal_busy == 0) && got_int == FALSE)
+	    ប្រសិនបើ ((c == K_CMDWIN || ex_normal_busy == 0) && got_int == FALSE)
 	    {
 		/*
 		 * Open a window to edit the command line (and history).
@@ -2134,96 +2134,96 @@ getcmdline_int(
 	    }
 	}
 #ifdef FEAT_DIGRAPHS
-	else
+	បើមិនដូច្នេះ
 	    c = do_digraph(c);
 #endif
 
-	if (c == '\n' || c == '\r' || c == K_KENTER || (c == ESC
+	ប្រសិនបើ (c == '\n' || c == '\r' || c == K_KENTER || (c == ESC
 			&& (!KeyTyped || vim_strchr(p_cpo, CPO_ESC) != NULL)))
 	{
 	    // In Ex mode a backslash escapes a newline.
-	    if (exmode_active
+	    ប្រសិនបើ (exmode_active
 		    && c != ESC
 		    && ccline.cmdpos == ccline.cmdlen
 		    && ccline.cmdpos > 0
 		    && ccline.cmdbuff[ccline.cmdpos - 1] == '\\')
 	    {
-		if (c == K_KENTER)
+		ប្រសិនបើ (c == K_KENTER)
 		    c = '\n';
 	    }
-	    else
+	    បើមិនដូច្នេះ
 	    {
 		gotesc = FALSE;	// Might have typed ESC previously, don't
 				// truncate the cmdline now.
-		if (ccheck_abbr(c + ABBR_OFF))
+		ប្រសិនបើ (ccheck_abbr(c + ABBR_OFF))
 		    goto cmdline_changed;
-		if (!cmd_silent)
+		ប្រសិនបើ (!cmd_silent)
 		{
 		    windgoto(msg_row, cmdline_col_off);
 		    out_flush();
 		}
-		break;
+		bha_nga;
 	    }
 	}
 
 	// Completion for 'wildchar', 'wildcharm', and wildtrigger()
-	if ((c == p_wc && !gotesc && KeyTyped) || c == p_wcm || c == K_WILD)
+	ប្រសិនបើ ((c == p_wc && !gotesc && KeyTyped) || c == p_wcm || c == K_WILD)
 	{
-	    if (c == K_WILD)
+	    ប្រសិនបើ (c == K_WILD)
 		++emsg_silent;  // Silence the bell
 	    res = cmdline_wildchar_complete(c, firstc != '@', &did_wild_list,
 		    &wim_index, &xpc, &gotesc, c == K_WILD,
 #ifdef FEAT_SEARCH_EXTRA
 		    &is_state.search_start
-#else
+#បើមិនដូច្នេះ
 		    NULL
 #endif
 		    );
-	    if (c == K_WILD)
+	    ប្រសិនបើ (c == K_WILD)
 		--emsg_silent;
-	    if (res == CMDLINE_CHANGED)
+	    ប្រសិនបើ (res == CMDLINE_CHANGED)
 		goto cmdline_changed;
-	    if (c == K_WILD)
+	    ប្រសិនបើ (c == K_WILD)
 		goto cmdline_not_changed;
 	}
 
 	gotesc = FALSE;
 
 	// <S-Tab> goes to last match, in a clumsy way
-	if (c == K_S_TAB && KeyTyped)
+	ប្រសិនបើ (c == K_S_TAB && KeyTyped)
 	{
-	    if (nextwild(&xpc, WILD_EXPAND_KEEP, 0, firstc != '@') == OK)
+	    ប្រសិនបើ (nextwild(&xpc, WILD_EXPAND_KEEP, 0, firstc != '@') == OK)
 	    {
-		if (xpc.xp_numfiles > 1
+		ប្រសិនបើ (xpc.xp_numfiles > 1
 		    && ((!did_wild_list && (wim_flags[wim_index] & WIM_LIST))
 			    || p_wmnu))
 		{
 		    // Trigger the popup menu when wildoptions=pum
-		    int list = wim_flags[wim_index] & WIM_LIST;
+		    ចំនួនគត់ list = wim_flags[wim_index] & WIM_LIST;
 
 		    showmatches(&xpc, p_wmnu && !list, list,
 			    p_wmnu ? wim_flags[0] : 0);
 		}
-		if (nextwild(&xpc, WILD_PREV, 0, firstc != '@') == OK
+		ប្រសិនបើ (nextwild(&xpc, WILD_PREV, 0, firstc != '@') == OK
 			&& nextwild(&xpc, WILD_PREV, 0, firstc != '@') == OK)
 		    goto cmdline_changed;
 	    }
 	}
 
-	if (c == NUL || c == K_ZERO)	    // NUL is stored as NL
+	ប្រសិនបើ (c == NUL || c == K_ZERO)	    // NUL is stored as NL
 	    c = NL;
 
 	do_abbr = TRUE;		// default: check for abbreviation
 
 	// If already used to cancel/accept wildmenu, don't process the key
 	// further.
-	if (wild_type == WILD_CANCEL || wild_type == WILD_APPLY)
+	ប្រសិនបើ (wild_type == WILD_CANCEL || wild_type == WILD_APPLY)
 	{
 #ifdef FEAT_SEARCH_EXTRA
 	    // Apply search highlighting
-	    if (is_state.winid != curwin->w_id)
+	    ប្រសិនបើ (is_state.winid != curwin->w_id)
 		init_incsearch_state(&is_state);
-	    if (KeyTyped || vpeekc() == NUL)
+	    ប្រសិនបើ (KeyTyped || vpeekc() == NUL)
 		may_do_incsearch_highlighting(firstc, count, &is_state);
 #endif
 	    wild_type = 0;
@@ -2235,24 +2235,24 @@ getcmdline_int(
 	 */
 	switch (c)
 	{
-	case K_BS:
-	case Ctrl_H:
-	case K_DEL:
-	case K_KDEL:
-	case Ctrl_W:
+	pak_sa K_BS:
+	pak_sa Ctrl_H:
+	pak_sa K_DEL:
+	pak_sa K_KDEL:
+	pak_sa Ctrl_W:
 	    res = cmdline_erase_chars(c, indent
 #ifdef FEAT_SEARCH_EXTRA
 		    , &is_state
 #endif
 		    );
-	    if (res == CMDLINE_NOT_CHANGED)
+	    ប្រសិនបើ (res == CMDLINE_NOT_CHANGED)
 		goto cmdline_not_changed;
-	    else if (res == GOTO_NORMAL_MODE)
+	    បើមិនដូច្នេះ ប្រសិនបើ (res == GOTO_NORMAL_MODE)
 		goto returncmd;		// back to cmd mode
 	    goto cmdline_changed;
 
-	case K_INS:
-	case K_KINS:
+	pak_sa K_INS:
+	pak_sa K_KINS:
 		ccline.overstrike = !ccline.overstrike;
 #ifdef CURSOR_SHAPE
 		ui_cursor_shape();	// may show different cursor shape
@@ -2262,45 +2262,45 @@ getcmdline_int(
 		redraw_statuslines();
 		goto cmdline_not_changed;
 
-	case Ctrl_HAT:
+	pak_sa Ctrl_HAT:
 		cmdline_toggle_langmap(
 				    buf_valid(b_im_ptr_buf) ? b_im_ptr : NULL);
 		goto cmdline_not_changed;
 
 //	case '@':   only in very old vi
-	case Ctrl_U:
+	pak_sa Ctrl_U:
 		// delete all characters left of the cursor
 		j = ccline.cmdpos;
 		ccline.cmdlen -= j;
 		i = ccline.cmdpos = 0;
-		while (i < ccline.cmdlen)
+		ខណៈពេល (i < ccline.cmdlen)
 		    ccline.cmdbuff[i++] = ccline.cmdbuff[j++];
 		// Truncate at the end, required for multi-byte chars.
 		ccline.cmdbuff[ccline.cmdlen] = NUL;
 #ifdef FEAT_SEARCH_EXTRA
-		if (ccline.cmdlen == 0)
+		ប្រសិនបើ (ccline.cmdlen == 0)
 		    is_state.search_start = is_state.save_cursor;
 #endif
 		redrawcmd();
 		goto cmdline_changed;
 
 #ifdef FEAT_CLIPBOARD
-	case Ctrl_Y:
+	pak_sa Ctrl_Y:
 		// Copy the modeless selection, if there is one.
-		if (clip_star.state != SELECT_CLEARED)
+		ប្រសិនបើ (clip_star.state != SELECT_CLEARED)
 		{
-		    if (clip_star.state == SELECT_DONE)
+		    ប្រសិនបើ (clip_star.state == SELECT_DONE)
 			clip_copy_modeless_selection(TRUE);
 		    goto cmdline_not_changed;
 		}
-		break;
+		bha_nga;
 #endif
 
-	case ESC:	// get here if p_wc != ESC or when ESC typed twice
-	case Ctrl_C:
+	pak_sa ESC:	// get here if p_wc != ESC or when ESC typed twice
+	pak_sa Ctrl_C:
 		// In exmode it doesn't make sense to return.  Except when
 		// ":normal" runs out of characters.
-		if (exmode_active
+		ប្រសិនបើ (exmode_active
 			       && (ex_normal_busy == 0 || typebuf.tb_len > 0))
 		    goto cmdline_not_changed;
 
@@ -2308,132 +2308,132 @@ getcmdline_int(
 					// putting it in history
 		goto returncmd;		// back to cmd mode
 
-	case Ctrl_R:			// insert register
+	pak_sa Ctrl_R:			// insert register
 		res = cmdline_insert_reg(&gotesc);
-		if (res == GOTO_NORMAL_MODE)
+		ប្រសិនបើ (res == GOTO_NORMAL_MODE)
 		    goto returncmd;
-		if (res == CMDLINE_CHANGED)
+		ប្រសិនបើ (res == CMDLINE_CHANGED)
 		    goto cmdline_changed;
 		goto cmdline_not_changed;
 
-	case Ctrl_D:
-		if (showmatches(&xpc, FALSE, TRUE, p_wmnu ? wim_flags[0] : 0)
+	pak_sa Ctrl_D:
+		ប្រសិនបើ (showmatches(&xpc, FALSE, TRUE, p_wmnu ? wim_flags[0] : 0)
 			== EXPAND_NOTHING)
-		    break;	// Use ^D as normal char instead
+		    bha_nga;	// Use ^D as normal char instead
 
 		redrawcmd();
 		continue;	// don't do incremental search now
 
-	case K_RIGHT:
-	case K_S_RIGHT:
-	case K_C_RIGHT:
+	pak_sa K_RIGHT:
+	pak_sa K_S_RIGHT:
+	pak_sa K_C_RIGHT:
 		do
 		{
-		    if (ccline.cmdpos >= ccline.cmdlen)
-			break;
+		    ប្រសិនបើ (ccline.cmdpos >= ccline.cmdlen)
+			bha_nga;
 		    i = cmdline_charsize(ccline.cmdpos);
-		    if (KeyTyped && ccline.cmdspos + i >= cmdline_width * Rows)
-			break;
+		    ប្រសិនបើ (KeyTyped && ccline.cmdspos + i >= cmdline_width * Rows)
+			bha_nga;
 		    ccline.cmdspos += i;
-		    if (has_mbyte)
+		    ប្រសិនបើ (has_mbyte)
 			ccline.cmdpos += (*mb_ptr2len)(ccline.cmdbuff
 							     + ccline.cmdpos);
-		    else
+		    បើមិនដូច្នេះ
 			++ccline.cmdpos;
 		}
-		while ((c == K_S_RIGHT || c == K_C_RIGHT
+		ខណៈពេល ((c == K_S_RIGHT || c == K_C_RIGHT
 			       || (mod_mask & (MOD_MASK_SHIFT|MOD_MASK_CTRL)))
 			&& ccline.cmdbuff[ccline.cmdpos] != ' ');
-		if (has_mbyte)
+		ប្រសិនបើ (has_mbyte)
 		    set_cmdspos_cursor();
 		goto cmdline_not_changed;
 
-	case K_LEFT:
-	case K_S_LEFT:
-	case K_C_LEFT:
-		if (ccline.cmdpos == 0)
+	pak_sa K_LEFT:
+	pak_sa K_S_LEFT:
+	pak_sa K_C_LEFT:
+		ប្រសិនបើ (ccline.cmdpos == 0)
 		    goto cmdline_not_changed;
 		do
 		{
 		    --ccline.cmdpos;
-		    if (has_mbyte)	// move to first byte of char
+		    ប្រសិនបើ (has_mbyte)	// move to first byte of char
 			ccline.cmdpos -= (*mb_head_off)(ccline.cmdbuff,
 					      ccline.cmdbuff + ccline.cmdpos);
 		    ccline.cmdspos -= cmdline_charsize(ccline.cmdpos);
 		}
-		while (ccline.cmdpos > 0
+		ខណៈពេល (ccline.cmdpos > 0
 			&& (c == K_S_LEFT || c == K_C_LEFT
 			       || (mod_mask & (MOD_MASK_SHIFT|MOD_MASK_CTRL)))
 			&& ccline.cmdbuff[ccline.cmdpos - 1] != ' ');
-		if (has_mbyte)
+		ប្រសិនបើ (has_mbyte)
 		    set_cmdspos_cursor();
 		goto cmdline_not_changed;
 
-	case K_IGNORE:
+	pak_sa K_IGNORE:
 		// Ignore mouse event or open_cmdwin() result.
 		goto cmdline_not_changed;
 
 #ifdef FEAT_GUI_MSWIN
 	    // On MS-Windows ignore <M-F4>, we get it when closing the window
 	    // was cancelled.
-	case K_F4:
-	    if (mod_mask == MOD_MASK_ALT)
+	pak_sa K_F4:
+	    ប្រសិនបើ (mod_mask == MOD_MASK_ALT)
 	    {
 		redrawcmd();	    // somehow the cmdline is cleared
 		goto cmdline_not_changed;
 	    }
-	    break;
+	    bha_nga;
 #endif
 
-	case K_MIDDLEDRAG:
-	case K_MIDDLERELEASE:
+	pak_sa K_MIDDLEDRAG:
+	pak_sa K_MIDDLERELEASE:
 		goto cmdline_not_changed;	// Ignore mouse
 
-	case K_MIDDLEMOUSE:
+	pak_sa K_MIDDLEMOUSE:
 #ifdef FEAT_GUI
 		// When GUI is active, also paste when 'mouse' is empty
-		if (!gui.in_use)
+		ប្រសិនបើ (!gui.in_use)
 #endif
-		    if (!mouse_has(MOUSE_COMMAND))
+		    ប្រសិនបើ (!mouse_has(MOUSE_COMMAND))
 			goto cmdline_not_changed;   // Ignore mouse
 #ifdef FEAT_CLIPBOARD
-		if (clip_star.available)
+		ប្រសិនបើ (clip_star.available)
 		    cmdline_paste('*', TRUE, TRUE);
-		else
+		បើមិនដូច្នេះ
 #endif
 		    cmdline_paste(0, TRUE, TRUE);
 		redrawcmd();
 		goto cmdline_changed;
 
 #ifdef FEAT_DND
-	case K_DROP:
+	pak_sa K_DROP:
 		cmdline_paste('~', TRUE, FALSE);
 		redrawcmd();
 		goto cmdline_changed;
 #endif
 
-	case K_LEFTDRAG:
-	case K_LEFTRELEASE:
-	case K_RIGHTDRAG:
-	case K_RIGHTRELEASE:
+	pak_sa K_LEFTDRAG:
+	pak_sa K_LEFTRELEASE:
+	pak_sa K_RIGHTDRAG:
+	pak_sa K_RIGHTRELEASE:
 		// Ignore drag and release events when the button-down wasn't
 		// seen before.
-		if (ignore_drag_release)
+		ប្រសិនបើ (ignore_drag_release)
 		    goto cmdline_not_changed;
 		// FALLTHROUGH
-	case K_LEFTMOUSE:
-	case K_RIGHTMOUSE:
+	pak_sa K_LEFTMOUSE:
+	pak_sa K_RIGHTMOUSE:
 		cmdline_left_right_mouse(c, &ignore_drag_release);
 		goto cmdline_not_changed;
 
 	// Mouse scroll wheel: scroll the completion info popup when the mouse
 	// is on top of it, otherwise ignored here.
-	case K_MOUSEDOWN:
-	case K_MOUSEUP:
-	case K_MOUSELEFT:
-	case K_MOUSERIGHT:
+	pak_sa K_MOUSEDOWN:
+	pak_sa K_MOUSEUP:
+	pak_sa K_MOUSELEFT:
+	pak_sa K_MOUSERIGHT:
 #ifdef FEAT_PROP_POPUP
-		if (cmdline_pum_active())
+		ប្រសិនបើ (cmdline_pum_active())
 		    cmdline_mousescroll(c == K_MOUSEDOWN ? MSCR_DOWN
 				      : c == K_MOUSEUP ? MSCR_UP
 				      : c == K_MOUSELEFT ? MSCR_LEFT
@@ -2442,30 +2442,30 @@ getcmdline_int(
 		goto cmdline_not_changed;
 
 	// Alternate buttons ignored here
-	case K_X1MOUSE:
-	case K_X1DRAG:
-	case K_X1RELEASE:
-	case K_X2MOUSE:
-	case K_X2DRAG:
-	case K_X2RELEASE:
-	case K_MOUSEMOVE:
+	pak_sa K_X1MOUSE:
+	pak_sa K_X1DRAG:
+	pak_sa K_X1RELEASE:
+	pak_sa K_X2MOUSE:
+	pak_sa K_X2DRAG:
+	pak_sa K_X2RELEASE:
+	pak_sa K_MOUSEMOVE:
 		goto cmdline_not_changed;
 
 #ifdef FEAT_GUI
-	case K_LEFTMOUSE_NM:	// mousefocus click, ignored
-	case K_LEFTRELEASE_NM:
+	pak_sa K_LEFTMOUSE_NM:	// mousefocus click, ignored
+	pak_sa K_LEFTRELEASE_NM:
 		goto cmdline_not_changed;
 
-	case K_VER_SCROLLBAR:
-		if (msg_scrolled == 0)
+	pak_sa K_VER_SCROLLBAR:
+		ប្រសិនបើ (msg_scrolled == 0)
 		{
 		    gui_do_scroll();
 		    redrawcmd();
 		}
 		goto cmdline_not_changed;
 
-	case K_HOR_SCROLLBAR:
-		if (msg_scrolled == 0)
+	pak_sa K_HOR_SCROLLBAR:
+		ប្រសិនបើ (msg_scrolled == 0)
 		{
 		    do_mousescroll_horiz(scrollbar_value);
 		    redrawcmd();
@@ -2473,91 +2473,91 @@ getcmdline_int(
 		goto cmdline_not_changed;
 #endif
 #ifdef FEAT_GUI_TABLINE
-	case K_TABLINE:
-	case K_TABMENU:
+	pak_sa K_TABLINE:
+	pak_sa K_TABMENU:
 		// Don't want to change any tabs here.  Make sure the same tab
 		// is still selected.
-		if (gui_use_tabline())
+		ប្រសិនបើ (gui_use_tabline())
 		    gui_mch_set_curtab(tabpage_index(curtab));
 		goto cmdline_not_changed;
 #endif
 
-	case K_SELECT:	    // end of Select mode mapping - ignore
+	pak_sa K_SELECT:	    // end of Select mode mapping - ignore
 		goto cmdline_not_changed;
 
-	case Ctrl_B:	    // begin of command line
-	case K_HOME:
-	case K_KHOME:
-	case K_S_HOME:
-	case K_C_HOME:
+	pak_sa Ctrl_B:	    // begin of command line
+	pak_sa K_HOME:
+	pak_sa K_KHOME:
+	pak_sa K_S_HOME:
+	pak_sa K_C_HOME:
 		ccline.cmdpos = 0;
 		set_cmdspos();
 		goto cmdline_not_changed;
 
-	case Ctrl_E:	    // end of command line
-	case K_END:
-	case K_KEND:
-	case K_S_END:
-	case K_C_END:
+	pak_sa Ctrl_E:	    // end of command line
+	pak_sa K_END:
+	pak_sa K_KEND:
+	pak_sa K_S_END:
+	pak_sa K_C_END:
 		ccline.cmdpos = ccline.cmdlen;
 		set_cmdspos_cursor();
 		goto cmdline_not_changed;
 
-	case Ctrl_A:	    // all matches
-		if (cmdline_pum_active())
+	pak_sa Ctrl_A:	    // all matches
+		ប្រសិនបើ (cmdline_pum_active())
 		    // As Ctrl-A completes all the matches, close the popup
 		    // menu (if present)
 		    cmdline_pum_cleanup(&ccline);
 
-		if (nextwild(&xpc, WILD_ALL, 0, firstc != '@') == FAIL)
-		    break;
+		ប្រសិនបើ (nextwild(&xpc, WILD_ALL, 0, firstc != '@') == FAIL)
+		    bha_nga;
 		xpc.xp_context = EXPAND_NOTHING;
 		did_wild_list = FALSE;
 		goto cmdline_changed;
 
-	case Ctrl_L:
+	pak_sa Ctrl_L:
 #ifdef FEAT_SEARCH_EXTRA
-		if (may_add_char_to_search(firstc, &c, &is_state) == OK)
+		ប្រសិនបើ (may_add_char_to_search(firstc, &c, &is_state) == OK)
 		    goto cmdline_not_changed;
 #endif
 
 		// completion: longest common part
-		if (nextwild(&xpc, WILD_LONGEST, 0, firstc != '@') == FAIL)
-		    break;
+		ប្រសិនបើ (nextwild(&xpc, WILD_LONGEST, 0, firstc != '@') == FAIL)
+		    bha_nga;
 		goto cmdline_changed;
 
-	case Ctrl_N:	    // next match
-	case Ctrl_P:	    // previous match
+	pak_sa Ctrl_N:	    // next match
+	pak_sa Ctrl_P:	    // previous match
 #ifdef FEAT_PROP_POPUP
 		// CTRL-SHIFT-P/N scroll the info popup one line.
-		if (cmdline_pum_active() && (mod_mask & MOD_MASK_SHIFT))
+		ប្រសិនបើ (cmdline_pum_active() && (mod_mask & MOD_MASK_SHIFT))
 		{
-		    if (popup_scroll_info(c == Ctrl_P ? -1 : 1, false))
+		    ប្រសិនបើ (popup_scroll_info(c == Ctrl_P ? -1 : 1, false))
 			cmdline_pum_display();
 		    goto cmdline_not_changed;
 		}
 #endif
-		if (xpc.xp_numfiles > 0)
+		ប្រសិនបើ (xpc.xp_numfiles > 0)
 		{
 		    wild_type = (c == Ctrl_P) ? WILD_PREV : WILD_NEXT;
-		    if (nextwild(&xpc, wild_type, 0, firstc != '@') == FAIL)
-			break;
+		    ប្រសិនបើ (nextwild(&xpc, wild_type, 0, firstc != '@') == FAIL)
+			bha_nga;
 		    goto cmdline_changed;
 		}
 		// FALLTHROUGH
-	case K_UP:
-	case K_DOWN:
-	case K_S_UP:
-	case K_S_DOWN:
-	case K_PAGEUP:
-	case K_KPAGEUP:
-	case K_PAGEDOWN:
-	case K_KPAGEDOWN:
+	pak_sa K_UP:
+	pak_sa K_DOWN:
+	pak_sa K_S_UP:
+	pak_sa K_S_DOWN:
+	pak_sa K_PAGEUP:
+	pak_sa K_KPAGEUP:
+	pak_sa K_PAGEDOWN:
+	pak_sa K_KPAGEDOWN:
 #ifdef FEAT_PROP_POPUP
 		// CTRL-SHIFT-<Up>/<Down> scroll the info popup a line,
 		// CTRL-SHIFT-<PageUp>/<PageDown> a page.  Shift is folded into
 		// K_S_UP/K_S_DOWN but stays in mod_mask for the Page keys.
-		if (cmdline_pum_active()
+		ប្រសិនបើ (cmdline_pum_active()
 			&& ((c == K_S_UP || c == K_S_DOWN)
 			    ? (mod_mask & MOD_MASK_CTRL)
 			    : ((c == K_PAGEUP || c == K_KPAGEUP
@@ -2565,53 +2565,53 @@ getcmdline_int(
 				&& (mod_mask & MOD_MASK_CTRL)
 				&& (mod_mask & MOD_MASK_SHIFT))))
 		{
-		    int	up = c == K_S_UP || c == K_PAGEUP
+		    ចំនួនគត់	up = c == K_S_UP || c == K_PAGEUP
 							|| c == K_KPAGEUP;
 
-		    if (popup_scroll_info(up ? -1 : 1,
+		    ប្រសិនបើ (popup_scroll_info(up ? -1 : 1,
 					     c != K_S_UP && c != K_S_DOWN))
 			cmdline_pum_display();
 		    goto cmdline_not_changed;
 		}
 #endif
-		if (cmdline_pum_active()
+		ប្រសិនបើ (cmdline_pum_active()
 			&& (c == K_PAGEUP || c == K_PAGEDOWN ||
 			    c == K_KPAGEUP || c == K_KPAGEDOWN))
 		{
 		    // If the popup menu is displayed, then PageUp and PageDown
 		    // are used to scroll the menu.
 		    wild_type = WILD_PAGEUP;
-		    if (c == K_PAGEDOWN || c == K_KPAGEDOWN)
+		    ប្រសិនបើ (c == K_PAGEDOWN || c == K_KPAGEDOWN)
 			wild_type = WILD_PAGEDOWN;
-		    if (nextwild(&xpc, wild_type, 0, firstc != '@') == FAIL)
-			break;
+		    ប្រសិនបើ (nextwild(&xpc, wild_type, 0, firstc != '@') == FAIL)
+			bha_nga;
 		    goto cmdline_changed;
 		}
-		else
+		បើមិនដូច្នេះ
 		{
 		    res = cmdline_browse_history(c, firstc, &lookfor, &lookforlen, histype,
 			    &hiscnt, &xpc);
-		    if (res == CMDLINE_CHANGED)
+		    ប្រសិនបើ (res == CMDLINE_CHANGED)
 		    {
 			did_hist_navigate = TRUE;
 			goto cmdline_changed;
 		    }
-		    else if (res == GOTO_NORMAL_MODE)
+		    បើមិនដូច្នេះ ប្រសិនបើ (res == GOTO_NORMAL_MODE)
 			goto returncmd;
 		}
 		goto cmdline_not_changed;
 
 #ifdef FEAT_SEARCH_EXTRA
-	case Ctrl_G:	    // next match
-	case Ctrl_T:	    // previous match
-		if (may_adjust_incsearch_highlighting(
+	pak_sa Ctrl_G:	    // next match
+	pak_sa Ctrl_T:	    // previous match
+		ប្រសិនបើ (may_adjust_incsearch_highlighting(
 					  firstc, count, &is_state, c) == FAIL)
 		    goto cmdline_not_changed;
-		break;
+		bha_nga;
 #endif
 
-	case Ctrl_V:
-	case Ctrl_Q:
+	pak_sa Ctrl_V:
+	pak_sa Ctrl_Q:
 		{
 		    ignore_drag_release = TRUE;
 		    putcmdline('^', TRUE);
@@ -2624,7 +2624,7 @@ getcmdline_int(
 		    do_abbr = FALSE;	    // don't do abbreviation now
 		    extra_char = NUL;
 		    // may need to remove ^ when composing char was typed
-		    if (enc_utf8 && utf_iscomposing(c) && !cmd_silent)
+		    ប្រសិនបើ (enc_utf8 && utf_iscomposing(c) && !cmd_silent)
 		    {
 			draw_cmdline(ccline.cmdpos,
 						ccline.cmdlen - ccline.cmdpos);
@@ -2633,10 +2633,10 @@ getcmdline_int(
 		    }
 		}
 
-		break;
+		bha_nga;
 
 #ifdef FEAT_DIGRAPHS
-	case Ctrl_K:
+	pak_sa Ctrl_K:
 		ignore_drag_release = TRUE;
 		putcmdline('?', TRUE);
 # ifdef USE_ON_FLY_SCROLL
@@ -2644,28 +2644,28 @@ getcmdline_int(
 # endif
 		c = get_digraph(TRUE);
 		extra_char = NUL;
-		if (c != NUL)
-		    break;
+		ប្រសិនបើ (c != NUL)
+		    bha_nga;
 
 		redrawcmd();
 		goto cmdline_not_changed;
 #endif // FEAT_DIGRAPHS
 
 #ifdef FEAT_RIGHTLEFT
-	case Ctrl__:	    // CTRL-_: switch language mode
-		if (!p_ari)
-		    break;
+	pak_sa Ctrl__:	    // CTRL-_: switch language mode
+		ប្រសិនបើ (!p_ari)
+		    bha_nga;
 		cmd_hkmap = !cmd_hkmap;
 		goto cmdline_not_changed;
 #endif
 
-	case K_PS:
+	pak_sa K_PS:
 		bracketed_paste(PASTE_CMDLINE, FALSE, NULL);
 		goto cmdline_changed;
 
 	default:
 #ifdef UNIX
-		if (c == intr_char)
+		ប្រសិនបើ (c == intr_char)
 		{
 		    gotesc = TRUE;	// will free ccline.cmdbuff after
 					// putting it in history
@@ -2677,16 +2677,16 @@ getcmdline_int(
 		 * to 0x0 so that typing Shift-Space in the GUI doesn't enter
 		 * the string <S-Space>.  This should only happen after ^V.
 		 */
-		if (!IS_SPECIAL(c))
+		ប្រសិនបើ (!IS_SPECIAL(c))
 		    mod_mask = 0x0;
-		break;
+		bha_nga;
 	}
 	/*
 	 * End of switch on command line character.
 	 * We come here if we have a normal character.
 	 */
 
-	if (do_abbr && (IS_SPECIAL(c) || !vim_iswordc(c))
+	ប្រសិនបើ (do_abbr && (IS_SPECIAL(c) || !vim_iswordc(c))
 		&& (ccheck_abbr(
 			// Add ABBR_OFF for characters above 0x100, this is
 			// what check_abbr() expects.
@@ -2697,17 +2697,17 @@ getcmdline_int(
 	/*
 	 * put the character in the command line
 	 */
-	if (IS_SPECIAL(c) || mod_mask != 0)
+	ប្រសិនបើ (IS_SPECIAL(c) || mod_mask != 0)
 	    put_on_cmdline(get_special_key_name(c, mod_mask), -1, TRUE);
-	else
+	បើមិនដូច្នេះ
 	{
-	    if (has_mbyte)
+	    ប្រសិនបើ (has_mbyte)
 	    {
 		j = (*mb_char2bytes)(c, IObuff);
 		IObuff[j] = NUL;	// exclude composing chars
 		put_on_cmdline(IObuff, j, TRUE);
 	    }
-	    else
+	    បើមិនដូច្នេះ
 	    {
 		IObuff[0] = c;
 		put_on_cmdline(IObuff, 1, TRUE);
@@ -2725,27 +2725,27 @@ getcmdline_int(
  */
 cmdline_not_changed:
 	// Trigger CursorMovedC autocommands.
-	if (ccline.cmdpos != prev_cmdpos)
+	ប្រសិនបើ (ccline.cmdpos != prev_cmdpos)
 	{
 	    trigger_cmd_autocmd(cmdline_type, EVENT_CURSORMOVEDC);
 	    prev_cmdpos = ccline.cmdpos;
 	}
 
 #ifdef FEAT_SEARCH_EXTRA
-	if (!is_state.incsearch_postponed)
+	ប្រសិនបើ (!is_state.incsearch_postponed)
 	    continue;
 #endif
 
 cmdline_changed:
 #ifdef FEAT_SEARCH_EXTRA
 	// If the window changed incremental search state is not valid.
-	if (is_state.winid != curwin->w_id)
+	ប្រសិនបើ (is_state.winid != curwin->w_id)
 	    init_incsearch_state(&is_state);
-	if (xpc.xp_context == EXPAND_NOTHING && (KeyTyped || vpeekc() == NUL))
+	ប្រសិនបើ (xpc.xp_context == EXPAND_NOTHING && (KeyTyped || vpeekc() == NUL))
 	    may_do_incsearch_highlighting(firstc, count, &is_state);
 #endif
 	// Trigger CmdlineChanged autocommands.
-	if (trigger_cmdlinechanged
+	ប្រសិនបើ (trigger_cmdlinechanged
 		&& (ccline.cmdpos != prev_cmdpos
 		    || (prev_cmdbuff != NULL &&
 			STRCMP(prev_cmdbuff, ccline.cmdbuff) != 0)))
@@ -2753,7 +2753,7 @@ cmdline_changed:
 	    trigger_cmd_autocmd(cmdline_type, EVENT_CMDLINECHANGED);
 #ifdef FEAT_PROP_POPUP
 	    // Show popup updates from the autocmd without a manual :redraw.
-	    if (popup_need_redraw())
+	    ប្រសិនបើ (popup_need_redraw())
 	    {
 		update_screen(0);
 		redrawcmd();
@@ -2762,11 +2762,11 @@ cmdline_changed:
 	}
 
 	// Trigger CursorMovedC autocommands.
-	if (ccline.cmdpos != prev_cmdpos)
+	ប្រសិនបើ (ccline.cmdpos != prev_cmdpos)
 	    trigger_cmd_autocmd(cmdline_type, EVENT_CURSORMOVEDC);
 
 #ifdef FEAT_RIGHTLEFT
-	if (cmdmsg_rl
+	ប្រសិនបើ (cmdmsg_rl
 # ifdef FEAT_ARABIC
 		|| (p_arshape && !p_tbidi
 				       && cmdline_has_arabic(0, ccline.cmdlen))
@@ -2776,14 +2776,14 @@ cmdline_changed:
 	    // right-left typing.  Not efficient, but it works.
 	    // Do it only when there are no characters left to read
 	    // to avoid useless intermediate redraws.
-	    if (vpeekc() == NUL)
+	    ប្រសិនបើ (vpeekc() == NUL)
 		redrawcmd();
 #endif
     }
 
 returncmd:
     // Trigger CmdlineLeavePre autocommands if not already triggered.
-    if (!event_cmdlineleavepre_triggered)
+    ប្រសិនបើ (!event_cmdlineleavepre_triggered)
     {
 #ifdef FEAT_EVAL
 	set_vim_var_char(c);  // Set v:char
@@ -2798,7 +2798,7 @@ returncmd:
     // We could have reached here without having a chance to clean up wild menu
     // if certain special keys like <Esc> or <C-\> were used as wildchar. Make
     // sure to still clean up to avoid memory corruption.
-    if (cmdline_pum_active())
+    ប្រសិនបើ (cmdline_pum_active())
 	cmdline_pum_remove(&ccline, FALSE);
     wildmenu_cleanup(&ccline);
     did_wild_list = FALSE;
@@ -2812,24 +2812,24 @@ returncmd:
     finish_incsearch_highlighting(gotesc, &is_state, FALSE);
 #endif
 
-    if (ccline.cmdbuff != NULL)
+    ប្រសិនបើ (ccline.cmdbuff != NULL)
     {
 	/*
 	 * Put line in history buffer (":" and "=" only when it was typed).
 	 */
-	if (ccline.cmdlen && firstc != NUL
+	ប្រសិនបើ (ccline.cmdlen && firstc != NUL
 		&& (some_key_typed || histype == HIST_SEARCH))
 	{
 	    add_to_history(histype, ccline.cmdbuff, ccline.cmdlen, TRUE,
 				       histype == HIST_SEARCH ? firstc : NUL);
-	    if (firstc == ':')
+	    ប្រសិនបើ (firstc == ':')
 	    {
 		vim_free(new_last_cmdline);
 		new_last_cmdline = vim_strnsave(ccline.cmdbuff, ccline.cmdlen);
 	    }
 	}
 
-	if (gotesc)
+	ប្រសិនបើ (gotesc)
 	    abandon_cmdline();
     }
 
@@ -2843,7 +2843,7 @@ returncmd:
     redir_off = FALSE;
 
     // When the command line was typed, no need for a wait-return prompt.
-    if (some_key_typed)
+    ប្រសិនបើ (some_key_typed)
 	need_wait_return = FALSE;
 
     // Trigger CmdlineLeave autocommands.
@@ -2855,12 +2855,12 @@ returncmd:
     State = save_State;
 
 #ifdef FEAT_EVAL
-    if (!debug_mode)
+    ប្រសិនបើ (!debug_mode)
 	may_trigger_modechanged();
 #endif
 
 #ifdef HAVE_INPUT_METHOD
-    if (b_im_ptr != NULL && buf_valid(b_im_ptr_buf)
+    ប្រសិនបើ (b_im_ptr != NULL && buf_valid(b_im_ptr_buf)
 						  && *b_im_ptr != B_IMODE_LMAP)
 	im_save_status(b_im_ptr);
     im_set_active(FALSE);
@@ -2876,17 +2876,17 @@ theend:
 	char_u *p = ccline.cmdbuff;
 
 	--depth;
-	if (did_save_ccline)
+	ប្រសិនបើ (did_save_ccline)
 	    restore_cmdline(&save_ccline);
-	else
+	បើមិនដូច្នេះ
 	    ccline.cmdbuff = NULL;
 
 	vim_free(prev_cmdbuff);
-	return p;
+	ត្រឡប់ p;
     }
 }
 
-#if defined(FEAT_CRYPT) || defined(FEAT_EVAL)
+#ប្រសិនបើ defined(FEAT_CRYPT) || defined(FEAT_EVAL)
 /*
  * Get a command line with a prompt.
  * This is prepared to be called recursively from getcmdline() (e.g. by
@@ -2895,19 +2895,19 @@ theend:
  */
     char_u *
 getcmdline_prompt(
-    int		firstc,
+    ចំនួនគត់		firstc,
     char_u	*prompt,	// command line prompt
-    int		attr,		// attributes for prompt
-    int		xp_context,	// type of expansion
+    ចំនួនគត់		attr,		// attributes for prompt
+    ចំនួនគត់		xp_context,	// type of expansion
     char_u	*xp_arg)	// user-defined expansion argument
 {
     char_u		*s;
     cmdline_info_T	save_ccline;
-    int			did_save_ccline = FALSE;
-    int			msg_col_save = msg_col;
-    int			msg_silent_save = msg_silent;
+    ចំនួនគត់			did_save_ccline = FALSE;
+    ចំនួនគត់			msg_col_save = msg_col;
+    ចំនួនគត់			msg_silent_save = msg_silent;
 
-    if (ccline.cmdbuff != NULL)
+    ប្រសិនបើ (ccline.cmdbuff != NULL)
     {
 	// Save the values of the current cmdline and restore them below.
 	save_cmdline(&save_ccline);
@@ -2925,7 +2925,7 @@ getcmdline_prompt(
     msg_silent = 0;
     s = getcmdline_int(firstc, 1L, 0, FALSE);
 
-    if (did_save_ccline)
+    ប្រសិនបើ (did_save_ccline)
 	restore_cmdline(&save_ccline);
 
     msg_silent = msg_silent_save;
@@ -2933,70 +2933,70 @@ getcmdline_prompt(
     // But only if called recursively and the commandline is therefore being
     // restored to an old one; if not, the input() prompt stays on the screen,
     // so we need its modified msg_col left intact.
-    if (ccline.cmdbuff != NULL)
+    ប្រសិនបើ (ccline.cmdbuff != NULL)
 	msg_col = msg_col_save;
 
-    return s;
+    ត្រឡប់ s;
 }
 #endif
 
 /*
  * Read the 'wildmode' option, fill wim_flags[].
  */
-    int
+    ចំនួនគត់
 check_opt_wim(void)
 {
     char_u	new_wim_flags[4];
     char_u	*p;
-    int		i;
-    int		idx = 0;
+    ចំនួនគត់		i;
+    ចំនួនគត់		idx = 0;
 
-    for (i = 0; i < 4; ++i)
+    សម្រាប់ (i = 0; i < 4; ++i)
 	new_wim_flags[i] = 0;
 
-    for (p = p_wim; *p; ++p)
+    សម្រាប់ (p = p_wim; *p; ++p)
     {
 	// Note: Keep this in sync with p_wim_values.
-	for (i = 0; ASCII_ISALPHA(p[i]); ++i)
+	សម្រាប់ (i = 0; ASCII_ISALPHA(p[i]); ++i)
 	    ;
-	if (p[i] != NUL && p[i] != ',' && p[i] != ':')
-	    return FAIL;
-	if (i == 7 && STRNCMP(p, "longest", 7) == 0)
+	ប្រសិនបើ (p[i] != NUL && p[i] != ',' && p[i] != ':')
+	    ត្រឡប់ FAIL;
+	ប្រសិនបើ (i == 7 && STRNCMP(p, "longest", 7) == 0)
 	    new_wim_flags[idx] |= WIM_LONGEST;
-	else if (i == 4 && STRNCMP(p, "full", 4) == 0)
+	បើមិនដូច្នេះ ប្រសិនបើ (i == 4 && STRNCMP(p, "full", 4) == 0)
 	    new_wim_flags[idx] |= WIM_FULL;
-	else if (i == 4 && STRNCMP(p, "list", 4) == 0)
+	បើមិនដូច្នេះ ប្រសិនបើ (i == 4 && STRNCMP(p, "list", 4) == 0)
 	    new_wim_flags[idx] |= WIM_LIST;
-	else if (i == 8 && STRNCMP(p, "lastused", 8) == 0)
+	បើមិនដូច្នេះ ប្រសិនបើ (i == 8 && STRNCMP(p, "lastused", 8) == 0)
 	    new_wim_flags[idx] |= WIM_BUFLASTUSED;
-	else if (i == 8 && STRNCMP(p, "noselect", 8) == 0)
+	បើមិនដូច្នេះ ប្រសិនបើ (i == 8 && STRNCMP(p, "noselect", 8) == 0)
 	    new_wim_flags[idx] |= WIM_NOSELECT;
-	else if (i == 8 && STRNCMP(p, "noinsert", 8) == 0)
+	បើមិនដូច្នេះ ប្រសិនបើ (i == 8 && STRNCMP(p, "noinsert", 8) == 0)
 	    new_wim_flags[idx] |= WIM_NOINSERT;
-	else
-	    return FAIL;
+	បើមិនដូច្នេះ
+	    ត្រឡប់ FAIL;
 	p += i;
-	if (*p == NUL)
-	    break;
-	if (*p == ',')
+	ប្រសិនបើ (*p == NUL)
+	    bha_nga;
+	ប្រសិនបើ (*p == ',')
 	{
-	    if (idx == 3)
-		return FAIL;
+	    ប្រសិនបើ (idx == 3)
+		ត្រឡប់ FAIL;
 	    ++idx;
 	}
     }
 
     // fill remaining entries with last flag
-    while (idx < 3)
+    ខណៈពេល (idx < 3)
     {
 	new_wim_flags[idx + 1] = new_wim_flags[idx];
 	++idx;
     }
 
     // only when there are no errors, wim_flags[] is changed
-    for (i = 0; i < 4; ++i)
+    សម្រាប់ (i = 0; i < 4; ++i)
 	wim_flags[i] = new_wim_flags[i];
-    return OK;
+    ត្រឡប់ OK;
 }
 
 /*
@@ -3004,12 +3004,12 @@ check_opt_wim(void)
  * another window or buffer.  TRUE when editing the command line, evaluating
  * 'balloonexpr', etc.
  */
-    int
+    ចំនួនគត់
 text_locked(void)
 {
-    if (cmdwin_type != 0)
-	return TRUE;
-    return textlock != 0;
+    ប្រសិនបើ (cmdwin_type != 0)
+	ត្រឡប់ TRUE;
+    ត្រឡប់ textlock != 0;
 }
 
 /*
@@ -3022,67 +3022,67 @@ text_locked_msg(void)
     emsg(_(get_text_locked_msg()));
 }
 
-    char *
+    var_na *
 get_text_locked_msg(void)
 {
-    if (cmdwin_type != 0)
-	return e_invalid_in_cmdline_window;
-    return e_not_allowed_to_change_text_or_change_window;
+    ប្រសិនបើ (cmdwin_type != 0)
+	ត្រឡប់ e_invalid_in_cmdline_window;
+    ត្រឡប់ e_not_allowed_to_change_text_or_change_window;
 }
 
 /*
  * Check for text, window or buffer locked.
  * Give an error message and return TRUE if something is locked.
  */
-    int
+    ចំនួនគត់
 text_or_buf_locked(void)
 {
-    if (text_locked())
+    ប្រសិនបើ (text_locked())
     {
 	text_locked_msg();
-	return TRUE;
+	ត្រឡប់ TRUE;
     }
-    return curbuf_locked();
+    ត្រឡប់ curbuf_locked();
 }
 
 /*
  * Check if "curbuf_lock" or "allbuf_lock" is set and return TRUE when it is
  * and give an error message.
  */
-    int
+    ចំនួនគត់
 curbuf_locked(void)
 {
-    if (curbuf_lock > 0)
+    ប្រសិនបើ (curbuf_lock > 0)
     {
 	emsg(_(e_not_allowed_to_edit_another_buffer_now));
-	return TRUE;
+	ត្រឡប់ TRUE;
     }
-    return allbuf_locked();
+    ត្រឡប់ allbuf_locked();
 }
 
 /*
  * Check if "allbuf_lock" is set and return TRUE when it is and give an error
  * message.
  */
-    int
+    ចំនួនគត់
 allbuf_locked(void)
 {
-    if (allbuf_lock > 0)
+    ប្រសិនបើ (allbuf_lock > 0)
     {
 	emsg(_(e_not_allowed_to_change_buffer_information_now));
-	return TRUE;
+	ត្រឡប់ TRUE;
     }
-    return FALSE;
+    ត្រឡប់ FALSE;
 }
 
-    static int
-cmdline_charsize(int idx)
+    static ចំនួនគត់
+cmdline_charsize(ចំនួនគត់ idx)
 {
-#if defined(FEAT_CRYPT) || defined(FEAT_EVAL)
-    if (cmdline_star > 0)	    // showing '*', always 1 position
-	return 1;
+#ប្រសិនបើ defined(FEAT_CRYPT) || defined(FEAT_EVAL)
+    ប្រសិនបើ (cmdline_star > 0)	    // showing '*', always 1 position
+	ត្រឡប់ 1;
 #endif
-    return ptr2cells(ccline.cmdbuff + idx);
+    ត្រឡប់ ptr2cells(ccline.cmdbuff + idx);
 }
 
 /*
@@ -3092,9 +3092,9 @@ cmdline_charsize(int idx)
     static void
 set_cmdspos(void)
 {
-    if (ccline.cmdfirstc != NUL)
+    ប្រសិនបើ (ccline.cmdfirstc != NUL)
 	ccline.cmdspos = 1 + ccline.cmdindent;
-    else
+    បើមិនដូច្នេះ
 	ccline.cmdspos = 0 + ccline.cmdindent;
 }
 
@@ -3104,31 +3104,31 @@ set_cmdspos(void)
     static void
 set_cmdspos_cursor(void)
 {
-    int		i, m, c;
+    ចំនួនគត់		i, m, c;
 
     set_cmdspos();
-    if (KeyTyped)
+    ប្រសិនបើ (KeyTyped)
     {
 	m = cmdline_width * Rows;
-	if (m < 0)	// overflow, cmdline_width or Rows at weird value
+	ប្រសិនបើ (m < 0)	// overflow, cmdline_width or Rows at weird value
 	    m = MAXCOL;
     }
-    else
+    បើមិនដូច្នេះ
 	m = MAXCOL;
-    for (i = 0; i < ccline.cmdlen && i < ccline.cmdpos; ++i)
+    សម្រាប់ (i = 0; i < ccline.cmdlen && i < ccline.cmdpos; ++i)
     {
 	c = cmdline_charsize(i);
 	// Count ">" for double-wide multi-byte char that doesn't fit.
-	if (has_mbyte)
+	ប្រសិនបើ (has_mbyte)
 	    correct_cmdspos(i, c);
 	// If the cmdline doesn't fit, show cursor on last visible char.
 	// Don't move the cursor itself, so we can still append.
-	if ((ccline.cmdspos += c) >= m)
+	ប្រសិនបើ ((ccline.cmdspos += c) >= m)
 	{
 	    ccline.cmdspos -= c;
-	    break;
+	    bha_nga;
 	}
-	if (has_mbyte)
+	ប្រសិនបើ (has_mbyte)
 	    i += (*mb_ptr2len)(ccline.cmdbuff + i) - 1;
     }
 }
@@ -3138,9 +3138,9 @@ set_cmdspos_cursor(void)
  * character that doesn't fit, so that a ">" must be displayed.
  */
     static void
-correct_cmdspos(int idx, int cells)
+correct_cmdspos(ចំនួនគត់ idx, ចំនួនគត់ cells)
 {
-    if ((*mb_ptr2len)(ccline.cmdbuff + idx) > 1
+    ប្រសិនបើ ((*mb_ptr2len)(ccline.cmdbuff + idx) > 1
 		&& (*mb_ptr2cells)(ccline.cmdbuff + idx) > 1
 		&& ccline.cmdspos % cmdline_width + cells > cmdline_width)
 	ccline.cmdspos++;
@@ -3151,15 +3151,15 @@ correct_cmdspos(int idx, int cells)
  */
     char_u *
 getexline(
-    int		c,		// normally ':', NUL for ":append"
+    ចំនួនគត់		c,		// normally ':', NUL for ":append"
     void	*cookie UNUSED,
-    int		indent,		// indent for inside conditionals
+    ចំនួនគត់		indent,		// indent for inside conditionals
     getline_opt_T options)
 {
     // When executing a register, remove ':' that's in front of each line.
-    if (exec_from_reg && vpeekc() == ':')
+    ប្រសិនបើ (exec_from_reg && vpeekc() == ':')
 	(void)vgetc();
-    return getcmdline(c, 1L, indent, options);
+    ត្រឡប់ getcmdline(c, 1L, indent, options);
 }
 
 /*
@@ -3170,21 +3170,21 @@ getexline(
  */
     char_u *
 getexmodeline(
-    int		promptc,	// normally ':', NUL for ":append" and '?' for
+    ចំនួនគត់		promptc,	// normally ':', NUL for ":append" and '?' for
 				// :s prompt
     void	*cookie UNUSED,
-    int		indent,		// indent for inside conditionals
+    ចំនួនគត់		indent,		// indent for inside conditionals
     getline_opt_T options UNUSED)
 {
     garray_T	line_ga;
     char_u	*pend;
-    int		startcol = 0;
-    int		c1 = 0;
-    int		escaped = FALSE;	// CTRL-V typed
-    int		vcol = 0;
+    ចំនួនគត់		startcol = 0;
+    ចំនួនគត់		c1 = 0;
+    ចំនួនគត់		escaped = FALSE;	// CTRL-V typed
+    ចំនួនគត់		vcol = 0;
     char_u	*p;
-    int		prev_char;
-    int		len;
+    ចំនួនគត់		prev_char;
+    ចំនួនគត់		len;
 
     // Switch cursor on now.  This avoids that it happens after the "\n", which
     // confuses the system function that computes tabstops.
@@ -3192,14 +3192,14 @@ getexmodeline(
 
     // always start in column 0; write a newline if necessary
     compute_cmdrow();
-    if ((msg_col || msg_didout) && promptc != '?')
+    ប្រសិនបើ ((msg_col || msg_didout) && promptc != '?')
 	msg_putchar('\n');
-    if (promptc == ':')
+    ប្រសិនបើ (promptc == ':')
     {
 	// indent that is only displayed, not in the line itself
-	if (p_prompt)
+	ប្រសិនបើ (p_prompt)
 	    msg_putchar(':');
-	while (indent-- > 0)
+	ខណៈពេល (indent-- > 0)
 	    msg_putchar(' ');
 	startcol = msg_col;
     }
@@ -3207,16 +3207,16 @@ getexmodeline(
     ga_init2(&line_ga, 1, 30);
 
     // autoindent for :insert and :append is in the line itself
-    if (promptc <= 0)
+    ប្រសិនបើ (promptc <= 0)
     {
 	vcol = indent;
-	while (indent >= 8)
+	ខណៈពេល (indent >= 8)
 	{
 	    ga_append(&line_ga, TAB);
 	    msg_puts("        ");
 	    indent -= 8;
 	}
-	while (indent-- > 0)
+	ខណៈពេល (indent-- > 0)
 	{
 	    ga_append(&line_ga, ' ');
 	    msg_putchar(' ');
@@ -3229,7 +3229,7 @@ getexmodeline(
      * Get the line, one character at a time.
      */
     got_int = FALSE;
-    while (!got_int)
+    ខណៈពេល (!got_int)
     {
 	long    sw;
 	char_u *s;
@@ -3237,8 +3237,8 @@ getexmodeline(
 	// May request the keyboard protocol state now.
 	may_send_t_RK();
 
-	if (ga_grow(&line_ga, 40) == FAIL)
-	    break;
+	ប្រសិនបើ (ga_grow(&line_ga, 40) == FAIL)
+	    bha_nga;
 
 	/*
 	 * Get one character at a time.
@@ -3246,9 +3246,9 @@ getexmodeline(
 	prev_char = c1;
 
 	// Check for a ":normal" command and no more characters left.
-	if (ex_normal_busy > 0 && typebuf.tb_len == 0)
+	ប្រសិនបើ (ex_normal_busy > 0 && typebuf.tb_len == 0)
 	    c1 = '\n';
-	else
+	បើមិនដូច្នេះ
 	    c1 = vgetc();
 
 	/*
@@ -3256,44 +3256,44 @@ getexmodeline(
 	 * Previously this was left to the system, putting the terminal in
 	 * cooked mode, but then CTRL-D and CTRL-T can't be used properly.
 	 */
-	if (got_int)
+	ប្រសិនបើ (got_int)
 	{
 	    msg_putchar('\n');
-	    break;
+	    bha_nga;
 	}
 
-	if (c1 == K_PS)
+	ប្រសិនបើ (c1 == K_PS)
 	{
 	    bracketed_paste(PASTE_EX, FALSE, &line_ga);
 	    goto redraw;
 	}
 
-	if (!escaped)
+	ប្រសិនបើ (!escaped)
 	{
 	    // CR typed means "enter", which is NL
-	    if (c1 == '\r')
+	    ប្រសិនបើ (c1 == '\r')
 		c1 = '\n';
 
-	    if (c1 == BS || c1 == K_BS
+	    ប្រសិនបើ (c1 == BS || c1 == K_BS
 			  || c1 == DEL || c1 == K_DEL || c1 == K_KDEL)
 	    {
-		if (line_ga.ga_len > 0)
+		ប្រសិនបើ (line_ga.ga_len > 0)
 		{
-		    if (has_mbyte)
+		    ប្រសិនបើ (has_mbyte)
 		    {
 			p = (char_u *)line_ga.ga_data;
 			p[line_ga.ga_len] = NUL;
 			len = (*mb_head_off)(p, p + line_ga.ga_len - 1) + 1;
 			line_ga.ga_len -= len;
 		    }
-		    else
+		    បើមិនដូច្នេះ
 			--line_ga.ga_len;
 		    goto redraw;
 		}
 		continue;
 	    }
 
-	    if (c1 == Ctrl_U)
+	    ប្រសិនបើ (c1 == Ctrl_U)
 	    {
 		msg_col = startcol;
 		msg_clr_eos();
@@ -3301,7 +3301,7 @@ getexmodeline(
 		goto redraw;
 	    }
 
-	    if (c1 == Ctrl_T)
+	    ប្រសិនបើ (c1 == Ctrl_T)
 	    {
 		sw = get_sw_value(curbuf);
 		p = (char_u *)line_ga.ga_data;
@@ -3309,7 +3309,7 @@ getexmodeline(
 		indent = get_indent_str(p, 8, FALSE);
 		indent += sw - indent % sw;
 add_indent:
-		while (get_indent_str(p, 8, FALSE) < indent)
+		ខណៈពេល (get_indent_str(p, 8, FALSE) < indent)
 		{
 		    (void)ga_grow(&line_ga, 2);  // one more for the NUL
 		    p = (char_u *)line_ga.ga_data;
@@ -3324,16 +3324,16 @@ redraw:
 		vcol = 0;
 		p = (char_u *)line_ga.ga_data;
 		p[line_ga.ga_len] = NUL;
-		while (p < (char_u *)line_ga.ga_data + line_ga.ga_len)
+		ខណៈពេល (p < (char_u *)line_ga.ga_data + line_ga.ga_len)
 		{
-		    if (*p == TAB)
+		    ប្រសិនបើ (*p == TAB)
 		    {
 			do
 			    msg_putchar(' ');
-			while (++vcol % 8);
+			ខណៈពេល (++vcol % 8);
 			++p;
 		    }
-		    else
+		    បើមិនដូច្នេះ
 		    {
 			len = mb_ptr2len(p);
 			msg_outtrans_len(p, len);
@@ -3346,28 +3346,28 @@ redraw:
 		continue;
 	    }
 
-	    if (c1 == Ctrl_D)
+	    ប្រសិនបើ (c1 == Ctrl_D)
 	    {
 		// Delete one shiftwidth.
 		p = (char_u *)line_ga.ga_data;
-		if (prev_char == '0' || prev_char == '^')
+		ប្រសិនបើ (prev_char == '0' || prev_char == '^')
 		{
-		    if (prev_char == '^')
+		    ប្រសិនបើ (prev_char == '^')
 			ex_keep_indent = TRUE;
 		    indent = 0;
 		    p[--line_ga.ga_len] = NUL;
 		}
-		else
+		បើមិនដូច្នេះ
 		{
 		    p[line_ga.ga_len] = NUL;
 		    indent = get_indent_str(p, 8, FALSE);
-		    if (indent > 0)
+		    ប្រសិនបើ (indent > 0)
 		    {
 			--indent;
 			indent -= indent % get_sw_value(curbuf);
 		    }
 		}
-		while (get_indent_str(p, 8, FALSE) > indent)
+		ខណៈពេល (get_indent_str(p, 8, FALSE) > indent)
 		{
 		    s = skipwhite(p);
 		    mch_memmove(s - 1, s, line_ga.ga_len - (s - p) + 1);
@@ -3376,37 +3376,37 @@ redraw:
 		goto add_indent;
 	    }
 
-	    if (c1 == Ctrl_V || c1 == Ctrl_Q)
+	    ប្រសិនបើ (c1 == Ctrl_V || c1 == Ctrl_Q)
 	    {
 		escaped = TRUE;
 		continue;
 	    }
 
 	    // Ignore special key codes: mouse movement, K_IGNORE, etc.
-	    if (IS_SPECIAL(c1))
+	    ប្រសិនបើ (IS_SPECIAL(c1))
 		continue;
 	}
 
-	if (IS_SPECIAL(c1))
+	ប្រសិនបើ (IS_SPECIAL(c1))
 	    c1 = '?';
-	if (has_mbyte)
+	ប្រសិនបើ (has_mbyte)
 	    len = (*mb_char2bytes)(c1,
 				  (char_u *)line_ga.ga_data + line_ga.ga_len);
-	else
+	បើមិនដូច្នេះ
 	{
 	    len = 1;
 	    ((char_u *)line_ga.ga_data)[line_ga.ga_len] = c1;
 	}
-	if (c1 == '\n')
+	ប្រសិនបើ (c1 == '\n')
 	    msg_putchar('\n');
-	else if (c1 == TAB)
+	បើមិនដូច្នេះ ប្រសិនបើ (c1 == TAB)
 	{
 	    // Don't use chartabsize(), 'ts' can be different
 	    do
 		msg_putchar(' ');
-	    while (++vcol % 8);
+	    ខណៈពេល (++vcol % 8);
 	}
-	else
+	បើមិនដូច្នេះ
 	{
 	    msg_outtrans_len(
 		     ((char_u *)line_ga.ga_data) + line_ga.ga_len, len);
@@ -3420,13 +3420,13 @@ redraw:
 
 	// We are done when a NL is entered, but not when it comes after a
 	// backslash in prompt mode.
-	if (line_ga.ga_len > 0 && pend[-1] == '\n'
+	ប្រសិនបើ (line_ga.ga_len > 0 && pend[-1] == '\n'
 		&& (line_ga.ga_len <= 1 || pend[-2] != '\\' || !promptc))
 	{
 	    --line_ga.ga_len;
 	    --pend;
 	    *pend = NUL;
-	    break;
+	    bha_nga;
 	}
     }
 
@@ -3436,37 +3436,37 @@ redraw:
     // make following messages go to the next line
     msg_didout = FALSE;
     msg_col = 0;
-    if (msg_row < Rows - 1)
+    ប្រសិនបើ (msg_row < Rows - 1)
 	++msg_row;
     emsg_on_display = FALSE;		// don't want ui_delay()
 
-    if (got_int)
+    ប្រសិនបើ (got_int)
 	ga_clear(&line_ga);
 
-    return (char_u *)line_ga.ga_data;
+    ត្រឡប់ (char_u *)line_ga.ga_data;
 }
 
 /*
  * Return TRUE if ccline.overstrike is on.
  */
-    int
+    ចំនួនគត់
 cmdline_overstrike(void)
 {
-    return ccline.overstrike;
+    ត្រឡប់ ccline.overstrike;
 }
 
-#if defined(MCH_CURSOR_SHAPE) || defined(FEAT_GUI) || defined(FEAT_MOUSESHAPE)
+#ប្រសិនបើ defined(MCH_CURSOR_SHAPE) || defined(FEAT_GUI) || defined(FEAT_MOUSESHAPE)
 /*
  * Return TRUE if the cursor is at the end of the cmdline.
  */
-    int
+    ចំនួនគត់
 cmdline_at_end(void)
 {
-    return (ccline.cmdpos >= ccline.cmdlen);
+    ត្រឡប់ (ccline.cmdpos >= ccline.cmdlen);
 }
 #endif
 
-#if defined(FEAT_XIM) && (defined(FEAT_GUI_GTK))
+#ប្រសិនបើ defined(FEAT_XIM) && (defined(FEAT_GUI_GTK))
 /*
  * Return the virtual column number at the current cursor position.
  * This is used by the IM code to obtain the start of the preedit string.
@@ -3474,25 +3474,25 @@ cmdline_at_end(void)
     colnr_T
 cmdline_getvcol_cursor(void)
 {
-    if (ccline.cmdbuff == NULL || ccline.cmdpos > ccline.cmdlen)
-	return MAXCOL;
+    ប្រសិនបើ (ccline.cmdbuff == NULL || ccline.cmdpos > ccline.cmdlen)
+	ត្រឡប់ MAXCOL;
 
-    if (has_mbyte)
+    ប្រសិនបើ (has_mbyte)
     {
 	colnr_T	col;
-	int	i = 0;
+	ចំនួនគត់	i = 0;
 
-	for (col = 0; i < ccline.cmdpos; ++col)
+	សម្រាប់ (col = 0; i < ccline.cmdpos; ++col)
 	    i += (*mb_ptr2len)(ccline.cmdbuff + i);
 
-	return col;
+	ត្រឡប់ col;
     }
-    else
-	return ccline.cmdpos;
+    បើមិនដូច្នេះ
+	ត្រឡប់ ccline.cmdpos;
 }
 #endif
 
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+#ប្រសិនបើ defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
 /*
  * If part of the command line is an IM preedit string, redraw it with
  * IM feedback attributes.  The cursor position is restored after drawing.
@@ -3500,32 +3500,32 @@ cmdline_getvcol_cursor(void)
     static void
 redrawcmd_preedit(void)
 {
-    if ((State & MODE_CMDLINE)
+    ប្រសិនបើ ((State & MODE_CMDLINE)
 	    && xic != NULL
 	    // && im_get_status()  doesn't work when using SCIM
 	    && !p_imdisable
 	    && im_is_preediting())
     {
-	int	cmdpos = 0;
-	int	cmdspos;
-	int	old_row;
-	int	old_col;
+	ចំនួនគត់	cmdpos = 0;
+	ចំនួនគត់	cmdspos;
+	ចំនួនគត់	old_row;
+	ចំនួនគត់	old_col;
 	colnr_T	col;
 
 	old_row = msg_row;
 	old_col = msg_col;
 	cmdspos = ((ccline.cmdfirstc != NUL) ? 1 : 0) + ccline.cmdindent;
 
-	if (has_mbyte)
+	ប្រសិនបើ (has_mbyte)
 	{
-	    for (col = 0; col < preedit_start_col
+	    សម្រាប់ (col = 0; col < preedit_start_col
 			  && cmdpos < ccline.cmdlen; ++col)
 	    {
 		cmdspos += (*mb_ptr2cells)(ccline.cmdbuff + cmdpos);
 		cmdpos  += (*mb_ptr2len)(ccline.cmdbuff + cmdpos);
 	    }
 	}
-	else
+	បើមិនដូច្នេះ
 	{
 	    cmdspos += preedit_start_col;
 	    cmdpos  += preedit_start_col;
@@ -3533,21 +3533,21 @@ redrawcmd_preedit(void)
 
 	msg_row = cmdline_row + (cmdspos / cmdline_width);
 	msg_col = cmdspos % cmdline_width;
-	if (msg_row >= Rows)
+	ប្រសិនបើ (msg_row >= Rows)
 	    msg_row = Rows - 1;
 
-	for (col = 0; cmdpos < ccline.cmdlen; ++col)
+	សម្រាប់ (col = 0; cmdpos < ccline.cmdlen; ++col)
 	{
-	    int char_len;
-	    int char_attr;
+	    ចំនួនគត់ char_len;
+	    ចំនួនគត់ char_attr;
 
 	    char_attr = im_get_feedback_attr(col);
-	    if (char_attr < 0)
-		break; // end of preedit string
+	    ប្រសិនបើ (char_attr < 0)
+		bha_nga; // end of preedit string
 
-	    if (has_mbyte)
+	    ប្រសិនបើ (has_mbyte)
 		char_len = (*mb_ptr2len)(ccline.cmdbuff + cmdpos);
-	    else
+	    បើមិនដូច្នេះ
 		char_len = 1;
 
 	    msg_outtrans_len_attr(ccline.cmdbuff + cmdpos, char_len, char_attr);
@@ -3580,27 +3580,27 @@ alloc_cmdbuff(size_t len)
     /*
      * give some extra space to avoid having to allocate all the time
      */
-    if (len < 80)
+    ប្រសិនបើ (len < 80)
 	len = 100;
-    else
+    បើមិនដូច្នេះ
 	len += 20;
 
     ccline.cmdbuff = alloc(len);    // caller should check for out-of-memory
-    ccline.cmdbufflen = (int)len;
+    ccline.cmdbufflen = (ចំនួនគត់)len;
 }
 
 /*
  * Re-allocate the command line to length len + something extra.
  * return FAIL for failure, OK otherwise
  */
-    int
-realloc_cmdbuff(int len)
+    ចំនួនគត់
+realloc_cmdbuff(ចំនួនគត់ len)
 {
     char_u	*p;
-    int		plen;
+    ចំនួនគត់		plen;
 
-    if (len < ccline.cmdbufflen)
-	return OK;			// no need to resize
+    ប្រសិនបើ (len < ccline.cmdbufflen)
+	ត្រឡប់ OK;			// no need to resize
 
     // Keep a copy of the original cmdbuff and it's size so
     // they can be restored/used later.
@@ -3608,39 +3608,39 @@ realloc_cmdbuff(int len)
     plen = ccline.cmdbufflen;
 
     alloc_cmdbuff(len);			// will get some more
-    if (ccline.cmdbuff == NULL)		// out of memory
+    ប្រសិនបើ (ccline.cmdbuff == NULL)		// out of memory
     {
 	ccline.cmdbuff = p;		// keep the old one
 	ccline.cmdbufflen = plen;
-	return FAIL;
+	ត្រឡប់ FAIL;
     }
     // There isn't always a NUL after the command, but it may need to be
     // there, thus copy up to the NUL and add a NUL.
     mch_memmove(ccline.cmdbuff, p, (size_t)ccline.cmdlen);
     ccline.cmdbuff[ccline.cmdlen] = NUL;
 
-    if (ccline.xpc != NULL
+    ប្រសិនបើ (ccline.xpc != NULL
 	    && ccline.xpc->xp_pattern != NULL
 	    && ccline.xpc->xp_context != EXPAND_NOTHING
 	    && ccline.xpc->xp_context != EXPAND_UNSUCCESSFUL)
     {
-	int i = (int)(ccline.xpc->xp_pattern - p);
+	ចំនួនគត់ i = (ចំនួនគត់)(ccline.xpc->xp_pattern - p);
 
 	// If xp_pattern points inside the old cmdbuff it needs to be adjusted
 	// to point into the newly allocated memory.
-	if (i >= 0 && i <= ccline.cmdlen)
+	ប្រសិនបើ (i >= 0 && i <= ccline.cmdlen)
 	    ccline.xpc->xp_pattern = ccline.cmdbuff + i;
     }
 
     vim_free(p);
 
-    return OK;
+    ត្រឡប់ OK;
 }
 
-#if defined(FEAT_ARABIC)
+#ប្រសិនបើ defined(FEAT_ARABIC)
 static char_u	*arshape_buf = NULL;
 
-# if defined(EXITFREE)
+# ប្រសិនបើ defined(EXITFREE)
     void
 free_arshape_buf(void)
 {
@@ -3654,84 +3654,84 @@ free_arshape_buf(void)
  * when cmdline_star is TRUE.
  */
     static void
-draw_cmdline(int start, int len)
+draw_cmdline(ចំនួនគត់ start, ចំនួនគត់ len)
 {
-#if defined(FEAT_CRYPT) || defined(FEAT_EVAL)
-    int		i;
+#ប្រសិនបើ defined(FEAT_CRYPT) || defined(FEAT_EVAL)
+    ចំនួនគត់		i;
 
-    if (cmdline_star > 0)
-	for (i = 0; i < len; ++i)
+    ប្រសិនបើ (cmdline_star > 0)
+	សម្រាប់ (i = 0; i < len; ++i)
 	{
 	    msg_putchar('*');
-	    if (has_mbyte)
+	    ប្រសិនបើ (has_mbyte)
 		i += (*mb_ptr2len)(ccline.cmdbuff + start + i) - 1;
 	}
-    else
+    បើមិនដូច្នេះ
 #endif
 #ifdef FEAT_ARABIC
-	if (p_arshape && !p_tbidi && cmdline_has_arabic(start, len))
+	ប្រសិនបើ (p_arshape && !p_tbidi && cmdline_has_arabic(start, len))
     {
-	static int	buflen = 0;
+	static ចំនួនគត់	buflen = 0;
 	char_u		*p;
-	int		j;
-	int		newlen = 0;
-	int		mb_l;
-	int		pc, pc1 = 0;
-	int		prev_c = 0;
-	int		prev_c1 = 0;
-	int		u8c;
-	int		u8cc[MAX_MCO];
-	int		nc = 0;
+	ចំនួនគត់		j;
+	ចំនួនគត់		newlen = 0;
+	ចំនួនគត់		mb_l;
+	ចំនួនគត់		pc, pc1 = 0;
+	ចំនួនគត់		prev_c = 0;
+	ចំនួនគត់		prev_c1 = 0;
+	ចំនួនគត់		u8c;
+	ចំនួនគត់		u8cc[MAX_MCO];
+	ចំនួនគត់		nc = 0;
 
 	/*
 	 * Do arabic shaping into a temporary buffer.  This is very
 	 * inefficient!
 	 */
-	if (len * 2 + 2 > buflen)
+	ប្រសិនបើ (len * 2 + 2 > buflen)
 	{
 	    // Re-allocate the buffer.  We keep it around to avoid a lot of
 	    // alloc()/free() calls.
 	    vim_free(arshape_buf);
 	    buflen = len * 2 + 2;
 	    arshape_buf = alloc(buflen);
-	    if (arshape_buf == NULL)
-		return;	// out of memory
+	    ប្រសិនបើ (arshape_buf == NULL)
+		ត្រឡប់;	// out of memory
 	}
 
-	if (utf_iscomposing(utf_ptr2char(ccline.cmdbuff + start)))
+	ប្រសិនបើ (utf_iscomposing(utf_ptr2char(ccline.cmdbuff + start)))
 	{
 	    // Prepend a space to draw the leading composing char on.
 	    arshape_buf[0] = ' ';
 	    newlen = 1;
 	}
 
-	for (j = start; j < start + len; j += mb_l)
+	សម្រាប់ (j = start; j < start + len; j += mb_l)
 	{
 	    p = ccline.cmdbuff + j;
 	    u8c = utfc_ptr2char_len(p, u8cc, start + len - j);
 	    mb_l = utfc_ptr2len_len(p, start + len - j);
-	    if (ARABIC_CHAR(u8c))
+	    ប្រសិនបើ (ARABIC_CHAR(u8c))
 	    {
 		// Do Arabic shaping.
-		if (cmdmsg_rl)
+		ប្រសិនបើ (cmdmsg_rl)
 		{
 		    // displaying from right to left
 		    pc = prev_c;
 		    pc1 = prev_c1;
 		    prev_c1 = u8cc[0];
-		    if (j + mb_l >= start + len)
+		    ប្រសិនបើ (j + mb_l >= start + len)
 			nc = NUL;
-		    else
+		    បើមិនដូច្នេះ
 			nc = utf_ptr2char(p + mb_l);
 		}
-		else
+		បើមិនដូច្នេះ
 		{
 		    // displaying from left to right
-		    if (j + mb_l >= start + len)
+		    ប្រសិនបើ (j + mb_l >= start + len)
 			pc = NUL;
-		    else
+		    បើមិនដូច្នេះ
 		    {
-			int	pcc[MAX_MCO];
+			ចំនួនគត់	pcc[MAX_MCO];
 
 			pc = utfc_ptr2char_len(p + mb_l, pcc,
 						      start + len - j - mb_l);
@@ -3744,15 +3744,15 @@ draw_cmdline(int start, int len)
 		u8c = arabic_shape(u8c, NULL, &u8cc[0], pc, pc1, nc);
 
 		newlen += (*mb_char2bytes)(u8c, arshape_buf + newlen);
-		if (u8cc[0] != 0)
+		ប្រសិនបើ (u8cc[0] != 0)
 		{
 		    newlen += (*mb_char2bytes)(u8cc[0], arshape_buf + newlen);
-		    if (u8cc[1] != 0)
+		    ប្រសិនបើ (u8cc[1] != 0)
 			newlen += (*mb_char2bytes)(u8cc[1],
 							arshape_buf + newlen);
 		}
 	    }
-	    else
+	    បើមិនដូច្នេះ
 	    {
 		prev_c = u8c;
 		mch_memmove(arshape_buf + newlen, p, mb_l);
@@ -3762,7 +3762,7 @@ draw_cmdline(int start, int len)
 
 	msg_outtrans_len(arshape_buf, newlen);
     }
-    else
+    បើមិនដូច្នេះ
 #endif
 	msg_outtrans_len(ccline.cmdbuff + start, len);
 }
@@ -3773,13 +3773,13 @@ draw_cmdline(int start, int len)
  * "c" must be printable (fit in one display cell)!
  */
     void
-putcmdline(int c, int shift)
+putcmdline(ចំនួនគត់ c, ចំនួនគត់ shift)
 {
-    if (cmd_silent)
-	return;
+    ប្រសិនបើ (cmd_silent)
+	ត្រឡប់;
     msg_no_more = TRUE;
     msg_putchar(c);
-    if (shift)
+    ប្រសិនបើ (shift)
 	draw_cmdline(ccline.cmdpos, ccline.cmdlen - ccline.cmdpos);
     msg_no_more = FALSE;
     cursorcmd();
@@ -3793,15 +3793,15 @@ putcmdline(int c, int shift)
     void
 unputcmdline(void)
 {
-    if (cmd_silent)
-	return;
+    ប្រសិនបើ (cmd_silent)
+	ត្រឡប់;
     msg_no_more = TRUE;
-    if (ccline.cmdlen == ccline.cmdpos)
+    ប្រសិនបើ (ccline.cmdlen == ccline.cmdpos)
 	msg_putchar(' ');
-    else if (has_mbyte)
+    បើមិនដូច្នេះ ប្រសិនបើ (has_mbyte)
 	draw_cmdline(ccline.cmdpos,
 			       (*mb_ptr2len)(ccline.cmdbuff + ccline.cmdpos));
-    else
+    បើមិនដូច្នេះ
 	draw_cmdline(ccline.cmdpos, 1);
     msg_no_more = FALSE;
     cursorcmd();
@@ -3816,66 +3816,66 @@ unputcmdline(void)
  * twice in a row, then 'redraw' should be FALSE and redrawcmd() should be
  * called afterwards.
  */
-    int
-put_on_cmdline(char_u *str, int len, int redraw)
+    ចំនួនគត់
+put_on_cmdline(char_u *str, ចំនួនគត់ len, ចំនួនគត់ redraw)
 {
-    int		retval;
-    int		i;
-    int		m;
-    int		c;
+    ចំនួនគត់		retval;
+    ចំនួនគត់		i;
+    ចំនួនគត់		m;
+    ចំនួនគត់		c;
 
-    if (len < 0)
-	len = (int)STRLEN(str);
+    ប្រសិនបើ (len < 0)
+	len = (ចំនួនគត់)STRLEN(str);
 
     // Check if ccline.cmdbuff needs to be longer
-    if (ccline.cmdlen + len + 1 >= ccline.cmdbufflen)
+    ប្រសិនបើ (ccline.cmdlen + len + 1 >= ccline.cmdbufflen)
 	retval = realloc_cmdbuff(ccline.cmdlen + len + 1);
-    else
+    បើមិនដូច្នេះ
 	retval = OK;
-    if (retval == OK)
+    ប្រសិនបើ (retval == OK)
     {
-	if (!ccline.overstrike)
+	ប្រសិនបើ (!ccline.overstrike)
 	{
 	    mch_memmove(ccline.cmdbuff + ccline.cmdpos + len,
 					       ccline.cmdbuff + ccline.cmdpos,
 				     (size_t)(ccline.cmdlen - ccline.cmdpos));
 	    ccline.cmdlen += len;
 	}
-	else
+	បើមិនដូច្នេះ
 	{
-	    if (has_mbyte)
+	    ប្រសិនបើ (has_mbyte)
 	    {
 		// Count nr of characters in the new string.
 		m = 0;
-		for (i = 0; i < len; i += (*mb_ptr2len)(str + i))
+		សម្រាប់ (i = 0; i < len; i += (*mb_ptr2len)(str + i))
 		    ++m;
 		// Count nr of bytes in cmdline that are overwritten by these
 		// characters.
-		for (i = ccline.cmdpos; i < ccline.cmdlen && m > 0;
+		សម្រាប់ (i = ccline.cmdpos; i < ccline.cmdlen && m > 0;
 				 i += (*mb_ptr2len)(ccline.cmdbuff + i))
 		    --m;
-		if (i < ccline.cmdlen)
+		ប្រសិនបើ (i < ccline.cmdlen)
 		{
 		    mch_memmove(ccline.cmdbuff + ccline.cmdpos + len,
 			    ccline.cmdbuff + i, (size_t)(ccline.cmdlen - i));
 		    ccline.cmdlen += ccline.cmdpos + len - i;
 		}
-		else
+		បើមិនដូច្នេះ
 		    ccline.cmdlen = ccline.cmdpos + len;
 	    }
-	    else if (ccline.cmdpos + len > ccline.cmdlen)
+	    បើមិនដូច្នេះ ប្រសិនបើ (ccline.cmdpos + len > ccline.cmdlen)
 		ccline.cmdlen = ccline.cmdpos + len;
 	}
 	mch_memmove(ccline.cmdbuff + ccline.cmdpos, str, (size_t)len);
 	ccline.cmdbuff[ccline.cmdlen] = NUL;
 
-	if (enc_utf8)
+	ប្រសិនបើ (enc_utf8)
 	{
 	    // When the inserted text starts with a composing character,
 	    // backup to the character before it.  There could be two of them.
 	    i = 0;
 	    c = utf_ptr2char(ccline.cmdbuff + ccline.cmdpos);
-	    while (ccline.cmdpos > 0 && utf_iscomposing(c))
+	    ខណៈពេល (ccline.cmdpos > 0 && utf_iscomposing(c))
 	    {
 		i = (*mb_head_off)(ccline.cmdbuff,
 				      ccline.cmdbuff + ccline.cmdpos - 1) + 1;
@@ -3884,28 +3884,28 @@ put_on_cmdline(char_u *str, int len, int redraw)
 		c = utf_ptr2char(ccline.cmdbuff + ccline.cmdpos);
 	    }
 #ifdef FEAT_ARABIC
-	    if (i == 0 && ccline.cmdpos > 0 && arabic_maycombine(c))
+	    ប្រសិនបើ (i == 0 && ccline.cmdpos > 0 && arabic_maycombine(c))
 	    {
 		// Check the previous character for Arabic combining pair.
 		i = (*mb_head_off)(ccline.cmdbuff,
 				      ccline.cmdbuff + ccline.cmdpos - 1) + 1;
-		if (arabic_combine(utf_ptr2char(ccline.cmdbuff
+		ប្រសិនបើ (arabic_combine(utf_ptr2char(ccline.cmdbuff
 						     + ccline.cmdpos - i), c))
 		{
 		    ccline.cmdpos -= i;
 		    len += i;
 		}
-		else
+		បើមិនដូច្នេះ
 		    i = 0;
 	    }
 #endif
-	    if (i != 0)
+	    ប្រសិនបើ (i != 0)
 	    {
 		// Also backup the cursor position.
 		i = ptr2cells(ccline.cmdbuff + ccline.cmdpos);
 		ccline.cmdspos -= i;
 		msg_col -= i;
-		if (msg_col < 0)
+		ប្រសិនបើ (msg_col < 0)
 		{
 		    msg_col += cmdline_width;
 		    --msg_row;
@@ -3913,41 +3913,41 @@ put_on_cmdline(char_u *str, int len, int redraw)
 	    }
 	}
 
-	if (redraw && !cmd_silent)
+	ប្រសិនបើ (redraw && !cmd_silent)
 	{
 	    msg_no_more = TRUE;
 	    i = cmdline_row;
 	    cursorcmd();
 	    draw_cmdline(ccline.cmdpos, ccline.cmdlen - ccline.cmdpos);
 	    // Avoid clearing the rest of the line too often.
-	    if (cmdline_row != i || ccline.overstrike)
+	    ប្រសិនបើ (cmdline_row != i || ccline.overstrike)
 		msg_clr_eos();
 	    msg_no_more = FALSE;
 	}
-	if (KeyTyped)
+	ប្រសិនបើ (KeyTyped)
 	{
 	    m = cmdline_width * Rows;
-	    if (m < 0)	// overflow, cmdline_width or Rows at weird value
+	    ប្រសិនបើ (m < 0)	// overflow, cmdline_width or Rows at weird value
 		m = MAXCOL;
 	}
-	else
+	បើមិនដូច្នេះ
 	    m = MAXCOL;
-	for (i = 0; i < len; ++i)
+	សម្រាប់ (i = 0; i < len; ++i)
 	{
 	    c = cmdline_charsize(ccline.cmdpos);
 	    // count ">" for a double-wide char that doesn't fit.
-	    if (has_mbyte)
+	    ប្រសិនបើ (has_mbyte)
 		correct_cmdspos(ccline.cmdpos, c);
 	    // Stop cursor at the end of the screen, but do increment the
 	    // insert position, so that entering a very long command
 	    // works, even though you can't see it.
-	    if (ccline.cmdspos + c < m)
+	    ប្រសិនបើ (ccline.cmdspos + c < m)
 		ccline.cmdspos += c;
 
-	    if (has_mbyte)
+	    ប្រសិនបើ (has_mbyte)
 	    {
 		c = (*mb_ptr2len)(ccline.cmdbuff + ccline.cmdpos) - 1;
-		if (c > len - i - 1)
+		ប្រសិនបើ (c > len - i - 1)
 		    c = len - i - 1;
 		ccline.cmdpos += c;
 		i += c;
@@ -3955,13 +3955,13 @@ put_on_cmdline(char_u *str, int len, int redraw)
 	    ++ccline.cmdpos;
 	}
     }
-    if (redraw)
+    ប្រសិនបើ (redraw)
 	msg_check();
-    return retval;
+    ត្រឡប់ retval;
 }
 
 static cmdline_info_T	prev_ccline;
-static int		prev_ccline_used = FALSE;
+static ចំនួនគត់		prev_ccline_used = FALSE;
 
 /*
  * Save ccline, because obtaining the "=" register may execute "normal :cmd"
@@ -3971,7 +3971,7 @@ static int		prev_ccline_used = FALSE;
     static void
 save_cmdline(cmdline_info_T *ccp)
 {
-    if (!prev_ccline_used)
+    ប្រសិនបើ (!prev_ccline_used)
     {
 	CLEAR_FIELD(prev_ccline);
 	prev_ccline_used = TRUE;
@@ -3999,29 +3999,29 @@ restore_cmdline(cmdline_info_T *ccp)
  *
  * Return FAIL for failure, OK otherwise.
  */
-    static int
+    static ចំនួនគត់
 cmdline_paste(
-    int regname,
-    int literally,	// Insert text literally instead of "as typed"
-    int remcr)		// remove trailing CR
+    ចំនួនគត់ regname,
+    ចំនួនគត់ literally,	// Insert text literally instead of "as typed"
+    ចំនួនគត់ remcr)		// remove trailing CR
 {
     long		i;
     char_u		*arg;
     char_u		*p;
-    int			allocated;
+    ចំនួនគត់			allocated;
 
     // check for valid regname; also accept special characters for CTRL-R in
     // the command line
-    if (regname != Ctrl_F && regname != Ctrl_P && regname != Ctrl_W
+    ប្រសិនបើ (regname != Ctrl_F && regname != Ctrl_P && regname != Ctrl_W
 	    && regname != Ctrl_A && regname != Ctrl_L
 	    && !valid_yank_reg(regname, FALSE))
-	return FAIL;
+	ត្រឡប់ FAIL;
 
     // A register containing CTRL-R can cause an endless loop.  Allow using
     // CTRL-C to break the loop.
     line_breakcheck();
-    if (got_int)
-	return FAIL;
+    ប្រសិនបើ (got_int)
+	ត្រឡប់ FAIL;
 
 #ifdef FEAT_CLIPBOARD
     regname = may_get_selection(regname);
@@ -4033,49 +4033,49 @@ cmdline_paste(
     i = get_spec_reg(regname, &arg, &allocated, TRUE);
     --textlock;
 
-    if (i)
+    ប្រសិនបើ (i)
     {
 	// Got the value of a special register in "arg".
-	if (arg == NULL)
-	    return FAIL;
+	ប្រសិនបើ (arg == NULL)
+	    ត្រឡប់ FAIL;
 
 	// When 'incsearch' is set and CTRL-R CTRL-W used: skip the duplicate
 	// part of the word.
 	p = arg;
-	if (p_is && regname == Ctrl_W)
+	ប្រសិនបើ (p_is && regname == Ctrl_W)
 	{
 	    char_u  *w;
-	    int	    len;
+	    ចំនួនគត់	    len;
 
 	    // Locate start of last word in the cmd buffer.
-	    for (w = ccline.cmdbuff + ccline.cmdpos; w > ccline.cmdbuff; )
+	    សម្រាប់ (w = ccline.cmdbuff + ccline.cmdpos; w > ccline.cmdbuff; )
 	    {
-		if (has_mbyte)
+		ប្រសិនបើ (has_mbyte)
 		{
 		    len = (*mb_head_off)(ccline.cmdbuff, w - 1) + 1;
-		    if (!vim_iswordc(mb_ptr2char(w - len)))
-			break;
+		    ប្រសិនបើ (!vim_iswordc(mb_ptr2char(w - len)))
+			bha_nga;
 		    w -= len;
 		}
-		else
+		បើមិនដូច្នេះ
 		{
-		    if (!vim_iswordc(w[-1]))
-			break;
+		    ប្រសិនបើ (!vim_iswordc(w[-1]))
+			bha_nga;
 		    --w;
 		}
 	    }
-	    len = (int)((ccline.cmdbuff + ccline.cmdpos) - w);
-	    if (p_ic ? STRNICMP(w, arg, len) == 0 : STRNCMP(w, arg, len) == 0)
+	    len = (ចំនួនគត់)((ccline.cmdbuff + ccline.cmdpos) - w);
+	    ប្រសិនបើ (p_ic ? STRNICMP(w, arg, len) == 0 : STRNCMP(w, arg, len) == 0)
 		p += len;
 	}
 
 	cmdline_paste_str(p, literally);
-	if (allocated)
+	ប្រសិនបើ (allocated)
 	    vim_free(arg);
-	return OK;
+	ត្រឡប់ OK;
     }
 
-    return cmdline_paste_reg(regname, literally, remcr);
+    ត្រឡប់ cmdline_paste_reg(regname, literally, remcr);
 }
 
 /*
@@ -4085,23 +4085,23 @@ cmdline_paste(
  * line.
  */
     void
-cmdline_paste_str(char_u *s, int literally)
+cmdline_paste_str(char_u *s, ចំនួនគត់ literally)
 {
-    int		c, cv;
+    ចំនួនគត់		c, cv;
 
-    if (literally)
+    ប្រសិនបើ (literally)
 	put_on_cmdline(s, -1, TRUE);
-    else
-	while (*s != NUL)
+    បើមិនដូច្នេះ
+	ខណៈពេល (*s != NUL)
 	{
 	    cv = *s;
-	    if (cv == Ctrl_V && s[1])
+	    ប្រសិនបើ (cv == Ctrl_V && s[1])
 		++s;
-	    if (has_mbyte)
+	    ប្រសិនបើ (has_mbyte)
 		c = mb_cptr2char_adv(&s);
-	    else
+	    បើមិនដូច្នេះ
 		c = *s++;
-	    if (cv == Ctrl_V || c == ESC || c == Ctrl_C
+	    ប្រសិនបើ (cv == Ctrl_V || c == ESC || c == Ctrl_C
 		    || c == CAR || c == NL || c == Ctrl_L
 #ifdef UNIX
 		    || c == intr_char
@@ -4128,12 +4128,12 @@ redrawcmdline(void)
  * If FALSE cmdline_row is used, which should redraw in the same place.
  */
     void
-redrawcmdline_ex(int do_compute_cmdrow)
+redrawcmdline_ex(ចំនួនគត់ do_compute_cmdrow)
 {
-    if (cmd_silent)
-	return;
+    ប្រសិនបើ (cmd_silent)
+	ត្រឡប់;
     need_wait_return = FALSE;
-    if (do_compute_cmdrow)
+    ប្រសិនបើ (do_compute_cmdrow)
 	compute_cmdrow();
     redrawcmd();
     cursorcmd();
@@ -4142,22 +4142,22 @@ redrawcmdline_ex(int do_compute_cmdrow)
     static void
 redrawcmdprompt(void)
 {
-    int		i;
+    ចំនួនគត់		i;
 
-    if (cmd_silent)
-	return;
-    if (ccline.cmdfirstc != NUL)
+    ប្រសិនបើ (cmd_silent)
+	ត្រឡប់;
+    ប្រសិនបើ (ccline.cmdfirstc != NUL)
 	msg_putchar(ccline.cmdfirstc);
-    if (ccline.cmdprompt != NULL)
+    ប្រសិនបើ (ccline.cmdprompt != NULL)
     {
-	msg_puts_attr((char *)ccline.cmdprompt, ccline.cmdattr);
+	msg_puts_attr((var_na *)ccline.cmdprompt, ccline.cmdattr);
 	ccline.cmdindent = msg_col + (msg_row - cmdline_row) * cmdline_width;
 	// do the reverse of set_cmdspos()
-	if (ccline.cmdfirstc != NUL)
+	ប្រសិនបើ (ccline.cmdfirstc != NUL)
 	    --ccline.cmdindent;
     }
-    else
-	for (i = ccline.cmdindent; i > 0; --i)
+    បើមិនដូច្នេះ
+	សម្រាប់ (i = ccline.cmdindent; i > 0; --i)
 	    msg_putchar(' ');
 }
 
@@ -4167,17 +4167,17 @@ redrawcmdprompt(void)
     void
 redrawcmd(void)
 {
-    int save_in_echowindow = in_echowindow;
+    ចំនួនគត់ save_in_echowindow = in_echowindow;
 
-    if (cmd_silent)
-	return;
+    ប្រសិនបើ (cmd_silent)
+	ត្រឡប់;
 
     // when 'incsearch' is set there may be no command line while redrawing
-    if (ccline.cmdbuff == NULL)
+    ប្រសិនបើ (ccline.cmdbuff == NULL)
     {
 	windgoto(cmdline_row, cmdline_col_off);
 	msg_clr_eos();
-	return;
+	ត្រឡប់;
     }
 
     // Do not put this in the message window.
@@ -4196,7 +4196,7 @@ redrawcmd(void)
     msg_no_more = FALSE;
 
     set_cmdspos_cursor();
-    if (extra_char != NUL)
+    ប្រសិនបើ (extra_char != NUL)
 	putcmdline(extra_char, extra_char_shift);
 
     /*
@@ -4216,9 +4216,9 @@ redrawcmd(void)
 compute_cmdrow(void)
 {
     // ignore "msg_scrolled" in update_screen(), it will be reset soon.
-    if (exmode_active || (msg_scrolled != 0 && !updating_screen))
+    ប្រសិនបើ (exmode_active || (msg_scrolled != 0 && !updating_screen))
 	cmdline_row = Rows - 1;
-    else
+    បើមិនដូច្នេះ
 	cmdline_row = W_WINROW(lastwin) + lastwin->w_height
 						    + lastwin->w_status_height;
 }
@@ -4226,29 +4226,29 @@ compute_cmdrow(void)
     void
 cursorcmd(void)
 {
-    if (cmd_silent)
-	return;
+    ប្រសិនបើ (cmd_silent)
+	ត្រឡប់;
 
 #ifdef FEAT_RIGHTLEFT
-    if (cmdmsg_rl)
+    ប្រសិនបើ (cmdmsg_rl)
     {
 	msg_row = cmdline_row  + (ccline.cmdspos / (cmdline_width - 1));
 	msg_col = cmdline_width - (ccline.cmdspos % (cmdline_width - 1)) - 1;
-	if (msg_row <= 0)
+	ប្រសិនបើ (msg_row <= 0)
 	    msg_row = Rows - 1;
     }
-    else
+    បើមិនដូច្នេះ
 #endif
     {
 	msg_row = cmdline_row + (ccline.cmdspos / cmdline_width);
 	msg_col = ccline.cmdspos % cmdline_width;
-	if (msg_row >= Rows)
+	ប្រសិនបើ (msg_row >= Rows)
 	    msg_row = Rows - 1;
     }
 
     windgoto(msg_row, cmdline_col_off + msg_col);
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
-    if (p_imst == IM_ON_THE_SPOT)
+#ប្រសិនបើ defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+    ប្រសិនបើ (p_imst == IM_ON_THE_SPOT)
 	redrawcmd_preedit();
 #endif
 #ifdef MCH_CURSOR_SHAPE
@@ -4257,16 +4257,16 @@ cursorcmd(void)
 }
 
     void
-gotocmdline(int clr)
+gotocmdline(ចំនួនគត់ clr)
 {
     msg_start();
 #ifdef FEAT_RIGHTLEFT
-    if (cmdmsg_rl)
+    ប្រសិនបើ (cmdmsg_rl)
 	msg_col = cmdline_width - 1;
-    else
+    បើមិនដូច្នេះ
 #endif
 	msg_col = 0;	    // always start in column 0
-    if (clr)		    // clear the bottom line(s)
+    ប្រសិនបើ (clr)		    // clear the bottom line(s)
 	msg_clr_eos();	    // will reset clear_cmdline
     windgoto(cmdline_row, cmdline_col_off);
 }
@@ -4277,28 +4277,28 @@ gotocmdline(int clr)
  * When an abbreviation is recognized it is removed from the text with
  * backspaces and the replacement string is inserted, followed by "c".
  */
-    static int
-ccheck_abbr(int c)
+    static ចំនួនគត់
+ccheck_abbr(ចំនួនគត់ c)
 {
-    int spos = 0;
+    ចំនួនគត់ spos = 0;
 
-    if (p_paste || no_abbr)	    // no abbreviations or in paste mode
-	return FALSE;
+    ប្រសិនបើ (p_paste || no_abbr)	    // no abbreviations or in paste mode
+	ត្រឡប់ FALSE;
 
     // Do not consider '<,'> be part of the mapping, skip leading whitespace.
     // Actually accepts any mark.
-    while (VIM_ISWHITE(ccline.cmdbuff[spos]) && spos < ccline.cmdlen)
+    ខណៈពេល (VIM_ISWHITE(ccline.cmdbuff[spos]) && spos < ccline.cmdlen)
 	spos++;
-    if (ccline.cmdlen - spos > 5
+    ប្រសិនបើ (ccline.cmdlen - spos > 5
 	    && ccline.cmdbuff[spos] == '\''
 	    && ccline.cmdbuff[spos + 2] == ','
 	    && ccline.cmdbuff[spos + 3] == '\'')
 	spos += 5;
-    else
+    បើមិនដូច្នេះ
 	// check abbreviation from the beginning of the commandline
 	spos = 0;
 
-    return check_abbr(c, ccline.cmdbuff, ccline.cmdpos, spos);
+    ត្រឡប់ check_abbr(c, ccline.cmdbuff, ccline.cmdpos, spos);
 }
 
 /*
@@ -4309,25 +4309,25 @@ ccheck_abbr(int c)
  * Returns the result in allocated memory.
  */
     char_u *
-vim_strsave_fnameescape(char_u *fname, int what)
+vim_strsave_fnameescape(char_u *fname, ចំនួនគត់ what)
 {
     char_u	*p;
 #ifdef BACKSLASH_IN_FILENAME
     char_u	buf[20];
-    int		j = 0;
+    ចំនួនគត់		j = 0;
 
     // Don't escape '[', '{' and '!' if they are in 'isfname' and for the
     // ":buffer" command.
-    for (p = what == VSE_BUFFER ? BUFFER_ESC_CHARS : PATH_ESC_CHARS;
+    សម្រាប់ (p = what == VSE_BUFFER ? BUFFER_ESC_CHARS : PATH_ESC_CHARS;
 								*p != NUL; ++p)
-	if ((*p != '[' && *p != '{' && *p != '!') || !vim_isfilec(*p))
+	ប្រសិនបើ ((*p != '[' && *p != '{' && *p != '!') || !vim_isfilec(*p))
 	    buf[j++] = *p;
     buf[j] = NUL;
     p = vim_strsave_escaped(fname, buf);
-#else
+#បើមិនដូច្នេះ
     p = vim_strsave_escaped(fname, what == VSE_SHELL ? SHELL_ESC_CHARS
 		    : what == VSE_BUFFER ? BUFFER_ESC_CHARS : PATH_ESC_CHARS);
-    if (what == VSE_SHELL && csh_like_shell() && p != NULL)
+    ប្រសិនបើ (what == VSE_SHELL && csh_like_shell() && p != NULL)
     {
 	char_u	    *s;
 
@@ -4341,10 +4341,10 @@ vim_strsave_fnameescape(char_u *fname, int what)
 
     // '>' and '+' are special at the start of some commands, e.g. ":edit" and
     // ":write".  "cd -" has a special meaning.
-    if (p != NULL && (*p == '>' || *p == '+' || (*p == '-' && p[1] == NUL)))
+    ប្រសិនបើ (p != NULL && (*p == '>' || *p == '+' || (*p == '-' && p[1] == NUL)))
 	escape_fname(&p);
 
-    return p;
+    ត្រឡប់ p;
 }
 
 /*
@@ -4356,8 +4356,8 @@ escape_fname(char_u **pp)
     char_u	*p;
 
     p = alloc(STRLEN(*pp) + 2);
-    if (p == NULL)
-	return;
+    ប្រសិនបើ (p == NULL)
+	ត្រឡប់;
 
     p[0] = '\\';
     STRCPY(p + 1, *pp);
@@ -4372,18 +4372,18 @@ escape_fname(char_u **pp)
     void
 tilde_replace(
     char_u  *orig_pat,
-    int	    num_files,
+    ចំនួនគត់	    num_files,
     char_u  **files)
 {
-    int	    i;
+    ចំនួនគត់	    i;
     char_u  *p;
 
-    if (orig_pat[0] == '~' && vim_ispathsep(orig_pat[1]))
+    ប្រសិនបើ (orig_pat[0] == '~' && vim_ispathsep(orig_pat[1]))
     {
-	for (i = 0; i < num_files; ++i)
+	សម្រាប់ (i = 0; i < num_files; ++i)
 	{
 	    p = home_replace_save(NULL, files[i]);
-	    if (p != NULL)
+	    ប្រសិនបើ (p != NULL)
 	    {
 		vim_free(files[i]);
 		files[i] = p;
@@ -4398,7 +4398,7 @@ tilde_replace(
     cmdline_info_T *
 get_cmdline_info(void)
 {
-    return &ccline;
+    ត្រឡប់ &ccline;
 }
 
 /*
@@ -4408,13 +4408,13 @@ get_cmdline_info(void)
     static cmdline_info_T *
 get_ccline_ptr(void)
 {
-    if ((State & MODE_CMDLINE) == 0)
-	return NULL;
-    if (ccline.cmdbuff != NULL)
-	return &ccline;
-    if (prev_ccline_used && prev_ccline.cmdbuff != NULL)
-	return &prev_ccline;
-    return NULL;
+    ប្រសិនបើ ((State & MODE_CMDLINE) == 0)
+	ត្រឡប់ NULL;
+    ប្រសិនបើ (ccline.cmdbuff != NULL)
+	ត្រឡប់ &ccline;
+    ប្រសិនបើ (prev_ccline_used && prev_ccline.cmdbuff != NULL)
+	ត្រឡប់ &prev_ccline;
+    ត្រឡប់ NULL;
 }
 
 /*
@@ -4423,23 +4423,23 @@ get_ccline_ptr(void)
  * Only works when the command line is being edited.
  * Returns NUL when something is wrong.
  */
-    static int
+    static ចំនួនគត់
 get_cmdline_type(void)
 {
     cmdline_info_T *p = get_ccline_ptr();
 
-    if (p == NULL)
-	return NUL;
-    if (p->cmdfirstc == NUL)
-	return
+    ប្រសិនបើ (p == NULL)
+	ត្រឡប់ NUL;
+    ប្រសិនបើ (p->cmdfirstc == NUL)
+	ត្រឡប់
 #ifdef FEAT_EVAL
 	    (p->input_fn) ? '@' :
 #endif
 	    '-';
-    return p->cmdfirstc;
+    ត្រឡប់ p->cmdfirstc;
 }
 
-#if defined(FEAT_EVAL)
+#ប្រសិនបើ defined(FEAT_EVAL)
 /*
  * Get the current command line in allocated memory.
  * Only works when the command line is being edited.
@@ -4450,12 +4450,12 @@ get_cmdline_str(void)
 {
     cmdline_info_T *p;
 
-    if (cmdline_star > 0)
-	return NULL;
+    ប្រសិនបើ (cmdline_star > 0)
+	ត្រឡប់ NULL;
     p = get_ccline_ptr();
-    if (p == NULL)
-	return NULL;
-    return vim_strnsave(p->cmdbuff, p->cmdlen);
+    ប្រសិនបើ (p == NULL)
+	ត្រឡប់ NULL;
+    ត្រឡប់ vim_strnsave(p->cmdbuff, p->cmdlen);
 }
 
 /*
@@ -4465,31 +4465,31 @@ get_cmdline_str(void)
 get_cmdline_completion_pattern(void)
 {
     cmdline_info_T *p;
-    int		xp_context;
+    ចំនួនគត់		xp_context;
 
-    if (cmdline_star > 0)
-	return NULL;
+    ប្រសិនបើ (cmdline_star > 0)
+	ត្រឡប់ NULL;
 
     p = get_ccline_ptr();
-    if (p == NULL || p->xpc == NULL)
-	return NULL;
+    ប្រសិនបើ (p == NULL || p->xpc == NULL)
+	ត្រឡប់ NULL;
 
     xp_context = p->xpc->xp_context;
-    if (xp_context == EXPAND_NOTHING)
+    ប្រសិនបើ (xp_context == EXPAND_NOTHING)
     {
 	set_expand_context(p->xpc);
 	xp_context = p->xpc->xp_context;
 	p->xpc->xp_context = EXPAND_NOTHING;
     }
-    if (xp_context == EXPAND_UNSUCCESSFUL)
-	return NULL;
+    ប្រសិនបើ (xp_context == EXPAND_UNSUCCESSFUL)
+	ត្រឡប់ NULL;
 
     char_u *compl_pat = p->xpc->xp_pattern;
 
-    if (compl_pat == NULL)
-	return NULL;
+    ប្រសិនបើ (compl_pat == NULL)
+	ត្រឡប់ NULL;
 
-    return vim_strsave(compl_pat);
+    ត្រឡប់ vim_strsave(compl_pat);
 }
 
 /*
@@ -4499,26 +4499,26 @@ get_cmdline_completion_pattern(void)
 get_cmdline_completion(void)
 {
     cmdline_info_T	*p;
-    int			xp_context;
+    ចំនួនគត់			xp_context;
 
-    if (cmdline_star > 0)
-	return NULL;
+    ប្រសិនបើ (cmdline_star > 0)
+	ត្រឡប់ NULL;
 
     p = get_ccline_ptr();
-    if (p == NULL || p->xpc == NULL)
-	return NULL;
+    ប្រសិនបើ (p == NULL || p->xpc == NULL)
+	ត្រឡប់ NULL;
 
     xp_context = p->xpc->xp_context;
-    if (xp_context == EXPAND_NOTHING)
+    ប្រសិនបើ (xp_context == EXPAND_NOTHING)
     {
 	set_expand_context(p->xpc);
 	xp_context = p->xpc->xp_context;
 	p->xpc->xp_context = EXPAND_NOTHING;
     }
-    if (xp_context == EXPAND_UNSUCCESSFUL)
-	return NULL;
+    ប្រសិនបើ (xp_context == EXPAND_UNSUCCESSFUL)
+	ត្រឡប់ NULL;
 
-    return cmdcomplete_type_to_str(xp_context, p->xpc->xp_arg);
+    ត្រឡប់ cmdcomplete_type_to_str(xp_context, p->xpc->xp_arg);
 }
 
 /*
@@ -4593,8 +4593,8 @@ f_getcmdtype(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = alloc(2);
-    if (rettv->vval.v_string == NULL)
-	return;
+    ប្រសិនបើ (rettv->vval.v_string == NULL)
+	ត្រឡប់;
 
     rettv->vval.v_string[0] = get_cmdline_type();
     rettv->vval.v_string[1] = NUL;
@@ -4602,18 +4602,18 @@ f_getcmdtype(typval_T *argvars UNUSED, typval_T *rettv)
 
 // Set the command line str to "str".
 // Returns 1 when failed, 0 when OK.
-    static int
-set_cmdline_str(char_u *str, int pos)
+    static ចំនួនគត់
+set_cmdline_str(char_u *str, ចំនួនគត់ pos)
 {
     cmdline_info_T  *p = get_ccline_ptr();
-    int		    len;
+    ចំនួនគត់		    len;
 
-    if (p == NULL)
-	return 1;
+    ប្រសិនបើ (p == NULL)
+	ត្រឡប់ 1;
 
-    len = (int)STRLEN(str);
-    if (realloc_cmdbuff(len + 1) != OK)
-	return 1;
+    len = (ចំនួនគត់)STRLEN(str);
+    ប្រសិនបើ (realloc_cmdbuff(len + 1) != OK)
+	ត្រឡប់ 1;
     p->cmdlen = len;
     STRCPY(p->cmdbuff, str);
 
@@ -4626,7 +4626,7 @@ set_cmdline_str(char_u *str, int pos)
     // Trigger CmdlineChanged autocommands.
     trigger_cmd_autocmd(get_cmdline_type(), EVENT_CMDLINECHANGED);
 
-    return 0;
+    ត្រឡប់ 0;
 }
 
 /*
@@ -4634,46 +4634,46 @@ set_cmdline_str(char_u *str, int pos)
  * Only works when the command line is being edited.
  * Returns 1 when failed, 0 when OK.
  */
-    static int
+    static ចំនួនគត់
 set_cmdline_pos(
-    int		pos)
+    ចំនួនគត់		pos)
 {
     cmdline_info_T *p = get_ccline_ptr();
 
-    if (p == NULL)
-	return 1;
+    ប្រសិនបើ (p == NULL)
+	ត្រឡប់ 1;
 
     // The position is not set directly but after CTRL-\ e or CTRL-R = has
     // changed the command line.
-    if (pos < 0)
+    ប្រសិនបើ (pos < 0)
 	new_cmdpos = 0;
-    else
+    បើមិនដូច្នេះ
 	new_cmdpos = pos;
 
-    return 0;
+    ត្រឡប់ 0;
 }
 
 // "setcmdline()" function
     void
 f_setcmdline(typval_T *argvars, typval_T *rettv)
 {
-    int pos = -1;
+    ចំនួនគត់ pos = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
+    ប្រសិនបើ (check_for_string_arg(argvars, 0) == FAIL
 	    || check_for_opt_number_arg(argvars, 1) == FAIL)
-	return;
+	ត្រឡប់;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ប្រសិនបើ (argvars[1].v_type != VAR_UNKNOWN)
     {
-	int error = FALSE;
+	ចំនួនគត់ error = FALSE;
 
-	pos = (int)tv_get_number_chk(&argvars[1], &error) - 1;
-	if (error)
-	    return;
-	if (pos < 0)
+	pos = (ចំនួនគត់)tv_get_number_chk(&argvars[1], &error) - 1;
+	ប្រសិនបើ (error)
+	    ត្រឡប់;
+	ប្រសិនបើ (pos < 0)
 	{
 	    emsg(_(e_argument_must_be_positive));
-	    return;
+	    ត្រឡប់;
 	}
     }
 
@@ -4687,13 +4687,13 @@ f_setcmdline(typval_T *argvars, typval_T *rettv)
     void
 f_setcmdpos(typval_T *argvars, typval_T *rettv)
 {
-    int		pos;
+    ចំនួនគត់		pos;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    ប្រសិនបើ (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+	ត្រឡប់;
 
-    pos = (int)tv_get_number(&argvars[0]) - 1;
-    if (pos >= 0)
+    pos = (ចំនួនគត់)tv_get_number(&argvars[0]) - 1;
+    ប្រសិនបើ (pos >= 0)
 	rettv->vval.v_number = set_cmdline_pos(pos);
 }
 #endif
@@ -4701,10 +4701,10 @@ f_setcmdpos(typval_T *argvars, typval_T *rettv)
 /*
  * Return the first character of the current command line.
  */
-    int
+    ចំនួនគត់
 get_cmdline_firstc(void)
 {
-    return ccline.cmdfirstc;
+    ត្រឡប់ ccline.cmdfirstc;
 }
 
 /*
@@ -4712,66 +4712,66 @@ get_cmdline_firstc(void)
  * text lines in a buffer!) from a string.  Used for ":history" and ":clist".
  * Returns OK if parsed successfully, otherwise FAIL.
  */
-    int
-get_list_range(char_u **str, int *num1, int *num2)
+    ចំនួនគត់
+get_list_range(char_u **str, ចំនួនគត់ *num1, ចំនួនគត់ *num2)
 {
-    int		len;
-    int		first = FALSE;
+    ចំនួនគត់		len;
+    ចំនួនគត់		first = FALSE;
     varnumber_T	num;
 
     *str = skipwhite(*str);
-    if (**str == '-' || vim_isdigit(**str))  // parse "from" part of range
+    ប្រសិនបើ (**str == '-' || vim_isdigit(**str))  // parse "from" part of range
     {
 	vim_str2nr(*str, NULL, &len, 0, &num, NULL, 0, FALSE, NULL);
 	*str += len;
 	// overflow
-	if (num > INT_MAX)
-	    return FAIL;
+	ប្រសិនបើ (num > INT_MAX)
+	    ត្រឡប់ FAIL;
 
-	*num1 = (int)num;
+	*num1 = (ចំនួនគត់)num;
 	first = TRUE;
     }
     *str = skipwhite(*str);
-    if (**str == ',')			// parse "to" part of range
+    ប្រសិនបើ (**str == ',')			// parse "to" part of range
     {
 	*str = skipwhite(*str + 1);
 	vim_str2nr(*str, NULL, &len, 0, &num, NULL, 0, FALSE, NULL);
-	if (len > 0)
+	ប្រសិនបើ (len > 0)
 	{
 	    *str = skipwhite(*str + len);
 	    // overflow
-	    if (num > INT_MAX)
-		return FAIL;
+	    ប្រសិនបើ (num > INT_MAX)
+		ត្រឡប់ FAIL;
 
-	    *num2 = (int)num;
+	    *num2 = (ចំនួនគត់)num;
 	}
-	else if (!first)		// no number given at all
-	    return FAIL;
+	បើមិនដូច្នេះ ប្រសិនបើ (!first)		// no number given at all
+	    ត្រឡប់ FAIL;
     }
-    else if (first)			// only one number given
+    បើមិនដូច្នេះ ប្រសិនបើ (first)			// only one number given
 	*num2 = *num1;
-    return OK;
+    ត្រឡប់ OK;
 }
 
 /*
  * Check value of 'cedit' and set cedit_key.
  * Returns NULL if value is OK, error message otherwise.
  */
-    char *
+    var_na *
 did_set_cedit(optset_T *args UNUSED)
 {
-    int n;
+    ចំនួនគត់ n;
 
-    if (*p_cedit == NUL)
+    ប្រសិនបើ (*p_cedit == NUL)
 	cedit_key = -1;
-    else
+    បើមិនដូច្នេះ
     {
 	n = string_to_key(p_cedit, FALSE);
-	if (n == 0 || vim_isprintc(n))
-	    return e_invalid_argument;
+	ប្រសិនបើ (n == 0 || vim_isprintc(n))
+	    ត្រឡប់ e_invalid_argument;
 	cedit_key = n;
     }
-    return NULL;
+    ត្រឡប់ NULL;
 }
 
 /*
@@ -4782,40 +4782,40 @@ did_set_cedit(optset_T *args UNUSED)
  *	Ctrl_C	 if it is to be abandoned
  *	K_IGNORE if editing continues
  */
-    static int
+    static ចំនួនគត់
 open_cmdwin(void)
 {
     bufref_T		old_curbuf;
     win_T		*old_curwin = curwin;
     bufref_T		bufref;
     win_T		*wp;
-    int			i;
+    ចំនួនគត់			i;
     linenr_T		lnum;
-    int			histtype;
+    ចំនួនគត់			histtype;
     garray_T		winsizes;
-    int			save_restart_edit = restart_edit;
-    int			save_State = State;
-    int			save_exmode = exmode_active;
+    ចំនួនគត់			save_restart_edit = restart_edit;
+    ចំនួនគត់			save_State = State;
+    ចំនួនគត់			save_exmode = exmode_active;
 #ifdef FEAT_RIGHTLEFT
-    int			save_cmdmsg_rl = cmdmsg_rl;
+    ចំនួនគត់			save_cmdmsg_rl = cmdmsg_rl;
 #endif
 #ifdef FEAT_FOLDING
-    int			save_KeyTyped;
+    ចំនួនគត់			save_KeyTyped;
 #endif
-    int			newbuf_status;
-    int			cmdwin_valid;
+    ចំនួនគត់			newbuf_status;
+    ចំនួនគត់			cmdwin_valid;
 
     // Can't do this when text or buffer is locked.
     // Can't do this recursively.  Can't do it when typing a password.
-    if (text_or_buf_locked()
+    ប្រសិនបើ (text_or_buf_locked()
 	    || cmdwin_type != 0
-#if defined(FEAT_CRYPT) || defined(FEAT_EVAL)
+#ប្រសិនបើ defined(FEAT_CRYPT) || defined(FEAT_EVAL)
 	    || cmdline_star > 0
 #endif
 	    )
     {
 	beep_flush();
-	return K_IGNORE;
+	ត្រឡប់ K_IGNORE;
     }
     set_bufref(&old_curbuf, curbuf);
 
@@ -4831,21 +4831,21 @@ open_cmdwin(void)
     cmdmod.cmod_flags |= CMOD_NOSWAPFILE;
 
     // Create a window for the command-line buffer.
-    if (win_split((int)p_cwh, WSP_BOT) == FAIL)
+    ប្រសិនបើ (win_split((ចំនួនគត់)p_cwh, WSP_BOT) == FAIL)
     {
 	beep_flush();
 	ga_clear(&winsizes);
-	return K_IGNORE;
+	ត្រឡប់ K_IGNORE;
     }
     // win_split() autocommands may have messed with the old window or buffer.
     // Treat it as abandoning this command-line.
-    if (!win_valid(old_curwin) || curwin == old_curwin
+    ប្រសិនបើ (!win_valid(old_curwin) || curwin == old_curwin
 	    || !bufref_valid(&old_curbuf)
 	    || old_curwin->w_buffer != old_curbuf.br_buf)
     {
 	beep_flush();
 	ga_clear(&winsizes);
-	return Ctrl_C;
+	ត្រឡប់ Ctrl_C;
     }
     // Don't let quitting the More prompt make this fail.
     got_int = FALSE;
@@ -4859,17 +4859,17 @@ open_cmdwin(void)
     newbuf_status = do_ecmd(0, NULL, NULL, NULL, ECMD_ONE, ECMD_HIDE,
 					NULL);
     cmdwin_valid = win_valid(cmdwin_win);
-    if (newbuf_status == FAIL || !cmdwin_valid || curwin != cmdwin_win ||
+    ប្រសិនបើ (newbuf_status == FAIL || !cmdwin_valid || curwin != cmdwin_win ||
 	    !win_valid(old_curwin) || !bufref_valid(&old_curbuf) ||
 	    old_curwin->w_buffer != old_curbuf.br_buf)
     {
-	if (newbuf_status == OK)
+	ប្រសិនបើ (newbuf_status == OK)
 	    set_bufref(&bufref, curbuf);
-	if (cmdwin_valid && !last_window())
+	ប្រសិនបើ (cmdwin_valid && !last_window())
 	    win_close(cmdwin_win, TRUE);
 
 	// win_close() autocommands may have already deleted the buffer.
-	if (newbuf_status == OK && bufref_valid(&bufref) &&
+	ប្រសិនបើ (newbuf_status == OK && bufref_valid(&bufref) &&
 		bufref.br_buf != curbuf)
 	    close_buffer(NULL, bufref.br_buf, DOBUF_WIPE, FALSE, FALSE, FALSE);
 
@@ -4877,7 +4877,7 @@ open_cmdwin(void)
 	cmdwin_win = NULL;
 	beep_flush();
 	ga_clear(&winsizes);
-	return Ctrl_C;
+	ត្រឡប់ Ctrl_C;
     }
     cmdwin_buf = curbuf;
 
@@ -4900,9 +4900,9 @@ open_cmdwin(void)
     need_wait_return = FALSE;
 
     histtype = hist_char2type(cmdwin_type);
-    if (histtype == HIST_CMD || histtype == HIST_DEBUG)
+    ប្រសិនបើ (histtype == HIST_CMD || histtype == HIST_DEBUG)
     {
-	if (p_wc == TAB)
+	ប្រសិនបើ (p_wc == TAB)
 	{
 	    // Make Tab start command-line completion: CTRL-X CTRL-V
 	    add_map((char_u *)"<buffer> <Tab> <C-X><C-V>", MODE_INSERT, TRUE);
@@ -4922,21 +4922,21 @@ open_cmdwin(void)
 
     // Fill the buffer with the history.
     init_history();
-    if (get_hislen() > 0)
+    ប្រសិនបើ (get_hislen() > 0)
     {
 	i = *get_hisidx(histtype);
-	if (i >= 0)
+	ប្រសិនបើ (i >= 0)
 	{
 	    lnum = 0;
 	    do
 	    {
-		if (++i == get_hislen())
+		ប្រសិនបើ (++i == get_hislen())
 		    i = 0;
-		if (get_histentry(histtype)[i].hisstr != NULL)
+		ប្រសិនបើ (get_histentry(histtype)[i].hisstr != NULL)
 		    ml_append(lnum++, get_histentry(histtype)[i].hisstr,
 							   (colnr_T)0, FALSE);
 	    }
-	    while (i != *get_hisidx(histtype));
+	    ខណៈពេល (i != *get_hisidx(histtype));
 	}
     }
 
@@ -4962,10 +4962,10 @@ open_cmdwin(void)
 
     // Trigger CmdwinEnter autocommands.
     trigger_cmd_autocmd(cmdwin_type, EVENT_CMDWINENTER);
-    if (restart_edit != 0)	// autocmd with ":startinsert"
+    ប្រសិនបើ (restart_edit != 0)	// autocmd with ":startinsert"
 	stuffcharReadbuff(K_NOP);
 
-    int save_RedrawingDisabled = RedrawingDisabled;
+    ចំនួនគត់ save_RedrawingDisabled = RedrawingDisabled;
     RedrawingDisabled = 0;
 
     /*
@@ -4994,42 +4994,42 @@ open_cmdwin(void)
 
     // Safety check: The old window or buffer was changed or deleted: It's a bug
     // when this happens!
-    if (!win_valid(old_curwin) || !bufref_valid(&old_curbuf)
+    ប្រសិនបើ (!win_valid(old_curwin) || !bufref_valid(&old_curbuf)
 	    || old_curwin->w_buffer != old_curbuf.br_buf)
     {
 	cmdwin_result = Ctrl_C;
 	emsg(_(e_active_window_or_buffer_changed_or_deleted));
     }
-    else
+    បើមិនដូច្នេះ
     {
-#if defined(FEAT_EVAL)
+#ប្រសិនបើ defined(FEAT_EVAL)
 	// autocmds may abort script processing
-	if (aborting() && cmdwin_result != K_IGNORE)
+	ប្រសិនបើ (aborting() && cmdwin_result != K_IGNORE)
 	    cmdwin_result = Ctrl_C;
 #endif
 	// Set the new command line from the cmdline buffer.
 	dealloc_cmdbuff();
 
-	if (cmdwin_result == K_XF1 || cmdwin_result == K_XF2) // :qa[!] typed
+	ប្រសិនបើ (cmdwin_result == K_XF1 || cmdwin_result == K_XF2) // :qa[!] typed
 	{
 	    char_u  *p = (char_u *)"qa";	    // assume cmdwin_result == K_XF2
 	    size_t  plen = 2;
 
-	    if (cmdwin_result == K_XF1)
+	    ប្រសិនបើ (cmdwin_result == K_XF1)
 	    {
 		p = (char_u *)"qa!";
 		plen = 3;
 	    }
 
-	    if (histtype == HIST_CMD)
+	    ប្រសិនបើ (histtype == HIST_CMD)
 	    {
 		// Execute the command directly.
 		ccline.cmdbuff = vim_strnsave(p, plen);
-		ccline.cmdlen = (int)plen;
-		ccline.cmdbufflen = (int)(plen + 1);
+		ccline.cmdlen = (ចំនួនគត់)plen;
+		ccline.cmdbufflen = (ចំនួនគត់)(plen + 1);
 		cmdwin_result = CAR;
 	    }
-	    else
+	    បើមិនដូច្នេះ
 	    {
 		// First need to cancel what we were doing.
 		stuffcharReadbuff(':');
@@ -5037,20 +5037,20 @@ open_cmdwin(void)
 		stuffcharReadbuff(CAR);
 	    }
 	}
-	else if (cmdwin_result == Ctrl_C)
+	បើមិនដូច្នេះ ប្រសិនបើ (cmdwin_result == Ctrl_C)
 	{
 	    // :q or :close, don't execute any command
 	    // and don't modify the cmd window.
 	    ccline.cmdbuff = NULL;
 	}
-	else
+	បើមិនដូច្នេះ
 	{
 	    ccline.cmdlen = ml_get_curline_len();
 	    ccline.cmdbufflen = ccline.cmdlen + 1;
 	    ccline.cmdbuff = vim_strnsave(ml_get_curline(), ccline.cmdlen);
 	}
 
-	if (ccline.cmdbuff == NULL)
+	ប្រសិនបើ (ccline.cmdbuff == NULL)
 	{
 	    ccline.cmdbuff = vim_strnsave((char_u *)"", 0);
 	    ccline.cmdlen = 0;
@@ -5058,12 +5058,12 @@ open_cmdwin(void)
 	    ccline.cmdpos = 0;
 	    cmdwin_result = Ctrl_C;
 	}
-	else
+	បើមិនដូច្នេះ
 	{
 	    ccline.cmdpos = curwin->w_cursor.col;
 	    // If the cursor is on the last character, it probably should be
 	    // after it.
-	    if (ccline.cmdpos == ccline.cmdlen - 1
+	    ប្រសិនបើ (ccline.cmdpos == ccline.cmdlen - 1
 		    || ccline.cmdpos > ccline.cmdlen)
 		ccline.cmdpos = ccline.cmdlen;
 	}
@@ -5081,19 +5081,19 @@ open_cmdwin(void)
 
 	// win_goto() may trigger an autocommand that already closes the
 	// cmdline window.
-	if (win_valid(wp) && wp != curwin)
+	ប្រសិនបើ (win_valid(wp) && wp != curwin)
 	    win_close(wp, TRUE);
 
 	// win_close() may have already wiped the buffer when 'bh' is
 	// set to 'wipe', autocommands may have closed other windows
-	if (bufref_valid(&bufref) && bufref.br_buf != curbuf)
+	ប្រសិនបើ (bufref_valid(&bufref) && bufref.br_buf != curbuf)
 	    close_buffer(NULL, bufref.br_buf, DOBUF_WIPE, FALSE, FALSE, FALSE);
 
 	// Restore window sizes.
 	win_size_restore(&winsizes);
 	skip_win_fix_cursor = FALSE;
 
-	if (cmdwin_result == K_IGNORE)
+	ប្រសិនបើ (cmdwin_result == K_IGNORE)
 	{
 	    // It can be confusing that the cmdwin still shows, redraw the
 	    // screen.
@@ -5113,16 +5113,16 @@ open_cmdwin(void)
     may_trigger_modechanged();
     setmouse();
 
-    return cmdwin_result;
+    ត្រឡប់ cmdwin_result;
 }
 
 /*
  * Return TRUE if in the cmdwin, not editing the command line.
  */
-    int
+    ចំនួនគត់
 is_in_cmdwin(void)
 {
-    return cmdwin_type != 0 && get_cmdline_type() == NUL;
+    ត្រឡប់ cmdwin_type != 0 && get_cmdline_type() == NUL;
 }
 
 /*
@@ -5141,13 +5141,13 @@ script_get(exarg_T *eap UNUSED, char_u *cmd UNUSED)
     char_u	*s;
     garray_T	ga;
 
-    if (cmd[0] != '<' || cmd[1] != '<' || eap->ea_getline == NULL)
-	return NULL;
+    ប្រសិនបើ (cmd[0] != '<' || cmd[1] != '<' || eap->ea_getline == NULL)
+	ត្រឡប់ NULL;
     cmd += 2;
 
     l = heredoc_get(eap, cmd, TRUE, FALSE);
-    if (l == NULL)
-	return NULL;
+    ប្រសិនបើ (l == NULL)
+	ត្រឡប់ NULL;
 
     ga_init2(&ga, 1, 0x400);
 
@@ -5160,13 +5160,13 @@ script_get(exarg_T *eap UNUSED, char_u *cmd UNUSED)
     ga_append(&ga, NUL);
 
     list_free(l);
-    return (char_u *)ga.ga_data;
-#else
-    return NULL;
+    ត្រឡប់ (char_u *)ga.ga_data;
+#បើមិនដូច្នេះ
+    ត្រឡប់ NULL;
 #endif
 }
 
-#if defined(FEAT_EVAL)
+#ប្រសិនបើ defined(FEAT_EVAL)
 /*
  * This function is used by f_input() and f_inputdialog() functions. The third
  * argument to f_input() specifies the type of completion to use at the
@@ -5177,93 +5177,93 @@ script_get(exarg_T *eap UNUSED, char_u *cmd UNUSED)
 get_user_input(
     typval_T	*argvars,
     typval_T	*rettv,
-    int		inputdialog,
-    int		secret)
+    ចំនួនគត់		inputdialog,
+    ចំនួនគត់		secret)
 {
     char_u	*prompt;
     char_u	*p = NULL;
-    int		c;
+    ចំនួនគត់		c;
     char_u	buf[NUMBUFLEN];
-    int		cmd_silent_save = cmd_silent;
+    ចំនួនគត់		cmd_silent_save = cmd_silent;
     char_u	*defstr = (char_u *)"";
-    int		xp_type = EXPAND_NOTHING;
+    ចំនួនគត់		xp_type = EXPAND_NOTHING;
     char_u	*xp_arg = NULL;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
-    if (input_busy)
-	return;  // this doesn't work recursively.
+    ប្រសិនបើ (input_busy)
+	ត្រឡប់;  // this doesn't work recursively.
 
-    if (in_vim9script()
+    ប្រសិនបើ (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_string_arg(argvars, 2) == FAIL)))
-	return;
+	ត្រឡប់;
 
     prompt = tv_get_string_chk(&argvars[0]);
 
 # ifdef NO_CONSOLE_INPUT
     // While starting up, there is no place to enter text. When running tests
     // with --not-a-term we assume feedkeys() will be used.
-    if (no_console_input() && !is_not_a_term())
-	return;
+    ប្រសិនបើ (no_console_input() && !is_not_a_term())
+	ត្រឡប់;
 # endif
 
     cmd_silent = FALSE;		// Want to see the prompt.
-    if (prompt != NULL)
+    ប្រសិនបើ (prompt != NULL)
     {
 	// Only the part of the message after the last NL is considered as
 	// prompt for the command line
 	p = vim_strrchr(prompt, '\n');
-	if (p == NULL)
+	ប្រសិនបើ (p == NULL)
 	    p = prompt;
-	else
+	បើមិនដូច្នេះ
 	{
 	    ++p;
 	    c = *p;
 	    *p = NUL;
 	    msg_start();
 	    msg_clr_eos();
-	    msg_puts_attr((char *)prompt, get_echo_attr());
+	    msg_puts_attr((var_na *)prompt, get_echo_attr());
 	    msg_didout = FALSE;
 	    msg_starthere();
 	    *p = c;
 	}
 	cmdline_row = msg_row;
 
-	if (argvars[1].v_type != VAR_UNKNOWN)
+	ប្រសិនបើ (argvars[1].v_type != VAR_UNKNOWN)
 	{
 	    defstr = tv_get_string_buf_chk(&argvars[1], buf);
-	    if (defstr != NULL)
+	    ប្រសិនបើ (defstr != NULL)
 		stuffReadbuffSpec(defstr);
 
-	    if (!inputdialog && argvars[2].v_type != VAR_UNKNOWN)
+	    ប្រសិនបើ (!inputdialog && argvars[2].v_type != VAR_UNKNOWN)
 	    {
 		char_u	*xp_name;
-		int	xp_namelen;
+		ចំនួនគត់	xp_namelen;
 		long	argt = 0;
 
 		// input() with a third argument: completion
 		rettv->vval.v_string = NULL;
 
 		xp_name = tv_get_string_buf_chk(&argvars[2], buf);
-		if (xp_name == NULL)
-		    return;
+		ប្រសិនបើ (xp_name == NULL)
+		    ត្រឡប់;
 
-		xp_namelen = (int)STRLEN(xp_name);
+		xp_namelen = (ចំនួនគត់)STRLEN(xp_name);
 
-		if (parse_compl_arg(xp_name, xp_namelen, &xp_type, &argt,
+		ប្រសិនបើ (parse_compl_arg(xp_name, xp_namelen, &xp_type, &argt,
 							     &xp_arg) == FAIL)
-		    return;
+		    ត្រឡប់;
 	    }
 	}
 
-	if (defstr != NULL)
+	ប្រសិនបើ (defstr != NULL)
 	{
-	    int save_ex_normal_busy = ex_normal_busy;
-	    int save_vgetc_busy = vgetc_busy;
-	    int save_input_busy = input_busy;
+	    ចំនួនគត់ save_ex_normal_busy = ex_normal_busy;
+	    ចំនួនគត់ save_vgetc_busy = vgetc_busy;
+	    ចំនួនគត់ save_input_busy = input_busy;
 
 	    input_busy |= vgetc_busy;
 	    ex_normal_busy = 0;
@@ -5275,7 +5275,7 @@ get_user_input(
 	    vgetc_busy = save_vgetc_busy;
 	    input_busy = save_input_busy;
 	}
-	if (inputdialog && rettv->vval.v_string == NULL
+	ប្រសិនបើ (inputdialog && rettv->vval.v_string == NULL
 		&& argvars[1].v_type != VAR_UNKNOWN
 		&& argvars[2].v_type != VAR_UNKNOWN)
 	    rettv->vval.v_string = vim_strsave(tv_get_string_buf(
@@ -5297,13 +5297,13 @@ get_user_input(
     void
 f_wildtrigger(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    if (!(State & MODE_CMDLINE) || char_avail() || wild_menu_showing
+    ប្រសិនបើ (!(State & MODE_CMDLINE) || char_avail() || wild_menu_showing
 	    || cmdline_pum_active())
-	return;
+	ត្រឡប់;
 
-    int cmd_type = get_cmdline_type();
+    ចំនួនគត់ cmd_type = get_cmdline_type();
 
-    if (cmd_type == ':' || cmd_type == '/' || cmd_type == '?')
+    ប្រសិនបើ (cmd_type == ':' || cmd_type == '/' || cmd_type == '?')
     {
 	// Add K_WILD as a single special key
 	char_u	key_string[4];
