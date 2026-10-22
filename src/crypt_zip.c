@@ -10,9 +10,9 @@
 /*
  * crypt_zip.c: Zip encryption support.
  */
-#include "vim.h"
+#অন্তর্ভাব "vim.h"
 
-#if defined(FEAT_CRYPT)
+#যদি defined(FEAT_CRYPT)
 /*
  * Optional encryption support.
  * Mohsin Ahmed, mosh@sasi.com, 98-09-24
@@ -24,106 +24,106 @@
  */
 
 // Need a type that should be 32 bits. 64 also works but wastes space.
-typedef unsigned int u32_T;	// int is at least 32 bits
+প্রকারলেখ unsigned পূর্ণসংখ্যা u32_T;	// int is at least 32 bits
 
 // The state of encryption, referenced by cryptstate_T.
-typedef struct {
-    u32_T keys[3];
+প্রকারলেখ কাঠামো {
+    u32_T চাবিগুলি[3];
 } zip_state_T;
 
 
-static u32_T crc_32_table[256];
+স্থির u32_T crc_32_table[256];
 
 /*
  * Fill the CRC table, if not done already.
  */
-    static void
-make_crc_tab(void)
+    স্থির শূন্য
+make_crc_tab(শূন্য)
 {
     u32_T	s, t, v;
-    static int	done = FALSE;
+    স্থির পূর্ণসংখ্যা	done = FALSE;
 
-    if (done)
-	return;
-    for (t = 0; t < 256; t++)
+    যদি (done)
+	ফেরত;
+    জন্য (t = 0; t < 256; t++)
     {
 	v = t;
-	for (s = 0; s < 8; s++)
+	জন্য (s = 0; s < 8; s++)
 	    v = (v >> 1) ^ ((v & 1) * (u32_T)0xedb88320L);
 	crc_32_table[t] = v;
     }
     done = TRUE;
 }
 
-#define CRC32(c, b) (crc_32_table[((int)(c) ^ (b)) & 0xff] ^ ((c) >> 8))
+#define CRC32(c, b) (crc_32_table[((পূর্ণসংখ্যা)(c) ^ (b)) & 0xff] ^ ((c) >> 8))
 
 /*
  * Return the next byte in the pseudo-random sequence.
  */
-#define DECRYPT_BYTE_ZIP(keys, t) \
+#define DECRYPT_BYTE_ZIP(চাবিগুলি, t) \
 { \
-    short_u temp = (short_u)keys[2] | 2; \
-    t = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff); \
+    short_u অস্থায়ী = (short_u)চাবিগুলি[2] | 2; \
+    t = (পূর্ণসংখ্যা)(((unsigned)(অস্থায়ী * (অস্থায়ী ^ 1U)) >> 8) & 0xff); \
 }
 
 /*
  * Update the encryption keys with the next byte of plain text.
  */
-#define UPDATE_KEYS_ZIP(keys, c) do { \
-    keys[0] = CRC32(keys[0], (c)); \
-    keys[1] += keys[0] & 0xff; \
-    keys[1] = keys[1] * 134775813L + 1; \
-    keys[2] = CRC32(keys[2], (int)(keys[1] >> 24)); \
-} while (0)
+#define UPDATE_চাবিগুলি_ZIP(চাবিগুলি, c) করো { \
+    চাবিগুলি[0] = CRC32(চাবিগুলি[0], (c)); \
+    চাবিগুলি[1] += চাবিগুলি[0] & 0xff; \
+    চাবিগুলি[1] = চাবিগুলি[1] * 134775813L + 1; \
+    চাবিগুলি[2] = CRC32(চাবিগুলি[2], (পূর্ণসংখ্যা)(চাবিগুলি[1] >> 24)); \
+} যখন (0)
 
 /*
  * Initialize for encryption/decryption.
  */
-    int
+    পূর্ণসংখ্যা
 crypt_zip_init(
     cryptstate_T    *state,
-    char_u	    *key,
+    char_u	    *চাবি,
     crypt_arg_T     *arg UNUSED)
 {
     char_u	*p;
     zip_state_T	*zs;
 
     zs = ALLOC_ONE(zip_state_T);
-    if (zs == NULL)
-	return FAIL;
+    যদি (zs == ফাঁকা)
+	ফেরত FAIL;
     state->method_state = zs;
 
     make_crc_tab();
-    zs->keys[0] = 305419896L;
-    zs->keys[1] = 591751049L;
-    zs->keys[2] = 878082192L;
-    for (p = key; *p != NUL; ++p)
-	UPDATE_KEYS_ZIP(zs->keys, (int)*p);
+    zs->চাবিগুলি[0] = 305419896L;
+    zs->চাবিগুলি[1] = 591751049L;
+    zs->চাবিগুলি[2] = 878082192L;
+    জন্য (p = চাবি; *p != NUL; ++p)
+	UPDATE_চাবিগুলি_ZIP(zs->চাবিগুলি, (পূর্ণসংখ্যা)*p);
 
-    return OK;
+    ফেরত OK;
 }
 
 /*
  * Encrypt "from[len]" into "to[len]".
  * "from" and "to" can be equal to encrypt in place.
  */
-    void
+    শূন্য
 crypt_zip_encode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
     char_u	*to,
-    int		last UNUSED)
+    পূর্ণসংখ্যা		last UNUSED)
 {
     zip_state_T *zs = state->method_state;
     size_t	i;
-    int		ztemp, t;
+    পূর্ণসংখ্যা		ztemp, t;
 
-    for (i = 0; i < len; ++i)
+    জন্য (i = 0; i < len; ++i)
     {
 	ztemp = from[i];
-	DECRYPT_BYTE_ZIP(zs->keys, t);
-	UPDATE_KEYS_ZIP(zs->keys, ztemp);
+	DECRYPT_BYTE_ZIP(zs->চাবিগুলি, t);
+	UPDATE_চাবিগুলি_ZIP(zs->চাবিগুলি, ztemp);
 	to[i] = t ^ ztemp;
     }
 }
@@ -131,23 +131,23 @@ crypt_zip_encode(
 /*
  * Decrypt "from[len]" into "to[len]".
  */
-    void
+    শূন্য
 crypt_zip_decode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
     char_u	*to,
-    int		last UNUSED)
+    পূর্ণসংখ্যা		last UNUSED)
 {
     zip_state_T *zs = state->method_state;
     size_t	i;
-    short_u	temp;
+    short_u	অস্থায়ী;
 
-    for (i = 0; i < len; ++i)
+    জন্য (i = 0; i < len; ++i)
     {
-	temp = (short_u)zs->keys[2] | 2;
-	temp = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff);
-	UPDATE_KEYS_ZIP(zs->keys, to[i] = from[i] ^ temp);
+	অস্থায়ী = (short_u)zs->চাবিগুলি[2] | 2;
+	অস্থায়ী = (পূর্ণসংখ্যা)(((unsigned)(অস্থায়ী * (অস্থায়ী ^ 1U)) >> 8) & 0xff);
+	UPDATE_চাবিগুলি_ZIP(zs->চাবিগুলি, to[i] = from[i] ^ অস্থায়ী);
     }
 }
 

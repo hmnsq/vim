@@ -20,32 +20,32 @@
 
 // System classes
 
-struct BMenu;
-struct BMenuItem;
-struct BPictureButton;
+কাঠামো BMenu;
+কাঠামো BMenuItem;
+কাঠামো BPictureButton;
 
 // Our own Vim-related classes
 
-struct VimApp;
-struct VimFormView;
-struct VimTextAreaView;
-struct VimWindow;
-struct VimScrollBar;
+কাঠামো VimApp;
+কাঠামো VimFormView;
+কাঠামো VimTextAreaView;
+কাঠামো VimWindow;
+কাঠামো VimScrollBar;
 
 // Locking functions
 
-extern int vim_lock_screen();
-extern void vim_unlock_screen();
+বাহ্যিক পূর্ণসংখ্যা vim_lock_screen();
+বাহ্যিক শূন্য vim_unlock_screen();
 
 #ifndef __cplusplus
 
-typedef struct BMenu BMenu;
-typedef struct BMenuItem BMenuItem;
-typedef struct BPictureButton BPictureButton;
-typedef struct VimWindow VimWindow;
-typedef struct VimFormView VimFormView;
-typedef struct VimTextAreaView VimTextAreaView;
-typedef struct VimApp VimApp;
-typedef struct VimScrollBar VimScrollBar;
+প্রকারলেখ কাঠামো BMenu BMenu;
+প্রকারলেখ কাঠামো BMenuItem BMenuItem;
+প্রকারলেখ কাঠামো BPictureButton BPictureButton;
+প্রকারলেখ কাঠামো VimWindow VimWindow;
+প্রকারলেখ কাঠামো VimFormView VimFormView;
+প্রকারলেখ কাঠামো VimTextAreaView VimTextAreaView;
+প্রকারলেখ কাঠামো VimApp VimApp;
+প্রকারলেখ কাঠামো VimScrollBar VimScrollBar;
 
 #endif

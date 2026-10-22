@@ -11,7 +11,7 @@
  * autocmd.c: Autocommand related functions
  */
 
-#include "vim.h"
+#অন্তর্ভাব "vim.h"
 
 /*
  * The autocommands are stored in a list for each event.
@@ -48,30 +48,30 @@
  *   The order of AutoCmds is important, this is the order in which they were
  *   defined and will have to be executed.
  */
-typedef struct AutoCmd
+প্রকারলেখ কাঠামো AutoCmd
 {
     char_u	    *cmd;		// The command to be executed (NULL
 					// when command has been removed).
-    char	    once;		// "One shot": removed after execution
-    char	    nested;		// If autocommands nest here.
-    char	    last;		// last command in list
+    অক্ষর	    once;		// "One shot": removed after execution
+    অক্ষর	    nested;		// If autocommands nest here.
+    অক্ষর	    last;		// last command in list
     sctx_T	    script_ctx;		// script context where it is defined
-    struct AutoCmd  *next;		// next AutoCmd in list
+    কাঠামো AutoCmd  *পরবর্তী;		// next AutoCmd in list
 } AutoCmd;
 
-typedef struct AutoPat
+প্রকারলেখ কাঠামো AutoPat
 {
-    struct AutoPat  *next;		// Next AutoPat in AutoPat list; MUST
+    কাঠামো AutoPat  *পরবর্তী;		// Next AutoPat in AutoPat list; MUST
 					// be the first entry.
     char_u	    *pat;		// pattern as typed (NULL when pattern
 					// has been removed)
     regprog_T	    *reg_prog;		// compiled regprog for pattern
     AutoCmd	    *cmds;		// list of commands to do
-    int		    group;		// group ID
-    int		    patlen;		// strlen() of pat
-    int		    buflocal_nr;	// !=0 for buffer-local AutoPat
-    char	    allow_dirs;		// Pattern may match whole path
-    char	    last;		// last pattern for apply_autocmds()
+    পূর্ণসংখ্যা		    group;		// group ID
+    পূর্ণসংখ্যা		    patlen;		// strlen() of pat
+    পূর্ণসংখ্যা		    buflocal_nr;	// !=0 for buffer-local AutoPat
+    অক্ষর	    allow_dirs;		// Pattern may match whole path
+    অক্ষর	    last;		// last pattern for apply_autocmds()
 } AutoPat;
 
 //
@@ -79,12 +79,12 @@ typedef struct AutoPat
 // BufNewFile and BufRead are searched for ALOT (especially at startup)
 // so we pre-determine their index into the event_tab[] table for fast access.
 // Keep these values in sync with event_tab[]!
-#define BUFNEWFILE_INDEX 9
-#define BUFREAD_INDEX 10
+#define BUFNEWFILE_সূচক 9
+#define BUFREAD_সূচক 10
 
 // Must be sorted by the 'value' field because it is used by bsearch()!
 // Events with positive keys aren't allowed in 'eventignorewin'.
-static keyvalue_T event_tab[NUM_EVENTS] = {
+স্থির keyvalue_T event_tab[অঙ্ক_EVENTS] = {
     KEYVALUE_ENTRY(-EVENT_BUFADD, "BufAdd"),
     KEYVALUE_ENTRY(-EVENT_BUFADD, "BufCreate"),
     KEYVALUE_ENTRY(-EVENT_BUFDELETE, "BufDelete"),
@@ -214,8 +214,8 @@ static keyvalue_T event_tab[NUM_EVENTS] = {
     KEYVALUE_ENTRY(-EVENT_WINSCROLLED, "WinScrolled"),
 };
 
-static AutoPat *first_autopat[NUM_EVENTS] = { NULL };
-static AutoPat *last_autopat[NUM_EVENTS] = { NULL };
+স্থির AutoPat *first_autopat[অঙ্ক_EVENTS] = { ফাঁকা };
+স্থির AutoPat *last_autopat[অঙ্ক_EVENTS] = { ফাঁকা };
 
 #define AUGROUP_DEFAULT    (-1)	    // default autocmd group
 #define AUGROUP_ERROR	   (-2)	    // erroneous autocmd group
@@ -224,134 +224,134 @@ static AutoPat *last_autopat[NUM_EVENTS] = { NULL };
 /*
  * struct used to keep status while executing autocommands for an event.
  */
-struct AutoPatCmd_S
+কাঠামো AutoPatCmd_S
 {
     AutoPat	*curpat;	// next AutoPat to examine
     AutoCmd	*nextcmd;	// next AutoCmd to execute
-    int		group;		// group being used
+    পূর্ণসংখ্যা		group;		// group being used
     char_u	*fname;		// fname to match with
     char_u	*sfname;	// sfname to match with
-    char_u	*tail;		// tail of fname
+    char_u	*লেজ;		// tail of fname
     event_T	event;		// current event
     sctx_T	script_ctx;	// script context where it is defined
-    int		arg_bufnr;	// Initially equal to <abuf>, set to zero when
+    পূর্ণসংখ্যা		arg_bufnr;	// Initially equal to <abuf>, set to zero when
 				// buf is deleted.
-    AutoPatCmd_T *next;		// chain of active apc-s for auto-invalidation
+    AutoPatCmd_T *পরবর্তী;		// chain of active apc-s for auto-invalidation
 };
 
-static AutoPatCmd_T *active_apc_list = NULL; // stack of active autocommands
+স্থির AutoPatCmd_T *active_apc_list = ফাঁকা; // stack of active autocommands
 
 // Macro to loop over all the patterns for an autocmd event
 #define FOR_ALL_AUTOCMD_PATTERNS(event, ap) \
-    for ((ap) = first_autopat[(int)(event)]; (ap) != NULL; (ap) = (ap)->next)
+    জন্য ((ap) = first_autopat[(পূর্ণসংখ্যা)(event)]; (ap) != ফাঁকা; (ap) = (ap)->পরবর্তী)
 
 /*
  * augroups stores a list of autocmd group names.
  */
-static garray_T augroups = {0, 0, sizeof(char_u *), 10, NULL};
-#define AUGROUP_NAME(i) (((char_u **)augroups.ga_data)[i])
+স্থির garray_T augroups = {0, 0, আকার(char_u *), 10, ফাঁকা};
+#define AUGROUP_NAME(i) (((char_u **)augroups.ga_তথ্য)[i])
 // use get_deleted_augroup() to get this
-static char_u *deleted_augroup = NULL;
+স্থির char_u *deleted_augroup = ফাঁকা;
 
 /*
  * The ID of the current group.  Group 0 is the default one.
  */
-static int current_augroup = AUGROUP_DEFAULT;
+স্থির পূর্ণসংখ্যা current_augroup = AUGROUP_DEFAULT;
 
-static int au_need_clean = FALSE;   // need to delete marked patterns
+স্থির পূর্ণসংখ্যা au_need_clean = FALSE;   // need to delete marked patterns
 
-static event_T event_name2nr(char_u *start, char_u **end);
-static string_T *event_nr2name(event_T event);
-static int au_get_grouparg(char_u **argp);
-static int do_autocmd_event(event_T event, char_u *pat, int once, int nested, char_u *cmd, int forceit, int group, int flags);
-static int apply_autocmds_group(event_T event, char_u *fname, char_u *fname_io, int force, int group, buf_T *buf, exarg_T *eap);
-static void auto_next_pat(AutoPatCmd_T *apc, int stop_at_last);
-static int au_find_group(char_u *name);
+স্থির event_T event_name2nr(char_u *start, char_u **end);
+স্থির string_T *event_nr2name(event_T event);
+স্থির পূর্ণসংখ্যা au_get_grouparg(char_u **argp);
+স্থির পূর্ণসংখ্যা do_autocmd_event(event_T event, char_u *pat, পূর্ণসংখ্যা once, পূর্ণসংখ্যা nested, char_u *cmd, পূর্ণসংখ্যা forceit, পূর্ণসংখ্যা group, পূর্ণসংখ্যা flags);
+স্থির পূর্ণসংখ্যা apply_autocmds_group(event_T event, char_u *fname, char_u *fname_io, পূর্ণসংখ্যা force, পূর্ণসংখ্যা group, buf_T *buf, exarg_T *eap);
+স্থির শূন্য auto_পরবর্তী_pat(AutoPatCmd_T *apc, পূর্ণসংখ্যা stop_at_last);
+স্থির পূর্ণসংখ্যা au_find_group(char_u *name);
 
-static event_T	last_event;
-static int	last_group;
-static int	autocmd_blocked = 0;	// block all autocmds
+স্থির event_T	last_event;
+স্থির পূর্ণসংখ্যা	last_group;
+স্থির পূর্ণসংখ্যা	autocmd_blocked = 0;	// block all autocmds
 
-    static char_u *
-get_deleted_augroup(void)
+    স্থির char_u *
+get_deleted_augroup(শূন্য)
 {
-    if (deleted_augroup == NULL)
+    যদি (deleted_augroup == ফাঁকা)
 	deleted_augroup = (char_u *)_("--Deleted--");
-    return deleted_augroup;
+    ফেরত deleted_augroup;
 }
 
 /*
  * Show the autocommands for one AutoPat.
  */
-    static void
+    স্থির শূন্য
 show_autocmd(AutoPat *ap, event_T event)
 {
     AutoCmd *ac;
 
     // Check for "got_int" (here and at various places below), which is set
     // when "q" has been hit for the "--more--" prompt
-    if (got_int)
-	return;
-    if (ap->pat == NULL)		// pattern has been removed
-	return;
+    যদি (got_int)
+	ফেরত;
+    যদি (ap->pat == ফাঁকা)		// pattern has been removed
+	ফেরত;
 
     // Make sure no info referenced by "ap" is cleared, e.g. when a timer
     // clears an augroup.  Jump to "theend" after this!
     // "ap->pat" may be cleared anyway.
     ++autocmd_busy;
 
-    msg_putchar('\n');
-    if (got_int)
-	goto theend;
-    if (event != last_event || ap->group != last_group)
+    বার্তা_putchar('\n');
+    যদি (got_int)
+	যাও theend;
+    যদি (event != last_event || ap->group != last_group)
     {
 	string_T    *event_name;
 
-	if (ap->group != AUGROUP_DEFAULT)
+	যদি (ap->group != AUGROUP_DEFAULT)
 	{
-	    if (AUGROUP_NAME(ap->group) == NULL)
-		msg_puts_attr((char *)get_deleted_augroup(), HL_ATTR(HLF_E));
-	    else
-		msg_puts_attr((char *)AUGROUP_NAME(ap->group), HL_ATTR(HLF_T));
-	    msg_puts("  ");
+	    যদি (AUGROUP_NAME(ap->group) == ফাঁকা)
+		বার্তা_puts_attr((অক্ষর *)get_deleted_augroup(), HL_ATTR(HLF_E));
+	    অন্যথা
+		বার্তা_puts_attr((অক্ষর *)AUGROUP_NAME(ap->group), HL_ATTR(HLF_T));
+	    বার্তা_puts("  ");
 	}
 	event_name = event_nr2name(event);
-	msg_puts_attr((char *)event_name->string, HL_ATTR(HLF_T));
+	বার্তা_puts_attr((অক্ষর *)event_name->string, HL_ATTR(HLF_T));
 	last_event = event;
 	last_group = ap->group;
-	msg_putchar('\n');
-	if (got_int)
-	    goto theend;
+	বার্তা_putchar('\n');
+	যদি (got_int)
+	    যাও theend;
     }
 
-    if (ap->pat == NULL)
-	goto theend;  // timer might have cleared the pattern or group
+    যদি (ap->pat == ফাঁকা)
+	যাও theend;  // timer might have cleared the pattern or group
 
-    msg_col = 4;
-    msg_outtrans(ap->pat);
+    বার্তা_col = 4;
+    বার্তা_outtrans(ap->pat);
 
-    for (ac = ap->cmds; ac != NULL; ac = ac->next)
+    জন্য (ac = ap->cmds; ac != ফাঁকা; ac = ac->পরবর্তী)
     {
-	if (ac->cmd == NULL)		// skip removed commands
-	    continue;
+	যদি (ac->cmd == ফাঁকা)		// skip removed commands
+	    চালু;
 
-	if (msg_col >= 14)
-	    msg_putchar('\n');
-	msg_col = 14;
-	if (got_int)
-	    goto theend;
-	msg_outtrans(ac->cmd);
+	যদি (বার্তা_col >= 14)
+	    বার্তা_putchar('\n');
+	বার্তা_col = 14;
+	যদি (got_int)
+	    যাও theend;
+	বার্তা_outtrans(ac->cmd);
 #ifdef FEAT_EVAL
-	if (p_verbose > 0)
-	    last_set_msg(ac->script_ctx);
+	যদি (p_verbose > 0)
+	    last_set_বার্তা(ac->script_ctx);
 #endif
-	if (got_int)
-	    goto theend;
-	if (ac->next != NULL)
+	যদি (got_int)
+	    যাও theend;
+	যদি (ac->পরবর্তী != ফাঁকা)
 	{
-	    msg_putchar('\n');
-	    if (got_int)
-		goto theend;
+	    বার্তা_putchar('\n');
+	    যদি (got_int)
+		যাও theend;
 	}
     }
 
@@ -362,7 +362,7 @@ theend:
 /*
  * Mark an autocommand pattern for deletion.
  */
-    static void
+    স্থির শূন্য
 au_remove_pat(AutoPat *ap)
 {
     VIM_CLEAR(ap->pat);
@@ -373,18 +373,18 @@ au_remove_pat(AutoPat *ap)
 /*
  * Mark all commands for a pattern for deletion.
  */
-    static void
+    স্থির শূন্য
 au_remove_cmds(AutoPat *ap)
 {
     AutoCmd *ac;
 
-    for (ac = ap->cmds; ac != NULL; ac = ac->next)
+    জন্য (ac = ap->cmds; ac != ফাঁকা; ac = ac->পরবর্তী)
 	VIM_CLEAR(ac->cmd);
     au_need_clean = TRUE;
 }
 
 // Delete one command from an autocmd pattern.
-static void au_del_cmd(AutoCmd *ac)
+স্থির শূন্য au_del_cmd(AutoCmd *ac)
 {
     VIM_CLEAR(ac->cmd);
     au_need_clean = TRUE;
@@ -394,68 +394,68 @@ static void au_del_cmd(AutoCmd *ac)
  * Cleanup autocommands and patterns that have been deleted.
  * This is only done when not executing autocommands.
  */
-    static void
-au_cleanup(void)
+    স্থির শূন্য
+au_cleanup(শূন্য)
 {
-    AutoPat	*ap, **prev_ap;
-    AutoCmd	*ac, **prev_ac;
+    AutoPat	*ap, **পূর্ব_ap;
+    AutoCmd	*ac, **পূর্ব_ac;
     event_T	event;
 
-    if (autocmd_busy || !au_need_clean)
-	return;
+    যদি (autocmd_busy || !au_need_clean)
+	ফেরত;
 
     // loop over all events
-    for (event = (event_T)0; (int)event < NUM_EVENTS;
-					    event = (event_T)((int)event + 1))
+    জন্য (event = (event_T)0; (পূর্ণসংখ্যা)event < অঙ্ক_EVENTS;
+					    event = (event_T)((পূর্ণসংখ্যা)event + 1))
     {
 	// loop over all autocommand patterns
-	prev_ap = &(first_autopat[(int)event]);
-	for (ap = *prev_ap; ap != NULL; ap = *prev_ap)
+	পূর্ব_ap = &(first_autopat[(পূর্ণসংখ্যা)event]);
+	জন্য (ap = *পূর্ব_ap; ap != ফাঁকা; ap = *পূর্ব_ap)
 	{
-	    int has_cmd = FALSE;
+	    পূর্ণসংখ্যা has_cmd = FALSE;
 
 	    // loop over all commands for this pattern
-	    prev_ac = &(ap->cmds);
-	    for (ac = *prev_ac; ac != NULL; ac = *prev_ac)
+	    পূর্ব_ac = &(ap->cmds);
+	    জন্য (ac = *পূর্ব_ac; ac != ফাঁকা; ac = *পূর্ব_ac)
 	    {
 		// remove the command if the pattern is to be deleted or when
 		// the command has been marked for deletion
-		if (ap->pat == NULL || ac->cmd == NULL)
+		যদি (ap->pat == ফাঁকা || ac->cmd == ফাঁকা)
 		{
-		    *prev_ac = ac->next;
+		    *পূর্ব_ac = ac->পরবর্তী;
 		    vim_free(ac->cmd);
 		    vim_free(ac);
 		}
-		else
+		অন্যথা
 		{
 		    has_cmd = TRUE;
-		    prev_ac = &(ac->next);
+		    পূর্ব_ac = &(ac->পরবর্তী);
 		}
 	    }
 
-	    if (ap->pat != NULL && !has_cmd)
+	    যদি (ap->pat != ফাঁকা && !has_cmd)
 		// Pattern was not marked for deletion, but all of its
 		// commands were.  So mark the pattern for deletion.
 		au_remove_pat(ap);
 
 	    // remove the pattern if it has been marked for deletion
-	    if (ap->pat == NULL)
+	    যদি (ap->pat == ফাঁকা)
 	    {
-		if (ap->next == NULL)
+		যদি (ap->পরবর্তী == ফাঁকা)
 		{
-		    if (prev_ap == &(first_autopat[(int)event]))
-			last_autopat[(int)event] = NULL;
-		    else
+		    যদি (পূর্ব_ap == &(first_autopat[(পূর্ণসংখ্যা)event]))
+			last_autopat[(পূর্ণসংখ্যা)event] = ফাঁকা;
+		    অন্যথা
 			// this depends on the "next" field being the first in
 			// the struct
-			last_autopat[(int)event] = (AutoPat *)prev_ap;
+			last_autopat[(পূর্ণসংখ্যা)event] = (AutoPat *)পূর্ব_ap;
 		}
-		*prev_ap = ap->next;
+		*পূর্ব_ap = ap->পরবর্তী;
 		vim_regfree(ap->reg_prog);
 		vim_free(ap);
 	    }
-	    else
-		prev_ap = &(ap->next);
+	    অন্যথা
+		পূর্ব_ap = &(ap->পরবর্তী);
 	}
     }
 
@@ -466,7 +466,7 @@ au_cleanup(void)
  * Called when buffer is freed, to remove/invalidate related buffer-local
  * autocmds.
  */
-    void
+    শূন্য
 aubuflocal_remove(buf_T *buf)
 {
     AutoPat	    *ap;
@@ -474,19 +474,19 @@ aubuflocal_remove(buf_T *buf)
     AutoPatCmd_T    *apc;
 
     // invalidate currently executing autocommands
-    for (apc = active_apc_list; apc; apc = apc->next)
-	if (buf->b_fnum == apc->arg_bufnr)
+    জন্য (apc = active_apc_list; apc; apc = apc->পরবর্তী)
+	যদি (buf->b_fnum == apc->arg_bufnr)
 	    apc->arg_bufnr = 0;
 
     // invalidate buflocals looping through events
-    for (event = (event_T)0; (int)event < NUM_EVENTS;
-					    event = (event_T)((int)event + 1))
+    জন্য (event = (event_T)0; (পূর্ণসংখ্যা)event < অঙ্ক_EVENTS;
+					    event = (event_T)((পূর্ণসংখ্যা)event + 1))
 	// loop over all autocommand patterns
 	FOR_ALL_AUTOCMD_PATTERNS(event, ap)
-	    if (ap->buflocal_nr == buf->b_fnum)
+	    যদি (ap->buflocal_nr == buf->b_fnum)
 	    {
 		au_remove_pat(ap);
-		if (p_verbose >= 6)
+		যদি (p_verbose >= 6)
 		{
 		    string_T	*event_name;
 
@@ -504,155 +504,155 @@ aubuflocal_remove(buf_T *buf)
  * Add an autocmd group name.
  * Return its ID.  Returns AUGROUP_ERROR (< 0) for error.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 au_new_group(char_u *name)
 {
-    int		i;
+    পূর্ণসংখ্যা		i;
 
     i = au_find_group(name);
-    if (i != AUGROUP_ERROR)
-	return i;
+    যদি (i != AUGROUP_ERROR)
+	ফেরত i;
 
     // the group doesn't exist yet, add it.  First try using a free entry.
-    for (i = 0; i < augroups.ga_len; ++i)
-	if (AUGROUP_NAME(i) == NULL)
-	    break;
-    if (i == augroups.ga_len && ga_grow(&augroups, 1) == FAIL)
-	return AUGROUP_ERROR;
+    জন্য (i = 0; i < augroups.ga_len; ++i)
+	যদি (AUGROUP_NAME(i) == ফাঁকা)
+	    বিরতি;
+    যদি (i == augroups.ga_len && ga_grow(&augroups, 1) == FAIL)
+	ফেরত AUGROUP_ERROR;
 
     AUGROUP_NAME(i) = vim_strsave(name);
-    if (AUGROUP_NAME(i) == NULL)
-	return AUGROUP_ERROR;
-    if (i == augroups.ga_len)
+    যদি (AUGROUP_NAME(i) == ফাঁকা)
+	ফেরত AUGROUP_ERROR;
+    যদি (i == augroups.ga_len)
 	++augroups.ga_len;
 
-    return i;
+    ফেরত i;
 }
 
-    static void
+    স্থির শূন্য
 au_del_group(char_u *name)
 {
-    int		i;
+    পূর্ণসংখ্যা		i;
     event_T	event;
     AutoPat	*ap;
-    int		in_use = FALSE;
+    পূর্ণসংখ্যা		in_use = FALSE;
 
 
     i = au_find_group(name);
-    if (i == AUGROUP_ERROR)	// the group doesn't exist
+    যদি (i == AUGROUP_ERROR)	// the group doesn't exist
     {
 	semsg(_(e_no_such_group_str), name);
-	return;
+	ফেরত;
     }
-    if (i == current_augroup)
+    যদি (i == current_augroup)
     {
 	emsg(_(e_cannot_delete_current_group));
-	return;
+	ফেরত;
     }
 
-    for (event = (event_T)0; (int)event < NUM_EVENTS;
-	    event = (event_T)((int)event + 1))
+    জন্য (event = (event_T)0; (পূর্ণসংখ্যা)event < অঙ্ক_EVENTS;
+	    event = (event_T)((পূর্ণসংখ্যা)event + 1))
     {
 	FOR_ALL_AUTOCMD_PATTERNS(event, ap)
-	    if (ap->group == i && ap->pat != NULL)
+	    যদি (ap->group == i && ap->pat != ফাঁকা)
 	    {
 		give_warning((char_u *)_("W19: Deleting augroup that is still in use"), TRUE);
 		in_use = TRUE;
-		event = NUM_EVENTS;
-		break;
+		event = অঙ্ক_EVENTS;
+		বিরতি;
 	    }
     }
     vim_free(AUGROUP_NAME(i));
-    if (in_use)
+    যদি (in_use)
 	AUGROUP_NAME(i) = get_deleted_augroup();
-    else
-	AUGROUP_NAME(i) = NULL;
+    অন্যথা
+	AUGROUP_NAME(i) = ফাঁকা;
 }
 
 /*
  * Find the ID of an autocmd group name.
  * Return its ID.  Returns AUGROUP_ERROR (< 0) for error.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 au_find_group(char_u *name)
 {
-    int	    i;
+    পূর্ণসংখ্যা	    i;
 
-    for (i = 0; i < augroups.ga_len; ++i)
-	if (AUGROUP_NAME(i) != NULL && AUGROUP_NAME(i) != get_deleted_augroup()
+    জন্য (i = 0; i < augroups.ga_len; ++i)
+	যদি (AUGROUP_NAME(i) != ফাঁকা && AUGROUP_NAME(i) != get_deleted_augroup()
 		&& STRCMP(AUGROUP_NAME(i), name) == 0)
-	    return i;
-    return AUGROUP_ERROR;
+	    ফেরত i;
+    ফেরত AUGROUP_ERROR;
 }
 
 /*
  * Return TRUE if augroup "name" exists.
  */
-    int
+    পূর্ণসংখ্যা
 au_has_group(char_u *name)
 {
-    return au_find_group(name) != AUGROUP_ERROR;
+    ফেরত au_find_group(name) != AUGROUP_ERROR;
 }
 
 /*
  * ":augroup {name}".
  */
-    void
-do_augroup(char_u *arg, int del_group)
+    শূন্য
+do_augroup(char_u *arg, পূর্ণসংখ্যা del_group)
 {
-    int	    i;
+    পূর্ণসংখ্যা	    i;
 
-    if (del_group)
+    যদি (del_group)
     {
-	if (*arg == NUL)
+	যদি (*arg == NUL)
 	    emsg(_(e_argument_required));
-	else
+	অন্যথা
 	    au_del_group(arg);
     }
-    else if (STRICMP(arg, "end") == 0)   // ":aug end": back to group 0
+    অন্যথা যদি (STRICMP(arg, "end") == 0)   // ":aug end": back to group 0
 	current_augroup = AUGROUP_DEFAULT;
-    else if (*arg)		    // ":aug xxx": switch to group xxx
+    অন্যথা যদি (*arg)		    // ":aug xxx": switch to group xxx
     {
 	i = au_new_group(arg);
-	if (i != AUGROUP_ERROR)
+	যদি (i != AUGROUP_ERROR)
 	    current_augroup = i;
     }
-    else			    // ":aug": list the group names
+    অন্যথা			    // ":aug": list the group names
     {
-	msg_start();
-	for (i = 0; i < augroups.ga_len; ++i)
+	বার্তা_start();
+	জন্য (i = 0; i < augroups.ga_len; ++i)
 	{
-	    if (AUGROUP_NAME(i) != NULL)
+	    যদি (AUGROUP_NAME(i) != ফাঁকা)
 	    {
-		msg_puts((char *)AUGROUP_NAME(i));
-		msg_puts("  ");
+		বার্তা_puts((অক্ষর *)AUGROUP_NAME(i));
+		বার্তা_puts("  ");
 	    }
 	}
-	msg_clr_eos();
-	msg_end();
+	বার্তা_clr_eos();
+	বার্তা_end();
     }
 }
 
-    void
-autocmd_init(void)
+    শূন্য
+autocmd_init(শূন্য)
 {
     CLEAR_FIELD(aucmd_win);
 }
 
-#if defined(EXITFREE)
-    void
-free_all_autocmds(void)
+#যদি defined(EXITFREE)
+    শূন্য
+free_all_autocmds(শূন্য)
 {
     char_u	*s;
 
-    for (current_augroup = -1; current_augroup < augroups.ga_len;
+    জন্য (current_augroup = -1; current_augroup < augroups.ga_len;
 							    ++current_augroup)
-	do_autocmd(NULL, (char_u *)"", TRUE);
+	do_autocmd(ফাঁকা, (char_u *)"", TRUE);
 
-    for (int i = 0; i < augroups.ga_len; ++i)
+    জন্য (পূর্ণসংখ্যা i = 0; i < augroups.ga_len; ++i)
     {
-	s = ((char_u **)(augroups.ga_data))[i];
-	if (s != get_deleted_augroup())
+	s = ((char_u **)(augroups.ga_তথ্য))[i];
+	যদি (s != get_deleted_augroup())
 	    vim_free(s);
     }
     ga_clear(&augroups);
@@ -664,13 +664,13 @@ free_all_autocmds(void)
 /*
  * Return TRUE if "win" is an active entry in aucmd_win[].
  */
-    int
+    পূর্ণসংখ্যা
 is_aucmd_win(win_T *win)
 {
-    for (int i = 0; i < AUCMD_WIN_COUNT; ++i)
-	if (aucmd_win[i].auc_win_used && aucmd_win[i].auc_win == win)
-	    return TRUE;
-    return FALSE;
+    জন্য (পূর্ণসংখ্যা i = 0; i < AUCMD_WIN_গুনতি; ++i)
+	যদি (aucmd_win[i].auc_win_used && aucmd_win[i].auc_win == win)
+	    ফেরত TRUE;
+    ফেরত FALSE;
 }
 
 /*
@@ -678,132 +678,132 @@ is_aucmd_win(win_T *win)
  * Return NUM_EVENTS if the event name was not found.
  * Return a pointer to the next event name in "end".
  */
-    static event_T
+    স্থির event_T
 event_name2nr(char_u *start, char_u **end)
 {
     char_u	*p;
     keyvalue_T target;
     keyvalue_T *entry;
-    static keyvalue_T *bufnewfile = &event_tab[BUFNEWFILE_INDEX];
-    static keyvalue_T *bufread = &event_tab[BUFREAD_INDEX];
+    স্থির keyvalue_T *bufnewfile = &event_tab[BUFNEWFILE_সূচক];
+    স্থির keyvalue_T *bufread = &event_tab[BUFREAD_সূচক];
 
     // the event name ends with end of line, '|', a blank or a comma
-    for (p = start; *p && !VIM_ISWHITE(*p) && *p != ',' && *p != '|'; ++p)
+    জন্য (p = start; *p && !VIM_ISWHITE(*p) && *p != ',' && *p != '|'; ++p)
 	;
 
-    target.key = 0;
-    target.value.string = start;
-    target.value.length = (size_t)(p - start);
+    target.চাবি = 0;
+    target.মান.string = start;
+    target.মান.দৈর্ঘ্য = (size_t)(p - start);
 
     // special cases:
     // BufNewFile and BufRead are searched for ALOT (especially at startup)
     // so we check for them first.
-    if (cmp_keyvalue_value_ni(&target, bufnewfile) == 0)
+    যদি (cmp_keyvalue_মান_ni(&target, bufnewfile) == 0)
 	entry = bufnewfile;
-    else if (cmp_keyvalue_value_ni(&target, bufread) == 0)
+    অন্যথা যদি (cmp_keyvalue_মান_ni(&target, bufread) == 0)
 	entry = bufread;
-    else
-	entry = (keyvalue_T *)bsearch(&target, &event_tab, NUM_EVENTS,
-				sizeof(event_tab[0]), cmp_keyvalue_value_ni);
+    অন্যথা
+	entry = (keyvalue_T *)bsearch(&target, &event_tab, অঙ্ক_EVENTS,
+				আকার(event_tab[0]), cmp_keyvalue_মান_ni);
 
-    if (*p == ',')
+    যদি (*p == ',')
 	++p;
     *end = p;
 
-    return (entry == NULL) ? NUM_EVENTS : (event_T)abs(entry->key);
+    ফেরত (entry == ফাঁকা) ? অঙ্ক_EVENTS : (event_T)abs(entry->চাবি);
 }
 
 /*
  * Return the name for event "event".
  */
-    static string_T *
+    স্থির string_T *
 event_nr2name(event_T event)
 {
-    int	    i;
-    enum {CACHE_SIZE = 12};
-    static int cache_tab[CACHE_SIZE];
-    static int cache_last_index = -1;
-    static string_T unknown = STR_LITERAL_INIT("Unknown");
+    পূর্ণসংখ্যা	    i;
+    গণনা {CACHE_আকার = 12};
+    স্থির পূর্ণসংখ্যা cache_tab[CACHE_আকার];
+    স্থির পূর্ণসংখ্যা cache_last_সূচক = -1;
+    স্থির string_T unknown = STR_LITERAL_INIT("Unknown");
 
-    if (cache_last_index < 0)
+    যদি (cache_last_সূচক < 0)
     {
-	for (i = 0; i < CACHE_SIZE; ++i)
+	জন্য (i = 0; i < CACHE_আকার; ++i)
 	    cache_tab[i] = -1;
-	cache_last_index = CACHE_SIZE - 1;
+	cache_last_সূচক = CACHE_আকার - 1;
     }
 
     // first look in the cache
     // the cache is circular. to search it we start at the most recent entry
     // and go backwards wrapping around when we get to index 0.
-    for (i = cache_last_index; cache_tab[i] >= 0; )
+    জন্য (i = cache_last_সূচক; cache_tab[i] >= 0; )
     {
-	if ((event_T)abs(event_tab[cache_tab[i]].key) == event)
-	    return &event_tab[cache_tab[i]].value;
+	যদি ((event_T)abs(event_tab[cache_tab[i]].চাবি) == event)
+	    ফেরত &event_tab[cache_tab[i]].মান;
 
-	if (i == 0)
-	    i = CACHE_SIZE - 1;
-	else
+	যদি (i == 0)
+	    i = CACHE_আকার - 1;
+	অন্যথা
 	    --i;
 
 	// are we back at the start?
-	if (i == cache_last_index)
-	    break;
+	যদি (i == cache_last_সূচক)
+	    বিরতি;
     }
 
     // look in the event table itself
-    for (i = 0; i < NUM_EVENTS; ++i)
+    জন্য (i = 0; i < অঙ্ক_EVENTS; ++i)
     {
-	if ((event_T)abs(event_tab[i].key) == event)
+	যদি ((event_T)abs(event_tab[i].চাবি) == event)
 	{
 	    // store the found entry in the next position in the cache,
 	    // wrapping around when we get to the maximum index.
-	    if (cache_last_index == CACHE_SIZE - 1)
-		cache_last_index = 0;
-	    else
-		++cache_last_index;
-	    cache_tab[cache_last_index] = i;
-	    return &event_tab[i].value;
+	    যদি (cache_last_সূচক == CACHE_আকার - 1)
+		cache_last_সূচক = 0;
+	    অন্যথা
+		++cache_last_সূচক;
+	    cache_tab[cache_last_সূচক] = i;
+	    ফেরত &event_tab[i].মান;
 	}
     }
 
-    return &unknown;
+    ফেরত &unknown;
 }
 
 /*
  * Scan over the events.  "*" stands for all events.
  */
-    static char_u *
+    স্থির char_u *
 find_end_event(
     char_u  *arg,
-    int	    have_group)	    // TRUE when group name was found
+    পূর্ণসংখ্যা	    have_group)	    // TRUE when group name was found
 {
     char_u  *pat;
     char_u  *p;
 
-    if (*arg == '*')
+    যদি (*arg == '*')
     {
-	if (arg[1] && !VIM_ISWHITE(arg[1]))
+	যদি (arg[1] && !VIM_ISWHITE(arg[1]))
 	{
 	    semsg(_(e_illegal_character_after_star_str), arg);
-	    return NULL;
+	    ফেরত ফাঁকা;
 	}
 	pat = arg + 1;
     }
-    else
+    অন্যথা
     {
-	for (pat = arg; *pat && *pat != '|' && !VIM_ISWHITE(*pat); pat = p)
+	জন্য (pat = arg; *pat && *pat != '|' && !VIM_ISWHITE(*pat); pat = p)
 	{
-	    if ((int)event_name2nr(pat, &p) >= NUM_EVENTS)
+	    যদি ((পূর্ণসংখ্যা)event_name2nr(pat, &p) >= অঙ্ক_EVENTS)
 	    {
-		if (have_group)
+		যদি (have_group)
 		    semsg(_(e_no_such_event_str), pat);
-		else
+		অন্যথা
 		    semsg(_(e_no_such_group_or_event_str), pat);
-		return NULL;
+		ফেরত ফাঁকা;
 	    }
 	}
     }
-    return pat;
+    ফেরত pat;
 }
 
 /*
@@ -816,100 +816,100 @@ au_find_cmd_arg(char_u *arg)
 {
     char_u	*pat;
     char_u	*cmd;
-    int		group;
+    পূর্ণসংখ্যা		group;
 
-    if (*arg == '|')
-	return NULL;
+    যদি (*arg == '|')
+	ফেরত ফাঁকা;
 
     // Errors are reported when the autocommand is actually defined.
     ++emsg_off;
     group = au_get_grouparg(&arg);
     pat = group == AUGROUP_ERROR
-			  ? NULL : find_end_event(arg, group != AUGROUP_ALL);
+			  ? ফাঁকা : find_end_event(arg, group != AUGROUP_ALL);
     --emsg_off;
-    if (pat == NULL)
-	return NULL;
+    যদি (pat == ফাঁকা)
+	ফেরত ফাঁকা;
 
     pat = skipwhite(pat);
-    if (*pat == NUL || *pat == '|')
-	return NULL;
+    যদি (*pat == NUL || *pat == '|')
+	ফেরত ফাঁকা;
 
     // White space in the pattern can be escaped with a backslash.
     cmd = pat;
-    while (*cmd != NUL
+    যখন (*cmd != NUL
 	    && (!VIM_ISWHITE(*cmd) || (cmd > pat && *(cmd - 1) == '\\')))
 	++cmd;
     cmd = skipwhite(cmd);
 
     // "++once" and "++nested" can come in any order.
-    for (int i = 0; i < 2; ++i)
+    জন্য (পূর্ণসংখ্যা i = 0; i < 2; ++i)
     {
-	if (STRNCMP(cmd, "++once", 6) == 0 && VIM_ISWHITE(cmd[6]))
+	যদি (STRNCMP(cmd, "++once", 6) == 0 && VIM_ISWHITE(cmd[6]))
 	    cmd = skipwhite(cmd + 6);
-	if (STRNCMP(cmd, "++nested", 8) == 0 && VIM_ISWHITE(cmd[8]))
+	যদি (STRNCMP(cmd, "++nested", 8) == 0 && VIM_ISWHITE(cmd[8]))
 	    cmd = skipwhite(cmd + 8);
-	if (!in_vim9script() && STRNCMP(cmd, "nested", 6) == 0
+	যদি (!in_vim9script() && STRNCMP(cmd, "nested", 6) == 0
 						       && VIM_ISWHITE(cmd[6]))
 	    cmd = skipwhite(cmd + 6);
     }
 
-    return *cmd == NUL ? NULL : cmd;
+    ফেরত *cmd == NUL ? ফাঁকা : cmd;
 }
 
 /*
  * Return TRUE if "event" is included in 'eventignore(win)'.
  */
-    int
+    পূর্ণসংখ্যা
 event_ignored(event_T event, char_u *ei)
 {
-    int ignored = FALSE;
-    while (*ei != NUL)
+    পূর্ণসংখ্যা ignored = FALSE;
+    যখন (*ei != NUL)
     {
-	int unignore = *ei == '-';
+	পূর্ণসংখ্যা unignore = *ei == '-';
 	ei += unignore;
-	if (STRNICMP(ei, "all", 3) == 0 && (ei[3] == NUL || ei[3] == ','))
+	যদি (STRNICMP(ei, "all", 3) == 0 && (ei[3] == NUL || ei[3] == ','))
 	{
-	    ignored = ei == p_ei || (event_tab[event].key <= 0);
+	    ignored = ei == p_ei || (event_tab[event].চাবি <= 0);
 	    ei += 3 + (ei[3] == ',');
 	}
-	else if (event_name2nr(ei, &ei) == event)
+	অন্যথা যদি (event_name2nr(ei, &ei) == event)
 	{
-	    if (unignore)
-		return FALSE;
-	    else
+	    যদি (unignore)
+		ফেরত FALSE;
+	    অন্যথা
 		ignored = TRUE;
 	}
     }
 
-    return ignored;
+    ফেরত ignored;
 }
 
 /*
  * Return OK when the contents of 'eventignore' or 'eventignorewin' is valid,
  * FAIL otherwise.
  */
-    int
+    পূর্ণসংখ্যা
 check_ei(char_u *ei)
 {
-    int	win = ei != p_ei;
+    পূর্ণসংখ্যা	win = ei != p_ei;
 
-    while (*ei)
+    যখন (*ei)
     {
-	if (STRNICMP(ei, "all", 3) == 0 && (ei[3] == NUL || ei[3] == ','))
+	যদি (STRNICMP(ei, "all", 3) == 0 && (ei[3] == NUL || ei[3] == ','))
 	    ei += 3 + (ei[3] == ',');
-	else
+	অন্যথা
 	{
 	    ei += (*ei == '-');
 	    event_T event = event_name2nr(ei, &ei);
-	    if (event == NUM_EVENTS || (win && event_tab[event].key > 0))
-		return FAIL;
+	    যদি (event == অঙ্ক_EVENTS || (win && event_tab[event].চাবি > 0))
+		ফেরত FAIL;
 	}
     }
 
-    return OK;
+    ফেরত OK;
 }
 
-#if defined(FEAT_SYN_HL)
+#যদি defined(FEAT_SYN_HL)
 
 /*
  * Add "what" to 'eventignore' to skip loading syntax highlighting for every
@@ -917,7 +917,7 @@ check_ei(char_u *ei)
  * Returns the old value of 'eventignore' in allocated memory.
  */
     char_u *
-au_event_disable(char *what)
+au_event_disable(অক্ষর *what)
 {
     char_u	*new_ei;
     char_u	*save_ei;
@@ -925,30 +925,30 @@ au_event_disable(char *what)
 
     p_ei_len = STRLEN(p_ei);
     save_ei = vim_strnsave(p_ei, p_ei_len);
-    if (save_ei == NULL)
-	return NULL;
+    যদি (save_ei == ফাঁকা)
+	ফেরত ফাঁকা;
 
     new_ei = vim_strnsave(p_ei, p_ei_len + STRLEN(what));
-    if (new_ei == NULL)
+    যদি (new_ei == ফাঁকা)
     {
 	vim_free(save_ei);
-	return NULL;
+	ফেরত ফাঁকা;
     }
 
-    if (*what == ',' && *p_ei == NUL)
+    যদি (*what == ',' && *p_ei == NUL)
 	STRCPY(new_ei, what + 1);
-    else
+    অন্যথা
 	STRCPY(new_ei + p_ei_len, what);
     set_string_option_direct((char_u *)"ei", -1, new_ei,
 	    OPT_FREE, SID_NONE);
     vim_free(new_ei);
-    return save_ei;
+    ফেরত save_ei;
 }
 
-    void
+    শূন্য
 au_event_restore(char_u *old_ei)
 {
-    if (old_ei != NULL)
+    যদি (old_ei != ফাঁকা)
     {
 	set_string_option_direct((char_u *)"ei", -1, old_ei,
 							  OPT_FREE, SID_NONE);
@@ -990,36 +990,36 @@ au_event_restore(char_u *old_ei)
  * Mostly a {group} argument can optionally appear before <event>.
  * "eap" can be NULL.
  */
-    void
-do_autocmd(exarg_T *eap, char_u *arg_in, int forceit)
+    শূন্য
+do_autocmd(exarg_T *eap, char_u *arg_in, পূর্ণসংখ্যা forceit)
 {
     char_u	*arg = arg_in;
     char_u	*pat;
-    char_u	*envpat = NULL;
+    char_u	*envpat = ফাঁকা;
     char_u	*cmd;
-    int		cmd_need_free = FALSE;
+    পূর্ণসংখ্যা		cmd_need_free = FALSE;
     event_T	event;
-    char_u	*tofree = NULL;
-    int		nested = FALSE;
-    int		once = FALSE;
-    int		group;
-    int		i;
-    int		flags = 0;
+    char_u	*tofree = ফাঁকা;
+    পূর্ণসংখ্যা		nested = FALSE;
+    পূর্ণসংখ্যা		once = FALSE;
+    পূর্ণসংখ্যা		group;
+    পূর্ণসংখ্যা		i;
+    পূর্ণসংখ্যা		flags = 0;
 
-    if (*arg == '|')
+    যদি (*arg == '|')
     {
 	eap->nextcmd = arg + 1;
 	arg = (char_u *)"";
 	group = AUGROUP_ALL;	// no argument, use all groups
     }
-    else
+    অন্যথা
     {
 	/*
 	 * Check for a legal group name.  If not, use AUGROUP_ALL.
 	 */
 	group = au_get_grouparg(&arg);
-	if (arg == NULL)	    // out of memory
-	    return;
+	যদি (arg == ফাঁকা)	    // out of memory
+	    ফেরত;
     }
 
     /*
@@ -1027,33 +1027,33 @@ do_autocmd(exarg_T *eap, char_u *arg_in, int forceit)
      * If we find an illegal name, return here, don't do anything.
      */
     pat = find_end_event(arg, group != AUGROUP_ALL);
-    if (pat == NULL)
-	return;
+    যদি (pat == ফাঁকা)
+	ফেরত;
 
     pat = skipwhite(pat);
-    if (*pat == '|')
+    যদি (*pat == '|')
     {
 	eap->nextcmd = pat + 1;
 	pat = (char_u *)"";
 	cmd = (char_u *)"";
     }
-    else
+    অন্যথা
     {
 	/*
 	 * Scan over the pattern.  Put a NUL at the end.
 	 */
 	cmd = pat;
-	while (*cmd && (!VIM_ISWHITE(*cmd) || cmd[-1] == '\\'))
+	যখন (*cmd && (!VIM_ISWHITE(*cmd) || cmd[-1] == '\\'))
 	    cmd++;
-	if (*cmd)
+	যদি (*cmd)
 	    *cmd++ = NUL;
 
 	// Expand environment variables in the pattern.  Set 'shellslash', we
 	// want forward slashes here.
-	if (vim_strchr(pat, '$') != NULL || vim_strchr(pat, '~') != NULL)
+	যদি (vim_strchr(pat, '$') != ফাঁকা || vim_strchr(pat, '~') != ফাঁকা)
 	{
 #ifdef BACKSLASH_IN_FILENAME
-	    int	p_ssl_save = p_ssl;
+	    পূর্ণসংখ্যা	p_ssl_save = p_ssl;
 
 	    p_ssl = TRUE;
 #endif
@@ -1061,55 +1061,55 @@ do_autocmd(exarg_T *eap, char_u *arg_in, int forceit)
 #ifdef BACKSLASH_IN_FILENAME
 	    p_ssl = p_ssl_save;
 #endif
-	    if (envpat != NULL)
+	    যদি (envpat != ফাঁকা)
 		pat = envpat;
 	}
 
 	cmd = skipwhite(cmd);
-	for (i = 0; i < 2; i++)
+	জন্য (i = 0; i < 2; i++)
 	{
-	    if (*cmd == NUL)
-		continue;
+	    যদি (*cmd == NUL)
+		চালু;
 
 	    // Check for "++once" flag.
-	    if (STRNCMP(cmd, "++once", 6) == 0 && VIM_ISWHITE(cmd[6]))
+	    যদি (STRNCMP(cmd, "++once", 6) == 0 && VIM_ISWHITE(cmd[6]))
 	    {
-		if (once)
+		যদি (once)
 		{
 		    semsg(_(e_duplicate_argument_str), "++once");
-		    goto err_exit;
+		    যাও err_exit;
 		}
 		once = TRUE;
 		cmd = skipwhite(cmd + 6);
 	    }
 
 	    // Check for "++nested" flag.
-	    if ((STRNCMP(cmd, "++nested", 8) == 0 && VIM_ISWHITE(cmd[8])))
+	    যদি ((STRNCMP(cmd, "++nested", 8) == 0 && VIM_ISWHITE(cmd[8])))
 	    {
-		if (nested)
+		যদি (nested)
 		{
 		    semsg(_(e_duplicate_argument_str), "++nested");
-		    goto err_exit;
+		    যাও err_exit;
 		}
 		nested = TRUE;
 		cmd = skipwhite(cmd + 8);
 	    }
 
 	    // Check for the old "nested" flag in legacy script.
-	    if (STRNCMP(cmd, "nested", 6) == 0 && VIM_ISWHITE(cmd[6]))
+	    যদি (STRNCMP(cmd, "nested", 6) == 0 && VIM_ISWHITE(cmd[6]))
 	    {
-		if (in_vim9script())
+		যদি (in_vim9script())
 		{
 		    // If there ever is a :nested command this error should
 		    // be removed and "nested" accepted as the start of the
 		    // command.
 		    emsg(_(e_invalid_command_nested_did_you_mean_plusplus_nested));
-		    goto err_exit;
+		    যাও err_exit;
 		}
-		if (nested)
+		যদি (nested)
 		{
 		    semsg(_(e_duplicate_argument_str), "nested");
-		    goto err_exit;
+		    যাও err_exit;
 		}
 		nested = TRUE;
 		cmd = skipwhite(cmd + 6);
@@ -1120,15 +1120,15 @@ do_autocmd(exarg_T *eap, char_u *arg_in, int forceit)
 	 * Find the start of the commands.
 	 * Expand <sfile> in it.
 	 */
-	if (*cmd != NUL)
+	যদি (*cmd != NUL)
 	{
-	    if (eap != NULL)
+	    যদি (eap != ফাঁকা)
 		// Read a {} block if it follows.
 		cmd = may_get_cmd_block(eap, cmd, &tofree, &flags);
 
 	    cmd = expand_sfile(cmd);
-	    if (cmd == NULL)	    // some error
-		goto err_exit;
+	    যদি (cmd == ফাঁকা)	    // some error
+		যাও err_exit;
 	    cmd_need_free = TRUE;
 	}
     }
@@ -1136,36 +1136,36 @@ do_autocmd(exarg_T *eap, char_u *arg_in, int forceit)
     /*
      * Print header when showing autocommands.
      */
-    if (!forceit && *cmd == NUL)
+    যদি (!forceit && *cmd == NUL)
 	// Highlight title
-	msg_puts_title(_("\n--- Autocommands ---"));
+	বার্তা_puts_title(_("\n--- Autocommands ---"));
 
     /*
      * Loop over the events.
      */
     last_event = (event_T)-1;		// for listing the event name
     last_group = AUGROUP_ERROR;		// for listing the group name
-    if (*arg == '*' || *arg == NUL || *arg == '|')
+    যদি (*arg == '*' || *arg == NUL || *arg == '|')
     {
-	if (*cmd != NUL)
+	যদি (*cmd != NUL)
 	    emsg(_(e_cannot_define_autocommands_for_all_events));
-	else
-	    for (event = (event_T)0; (int)event < NUM_EVENTS;
-					     event = (event_T)((int)event + 1))
-		if (do_autocmd_event(event, pat,
+	অন্যথা
+	    জন্য (event = (event_T)0; (পূর্ণসংখ্যা)event < অঙ্ক_EVENTS;
+					     event = (event_T)((পূর্ণসংখ্যা)event + 1))
+		যদি (do_autocmd_event(event, pat,
 			     once, nested, cmd, forceit, group, flags) == FAIL)
-		    break;
+		    বিরতি;
     }
-    else
+    অন্যথা
     {
-	while (*arg && *arg != '|' && !VIM_ISWHITE(*arg))
-	    if (do_autocmd_event(event_name2nr(arg, &arg), pat,
+	যখন (*arg && *arg != '|' && !VIM_ISWHITE(*arg))
+	    যদি (do_autocmd_event(event_name2nr(arg, &arg), pat,
 			  once, nested,	cmd, forceit, group, flags) == FAIL)
-		break;
+		বিরতি;
     }
 
 err_exit:
-    if (cmd_need_free)
+    যদি (cmd_need_free)
 	vim_free(cmd);
     vim_free(tofree);
     vim_free(envpat);
@@ -1177,29 +1177,29 @@ err_exit:
  *
  * Returns the group ID, AUGROUP_ERROR for error (out of memory).
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 au_get_grouparg(char_u **argp)
 {
     char_u	*group_name;
     char_u	*p;
     char_u	*arg = *argp;
-    int		group = AUGROUP_ALL;
+    পূর্ণসংখ্যা		group = AUGROUP_ALL;
 
-    for (p = arg; *p && !VIM_ISWHITE(*p) && *p != '|'; ++p)
+    জন্য (p = arg; *p && !VIM_ISWHITE(*p) && *p != '|'; ++p)
 	;
-    if (p <= arg)
-	return AUGROUP_ALL;
+    যদি (p <= arg)
+	ফেরত AUGROUP_ALL;
 
     group_name = vim_strnsave(arg, p - arg);
-    if (group_name == NULL)		// out of memory
-	return AUGROUP_ERROR;
+    যদি (group_name == ফাঁকা)		// out of memory
+	ফেরত AUGROUP_ERROR;
     group = au_find_group(group_name);
-    if (group == AUGROUP_ERROR)
+    যদি (group == AUGROUP_ERROR)
 	group = AUGROUP_ALL;	// no match, use all groups
-    else
+    অন্যথা
 	*argp = skipwhite(p);	// match, skip over group name
     vim_free(group_name);
-    return group;
+    ফেরত group;
 }
 
 /*
@@ -1209,49 +1209,49 @@ au_get_grouparg(char_u **argp)
  * If forceit == TRUE delete entries.
  * If group is not AUGROUP_ALL, only use this group.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 do_autocmd_event(
     event_T	event,
     char_u	*pat,
-    int		once,
-    int		nested,
+    পূর্ণসংখ্যা		once,
+    পূর্ণসংখ্যা		nested,
     char_u	*cmd,
-    int		forceit,
-    int		group,
-    int		flags)
+    পূর্ণসংখ্যা		forceit,
+    পূর্ণসংখ্যা		group,
+    পূর্ণসংখ্যা		flags)
 {
     AutoPat	*ap;
-    AutoPat	**prev_ap;
+    AutoPat	**পূর্ব_ap;
     AutoCmd	*ac;
-    AutoCmd	**prev_ac;
-    int		brace_level;
+    AutoCmd	**পূর্ব_ac;
+    পূর্ণসংখ্যা		brace_level;
     char_u	*endpat;
-    int		findgroup;
-    int		allgroups;
-    int		patlen;
-    int		is_buflocal;
-    int		buflocal_nr;
+    পূর্ণসংখ্যা		findgroup;
+    পূর্ণসংখ্যা		allgroups;
+    পূর্ণসংখ্যা		patlen;
+    পূর্ণসংখ্যা		is_buflocal;
+    পূর্ণসংখ্যা		buflocal_nr;
     char_u	buflocal_pat[25];	// for "<buffer=X>"
 
-    if (group == AUGROUP_ALL)
+    যদি (group == AUGROUP_ALL)
 	findgroup = current_augroup;
-    else
+    অন্যথা
 	findgroup = group;
     allgroups = (group == AUGROUP_ALL && !forceit && *cmd == NUL);
 
     /*
      * Show or delete all patterns for an event.
      */
-    if (*pat == NUL)
+    যদি (*pat == NUL)
     {
 	FOR_ALL_AUTOCMD_PATTERNS(event, ap)
 	{
-	    if (forceit)  // delete the AutoPat, if it's in the current group
+	    যদি (forceit)  // delete the AutoPat, if it's in the current group
 	    {
-		if (ap->group == findgroup)
+		যদি (ap->group == findgroup)
 		    au_remove_pat(ap);
 	    }
-	    else if (group == AUGROUP_ALL || ap->group == group)
+	    অন্যথা যদি (group == AUGROUP_ALL || ap->group == group)
 		show_autocmd(ap, event);
 	}
     }
@@ -1259,24 +1259,24 @@ do_autocmd_event(
     /*
      * Loop through all the specified patterns.
      */
-    for ( ; *pat; pat = (*endpat == ',' ? endpat + 1 : endpat))
+    জন্য ( ; *pat; pat = (*endpat == ',' ? endpat + 1 : endpat))
     {
 	/*
 	 * Find end of the pattern.
 	 * Watch out for a comma in braces, like "*.\{obj,o\}".
 	 */
 	brace_level = 0;
-	for (endpat = pat; *endpat && (*endpat != ',' || brace_level
+	জন্য (endpat = pat; *endpat && (*endpat != ',' || brace_level
 			   || (endpat > pat && endpat[-1] == '\\')); ++endpat)
 	{
-	    if (*endpat == '{')
+	    যদি (*endpat == '{')
 		brace_level++;
-	    else if (*endpat == '}')
+	    অন্যথা যদি (*endpat == '}')
 		brace_level--;
 	}
-	if (pat == endpat)		// ignore single comma
-	    continue;
-	patlen = (int)(endpat - pat);
+	যদি (pat == endpat)		// ignore single comma
+	    চালু;
+	patlen = (পূর্ণসংখ্যা)(endpat - pat);
 
 	/*
 	 * detect special <buflocal[=X]> buffer-local patterns
@@ -1284,45 +1284,45 @@ do_autocmd_event(
 	is_buflocal = FALSE;
 	buflocal_nr = 0;
 
-	if (patlen >= 8 && STRNCMP(pat, "<buffer", 7) == 0
+	যদি (patlen >= 8 && STRNCMP(pat, "<buffer", 7) == 0
 						    && pat[patlen - 1] == '>')
 	{
 	    // "<buffer...>": Error will be printed only for addition.
 	    // printing and removing will proceed silently.
 	    is_buflocal = TRUE;
-	    if (patlen == 8)
+	    যদি (patlen == 8)
 		// "<buffer>"
 		buflocal_nr = curbuf->b_fnum;
-	    else if (patlen > 9 && pat[7] == '=')
+	    অন্যথা যদি (patlen > 9 && pat[7] == '=')
 	    {
-		if (patlen == 13 && STRNICMP(pat, "<buffer=abuf>", 13) == 0)
+		যদি (patlen == 13 && STRNICMP(pat, "<buffer=abuf>", 13) == 0)
 		    // "<buffer=abuf>"
 		    buflocal_nr = autocmd_bufnr;
-		else if (skipdigits(pat + 8) == pat + patlen - 1)
+		অন্যথা যদি (skipdigits(pat + 8) == pat + patlen - 1)
 		    // "<buffer=123>"
-		    buflocal_nr = atoi((char *)pat + 8);
+		    buflocal_nr = atoi((অক্ষর *)pat + 8);
 	    }
 	}
 
-	if (is_buflocal)
+	যদি (is_buflocal)
 	{
 	    // normalize pat into standard "<buffer>#N" form
-	    sprintf((char *)buflocal_pat, "<buffer=%d>", buflocal_nr);
+	    sprintf((অক্ষর *)buflocal_pat, "<buffer=%d>", buflocal_nr);
 	    pat = buflocal_pat;			// can modify pat and patlen
-	    patlen = (int)STRLEN(buflocal_pat);	//   but not endpat
+	    patlen = (পূর্ণসংখ্যা)STRLEN(buflocal_pat);	//   but not endpat
 	}
 
 	/*
 	 * Find AutoPat entries with this pattern.  When adding a command it
 	 * always goes at or after the last one, so start at the end.
 	 */
-	if (!forceit && *cmd != NUL && last_autopat[(int)event] != NULL)
-	    prev_ap = &last_autopat[(int)event];
-	else
-	    prev_ap = &first_autopat[(int)event];
-	while ((ap = *prev_ap) != NULL)
+	যদি (!forceit && *cmd != NUL && last_autopat[(পূর্ণসংখ্যা)event] != ফাঁকা)
+	    পূর্ব_ap = &last_autopat[(পূর্ণসংখ্যা)event];
+	অন্যথা
+	    পূর্ব_ap = &first_autopat[(পূর্ণসংখ্যা)event];
+	যখন ((ap = *পূর্ব_ap) != ফাঁকা)
 	{
-	    if (ap->pat != NULL)
+	    যদি (ap->pat != ফাঁকা)
 	    {
 		/*
 		 * Accept a pattern when:
@@ -1334,7 +1334,7 @@ do_autocmd_event(
 		 * For <buffer[=X]>, this condition works because we normalize
 		 * all buffer-local patterns.
 		 */
-		if ((allgroups || ap->group == findgroup)
+		যদি ((allgroups || ap->group == findgroup)
 			&& ap->patlen == patlen
 			&& STRNCMP(pat, ap->pat, patlen) == 0)
 		{
@@ -1344,12 +1344,12 @@ do_autocmd_event(
 		     * delete the pattern from the autopat list, append to
 		     * this list.
 		     */
-		    if (forceit)
+		    যদি (forceit)
 		    {
-			if (*cmd != NUL && ap->next == NULL)
+			যদি (*cmd != NUL && ap->পরবর্তী == ফাঁকা)
 			{
 			    au_remove_cmds(ap);
-			    break;
+			    বিরতি;
 			}
 			au_remove_pat(ap);
 		    }
@@ -1357,60 +1357,60 @@ do_autocmd_event(
 		    /*
 		     * Show autocmd's for this autopat, or buflocals <buffer=X>
 		     */
-		    else if (*cmd == NUL)
+		    অন্যথা যদি (*cmd == NUL)
 			show_autocmd(ap, event);
 
 		    /*
 		     * Add autocmd to this autopat, if it's the last one.
 		     */
-		    else if (ap->next == NULL)
-			break;
+		    অন্যথা যদি (ap->পরবর্তী == ফাঁকা)
+			বিরতি;
 		}
 	    }
-	    prev_ap = &ap->next;
+	    পূর্ব_ap = &ap->পরবর্তী;
 	}
 
 	/*
 	 * Add a new command.
 	 */
-	if (*cmd != NUL)
+	যদি (*cmd != NUL)
 	{
 	    /*
 	     * If the pattern we want to add a command to does appear at the
 	     * end of the list (or not is not in the list at all), add the
 	     * pattern at the end of the list.
 	     */
-	    if (ap == NULL)
+	    যদি (ap == ফাঁকা)
 	    {
 		// refuse to add buffer-local ap if buffer number is invalid
-		if (is_buflocal && (buflocal_nr == 0
-				      || buflist_findnr(buflocal_nr) == NULL))
+		যদি (is_buflocal && (buflocal_nr == 0
+				      || buflist_findnr(buflocal_nr) == ফাঁকা))
 		{
-		    semsg(_(e_buffer_nr_invalid_buffer_number), buflocal_nr);
-		    return FAIL;
+		    semsg(_(e_বাফার_nr_invalid_বাফার_সংখ্যা), buflocal_nr);
+		    ফেরত FAIL;
 		}
 
 		ap = ALLOC_ONE(AutoPat);
-		if (ap == NULL)
-		    return FAIL;
+		যদি (ap == ফাঁকা)
+		    ফেরত FAIL;
 		ap->pat = vim_strnsave(pat, patlen);
 		ap->patlen = patlen;
-		if (ap->pat == NULL)
+		যদি (ap->pat == ফাঁকা)
 		{
 		    vim_free(ap);
-		    return FAIL;
+		    ফেরত FAIL;
 		}
 
 #ifdef FEAT_EVAL
 		// need to initialize last_mode for the first ModeChanged
 		// autocmd
-		if (event == EVENT_MODECHANGED && !has_modechanged())
+		যদি (event == EVENT_MODECHANGED && !has_modechanged())
 		    get_mode(last_mode);
 #endif
 		// Initialize the fields checked by the WinScrolled and
 		// WinResized trigger to prevent them from firing right after
 		// the first autocmd is defined.
-		if ((event == EVENT_WINSCROLLED || event == EVENT_WINRESIZED)
+		যদি ((event == EVENT_WINSCROLLED || event == EVENT_WINRESIZED)
 			&& !(has_winscrolled() || has_winresized()))
 		{
 		    tabpage_T *save_curtab = curtab;
@@ -1419,105 +1419,105 @@ do_autocmd_event(
 		    {
 			unuse_tabpage(curtab);
 			use_tabpage(tp);
-			snapshot_windows_scroll_size();
+			snapshot_windows_scroll_আকার();
 		    }
 		    unuse_tabpage(curtab);
 		    use_tabpage(save_curtab);
 		}
 
-		if (is_buflocal)
+		যদি (is_buflocal)
 		{
 		    ap->buflocal_nr = buflocal_nr;
-		    ap->reg_prog = NULL;
+		    ap->reg_prog = ফাঁকা;
 		}
-		else
+		অন্যথা
 		{
 		    char_u	*reg_pat;
 
 		    ap->buflocal_nr = 0;
 		    reg_pat = file_pat_to_reg_pat(pat, endpat,
 							 &ap->allow_dirs, TRUE);
-		    if (reg_pat != NULL)
+		    যদি (reg_pat != ফাঁকা)
 			ap->reg_prog = vim_regcomp(reg_pat, RE_MAGIC);
 		    vim_free(reg_pat);
-		    if (reg_pat == NULL || ap->reg_prog == NULL)
+		    যদি (reg_pat == ফাঁকা || ap->reg_prog == ফাঁকা)
 		    {
 			vim_free(ap->pat);
 			vim_free(ap);
-			return FAIL;
+			ফেরত FAIL;
 		    }
 		}
-		ap->cmds = NULL;
-		*prev_ap = ap;
-		last_autopat[(int)event] = ap;
-		ap->next = NULL;
-		if (group == AUGROUP_ALL)
+		ap->cmds = ফাঁকা;
+		*পূর্ব_ap = ap;
+		last_autopat[(পূর্ণসংখ্যা)event] = ap;
+		ap->পরবর্তী = ফাঁকা;
+		যদি (group == AUGROUP_ALL)
 		    ap->group = current_augroup;
-		else
+		অন্যথা
 		    ap->group = group;
 	    }
 
 	    /*
 	     * Add the autocmd at the end of the AutoCmd list.
 	     */
-	    prev_ac = &(ap->cmds);
-	    while ((ac = *prev_ac) != NULL)
-		prev_ac = &ac->next;
+	    পূর্ব_ac = &(ap->cmds);
+	    যখন ((ac = *পূর্ব_ac) != ফাঁকা)
+		পূর্ব_ac = &ac->পরবর্তী;
 	    ac = ALLOC_ONE(AutoCmd);
-	    if (ac == NULL)
-		return FAIL;
+	    যদি (ac == ফাঁকা)
+		ফেরত FAIL;
 	    ac->cmd = vim_strsave(cmd);
 	    ac->script_ctx = current_sctx;
-	    if (flags & UC_VIM9)
+	    যদি (flags & UC_VIM9)
 		ac->script_ctx.sc_version = SCRIPT_VERSION_VIM9;
 #ifdef FEAT_EVAL
 	    ac->script_ctx.sc_lnum += SOURCING_LNUM;
 #endif
-	    if (ac->cmd == NULL)
+	    যদি (ac->cmd == ফাঁকা)
 	    {
 		vim_free(ac);
-		return FAIL;
+		ফেরত FAIL;
 	    }
-	    ac->next = NULL;
-	    *prev_ac = ac;
+	    ac->পরবর্তী = ফাঁকা;
+	    *পূর্ব_ac = ac;
 	    ac->once = once;
 	    ac->nested = nested;
 	}
     }
 
     au_cleanup();	// may really delete removed patterns/commands now
-    return OK;
+    ফেরত OK;
 }
 
 /*
  * Implementation of ":doautocmd [group] event [fname]".
  * Return OK for success, FAIL for failure;
  */
-    int
+    পূর্ণসংখ্যা
 do_doautocmd(
     char_u	*arg_start,
-    int		do_msg,	    // give message for no matching autocmds?
-    int		*did_something)
+    পূর্ণসংখ্যা		do_বার্তা,	    // give message for no matching autocmds?
+    পূর্ণসংখ্যা		*did_something)
 {
     char_u	*arg = arg_start;
     char_u	*fname;
-    int		nothing_done = TRUE;
-    int		group;
+    পূর্ণসংখ্যা		nothing_done = TRUE;
+    পূর্ণসংখ্যা		group;
 
-    if (did_something != NULL)
+    যদি (did_something != ফাঁকা)
 	*did_something = FALSE;
 
     /*
      * Check for a legal group name.  If not, use AUGROUP_ALL.
      */
     group = au_get_grouparg(&arg);
-    if (arg == NULL)	    // out of memory
-	return FAIL;
+    যদি (arg == ফাঁকা)	    // out of memory
+	ফেরত FAIL;
 
-    if (*arg == '*')
+    যদি (*arg == '*')
     {
 	emsg(_(e_cant_execute_autocommands_for_all_events));
-	return FAIL;
+	ফেরত FAIL;
     }
 
     /*
@@ -1525,48 +1525,48 @@ do_doautocmd(
      * If we find an illegal name, return here, don't do anything.
      */
     fname = find_end_event(arg, group != AUGROUP_ALL);
-    if (fname == NULL)
-	return FAIL;
+    যদি (fname == ফাঁকা)
+	ফেরত FAIL;
 
     fname = skipwhite(fname);
 
     /*
      * Loop over the events.
      */
-    while (*arg && !ends_excmd(*arg) && !VIM_ISWHITE(*arg))
-	if (apply_autocmds_group(event_name2nr(arg, &arg),
-				      fname, NULL, TRUE, group, curbuf, NULL))
+    যখন (*arg && !ends_excmd(*arg) && !VIM_ISWHITE(*arg))
+	যদি (apply_autocmds_group(event_name2nr(arg, &arg),
+				      fname, ফাঁকা, TRUE, group, curbuf, ফাঁকা))
 	    nothing_done = FALSE;
 
-    if (nothing_done && do_msg
+    যদি (nothing_done && do_বার্তা
 #ifdef FEAT_EVAL
 		&& !aborting()
 #endif
 	       )
 	smsg(_("No matching autocommands: %s"), arg_start);
-    if (did_something != NULL)
+    যদি (did_something != ফাঁকা)
 	*did_something = !nothing_done;
 
 #ifdef FEAT_EVAL
-    return aborting() ? FAIL : OK;
-#else
-    return OK;
+    ফেরত aborting() ? FAIL : OK;
+#অন্যথা
+    ফেরত OK;
 #endif
 }
 
 /*
  * ":doautoall": execute autocommands for each loaded buffer.
  */
-    void
+    শূন্য
 ex_doautoall(exarg_T *eap)
 {
-    int		retval = OK;
+    পূর্ণসংখ্যা		retval = OK;
     aco_save_T	aco;
     buf_T	*buf;
     bufref_T	bufref;
     char_u	*arg = eap->arg;
-    int		call_do_modelines = check_nomodeline(&arg);
-    int		did_aucmd;
+    পূর্ণসংখ্যা		call_do_modelines = check_nomodeline(&arg);
+    পূর্ণসংখ্যা		did_aucmd;
 
     /*
      * This is a bit tricky: For some commands curwin->w_buffer needs to be
@@ -1578,17 +1578,17 @@ ex_doautoall(exarg_T *eap)
     FOR_ALL_BUFFERS(buf)
     {
 	// Only do loaded buffers and skip the current buffer, it's done last.
-	if (buf->b_ml.ml_mfp == NULL || buf == curbuf)
-	    continue;
+	যদি (buf->b_ml.ml_mfp == ফাঁকা || buf == curbuf)
+	    চালু;
 
 	// Find a window for this buffer and save some values.
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf != buf)
+	যদি (curbuf != buf)
 	{
 	    // Failed to find a window for this buffer.  Better not execute
 	    // autocommands then.
 	    retval = FAIL;
-	    break;
+	    বিরতি;
 	}
 
 	set_bufref(&bufref, buf);
@@ -1596,7 +1596,7 @@ ex_doautoall(exarg_T *eap)
 	// execute the autocommands for this buffer
 	retval = do_doautocmd(arg, FALSE, &did_aucmd);
 
-	if (call_do_modelines && did_aucmd)
+	যদি (call_do_modelines && did_aucmd)
 	    // Execute the modeline settings, but don't set window-local
 	    // options if we are using the current window for another
 	    // buffer.
@@ -1606,18 +1606,18 @@ ex_doautoall(exarg_T *eap)
 	aucmd_restbuf(&aco);
 
 	// stop if there is some error or buffer was deleted
-	if (retval == FAIL || !bufref_valid(&bufref))
+	যদি (retval == FAIL || !bufref_valid(&bufref))
 	{
 	    retval = FAIL;
-	    break;
+	    বিরতি;
 	}
     }
 
     // Execute autocommands for the current buffer last.
-    if (retval == OK)
+    যদি (retval == OK)
     {
 	do_doautocmd(arg, FALSE, &did_aucmd);
-	if (call_do_modelines && did_aucmd)
+	যদি (call_do_modelines && did_aucmd)
 	    do_modelines(0);
     }
 }
@@ -1627,15 +1627,15 @@ ex_doautoall(exarg_T *eap)
  * return TRUE and advance *argp to after it.
  * Thus return TRUE when do_modelines() should be called.
  */
-    int
+    পূর্ণসংখ্যা
 check_nomodeline(char_u **argp)
 {
-    if (STRNCMP(*argp, "<nomodeline>", 12) == 0)
+    যদি (STRNCMP(*argp, "<nomodeline>", 12) == 0)
     {
 	*argp = skipwhite(*argp + 12);
-	return FALSE;
+	ফেরত FALSE;
     }
-    return TRUE;
+    ফেরত TRUE;
 }
 
 /*
@@ -1645,57 +1645,57 @@ check_nomodeline(char_u **argp)
  * Set "curbuf" and "curwin" to match "buf".
  * When this fails "curbuf" is not equal "buf".
  */
-    void
+    শূন্য
 aucmd_prepbuf(
     aco_save_T	*aco,		// structure to save values in
     buf_T	*buf)		// new curbuf
 {
     win_T	*win;
-    int		save_ea;
+    পূর্ণসংখ্যা		save_ea;
 #ifdef FEAT_AUTOCHDIR
-    int		save_acd;
+    পূর্ণসংখ্যা		save_acd;
 #endif
-    int		same_buffer = buf == curbuf;
+    পূর্ণসংখ্যা		same_বাফার = buf == curbuf;
 
     // Find a window that is for the new buffer
-    if (same_buffer)		// be quick when buf is curbuf
+    যদি (same_বাফার)		// be quick when buf is curbuf
 	win = curwin;
-    else
+    অন্যথা
 	FOR_ALL_WINDOWS(win)
-	    if (win->w_buffer == buf)
-		break;
+	    যদি (win->w_বাফার == buf)
+		বিরতি;
 
     // Allocate a window when needed.
-    win_T *auc_win = NULL;
-    int auc_idx = AUCMD_WIN_COUNT;
-    if (win == NULL)
+    win_T *auc_win = ফাঁকা;
+    পূর্ণসংখ্যা auc_idx = AUCMD_WIN_গুনতি;
+    যদি (win == ফাঁকা)
     {
-	for (auc_idx = 0; auc_idx < AUCMD_WIN_COUNT; ++auc_idx)
-	    if (!aucmd_win[auc_idx].auc_win_used)
+	জন্য (auc_idx = 0; auc_idx < AUCMD_WIN_গুনতি; ++auc_idx)
+	    যদি (!aucmd_win[auc_idx].auc_win_used)
 	    {
-		if (aucmd_win[auc_idx].auc_win == NULL)
+		যদি (aucmd_win[auc_idx].auc_win == ফাঁকা)
 		    aucmd_win[auc_idx].auc_win = win_alloc_popup_win();
 		auc_win = aucmd_win[auc_idx].auc_win;
-		if (auc_win != NULL)
+		যদি (auc_win != ফাঁকা)
 		    aucmd_win[auc_idx].auc_win_used = TRUE;
-		break;
+		বিরতি;
 	    }
 
 	// If this fails (out of memory or using all AUCMD_WIN_COUNT
 	// entries) then we can't reliable execute the autocmd, return with
 	// "curbuf" unequal "buf".
-	if (auc_win == NULL)
-	    return;
+	যদি (auc_win == ফাঁকা)
+	    ফেরত;
     }
 
     aco->save_curwin_id = curwin->w_id;
-    aco->save_prevwin_id = prevwin == NULL ? 0 : prevwin->w_id;
+    aco->save_prevwin_id = prevwin == ফাঁকা ? 0 : prevwin->w_id;
 #ifdef FEAT_JOB_CHANNEL
-    if (bt_prompt(curbuf))
-	aco->save_prompt_insert = curbuf->b_prompt_insert;
+    যদি (bt_prompt(curbuf))
+	aco->save_prompt_ঢোকাও = curbuf->b_prompt_ঢোকাও;
 #endif
 
-    if (win != NULL)
+    যদি (win != ফাঁকা)
     {
 	// There is a window for "buf" in the current tab page, make it the
 	// curwin.  This is preferred, it has the least side effects (esp. if
@@ -1703,7 +1703,7 @@ aucmd_prepbuf(
 	aco->use_aucmd_win_idx = -1;
 	curwin = win;
     }
-    else
+    অন্যথা
     {
 	// There is no window for "buf", use "auc_win".  To minimize the side
 	// effects, insert it in the current tab page.
@@ -1717,9 +1717,9 @@ aucmd_prepbuf(
 	// chdir() in win_enter_ext().
 	// win_init_popup_win() has already set w_localdir to NULL.
 	aco->tp_localdir = curtab->tp_localdir;
-	curtab->tp_localdir = NULL;
+	curtab->tp_localdir = ফাঁকা;
 	aco->globaldir = globaldir;
-	globaldir = NULL;
+	globaldir = ফাঁকা;
 
 	// Split the current window, put the auc_win in the upper half.
 	// We don't want the BufEnter or WinEnter autocommands.
@@ -1734,7 +1734,7 @@ aucmd_prepbuf(
 	p_acd = FALSE;
 #endif
 
-	(void)win_split_ins(0, WSP_TOP | WSP_FORCE_ROOM, auc_win, 0, NULL);
+	(শূন্য)win_split_ins(0, WSP_শীর্ষ | WSP_FORCE_ROOM, auc_win, 0, ফাঁকা);
 	win_comp_pos();   // recompute window positions
 	p_ea = save_ea;
 #ifdef FEAT_AUTOCHDIR
@@ -1748,7 +1748,7 @@ aucmd_prepbuf(
     set_bufref(&aco->new_curbuf, curbuf);
 
     aco->save_VIsual_active = VIsual_active;
-    if (!same_buffer)
+    যদি (!same_বাফার)
 	// disable the Visual area, position may be invalid in another buffer
 	VIsual_active = FALSE;
 }
@@ -1757,48 +1757,48 @@ aucmd_prepbuf(
  * Cleanup after executing autocommands for a (hidden) buffer.
  * Restore the window as it was (if possible).
  */
-    void
+    শূন্য
 aucmd_restbuf(
     aco_save_T	*aco)		// structure holding saved values
 {
-    int	    dummy;
+    পূর্ণসংখ্যা	    dummy;
     win_T   *save_curwin;
 
-    if (aco->use_aucmd_win_idx >= 0)
+    যদি (aco->use_aucmd_win_idx >= 0)
     {
 	win_T *awp = aucmd_win[aco->use_aucmd_win_idx].auc_win;
 
 	// Find "awp", it can't be closed, but it may be in another tab
 	// page. Do not trigger autocommands here.
 	block_autocmds();
-	if (curwin != awp)
+	যদি (curwin != awp)
 	{
 	    tabpage_T	*tp;
 	    win_T	*wp;
 
 	    FOR_ALL_TAB_WINDOWS(tp, wp)
 	    {
-		if (wp == awp)
+		যদি (wp == awp)
 		{
-		    if (tp != curtab)
+		    যদি (tp != curtab)
 			goto_tabpage_tp(tp, TRUE, TRUE);
 		    win_goto(awp);
-		    goto win_found;
+		    যাও win_found;
 		}
 	    }
 	}
 win_found:
 	--curbuf->b_nwindows;
 	// Remove the window and frame from the tree of frames.
-	(void)winframe_remove(curwin, &dummy, NULL, NULL);
-	win_remove(curwin, NULL);
+	(শূন্য)winframe_remove(curwin, &dummy, ফাঁকা, ফাঁকা);
+	win_remove(curwin, ফাঁকা);
 
 	// The window is marked as not used, but it is not freed, it can be
 	// used again.
 	aucmd_win[aco->use_aucmd_win_idx].auc_win_used = FALSE;
 	last_status(FALSE);	    // may need to remove last status line
 
-	if (!valid_tabpage_win(curtab))
+	যদি (!valid_tabpage_win(curtab))
 	    // no valid window in current tabpage
 	    close_tabpage(curtab);
 
@@ -1807,17 +1807,17 @@ win_found:
 	unblock_autocmds();
 
 	save_curwin = win_find_by_id(aco->save_curwin_id);
-	if (save_curwin != NULL)
+	যদি (save_curwin != ফাঁকা)
 	    curwin = save_curwin;
-	else
+	অন্যথা
 	    // Hmm, original window disappeared.  Just use the first one.
 	    curwin = firstwin;
-	curbuf = curwin->w_buffer;
+	curbuf = curwin->w_বাফার;
 #ifdef FEAT_JOB_CHANNEL
 	// May need to restore insert mode for a prompt buffer.
 	entering_window(curwin);
-	if (bt_prompt(curbuf))
-	    curbuf->b_prompt_insert = aco->save_prompt_insert;
+	যদি (bt_prompt(curbuf))
+	    curbuf->b_prompt_ঢোকাও = aco->save_prompt_ঢোকাও;
 #endif
 	prevwin = win_find_by_id(aco->save_prevwin_id);
 #ifdef FEAT_EVAL
@@ -1826,7 +1826,7 @@ win_found:
 #endif
 	// If :lcd has been used in the autocommand window, correct current
 	// directory before restoring tp_localdir and globaldir.
-	if (awp->w_localdir != NULL)
+	যদি (awp->w_localdir != ফাঁকা)
 	    win_fix_current_dir();
 	vim_free(curtab->tp_localdir);
 	curtab->tp_localdir = aco->tp_localdir;
@@ -1836,50 +1836,50 @@ win_found:
 	// the buffer contents may have changed
 	VIsual_active = aco->save_VIsual_active;
 	check_cursor();
-	if (curwin->w_topline > curbuf->b_ml.ml_line_count)
+	যদি (curwin->w_topline > curbuf->b_ml.ml_সারি_গুনতি)
 	{
-	    curwin->w_topline = curbuf->b_ml.ml_line_count;
+	    curwin->w_topline = curbuf->b_ml.ml_সারি_গুনতি;
 #ifdef FEAT_DIFF
 	    curwin->w_topfill = 0;
 #endif
 	}
-#if defined(FEAT_GUI)
-	if (gui.in_use)
+#যদি defined(FEAT_GUI)
+	যদি (gui.in_use)
 	{
 	    // Hide the scrollbars from the "awp" and update.
-	    gui_mch_enable_scrollbar(&awp->w_scrollbars[SBAR_LEFT], FALSE);
-	    gui_mch_enable_scrollbar(&awp->w_scrollbars[SBAR_RIGHT], FALSE);
+	    gui_mch_enable_scrollbar(&awp->w_scrollbars[SBAR_বাম], FALSE);
+	    gui_mch_enable_scrollbar(&awp->w_scrollbars[SBAR_ডান], FALSE);
 	    gui_may_update_scrollbars();
 	}
 #endif
     }
-    else
+    অন্যথা
     {
 	// Restore curwin.  Use the window ID, a window may have been closed
 	// and the memory re-used for another one.
 	save_curwin = win_find_by_id(aco->save_curwin_id);
-	if (save_curwin != NULL)
+	যদি (save_curwin != ফাঁকা)
 	{
 	    // Restore the buffer which was previously edited by curwin, if
 	    // it was changed, we are still the same window and the buffer is
 	    // valid.
-	    if (curwin->w_id == aco->new_curwin_id
+	    যদি (curwin->w_id == aco->new_curwin_id
 		    && curbuf != aco->new_curbuf.br_buf
 		    && bufref_valid(&aco->new_curbuf)
-		    && aco->new_curbuf.br_buf->b_ml.ml_mfp != NULL)
+		    && aco->new_curbuf.br_buf->b_ml.ml_mfp != ফাঁকা)
 	    {
-#if defined(FEAT_SYN_HL) || defined(FEAT_SPELL)
-		if (curwin->w_s == &curbuf->b_s)
+#যদি defined(FEAT_SYN_HL) || defined(FEAT_SPELL)
+		যদি (curwin->w_s == &curbuf->b_s)
 		    curwin->w_s = &aco->new_curbuf.br_buf->b_s;
 #endif
 		--curbuf->b_nwindows;
 		curbuf = aco->new_curbuf.br_buf;
-		curwin->w_buffer = curbuf;
+		curwin->w_বাফার = curbuf;
 		++curbuf->b_nwindows;
 	    }
 
 	    curwin = save_curwin;
-	    curbuf = curwin->w_buffer;
+	    curbuf = curwin->w_বাফার;
 	    prevwin = win_find_by_id(aco->save_prevwin_id);
 
 	    // In case the autocommand moves the cursor to a position that
@@ -1891,42 +1891,42 @@ win_found:
 
     VIsual_active = aco->save_VIsual_active;
     check_cursor();	    // just in case lines got deleted
-    if (VIsual_active)
+    যদি (VIsual_active)
 	check_pos(curbuf, &VIsual);
 }
 
-static int	autocmd_nested = FALSE;
+স্থির পূর্ণসংখ্যা	autocmd_nested = FALSE;
 
 /*
  * Execute autocommands for "event" and file name "fname".
  * Return TRUE if some commands were executed.
  */
-    int
+    পূর্ণসংখ্যা
 apply_autocmds(
     event_T	event,
     char_u	*fname,	    // NULL or empty means use actual file name
     char_u	*fname_io,  // fname to use for <afile> on cmdline
-    int		force,	    // when TRUE, ignore autocmd_busy
+    পূর্ণসংখ্যা		force,	    // when TRUE, ignore autocmd_busy
     buf_T	*buf)	    // buffer for <abuf>
 {
-    return apply_autocmds_group(event, fname, fname_io, force,
-						      AUGROUP_ALL, buf, NULL);
+    ফেরত apply_autocmds_group(event, fname, fname_io, force,
+						      AUGROUP_ALL, buf, ফাঁকা);
 }
 
 /*
  * Like apply_autocmds(), but with extra "eap" argument.  This takes care of
  * setting v:filearg.
  */
-    int
+    পূর্ণসংখ্যা
 apply_autocmds_exarg(
     event_T	event,
     char_u	*fname,
     char_u	*fname_io,
-    int		force,
+    পূর্ণসংখ্যা		force,
     buf_T	*buf,
     exarg_T	*eap)
 {
-    return apply_autocmds_group(event, fname, fname_io, force,
+    ফেরত apply_autocmds_group(event, fname, fname_io, force,
 						       AUGROUP_ALL, buf, eap);
 }
 
@@ -1936,203 +1936,203 @@ apply_autocmds_exarg(
  * conditional, no autocommands are executed.  If otherwise the autocommands
  * cause the script to be aborted, retval is set to FAIL.
  */
-    int
+    পূর্ণসংখ্যা
 apply_autocmds_retval(
     event_T	event,
     char_u	*fname,	    // NULL or empty means use actual file name
     char_u	*fname_io,  // fname to use for <afile> on cmdline
-    int		force,	    // when TRUE, ignore autocmd_busy
+    পূর্ণসংখ্যা		force,	    // when TRUE, ignore autocmd_busy
     buf_T	*buf,	    // buffer for <abuf>
-    int		*retval)    // pointer to caller's retval
+    পূর্ণসংখ্যা		*retval)    // pointer to caller's retval
 {
-    int		did_cmd;
+    পূর্ণসংখ্যা		did_cmd;
 
 #ifdef FEAT_EVAL
-    if (should_abort(*retval))
-	return FALSE;
+    যদি (should_abort(*retval))
+	ফেরত FALSE;
 #endif
 
     did_cmd = apply_autocmds_group(event, fname, fname_io, force,
-						      AUGROUP_ALL, buf, NULL);
-    if (did_cmd
+						      AUGROUP_ALL, buf, ফাঁকা);
+    যদি (did_cmd
 #ifdef FEAT_EVAL
 	    && aborting()
 #endif
 	    )
 	*retval = FAIL;
-    return did_cmd;
+    ফেরত did_cmd;
 }
 
 /*
  * Return TRUE when there is a CursorHold autocommand defined.
  */
-    static int
-has_cursorhold(void)
+    স্থির পূর্ণসংখ্যা
+has_cursorhold(শূন্য)
 {
-    return (first_autopat[(int)(get_real_state() == MODE_NORMAL_BUSY
-			    ? EVENT_CURSORHOLD : EVENT_CURSORHOLDI)] != NULL);
+    ফেরত (first_autopat[(পূর্ণসংখ্যা)(get_real_state() == MODE_NORMAL_BUSY
+			    ? EVENT_CURSORHOLD : EVENT_CURSORHOLDI)] != ফাঁকা);
 }
 
 /*
  * Return TRUE if the CursorHold event can be triggered.
  */
-    int
-trigger_cursorhold(void)
+    পূর্ণসংখ্যা
+trigger_cursorhold(শূন্য)
 {
-    int		state;
+    পূর্ণসংখ্যা		state;
 
-    if (!did_cursorhold
+    যদি (!did_cursorhold
 	    && has_cursorhold()
 	    && reg_recording == 0
 	    && typebuf.tb_len == 0
 	    && !ins_compl_active())
     {
 	state = get_real_state();
-	if (state == MODE_NORMAL_BUSY || (state & MODE_INSERT) != 0)
-	    return TRUE;
+	যদি (state == MODE_NORMAL_BUSY || (state & MODE_ঢোকাও) != 0)
+	    ফেরত TRUE;
     }
-    return FALSE;
+    ফেরত FALSE;
 }
 
 /*
  * Return TRUE when there is a WinResized autocommand defined.
  */
-    int
-has_winresized(void)
+    পূর্ণসংখ্যা
+has_winresized(শূন্য)
 {
-    return (first_autopat[(int)EVENT_WINRESIZED] != NULL);
+    ফেরত (first_autopat[(পূর্ণসংখ্যা)EVENT_WINRESIZED] != ফাঁকা);
 }
 
 /*
  * Return TRUE when there is a WinScrolled autocommand defined.
  */
-    int
-has_winscrolled(void)
+    পূর্ণসংখ্যা
+has_winscrolled(শূন্য)
 {
-    return (first_autopat[(int)EVENT_WINSCROLLED] != NULL);
+    ফেরত (first_autopat[(পূর্ণসংখ্যা)EVENT_WINSCROLLED] != ফাঁকা);
 }
 
 /*
  * Return TRUE when there is a CursorMoved autocommand defined.
  */
-    int
-has_cursormoved(void)
+    পূর্ণসংখ্যা
+has_cursormoved(শূন্য)
 {
-    return (first_autopat[(int)EVENT_CURSORMOVED] != NULL);
+    ফেরত (first_autopat[(পূর্ণসংখ্যা)EVENT_CURSORMOVED] != ফাঁকা);
 }
 
 /*
  * Return TRUE when there is a CursorMovedI autocommand defined.
  */
-    int
-has_cursormovedI(void)
+    পূর্ণসংখ্যা
+has_cursormovedI(শূন্য)
 {
-    return (first_autopat[(int)EVENT_CURSORMOVEDI] != NULL);
+    ফেরত (first_autopat[(পূর্ণসংখ্যা)EVENT_CURSORMOVEDI] != ফাঁকা);
 }
 
 /*
  * Return TRUE when there is a TextChanged autocommand defined.
  */
-    int
-has_textchanged(void)
+    পূর্ণসংখ্যা
+has_textchanged(শূন্য)
 {
-    return (first_autopat[(int)EVENT_TEXTCHANGED] != NULL);
+    ফেরত (first_autopat[(পূর্ণসংখ্যা)EVENT_TEXTCHANGED] != ফাঁকা);
 }
 
 /*
  * Return TRUE when there is a TextChangedI autocommand defined.
  */
-    int
-has_textchangedI(void)
+    পূর্ণসংখ্যা
+has_textchangedI(শূন্য)
 {
-    return (first_autopat[(int)EVENT_TEXTCHANGEDI] != NULL);
+    ফেরত (first_autopat[(পূর্ণসংখ্যা)EVENT_TEXTCHANGEDI] != ফাঁকা);
 }
 
 /*
  * Return TRUE when there is a TextChangedP autocommand defined.
  */
-    int
-has_textchangedP(void)
+    পূর্ণসংখ্যা
+has_textchangedP(শূন্য)
 {
-    return (first_autopat[(int)EVENT_TEXTCHANGEDP] != NULL);
+    ফেরত (first_autopat[(পূর্ণসংখ্যা)EVENT_TEXTCHANGEDP] != ফাঁকা);
 }
 
 /*
  * Return TRUE when there is an InsertCharPre autocommand defined.
  */
-    int
-has_insertcharpre(void)
+    পূর্ণসংখ্যা
+has_insertcharpre(শূন্য)
 {
-    return (first_autopat[(int)EVENT_INSERTCHARPRE] != NULL);
+    ফেরত (first_autopat[(পূর্ণসংখ্যা)EVENT_INSERTCHARPRE] != ফাঁকা);
 }
 
 /*
  * Return TRUE when there is an KeyInputPre autocommand defined.
  */
-    int
-has_keyinputpre(void)
+    পূর্ণসংখ্যা
+has_keyinputpre(শূন্য)
 {
-    return (first_autopat[(int)EVENT_KEYINPUTPRE] != NULL);
+    ফেরত (first_autopat[(পূর্ণসংখ্যা)EVENT_KEYINPUTPRE] != ফাঁকা);
 }
 
 /*
  * Return TRUE when there is an CmdUndefined autocommand defined.
  */
-    int
-has_cmdundefined(void)
+    পূর্ণসংখ্যা
+has_cmdundefined(শূন্য)
 {
-    return (first_autopat[(int)EVENT_CMDUNDEFINED] != NULL);
+    ফেরত (first_autopat[(পূর্ণসংখ্যা)EVENT_CMDUNDEFINED] != ফাঁকা);
 }
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 
 /*
  * Return TRUE when there is a TextPutPost autocommand defined.
  */
-    int
-has_textputpost(void)
+    পূর্ণসংখ্যা
+has_textputpost(শূন্য)
 {
-    return (first_autopat[(int)EVENT_TEXTPUTPOST] != NULL);
+    ফেরত (first_autopat[(পূর্ণসংখ্যা)EVENT_TEXTPUTPOST] != ফাঁকা);
 }
 
 /*
  * Return TRUE when there is a TextPutPre autocommand defined.
  */
-    int
-has_textputpre(void)
+    পূর্ণসংখ্যা
+has_textputpre(শূন্য)
 {
-    return (first_autopat[(int)EVENT_TEXTPUTPRE] != NULL);
+    ফেরত (first_autopat[(পূর্ণসংখ্যা)EVENT_TEXTPUTPRE] != ফাঁকা);
 }
 
 /*
  * Return TRUE when there is a TextYankPost autocommand defined.
  */
-    int
-has_textyankpost(void)
+    পূর্ণসংখ্যা
+has_textyankpost(শূন্য)
 {
-    return (first_autopat[(int)EVENT_TEXTYANKPOST] != NULL);
+    ফেরত (first_autopat[(পূর্ণসংখ্যা)EVENT_TEXTYANKPOST] != ফাঁকা);
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 /*
  * Return TRUE when there is a CompleteChanged autocommand defined.
  */
-    int
-has_completechanged(void)
+    পূর্ণসংখ্যা
+has_completechanged(শূন্য)
 {
-    return (first_autopat[(int)EVENT_COMPLETECHANGED] != NULL);
+    ফেরত (first_autopat[(পূর্ণসংখ্যা)EVENT_COMPLETECHANGED] != ফাঁকা);
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 /*
  * Return TRUE when there is a ModeChanged autocommand defined.
  */
-    int
-has_modechanged(void)
+    পূর্ণসংখ্যা
+has_modechanged(শূন্য)
 {
-    return (first_autopat[(int)EVENT_MODECHANGED] != NULL);
+    ফেরত (first_autopat[(পূর্ণসংখ্যা)EVENT_MODECHANGED] != ফাঁকা);
 }
 #endif
 
@@ -2140,29 +2140,29 @@ has_modechanged(void)
  * Execute autocommands for "event" and file name "fname".
  * Return TRUE if some commands were executed.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 apply_autocmds_group(
     event_T	event,
     char_u	*fname,	     // NULL or empty means use actual file name
     char_u	*fname_io,   // fname to use for <afile> on cmdline, NULL means
 			     // use fname
-    int		force,	     // when TRUE, ignore autocmd_busy
-    int		group,	     // group ID, or AUGROUP_ALL
+    পূর্ণসংখ্যা		force,	     // when TRUE, ignore autocmd_busy
+    পূর্ণসংখ্যা		group,	     // group ID, or AUGROUP_ALL
     buf_T	*buf,	     // buffer for <abuf>
     exarg_T	*eap UNUSED) // command arguments
 {
-    char_u	*sfname = NULL;	// short file name
-    char_u	*tail;
-    int		save_changed;
+    char_u	*sfname = ফাঁকা;	// short file name
+    char_u	*লেজ;
+    পূর্ণসংখ্যা		save_changed;
     buf_T	*old_curbuf;
-    int		retval = FALSE;
+    পূর্ণসংখ্যা		retval = FALSE;
     char_u	*save_autocmd_fname;
-    int		save_autocmd_fname_full;
-    int		save_autocmd_bufnr;
+    পূর্ণসংখ্যা		save_autocmd_fname_full;
+    পূর্ণসংখ্যা		save_autocmd_bufnr;
     char_u	*save_autocmd_match;
-    int		save_autocmd_busy;
-    int		save_autocmd_nested;
-    static int	nesting = 0;
+    পূর্ণসংখ্যা		save_autocmd_busy;
+    পূর্ণসংখ্যা		save_autocmd_nested;
+    স্থির পূর্ণসংখ্যা	nesting = 0;
     AutoPatCmd_T patcmd;
     AutoPat	*ap;
     sctx_T	save_current_sctx;
@@ -2171,95 +2171,95 @@ apply_autocmds_group(
     char_u	*save_cmdarg;
     long	save_cmdbang;
 #endif
-    static int	filechangeshell_busy = FALSE;
+    স্থির পূর্ণসংখ্যা	filechangeshell_busy = FALSE;
 #ifdef FEAT_PROFILE
     proftime_T	wait_time;
 #endif
-    int		did_save_redobuff = FALSE;
+    পূর্ণসংখ্যা		did_save_redobuff = FALSE;
     save_redo_T	save_redo;
-    int		save_KeyTyped = KeyTyped;
+    পূর্ণসংখ্যা		save_চাবি_Typed = চাবি_Typed;
     ESTACK_CHECK_DECLARATION;
 
     /*
      * Quickly return if there are no autocommands for this event or
      * autocommands are blocked.
      */
-    if (event == NUM_EVENTS || first_autopat[(int)event] == NULL
+    যদি (event == অঙ্ক_EVENTS || first_autopat[(পূর্ণসংখ্যা)event] == ফাঁকা
 	    || autocmd_blocked > 0)
-	goto BYPASS_AU;
+	যাও BYPASS_AU;
 
     /*
      * When autocommands are busy, new autocommands are only executed when
      * explicitly enabled with the "nested" flag.
      */
-    if (autocmd_busy && !(force || autocmd_nested))
-	goto BYPASS_AU;
+    যদি (autocmd_busy && !(force || autocmd_nested))
+	যাও BYPASS_AU;
 
 #ifdef FEAT_EVAL
     /*
      * Quickly return when immediately aborting on error, or when an interrupt
      * occurred or an exception was thrown but not caught.
      */
-    if (aborting())
-	goto BYPASS_AU;
+    যদি (aborting())
+	যাও BYPASS_AU;
 #endif
 
     /*
      * FileChangedShell never nests, because it can create an endless loop.
      */
-    if (filechangeshell_busy && (event == EVENT_FILECHANGEDSHELL
+    যদি (filechangeshell_busy && (event == EVENT_FILECHANGEDSHELL
 				      || event == EVENT_FILECHANGEDSHELLPOST))
-	goto BYPASS_AU;
+	যাও BYPASS_AU;
 
     /*
      * Ignore events in 'eventignore'.
      */
-    if (event_ignored(event, p_ei))
-	goto BYPASS_AU;
+    যদি (event_ignored(event, p_ei))
+	যাও BYPASS_AU;
 
-    int win_ignore = FALSE;
+    পূর্ণসংখ্যা win_ignore = FALSE;
     // If event is allowed in 'eventignorewin', check if curwin or all windows
     // into "buf" are ignoring the event.
-    if (buf == curbuf && event_tab[event].key <= 0)
+    যদি (buf == curbuf && event_tab[event].চাবি <= 0)
 	win_ignore = event_ignored(event, curwin->w_p_eiw);
-    else if (buf != NULL && event_tab[event].key <= 0 && buf->b_nwindows > 0)
+    অন্যথা যদি (buf != ফাঁকা && event_tab[event].চাবি <= 0 && buf->b_nwindows > 0)
     {
 	tabpage_T *tp;
 	win_T *wp;
 
 	win_ignore = TRUE;
 	FOR_ALL_TAB_WINDOWS(tp, wp)
-	    if (wp->w_buffer == buf && !event_ignored(event, wp->w_p_eiw))
+	    যদি (wp->w_বাফার == buf && !event_ignored(event, wp->w_p_eiw))
 	    {
 		win_ignore = FALSE;
-		break;
+		বিরতি;
 	    }
     }
-    if (win_ignore)
-	goto BYPASS_AU;
+    যদি (win_ignore)
+	যাও BYPASS_AU;
 
     /*
      * Allow nesting of autocommands, but restrict the depth, because it's
      * possible to create an endless loop.
      */
-    if (nesting == 10)
+    যদি (nesting == 10)
     {
 	emsg(_(e_autocommand_nesting_too_deep));
-	goto BYPASS_AU;
+	যাও BYPASS_AU;
     }
 
     /*
      * Check if these autocommands are disabled.  Used when doing ":all" or
      * ":ball".
      */
-    if (       (autocmd_no_enter
+    যদি (       (autocmd_no_enter
 		&& (event == EVENT_WINENTER || event == EVENT_BUFENTER))
 	    || (autocmd_no_leave
 		&& (event == EVENT_WINLEAVE || event == EVENT_BUFLEAVE)))
-	goto BYPASS_AU;
+	যাও BYPASS_AU;
 
-    if (event == EVENT_CMDLINECHANGED)
-	++aucmd_cmdline_changed_count;
+    যদি (event == EVENT_CMDLINECHANGED)
+	++aucmd_cmdline_changed_গুনতি;
 
     /*
      * Save the autocmd_* variables and info about the current buffer.
@@ -2278,32 +2278,32 @@ apply_autocmds_group(
      * Make a copy to avoid that changing a buffer name or directory makes it
      * invalid.
      */
-    if (fname_io == NULL)
+    যদি (fname_io == ফাঁকা)
     {
-	if (event == EVENT_COLORSCHEME || event == EVENT_COLORSCHEMEPRE
+	যদি (event == EVENT_COLORSCHEME || event == EVENT_COLORSCHEMEPRE
 						 || event == EVENT_OPTIONSET
 						 || event == EVENT_MODECHANGED
 						 || event == EVENT_TERMRESPONSEALL)
-	    autocmd_fname = NULL;
-	else if (fname != NULL && !ends_excmd(*fname))
+	    autocmd_fname = ফাঁকা;
+	অন্যথা যদি (fname != ফাঁকা && !ends_excmd(*fname))
 	    autocmd_fname = fname;
-	else if (buf != NULL)
+	অন্যথা যদি (buf != ফাঁকা)
 	    autocmd_fname = buf->b_ffname;
-	else
-	    autocmd_fname = NULL;
+	অন্যথা
+	    autocmd_fname = ফাঁকা;
     }
-    else
+    অন্যথা
 	autocmd_fname = fname_io;
-    if (autocmd_fname != NULL)
+    যদি (autocmd_fname != ফাঁকা)
 	autocmd_fname = vim_strsave(autocmd_fname);
     autocmd_fname_full = FALSE; // call FullName_save() later
 
     /*
      * Set the buffer number to be used for <abuf>.
      */
-    if (buf == NULL)
+    যদি (buf == ফাঁকা)
 	autocmd_bufnr = 0;
-    else
+    অন্যথা
 	autocmd_bufnr = buf->b_fnum;
 
     /*
@@ -2311,36 +2311,36 @@ apply_autocmds_group(
      * Always use the full path of the file name to match with, in case
      * "allow_dirs" is set.
      */
-    if (fname == NULL || *fname == NUL)
+    যদি (fname == ফাঁকা || *fname == NUL)
     {
-	if (buf == NULL)
-	    fname = NULL;
-	else
+	যদি (buf == ফাঁকা)
+	    fname = ফাঁকা;
+	অন্যথা
 	{
 #ifdef FEAT_SYN_HL
-	    if (event == EVENT_SYNTAX)
+	    যদি (event == EVENT_SYNTAX)
 		fname = buf->b_p_syn;
-	    else
+	    অন্যথা
 #endif
-		if (event == EVENT_FILETYPE)
+		যদি (event == EVENT_FILETYPE)
 		    fname = buf->b_p_ft;
-		else
+		অন্যথা
 		{
-		    if (buf->b_sfname != NULL)
+		    যদি (buf->b_sfname != ফাঁকা)
 			sfname = vim_strsave(buf->b_sfname);
 		    fname = buf->b_ffname;
 		}
 	}
-	if (fname == NULL)
+	যদি (fname == ফাঁকা)
 	    fname = (char_u *)"";
 	fname = vim_strsave(fname);	// make a copy, so we can change it
     }
-    else
+    অন্যথা
     {
 	sfname = vim_strsave(fname);
 	// Don't try expanding FileType, Syntax, FuncUndefined, WindowID,
 	// ColorScheme, QuickFixCmd*, DirChanged and similar.
-	if (event == EVENT_FILETYPE
+	যদি (event == EVENT_FILETYPE
 		|| event == EVENT_SYNTAX
 		|| event == EVENT_CMDLINECHANGED
 		|| event == EVENT_CMDLINEENTER
@@ -2372,14 +2372,14 @@ apply_autocmds_group(
 	    fname = vim_strsave(fname);
 	    autocmd_fname_full = TRUE; // don't expand it later
 	}
-	else
+	অন্যথা
 	    fname = FullName_save(fname, FALSE);
     }
-    if (fname == NULL)	    // out of memory
+    যদি (fname == ফাঁকা)	    // out of memory
     {
 	vim_free(sfname);
 	retval = FALSE;
-	goto BYPASS_AU;
+	যাও BYPASS_AU;
     }
 
 #ifdef BACKSLASH_IN_FILENAME
@@ -2387,14 +2387,14 @@ apply_autocmds_group(
      * Replace all backslashes with forward slashes.  This makes the
      * autocommand patterns portable between Unix and MS-DOS.
      */
-    if (sfname != NULL)
+    যদি (sfname != ফাঁকা)
 	forward_slash(sfname);
     forward_slash(fname);
 #endif
 
 #ifdef VMS
     // remove version for correct match
-    if (sfname != NULL)
+    যদি (sfname != ফাঁকা)
 	vms_remove_version(sfname);
     vms_remove_version(fname);
 #endif
@@ -2409,14 +2409,14 @@ apply_autocmds_group(
     ++RedrawingDisabled;
 
     // name and lnum are filled in later
-    estack_push(ETYPE_AUCMD, NULL, 0);
+    estack_ঠেলো(ETYPE_AUCMD, ফাঁকা, 0);
     ESTACK_CHECK_SETUP;
 
     save_current_sctx = current_sctx;
 
 #ifdef FEAT_EVAL
 # ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
+    যদি (do_profiling == PROF_YES)
 	prof_child_enter(&wait_time); // doesn't count for the caller itself
 # endif
 
@@ -2427,10 +2427,10 @@ apply_autocmds_group(
     /*
      * When starting to execute autocommands, save the search patterns.
      */
-    if (!autocmd_busy)
+    যদি (!autocmd_busy)
     {
-	save_search_patterns();
-	if (!ins_compl_active())
+	save_অনুসন্ধান_patterns();
+	যদি (!ins_compl_active())
 	{
 	    saveRedobuff(&save_redo);
 	    did_save_redobuff = TRUE;
@@ -2446,88 +2446,88 @@ apply_autocmds_group(
     ++nesting;		// see matching decrement below
 
     // Remember that FileType was triggered.  Used for did_filetype().
-    if (event == EVENT_FILETYPE)
+    যদি (event == EVENT_FILETYPE)
 	curbuf->b_did_filetype = true;
 
-    tail = gettail(fname);
+    লেজ = gettail(fname);
 
     // Find first autocommand that matches
     CLEAR_FIELD(patcmd);
-    patcmd.curpat = first_autopat[(int)event];
+    patcmd.curpat = first_autopat[(পূর্ণসংখ্যা)event];
     patcmd.group = group;
     patcmd.fname = fname;
     patcmd.sfname = sfname;
-    patcmd.tail = tail;
+    patcmd.লেজ = লেজ;
     patcmd.event = event;
     patcmd.arg_bufnr = autocmd_bufnr;
-    auto_next_pat(&patcmd, FALSE);
+    auto_পরবর্তী_pat(&patcmd, FALSE);
 
     // found one, start executing the autocommands
-    if (patcmd.curpat != NULL)
+    যদি (patcmd.curpat != ফাঁকা)
     {
 	// add to active_apc_list
-	patcmd.next = active_apc_list;
+	patcmd.পরবর্তী = active_apc_list;
 	active_apc_list = &patcmd;
 
 #ifdef FEAT_EVAL
 	// set v:cmdarg (only when there is a matching pattern)
 	save_cmdbang = (long)get_vim_var_nr(VV_CMDBANG);
-	if (eap != NULL)
+	যদি (eap != ফাঁকা)
 	{
-	    save_cmdarg = set_cmdarg(eap, NULL);
+	    save_cmdarg = set_cmdarg(eap, ফাঁকা);
 	    set_vim_var_nr(VV_CMDBANG, (long)eap->forceit);
 	}
-	else
-	    save_cmdarg = NULL;	// avoid gcc warning
+	অন্যথা
+	    save_cmdarg = ফাঁকা;	// avoid gcc warning
 #endif
 	retval = TRUE;
 	// mark the last pattern, to avoid an endless loop when more patterns
 	// are added when executing autocommands
-	for (ap = patcmd.curpat; ap->next != NULL; ap = ap->next)
+	জন্য (ap = patcmd.curpat; ap->পরবর্তী != ফাঁকা; ap = ap->পরবর্তী)
 	    ap->last = FALSE;
 	ap->last = TRUE;
 
 	// Make sure cursor and topline are valid.  The first time the current
 	// values are saved, restored by reset_lnums().  When nested only the
 	// values are corrected when needed.
-	if (nesting == 1)
+	যদি (nesting == 1)
 	    check_lnums(TRUE);
-	else
+	অন্যথা
 	    check_lnums_nested(TRUE);
 
-	int save_did_emsg = did_emsg;
-	int save_ex_pressedreturn = get_pressedreturn();
+	পূর্ণসংখ্যা save_did_emsg = did_emsg;
+	পূর্ণসংখ্যা save_ex_pressedreturn = get_pressedreturn();
 
-	do_cmdline(NULL, getnextac, (void *)&patcmd,
+	do_cmdline(ফাঁকা, getnextac, (শূন্য *)&patcmd,
 				     DOCMD_NOWAIT|DOCMD_VERBOSE|DOCMD_REPEAT);
 
 	did_emsg += save_did_emsg;
 	set_pressedreturn(save_ex_pressedreturn);
 
-	if (nesting == 1)
+	যদি (nesting == 1)
 	    // restore cursor and topline, unless they were changed
 	    reset_lnums();
 
 #ifdef FEAT_EVAL
-	if (eap != NULL)
+	যদি (eap != ফাঁকা)
 	{
-	    (void)set_cmdarg(NULL, save_cmdarg);
+	    (শূন্য)set_cmdarg(ফাঁকা, save_cmdarg);
 	    set_vim_var_nr(VV_CMDBANG, save_cmdbang);
 	}
 #endif
 	// delete from active_apc_list
-	if (active_apc_list == &patcmd)	    // just in case
-	    active_apc_list = patcmd.next;
+	যদি (active_apc_list == &patcmd)	    // just in case
+	    active_apc_list = patcmd.পরবর্তী;
     }
 
-    if (RedrawingDisabled > 0)
+    যদি (RedrawingDisabled > 0)
 	--RedrawingDisabled;
     autocmd_busy = save_autocmd_busy;
     filechangeshell_busy = FALSE;
     autocmd_nested = save_autocmd_nested;
     vim_free(SOURCING_NAME);
     ESTACK_CHECK_NOW;
-    estack_pop();
+    estack_বের_করো();
     vim_free(autocmd_fname);
     autocmd_fname = save_autocmd_fname;
     autocmd_fname_full = save_autocmd_fname_full;
@@ -2537,11 +2537,11 @@ apply_autocmds_group(
 #ifdef FEAT_EVAL
     restore_funccal();
 # ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
+    যদি (do_profiling == PROF_YES)
 	prof_child_exit(&wait_time);
 # endif
 #endif
-    KeyTyped = save_KeyTyped;
+    চাবি_Typed = save_চাবি_Typed;
     vim_free(fname);
     vim_free(sfname);
     --nesting;		// see matching increment above
@@ -2551,22 +2551,22 @@ apply_autocmds_group(
      * the redo buffer.  Free any buffers in the au_pending_free_buf list and
      * free any windows in the au_pending_free_win list.
      */
-    if (!autocmd_busy)
+    যদি (!autocmd_busy)
     {
-	restore_search_patterns();
-	if (did_save_redobuff)
+	restore_অনুসন্ধান_patterns();
+	যদি (did_save_redobuff)
 	    restoreRedobuff(&save_redo);
 	curbuf->b_did_filetype = false;
-	while (au_pending_free_buf != NULL)
+	যখন (au_pending_free_buf != ফাঁকা)
 	{
-	    buf_T *b = au_pending_free_buf->b_next;
+	    buf_T *b = au_pending_free_buf->b_পরবর্তী;
 
 	    vim_free(au_pending_free_buf);
 	    au_pending_free_buf = b;
 	}
-	while (au_pending_free_win != NULL)
+	যখন (au_pending_free_win != ফাঁকা)
 	{
-	    win_T *w = au_pending_free_win->w_next;
+	    win_T *w = au_pending_free_win->w_পরবর্তী;
 
 	    vim_free(au_pending_free_win);
 	    au_pending_free_win = w;
@@ -2577,14 +2577,14 @@ apply_autocmds_group(
      * Some events don't set or reset the Changed flag.
      * Check if still in the same buffer!
      */
-    if (curbuf == old_curbuf
+    যদি (curbuf == old_curbuf
 	    && (event == EVENT_BUFREADPOST
 		|| event == EVENT_BUFWRITEPOST
 		|| event == EVENT_FILEAPPENDPOST
 		|| event == EVENT_VIMLEAVE
 		|| event == EVENT_VIMLEAVEPRE))
     {
-	if (curbuf->b_changed != save_changed)
+	যদি (curbuf->b_changed != save_changed)
 	    need_maketitle = TRUE;
 	curbuf->b_changed = save_changed;
     }
@@ -2594,34 +2594,34 @@ apply_autocmds_group(
 BYPASS_AU:
     // When wiping out a buffer make sure all its buffer-local autocommands
     // are deleted.
-    if (event == EVENT_BUFWIPEOUT && buf != NULL)
+    যদি (event == EVENT_BUFWIPEOUT && buf != ফাঁকা)
 	aubuflocal_remove(buf);
 
-    if (retval == OK && event == EVENT_FILETYPE)
+    যদি (retval == OK && event == EVENT_FILETYPE)
 	curbuf->b_au_did_filetype = true;
 
-    return retval;
+    ফেরত retval;
 }
 
 #ifdef FEAT_EVAL
-static char_u	*old_termresponse = NULL;
-static char_u	*old_termu7resp = NULL;
-static char_u	*old_termblinkresp = NULL;
-static char_u	*old_termrbgresp = NULL;
-static char_u	*old_termrfgresp = NULL;
-static char_u	*old_termstyleresp = NULL;
+স্থির char_u	*old_termresponse = ফাঁকা;
+স্থির char_u	*old_termu7resp = ফাঁকা;
+স্থির char_u	*old_termblinkresp = ফাঁকা;
+স্থির char_u	*old_termrbgresp = ফাঁকা;
+স্থির char_u	*old_termrfgresp = ফাঁকা;
+স্থির char_u	*old_termstyleresp = ফাঁকা;
 #endif
 
 /*
  * Block triggering autocommands until unblock_autocmd() is called.
  * Can be used recursively, so long as it's symmetric.
  */
-    void
-block_autocmds(void)
+    শূন্য
+block_autocmds(শূন্য)
 {
 #ifdef FEAT_EVAL
     // Remember the value of v:termresponse.
-    if (autocmd_blocked == 0)
+    যদি (autocmd_blocked == 0)
     {
 	old_termresponse = get_vim_var_str(VV_TERMRESPONSE);
 	old_termu7resp = get_vim_var_str(VV_TERMU7RESP);
@@ -2634,8 +2634,8 @@ block_autocmds(void)
     ++autocmd_blocked;
 }
 
-    void
-unblock_autocmds(void)
+    শূন্য
+unblock_autocmds(শূন্য)
 {
     --autocmd_blocked;
 
@@ -2643,88 +2643,88 @@ unblock_autocmds(void)
     // When v:termresponse, etc, were set while autocommands were blocked,
     // trigger the autocommands now.  Esp. useful when executing a shell
     // command during startup (vimdiff).
-    if (autocmd_blocked == 0)
+    যদি (autocmd_blocked == 0)
     {
-	if (get_vim_var_str(VV_TERMRESPONSE) != old_termresponse)
+	যদি (get_vim_var_str(VV_TERMRESPONSE) != old_termresponse)
 	{
-	    apply_autocmds(EVENT_TERMRESPONSE, NULL, NULL, FALSE, curbuf);
-	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"version", NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_TERMRESPONSE, ফাঁকা, ফাঁকা, FALSE, curbuf);
+	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"version", ফাঁকা, FALSE, curbuf);
 	}
-	if (get_vim_var_str(VV_TERMU7RESP) != old_termu7resp)
+	যদি (get_vim_var_str(VV_TERMU7RESP) != old_termu7resp)
 	{
-	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"ambiguouswidth", NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"ambiguouswidth", ফাঁকা, FALSE, curbuf);
 	}
-	if (get_vim_var_str(VV_TERMBLINKRESP) != old_termblinkresp)
+	যদি (get_vim_var_str(VV_TERMBLINKRESP) != old_termblinkresp)
 	{
-	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"cursorblink", NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"cursorblink", ফাঁকা, FALSE, curbuf);
 	}
-	if (get_vim_var_str(VV_TERMRBGRESP) != old_termrbgresp)
+	যদি (get_vim_var_str(VV_TERMRBGRESP) != old_termrbgresp)
 	{
-	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"background", NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"background", ফাঁকা, FALSE, curbuf);
 	}
-	if (get_vim_var_str(VV_TERMRFGRESP) != old_termrfgresp)
+	যদি (get_vim_var_str(VV_TERMRFGRESP) != old_termrfgresp)
 	{
-	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"foreground", NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"foreground", ফাঁকা, FALSE, curbuf);
 	}
-	if (get_vim_var_str(VV_TERMSTYLERESP) != old_termstyleresp)
+	যদি (get_vim_var_str(VV_TERMSTYLERESP) != old_termstyleresp)
 	{
-	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"cursorshape", NULL, FALSE, curbuf);
+	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"cursorshape", ফাঁকা, FALSE, curbuf);
 	}
     }
 #endif
 }
 
-    int
-is_autocmd_blocked(void)
+    পূর্ণসংখ্যা
+is_autocmd_blocked(শূন্য)
 {
-    return autocmd_blocked != 0;
+    ফেরত autocmd_blocked != 0;
 }
 
 /*
  * Find next autocommand pattern that matches.
  */
-    static void
-auto_next_pat(
+    স্থির শূন্য
+auto_পরবর্তী_pat(
     AutoPatCmd_T *apc,
-    int		stop_at_last)	    // stop when 'last' flag is set
+    পূর্ণসংখ্যা		stop_at_last)	    // stop when 'last' flag is set
 {
     AutoPat	*ap;
     estack_T	*entry;
 
-    entry = ((estack_T *)exestack.ga_data) + exestack.ga_len - 1;
+    entry = ((estack_T *)exestack.ga_তথ্য) + exestack.ga_len - 1;
 
     // Clear the exestack entry for this ETYPE_AUCMD entry.
     VIM_CLEAR(entry->es_name);
-    entry->es_info.aucmd = NULL;
+    entry->es_info.aucmd = ফাঁকা;
 
-    for (ap = apc->curpat; ap != NULL && !got_int; ap = ap->next)
+    জন্য (ap = apc->curpat; ap != ফাঁকা && !got_int; ap = ap->পরবর্তী)
     {
-	apc->curpat = NULL;
+	apc->curpat = ফাঁকা;
 
 	// Only use a pattern when it has not been removed, has commands and
 	// the group matches. For buffer-local autocommands only check the
 	// buffer number.
-	if (ap->pat != NULL && ap->cmds != NULL
+	যদি (ap->pat != ফাঁকা && ap->cmds != ফাঁকা
 		&& (apc->group == AUGROUP_ALL || apc->group == ap->group))
 	{
 	    // execution-condition
-	    if (ap->buflocal_nr == 0
-		    ? (match_file_pat(NULL, &ap->reg_prog, apc->fname,
-				      apc->sfname, apc->tail, ap->allow_dirs))
+	    যদি (ap->buflocal_nr == 0
+		    ? (match_file_pat(ফাঁকা, &ap->reg_prog, apc->fname,
+				      apc->sfname, apc->লেজ, ap->allow_dirs))
 		    : ap->buflocal_nr == apc->arg_bufnr)
 	    {
 		string_T    *event_name;
-		char	    *fmt;
+		অক্ষর	    *fmt;
 		char_u	    *namep;
 		AutoCmd	    *cp;
 
 		event_name = event_nr2name(apc->event);
 		fmt = _("%s Autocommands for \"%s\"");
-		namep = alloc(STRLEN(fmt) + event_name->length + ap->patlen + 1);
-		if (namep != NULL)
+		namep = alloc(STRLEN(fmt) + event_name->দৈর্ঘ্য + ap->patlen + 1);
+		যদি (namep != ফাঁকা)
 		{
-		    sprintf((char *)namep, fmt, (char *)event_name->string, (char *)ap->pat);
-		    if (p_verbose >= 8)
+		    sprintf((অক্ষর *)namep, fmt, (অক্ষর *)event_name->string, (অক্ষর *)ap->pat);
+		    যদি (p_verbose >= 8)
 		    {
 			verbose_enter();
 			smsg(_("Executing %s"), namep);
@@ -2739,27 +2739,27 @@ auto_next_pat(
 		apc->curpat = ap;
 		apc->nextcmd = ap->cmds;
 		// mark last command
-		for (cp = ap->cmds; cp->next != NULL; cp = cp->next)
+		জন্য (cp = ap->cmds; cp->পরবর্তী != ফাঁকা; cp = cp->পরবর্তী)
 		    cp->last = FALSE;
 		cp->last = TRUE;
 	    }
-	    line_breakcheck();
-	    if (apc->curpat != NULL)	    // found a match
-		break;
+	    সারি_breakcheck();
+	    যদি (apc->curpat != ফাঁকা)	    // found a match
+		বিরতি;
 	}
-	if (stop_at_last && ap->last)
-	    break;
+	যদি (stop_at_last && ap->last)
+	    বিরতি;
     }
 }
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 /*
  * Get the script context where autocommand "acp" is defined.
  */
     sctx_T *
 acp_script_ctx(AutoPatCmd_T *acp)
 {
-    return &acp->script_ctx;
+    ফেরত &acp->script_ctx;
 }
 #endif
 
@@ -2770,9 +2770,9 @@ acp_script_ctx(AutoPatCmd_T *acp)
  */
     char_u *
 getnextac(
-	int c UNUSED,
-	void *cookie,
-	int indent UNUSED,
+	পূর্ণসংখ্যা c UNUSED,
+	শূন্য *cookie,
+	পূর্ণসংখ্যা indent UNUSED,
 	getline_opt_T options UNUSED)
 {
     AutoPatCmd_T    *acp = (AutoPatCmd_T *)cookie;
@@ -2780,74 +2780,74 @@ getnextac(
     AutoCmd	    *ac;
 
     // Can be called again after returning the last line.
-    if (acp->curpat == NULL)
-	return NULL;
+    যদি (acp->curpat == ফাঁকা)
+	ফেরত ফাঁকা;
 
     // repeat until we find an autocommand to execute
-    for (;;)
+    জন্য (;;)
     {
 	// skip removed commands
-	while (acp->nextcmd != NULL && acp->nextcmd->cmd == NULL)
-	    if (acp->nextcmd->last)
-		acp->nextcmd = NULL;
-	    else
-		acp->nextcmd = acp->nextcmd->next;
+	যখন (acp->nextcmd != ফাঁকা && acp->nextcmd->cmd == ফাঁকা)
+	    যদি (acp->nextcmd->last)
+		acp->nextcmd = ফাঁকা;
+	    অন্যথা
+		acp->nextcmd = acp->nextcmd->পরবর্তী;
 
-	if (acp->nextcmd != NULL)
-	    break;
+	যদি (acp->nextcmd != ফাঁকা)
+	    বিরতি;
 
 	// at end of commands, find next pattern that matches
-	if (acp->curpat->last)
-	    acp->curpat = NULL;
-	else
-	    acp->curpat = acp->curpat->next;
-	if (acp->curpat != NULL)
-	    auto_next_pat(acp, TRUE);
-	if (acp->curpat == NULL)
-	    return NULL;
+	যদি (acp->curpat->last)
+	    acp->curpat = ফাঁকা;
+	অন্যথা
+	    acp->curpat = acp->curpat->পরবর্তী;
+	যদি (acp->curpat != ফাঁকা)
+	    auto_পরবর্তী_pat(acp, TRUE);
+	যদি (acp->curpat == ফাঁকা)
+	    ফেরত ফাঁকা;
     }
 
     ac = acp->nextcmd;
 
-    if (p_verbose >= 9)
+    যদি (p_verbose >= 9)
     {
 	verbose_enter_scroll();
 	smsg(_("autocommand %s"), ac->cmd);
-	msg_puts("\n");   // don't overwrite this either
+	বার্তা_puts("\n");   // don't overwrite this either
 	verbose_leave_scroll();
     }
     retval = vim_strsave(ac->cmd);
     // Remove one-shot ("once") autocmd in anticipation of its execution.
-    if (ac->once)
+    যদি (ac->once)
 	au_del_cmd(ac);
     autocmd_nested = ac->nested;
     current_sctx = ac->script_ctx;
     acp->script_ctx = current_sctx;
-    if (ac->last)
-	acp->nextcmd = NULL;
-    else
-	acp->nextcmd = ac->next;
-    return retval;
+    যদি (ac->last)
+	acp->nextcmd = ফাঁকা;
+    অন্যথা
+	acp->nextcmd = ac->পরবর্তী;
+    ফেরত retval;
 }
 
 /*
  * Implementation of has_autocmd() and has_autocmd_fullname().
  * When "is_full" is TRUE "sfname" is already a full path name.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 has_autocmd_ext(event_T event, char_u *sfname, buf_T *buf, bool is_full)
 {
     AutoPat	*ap;
     char_u	*fname;
-    char_u	*tail = gettail(sfname);
-    int		retval = FALSE;
+    char_u	*লেজ = gettail(sfname);
+    পূর্ণসংখ্যা		retval = FALSE;
 
-    if (first_autopat[(int)event] == NULL)
-	return FALSE;
+    যদি (first_autopat[(পূর্ণসংখ্যা)event] == ফাঁকা)
+	ফেরত FALSE;
 
     fname = is_full ? vim_strsave(sfname) : FullName_save(sfname, FALSE);
-    if (fname == NULL)
-	return FALSE;
+    যদি (fname == ফাঁকা)
+	ফেরত FALSE;
 
 #ifdef BACKSLASH_IN_FILENAME
     /*
@@ -2855,21 +2855,21 @@ has_autocmd_ext(event_T event, char_u *sfname, buf_T *buf, bool is_full)
      * autocommand patterns portable between Unix and MS-DOS.
      */
     sfname = vim_strsave(sfname);
-    if (sfname != NULL)
+    যদি (sfname != ফাঁকা)
 	forward_slash(sfname);
     forward_slash(fname);
 #endif
 
     FOR_ALL_AUTOCMD_PATTERNS(event, ap)
-	if (ap->pat != NULL && ap->cmds != NULL
+	যদি (ap->pat != ফাঁকা && ap->cmds != ফাঁকা
 	      && (ap->buflocal_nr == 0
-		? match_file_pat(NULL, &ap->reg_prog,
-					  fname, sfname, tail, ap->allow_dirs)
-		: buf != NULL && ap->buflocal_nr == buf->b_fnum
+		? match_file_pat(ফাঁকা, &ap->reg_prog,
+					  fname, sfname, লেজ, ap->allow_dirs)
+		: buf != ফাঁকা && ap->buflocal_nr == buf->b_fnum
 	   ))
 	{
 	    retval = TRUE;
-	    break;
+	    বিরতি;
 	}
 
     vim_free(fname);
@@ -2877,7 +2877,7 @@ has_autocmd_ext(event_T event, char_u *sfname, buf_T *buf, bool is_full)
     vim_free(sfname);
 #endif
 
-    return retval;
+    ফেরত retval;
 }
 
 /*
@@ -2885,10 +2885,10 @@ has_autocmd_ext(event_T event, char_u *sfname, buf_T *buf, bool is_full)
  * To account for buffer-local autocommands, function needs to know
  * in which buffer the file will be opened.
  */
-    int
+    পূর্ণসংখ্যা
 has_autocmd(event_T event, char_u *sfname, buf_T *buf)
 {
-    return has_autocmd_ext(event, sfname, buf, false);
+    ফেরত has_autocmd_ext(event, sfname, buf, false);
 }
 
 /*
@@ -2896,10 +2896,10 @@ has_autocmd(event_T event, char_u *sfname, buf_T *buf)
  * returned by fix_fname().  Avoids expanding it again, which is slow on
  * MS-Windows.
  */
-    int
+    পূর্ণসংখ্যা
 has_autocmd_fullname(event_T event, char_u *fname, buf_T *buf)
 {
-    return has_autocmd_ext(event, fname, buf, true);
+    ফেরত has_autocmd_ext(event, fname, buf, true);
 }
 
 /*
@@ -2907,104 +2907,104 @@ has_autocmd_fullname(event_T event, char_u *fname, buf_T *buf)
  * names.
  */
     char_u *
-get_augroup_name(expand_T *xp UNUSED, int idx)
+get_augroup_name(expand_T *xp UNUSED, পূর্ণসংখ্যা idx)
 {
-    if (idx == augroups.ga_len)		// add "END" add the end
-	return (char_u *)"END";
-    if (idx < 0 || idx >= augroups.ga_len)	// end of list
-	return NULL;
-    if (AUGROUP_NAME(idx) == NULL || AUGROUP_NAME(idx) == get_deleted_augroup())
+    যদি (idx == augroups.ga_len)		// add "END" add the end
+	ফেরত (char_u *)"END";
+    যদি (idx < 0 || idx >= augroups.ga_len)	// end of list
+	ফেরত ফাঁকা;
+    যদি (AUGROUP_NAME(idx) == ফাঁকা || AUGROUP_NAME(idx) == get_deleted_augroup())
 	// skip deleted entries
-	return (char_u *)"";
-    return AUGROUP_NAME(idx);		// return a name
+	ফেরত (char_u *)"";
+    ফেরত AUGROUP_NAME(idx);		// return a name
 }
 
-static int include_groups = FALSE;
+স্থির পূর্ণসংখ্যা include_groups = FALSE;
 
     char_u  *
 set_context_in_autocmd(
     expand_T	*xp,
     char_u	*arg,
-    int		doautocmd)	// TRUE for :doauto*, FALSE for :autocmd
+    পূর্ণসংখ্যা		doautocmd)	// TRUE for :doauto*, FALSE for :autocmd
 {
     char_u	*p;
-    int		group;
+    পূর্ণসংখ্যা		group;
 
     // check for a group name, skip it if present
     include_groups = FALSE;
     p = arg;
     group = au_get_grouparg(&arg);
-    if (group == AUGROUP_ERROR)
-	return NULL;
+    যদি (group == AUGROUP_ERROR)
+	ফেরত ফাঁকা;
     // If there only is a group name that's what we expand.
-    if (*arg == NUL && group != AUGROUP_ALL && !VIM_ISWHITE(arg[-1]))
+    যদি (*arg == NUL && group != AUGROUP_ALL && !VIM_ISWHITE(arg[-1]))
     {
 	arg = p;
 	group = AUGROUP_ALL;
     }
 
     // skip over event name
-    for (p = arg; *p != NUL && !VIM_ISWHITE(*p); ++p)
-	if (*p == ',')
+    জন্য (p = arg; *p != NUL && !VIM_ISWHITE(*p); ++p)
+	যদি (*p == ',')
 	    arg = p + 1;
-    if (*p == NUL)
+    যদি (*p == NUL)
     {
-	if (group == AUGROUP_ALL)
+	যদি (group == AUGROUP_ALL)
 	    include_groups = TRUE;
 	xp->xp_context = EXPAND_EVENTS;	    // expand event name
 	xp->xp_pattern = arg;
-	return NULL;
+	ফেরত ফাঁকা;
     }
 
     // skip over pattern
     arg = skipwhite(p);
-    while (*arg && (!VIM_ISWHITE(*arg) || arg[-1] == '\\'))
+    যখন (*arg && (!VIM_ISWHITE(*arg) || arg[-1] == '\\'))
 	arg++;
-    if (*arg)
+    যদি (*arg)
     {
 	// skip over "++once", "++nested" and "nested"
 	arg = skipwhite(arg);
-	for (int i = 0; i < 2; i++)
+	জন্য (পূর্ণসংখ্যা i = 0; i < 2; i++)
 	{
-	    if (STRNCMP(arg, "++once", 6) == 0 && VIM_ISWHITE(arg[6]))
+	    যদি (STRNCMP(arg, "++once", 6) == 0 && VIM_ISWHITE(arg[6]))
 		arg = skipwhite(arg + 6);
-	    if (STRNCMP(arg, "++nested", 8) == 0 && VIM_ISWHITE(arg[8]))
+	    যদি (STRNCMP(arg, "++nested", 8) == 0 && VIM_ISWHITE(arg[8]))
 		arg = skipwhite(arg + 8);
-	    if (!in_vim9script() && STRNCMP(arg, "nested", 6) == 0
+	    যদি (!in_vim9script() && STRNCMP(arg, "nested", 6) == 0
 						       && VIM_ISWHITE(arg[6]))
 		arg = skipwhite(arg + 6);
 	}
-	return arg;			    // expand (next) command
+	ফেরত arg;			    // expand (next) command
     }
 
-    if (doautocmd)
+    যদি (doautocmd)
 	xp->xp_context = EXPAND_FILES;	    // expand file names
-    else
+    অন্যথা
 	xp->xp_context = EXPAND_NOTHING;    // pattern is not expanded
-    return NULL;
+    ফেরত ফাঁকা;
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the list of event names.
  */
     char_u *
-get_event_name(expand_T *xp UNUSED, int idx)
+get_event_name(expand_T *xp UNUSED, পূর্ণসংখ্যা idx)
 {
-    int i;
+    পূর্ণসংখ্যা i;
 
-    if (idx < augroups.ga_len)		// First list group names, if wanted
+    যদি (idx < augroups.ga_len)		// First list group names, if wanted
     {
-	if (!include_groups || AUGROUP_NAME(idx) == NULL
+	যদি (!include_groups || AUGROUP_NAME(idx) == ফাঁকা
 				 || AUGROUP_NAME(idx) == get_deleted_augroup())
-	    return (char_u *)"";	// skip deleted entries
-	return AUGROUP_NAME(idx);	// return a name
+	    ফেরত (char_u *)"";	// skip deleted entries
+	ফেরত AUGROUP_NAME(idx);	// return a name
     }
 
     i = idx - augroups.ga_len;
-    if (i < 0 || i >= NUM_EVENTS)
-	return NULL;
+    যদি (i < 0 || i >= অঙ্ক_EVENTS)
+	ফেরত ফাঁকা;
 
-    return event_tab[i].value.string;
+    ফেরত event_tab[i].মান.string;
 }
 
 /*
@@ -3012,45 +3012,45 @@ get_event_name(expand_T *xp UNUSED, int idx)
  * include groups.
  */
     char_u *
-get_event_name_no_group(expand_T *xp UNUSED, int idx, int win)
+get_event_name_no_group(expand_T *xp UNUSED, পূর্ণসংখ্যা idx, পূর্ণসংখ্যা win)
 {
-    if (idx < 0 || idx >= NUM_EVENTS)
-	return NULL;
+    যদি (idx < 0 || idx >= অঙ্ক_EVENTS)
+	ফেরত ফাঁকা;
 
-    if (!win)
-	return event_tab[idx].value.string;
+    যদি (!win)
+	ফেরত event_tab[idx].মান.string;
 
     // Need to check subset of allowed values for 'eventignorewin'.
-    int j = 0;
-    for (int i = 0; i < NUM_EVENTS; ++i)
+    পূর্ণসংখ্যা j = 0;
+    জন্য (পূর্ণসংখ্যা i = 0; i < অঙ্ক_EVENTS; ++i)
     {
-	j += event_tab[i].key <= 0;
-	if (j == idx + 1)
-	    return event_tab[i].value.string;
+	j += event_tab[i].চাবি <= 0;
+	যদি (j == idx + 1)
+	    ফেরত event_tab[i].মান.string;
     }
 
-    return NULL;
+    ফেরত ফাঁকা;
 }
 
 /*
  * Return TRUE when there is a TabClosedPre autocommand defined.
  */
-    int
-has_tabclosedpre(void)
+    পূর্ণসংখ্যা
+has_tabclosedpre(শূন্য)
 {
-    return (first_autopat[(int)EVENT_TABCLOSEDPRE] != NULL);
+    ফেরত (first_autopat[(পূর্ণসংখ্যা)EVENT_TABCLOSEDPRE] != ফাঁকা);
 }
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 /*
  * Return TRUE if autocmd is supported.
  */
-    int
+    পূর্ণসংখ্যা
 autocmd_supported(char_u *name)
 {
     char_u *p;
 
-    return (event_name2nr(name, &p) != NUM_EVENTS);
+    ফেরত (event_name2nr(name, &p) != অঙ্ক_EVENTS);
 }
 
 /*
@@ -3065,48 +3065,48 @@ autocmd_supported(char_u *name)
  *	exists("#Event") or
  *	exists("#Event#pat")
  */
-    int
+    পূর্ণসংখ্যা
 au_exists(char_u *arg)
 {
     char_u	*arg_save;
-    char_u	*pattern = NULL;
+    char_u	*pattern = ফাঁকা;
     char_u	*event_name;
     char_u	*p;
     event_T	event;
     AutoPat	*ap;
-    buf_T	*buflocal_buf = NULL;
-    int		group;
-    int		retval = FALSE;
+    buf_T	*buflocal_buf = ফাঁকা;
+    পূর্ণসংখ্যা		group;
+    পূর্ণসংখ্যা		retval = FALSE;
 
     // Make a copy so that we can change the '#' chars to a NUL.
     arg_save = vim_strsave(arg);
-    if (arg_save == NULL)
-	return FALSE;
+    যদি (arg_save == ফাঁকা)
+	ফেরত FALSE;
     p = vim_strchr(arg_save, '#');
-    if (p != NULL)
+    যদি (p != ফাঁকা)
 	*p++ = NUL;
 
     // First, look for an autocmd group name
     group = au_find_group(arg_save);
-    if (group == AUGROUP_ERROR)
+    যদি (group == AUGROUP_ERROR)
     {
 	// Didn't match a group name, assume the first argument is an event.
 	group = AUGROUP_ALL;
 	event_name = arg_save;
     }
-    else
+    অন্যথা
     {
-	if (p == NULL)
+	যদি (p == ফাঁকা)
 	{
 	    // "Group": group name is present and it's recognized
 	    retval = TRUE;
-	    goto theend;
+	    যাও theend;
 	}
 
 	// Must be "Group#Event" or "Group#Event#pat".
 	event_name = p;
 	p = vim_strchr(event_name, '#');
-	if (p != NULL)
+	যদি (p != ফাঁকা)
 	    *p++ = NUL;	    // "Group#Event#pat"
     }
 
@@ -3116,148 +3116,148 @@ au_exists(char_u *arg)
     event = event_name2nr(event_name, &p);
 
     // return FALSE if the event name is not recognized
-    if (event == NUM_EVENTS)
-	goto theend;
+    যদি (event == অঙ্ক_EVENTS)
+	যাও theend;
 
     // Find the first autocommand for this event.
     // If there isn't any, return FALSE;
     // If there is one and no pattern given, return TRUE;
-    ap = first_autopat[(int)event];
-    if (ap == NULL)
-	goto theend;
+    ap = first_autopat[(পূর্ণসংখ্যা)event];
+    যদি (ap == ফাঁকা)
+	যাও theend;
 
     // if pattern is "<buffer>", special handling is needed which uses curbuf
     // for pattern "<buffer=N>, fnamecmp() will work fine
-    if (pattern != NULL && STRICMP(pattern, "<buffer>") == 0)
+    যদি (pattern != ফাঁকা && STRICMP(pattern, "<buffer>") == 0)
 	buflocal_buf = curbuf;
 
     // Check if there is an autocommand with the given pattern.
-    for ( ; ap != NULL; ap = ap->next)
+    জন্য ( ; ap != ফাঁকা; ap = ap->পরবর্তী)
 	// only use a pattern when it has not been removed and has commands.
 	// For buffer-local autocommands, fnamecmp() works fine.
-	if (ap->pat != NULL && ap->cmds != NULL
+	যদি (ap->pat != ফাঁকা && ap->cmds != ফাঁকা
 	    && (group == AUGROUP_ALL || ap->group == group)
-	    && (pattern == NULL
-		|| (buflocal_buf == NULL
+	    && (pattern == ফাঁকা
+		|| (buflocal_buf == ফাঁকা
 		    ? fnamecmp(ap->pat, pattern) == 0
 		    : ap->buflocal_nr == buflocal_buf->b_fnum)))
 	{
 	    retval = TRUE;
-	    break;
+	    বিরতি;
 	}
 
 theend:
     vim_free(arg_save);
-    return retval;
+    ফেরত retval;
 }
 
 /*
  * autocmd_add() and autocmd_delete() functions
  */
-    static void
-autocmd_add_or_delete(typval_T *argvars, typval_T *rettv, int delete)
+    স্থির শূন্য
+autocmd_add_or_delete(typval_T *argvars, typval_T *rettv, পূর্ণসংখ্যা delete)
 {
     list_T	*aucmd_list;
     listitem_T	*li;
     dict_T	*event_dict;
     dictitem_T	*di;
-    char_u	*event_name = NULL;
+    char_u	*event_name = ফাঁকা;
     list_T	*event_list;
     listitem_T	*eli;
     event_T	event;
-    char_u	*group_name = NULL;
-    int		group;
-    char_u	*pat = NULL;
+    char_u	*group_name = ফাঁকা;
+    পূর্ণসংখ্যা		group;
+    char_u	*pat = ফাঁকা;
     list_T	*pat_list;
     listitem_T	*pli;
-    char_u	*cmd = NULL;
+    char_u	*cmd = ফাঁকা;
     char_u	*end;
-    int		once;
-    int		nested;
-    int		replace;		// replace the cmd for a group/event
-    int		retval = VVAL_TRUE;
-    int		save_augroup = current_augroup;
+    পূর্ণসংখ্যা		once;
+    পূর্ণসংখ্যা		nested;
+    পূর্ণসংখ্যা		replace;		// replace the cmd for a group/event
+    পূর্ণসংখ্যা		retval = VVAL_TRUE;
+    পূর্ণসংখ্যা		save_augroup = current_augroup;
 
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = VVAL_FALSE;
+    rettv->vval.v_সংখ্যা = VVAL_FALSE;
 
-    if (check_restricted() || check_secure())
-	return;
+    যদি (check_restricted() || check_secure())
+	ফেরত;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    যদি (check_for_list_arg(argvars, 0) == FAIL)
+	ফেরত;
 
     aucmd_list = argvars[0].vval.v_list;
-    if (aucmd_list == NULL)
-	return;
+    যদি (aucmd_list == ফাঁকা)
+	ফেরত;
 
-    FOR_ALL_LIST_ITEMS(aucmd_list, li)
+    FOR_ALL_LIST_বস্তুসমূহ(aucmd_list, li)
     {
 	VIM_CLEAR(group_name);
 	VIM_CLEAR(cmd);
-	event_name = NULL;
-	event_list = NULL;
-	pat = NULL;
-	pat_list = NULL;
+	event_name = ফাঁকা;
+	event_list = ফাঁকা;
+	pat = ফাঁকা;
+	pat_list = ফাঁকা;
 
-	if (li->li_tv.v_type != VAR_DICT)
-	    continue;
+	যদি (li->li_tv.v_type != VAR_DICT)
+	    চালু;
 
 	event_dict = li->li_tv.vval.v_dict;
-	if (event_dict == NULL)
-	    continue;
+	যদি (event_dict == ফাঁকা)
+	    চালু;
 
 	di = dict_find(event_dict, (char_u *)"event", -1);
-	if (di != NULL)
+	যদি (di != ফাঁকা)
 	{
-	    if (di->di_tv.v_type == VAR_STRING)
+	    যদি (di->di_tv.v_type == VAR_STRING)
 	    {
 		event_name = di->di_tv.vval.v_string;
-		if (event_name == NULL)
+		যদি (event_name == ফাঁকা)
 		{
 		    emsg(_(e_string_required));
-		    continue;
+		    চালু;
 		}
 	    }
-	    else if (di->di_tv.v_type == VAR_LIST)
+	    অন্যথা যদি (di->di_tv.v_type == VAR_LIST)
 	    {
 		event_list = di->di_tv.vval.v_list;
-		if (event_list == NULL)
+		যদি (event_list == ফাঁকা)
 		{
 		    emsg(_(e_list_required));
-		    continue;
+		    চালু;
 		}
 	    }
-	    else
+	    অন্যথা
 	    {
 		emsg(_(e_string_or_list_expected));
-		continue;
+		চালু;
 	    }
 	}
 
 	group_name = dict_get_string(event_dict, "group", TRUE);
-	if (group_name == NULL || *group_name == NUL)
+	যদি (group_name == ফাঁকা || *group_name == NUL)
 	    // if the autocmd group name is not specified, then use the current
 	    // autocmd group
 	    group = current_augroup;
-	else
+	অন্যথা
 	{
 	    group = au_find_group(group_name);
-	    if (group == AUGROUP_ERROR)
+	    যদি (group == AUGROUP_ERROR)
 	    {
-		if (delete)
+		যদি (delete)
 		{
 		    semsg(_(e_no_such_group_str), group_name);
 		    retval = VVAL_FALSE;
-		    break;
+		    বিরতি;
 		}
 		// group is not found, create it now
 		group = au_new_group(group_name);
-		if (group == AUGROUP_ERROR)
+		যদি (group == AUGROUP_ERROR)
 		{
 		    semsg(_(e_no_such_group_str), group_name);
 		    retval = VVAL_FALSE;
-		    break;
+		    বিরতি;
 		}
 
 		current_augroup = group;
@@ -3266,47 +3266,47 @@ autocmd_add_or_delete(typval_T *argvars, typval_T *rettv, int delete)
 
 	// if a buffer number is specified, then generate a pattern of the form
 	// "<buffer=n>. Otherwise, use the pattern supplied by the user.
-	if (dict_has_key(event_dict, "bufnr"))
+	যদি (dict_has_চাবি(event_dict, "bufnr"))
 	{
 	    varnumber_T	bnum;
 
-	    bnum = dict_get_number_def(event_dict, "bufnr", -1);
-	    if (bnum == -1)
-		continue;
+	    bnum = dict_get_সংখ্যা_def(event_dict, "bufnr", -1);
+	    যদি (bnum == -1)
+		চালু;
 
-	    vim_snprintf((char *)IObuff, IOSIZE, "<buffer=%d>", (int)bnum);
+	    vim_snprintf((অক্ষর *)IObuff, IOSIZE, "<buffer=%d>", (পূর্ণসংখ্যা)bnum);
 	    pat = IObuff;
 	}
-	else
+	অন্যথা
 	{
 	    di = dict_find(event_dict, (char_u *)"pattern", -1);
-	    if (di != NULL)
+	    যদি (di != ফাঁকা)
 	    {
-		if (di->di_tv.v_type == VAR_STRING)
+		যদি (di->di_tv.v_type == VAR_STRING)
 		{
 		    pat = di->di_tv.vval.v_string;
-		    if (pat == NULL)
+		    যদি (pat == ফাঁকা)
 		    {
 			emsg(_(e_string_required));
-			continue;
+			চালু;
 		    }
 		}
-		else if (di->di_tv.v_type == VAR_LIST)
+		অন্যথা যদি (di->di_tv.v_type == VAR_LIST)
 		{
 		    pat_list = di->di_tv.vval.v_list;
-		    if (pat_list == NULL)
+		    যদি (pat_list == ফাঁকা)
 		    {
 			emsg(_(e_list_required));
-			continue;
+			চালু;
 		    }
 		}
-		else
+		অন্যথা
 		{
 		    emsg(_(e_string_or_list_expected));
-		    continue;
+		    চালু;
 		}
 	    }
-	    else if (delete)
+	    অন্যথা যদি (delete)
 		pat = (char_u *)"";
 	}
 
@@ -3317,100 +3317,100 @@ autocmd_add_or_delete(typval_T *argvars, typval_T *rettv, int delete)
 	replace = dict_get_bool(event_dict, "replace", FALSE);
 
 	cmd = dict_get_string(event_dict, "cmd", TRUE);
-	if (cmd == NULL)
+	যদি (cmd == ফাঁকা)
 	{
-	    if (delete)
+	    যদি (delete)
 		cmd = vim_strsave((char_u *)"");
-	    else
-		continue;
+	    অন্যথা
+		চালু;
 	}
 
-	if (delete && (event_name == NULL
+	যদি (delete && (event_name == ফাঁকা
 		    || (event_name[0] == '*' && event_name[1] == NUL)))
 	{
 	    // if the event name is not specified or '*', delete all the events
-	    for (event = (event_T)0; (int)event < NUM_EVENTS;
-		    event = (event_T)((int)event + 1))
+	    জন্য (event = (event_T)0; (পূর্ণসংখ্যা)event < অঙ্ক_EVENTS;
+		    event = (event_T)((পূর্ণসংখ্যা)event + 1))
 	    {
-		if (do_autocmd_event(event, pat, once, nested, cmd, delete,
+		যদি (do_autocmd_event(event, pat, once, nested, cmd, delete,
 							group, 0) == FAIL)
 		{
 		    retval = VVAL_FALSE;
-		    break;
+		    বিরতি;
 		}
 	    }
 	}
-	else
+	অন্যথা
 	{
-	    char_u *p = NULL;
+	    char_u *p = ফাঁকা;
 
-	    eli = NULL;
-	    end = NULL;
-	    while (TRUE)
+	    eli = ফাঁকা;
+	    end = ফাঁকা;
+	    যখন (TRUE)
 	    {
-		if (event_list != NULL)
+		যদি (event_list != ফাঁকা)
 		{
-		    if (eli == NULL)
+		    যদি (eli == ফাঁকা)
 			eli = event_list->lv_first;
-		    else
-			eli = eli->li_next;
-		    if (eli == NULL)
-			break;
-		    if (eli->li_tv.v_type != VAR_STRING
-			    || (p = eli->li_tv.vval.v_string) == NULL)
+		    অন্যথা
+			eli = eli->li_পরবর্তী;
+		    যদি (eli == ফাঁকা)
+			বিরতি;
+		    যদি (eli->li_tv.v_type != VAR_STRING
+			    || (p = eli->li_tv.vval.v_string) == ফাঁকা)
 		    {
 			emsg(_(e_string_required));
-			break;
+			বিরতি;
 		    }
 		}
-		else
+		অন্যথা
 		{
-		    if (p == NULL)
+		    যদি (p == ফাঁকা)
 			p = event_name;
-		    if (p == NULL || *p == NUL)
-			break;
+		    যদি (p == ফাঁকা || *p == NUL)
+			বিরতি;
 		}
 
 		event = event_name2nr(p, &end);
-		if (event == NUM_EVENTS || *end != NUL)
+		যদি (event == অঙ্ক_EVENTS || *end != NUL)
 		{
 		    // this also catches something following a valid event name
 		    semsg(_(e_no_such_event_str), p);
 		    retval = VVAL_FALSE;
-		    break;
+		    বিরতি;
 		}
-		if (pat != NULL)
+		যদি (pat != ফাঁকা)
 		{
-		    if (do_autocmd_event(event, pat, once, nested, cmd,
+		    যদি (do_autocmd_event(event, pat, once, nested, cmd,
 				delete | replace, group, 0) == FAIL)
 		    {
 			retval = VVAL_FALSE;
-			break;
+			বিরতি;
 		    }
 		}
-		else if (pat_list != NULL)
+		অন্যথা যদি (pat_list != ফাঁকা)
 		{
-		    FOR_ALL_LIST_ITEMS(pat_list, pli)
+		    FOR_ALL_LIST_বস্তুসমূহ(pat_list, pli)
 		    {
-			if (pli->li_tv.v_type != VAR_STRING
-				|| pli->li_tv.vval.v_string == NULL)
+			যদি (pli->li_tv.v_type != VAR_STRING
+				|| pli->li_tv.vval.v_string == ফাঁকা)
 			{
 			    emsg(_(e_string_required));
-			    continue;
+			    চালু;
 			}
-			if (do_autocmd_event(event,
+			যদি (do_autocmd_event(event,
 				    pli->li_tv.vval.v_string, once, nested,
 				    cmd, delete | replace, group, 0) ==
 				FAIL)
 			{
 			    retval = VVAL_FALSE;
-			    break;
+			    বিরতি;
 			}
 		    }
-		    if (retval == VVAL_FALSE)
-			break;
+		    যদি (retval == VVAL_FALSE)
+			বিরতি;
 		}
-		if (event_name != NULL)
+		যদি (event_name != ফাঁকা)
 		    p = end;
 	    }
 	}
@@ -3418,10 +3418,10 @@ autocmd_add_or_delete(typval_T *argvars, typval_T *rettv, int delete)
 	// if only the autocmd group name is specified for delete and the
 	// autocmd event, pattern and cmd are not specified, then delete the
 	// autocmd group.
-	if (delete && group_name != NULL &&
-		(event_name == NULL || event_name[0] == NUL)
-		&& (pat == NULL || pat[0] == NUL)
-		&& (cmd == NULL || cmd[0] == NUL))
+	যদি (delete && group_name != ফাঁকা &&
+		(event_name == ফাঁকা || event_name[0] == NUL)
+		&& (pat == ফাঁকা || pat[0] == NUL)
+		&& (cmd == ফাঁকা || cmd[0] == NUL))
 	    au_del_group(group_name);
     }
 
@@ -3429,13 +3429,13 @@ autocmd_add_or_delete(typval_T *argvars, typval_T *rettv, int delete)
     VIM_CLEAR(cmd);
 
     current_augroup = save_augroup;
-    rettv->vval.v_number = retval;
+    rettv->vval.v_সংখ্যা = retval;
 }
 
 /*
  * autocmd_add() function
  */
-    void
+    শূন্য
 f_autocmd_add(typval_T *argvars, typval_T *rettv)
 {
     autocmd_add_or_delete(argvars, rettv, FALSE);
@@ -3444,7 +3444,7 @@ f_autocmd_add(typval_T *argvars, typval_T *rettv)
 /*
  * autocmd_delete() function
  */
-    void
+    শূন্য
 f_autocmd_delete(typval_T *argvars, typval_T *rettv)
 {
     autocmd_add_or_delete(argvars, rettv, TRUE);
@@ -3454,97 +3454,97 @@ f_autocmd_delete(typval_T *argvars, typval_T *rettv)
  * autocmd_get() function
  * Returns a List of autocmds.
  */
-    void
+    শূন্য
 f_autocmd_get(typval_T *argvars, typval_T *rettv)
 {
-    event_T	event_arg = NUM_EVENTS;
+    event_T	event_arg = অঙ্ক_EVENTS;
     event_T	event;
     AutoPat	*ap;
     AutoCmd	*ac;
     list_T	*event_list;
     dict_T	*event_dict;
-    char_u	*pat = NULL;
-    char_u	*name = NULL;
-    int		group = AUGROUP_ALL;
+    char_u	*pat = ফাঁকা;
+    char_u	*name = ফাঁকা;
+    পূর্ণসংখ্যা		group = AUGROUP_ALL;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
-    if (check_for_opt_dict_arg(argvars, 0) == FAIL)
-	return;
+    যদি (rettv_list_alloc(rettv) == FAIL)
+	ফেরত;
+    যদি (check_for_opt_dict_arg(argvars, 0) == FAIL)
+	ফেরত;
 
-    if (argvars[0].v_type == VAR_DICT)
+    যদি (argvars[0].v_type == VAR_DICT)
     {
 	// return only the autocmds in the specified group
-	if (dict_has_key(argvars[0].vval.v_dict, "group"))
+	যদি (dict_has_চাবি(argvars[0].vval.v_dict, "group"))
 	{
 	    name = dict_get_string(argvars[0].vval.v_dict, "group", TRUE);
-	    if (name == NULL)
-		return;
+	    যদি (name == ফাঁকা)
+		ফেরত;
 
-	    if (*name == NUL)
+	    যদি (*name == NUL)
 		group = AUGROUP_DEFAULT;
-	    else
+	    অন্যথা
 	    {
 		group = au_find_group(name);
-		if (group == AUGROUP_ERROR)
+		যদি (group == AUGROUP_ERROR)
 		{
 		    semsg(_(e_no_such_group_str), name);
 		    vim_free(name);
-		    return;
+		    ফেরত;
 		}
 	    }
 	    vim_free(name);
 	}
 
 	// return only the autocmds for the specified event
-	if (dict_has_key(argvars[0].vval.v_dict, "event"))
+	যদি (dict_has_চাবি(argvars[0].vval.v_dict, "event"))
 	{
 	    name = dict_get_string(argvars[0].vval.v_dict, "event", TRUE);
-	    if (name == NULL)
-		return;
+	    যদি (name == ফাঁকা)
+		ফেরত;
 
-	    if (name[0] == '*' && name[1] == NUL)
-		event_arg = NUM_EVENTS;
-	    else
+	    যদি (name[0] == '*' && name[1] == NUL)
+		event_arg = অঙ্ক_EVENTS;
+	    অন্যথা
 	    {
 		keyvalue_T target;
 		keyvalue_T *entry;
 
-		target.key = 0;
-		target.value.string = name;
-		target.value.length = STRLEN(target.value.string);
+		target.চাবি = 0;
+		target.মান.string = name;
+		target.মান.দৈর্ঘ্য = STRLEN(target.মান.string);
 		entry = (keyvalue_T *)bsearch(&target, &event_tab,
-		    NUM_EVENTS, sizeof(event_tab[0]), cmp_keyvalue_value_ni);
-		if (entry == NULL)
+		    অঙ্ক_EVENTS, আকার(event_tab[0]), cmp_keyvalue_মান_ni);
+		যদি (entry == ফাঁকা)
 		{
 		    semsg(_(e_no_such_event_str), name);
 		    vim_free(name);
-		    return;
+		    ফেরত;
 		}
-		event_arg = (event_T)abs(entry->key);
+		event_arg = (event_T)abs(entry->চাবি);
 	    }
 	    vim_free(name);
 	}
 
 	// return only the autocmds for the specified pattern
-	if (dict_has_key(argvars[0].vval.v_dict, "pattern"))
+	যদি (dict_has_চাবি(argvars[0].vval.v_dict, "pattern"))
 	{
 	    pat = dict_get_string(argvars[0].vval.v_dict, "pattern", TRUE);
-	    if (pat == NULL)
-		return;
+	    যদি (pat == ফাঁকা)
+		ফেরত;
 	}
     }
 
     event_list = rettv->vval.v_list;
 
     // iterate through all the autocmd events
-    for (event = (event_T)0; (int)event < NUM_EVENTS;
-	    event = (event_T)((int)event + 1))
+    জন্য (event = (event_T)0; (পূর্ণসংখ্যা)event < অঙ্ক_EVENTS;
+	    event = (event_T)((পূর্ণসংখ্যা)event + 1))
     {
 	string_T    *event_name;
 
-	if (event_arg != NUM_EVENTS && event != event_arg)
-	    continue;
+	যদি (event_arg != অঙ্ক_EVENTS && event != event_arg)
+	    চালু;
 
 	event_name = event_nr2name(event);
 
@@ -3553,39 +3553,39 @@ f_autocmd_get(typval_T *argvars, typval_T *rettv)
 	{
 	    string_T	group_name;
 
-	    if (ap->pat == NULL)		// pattern has been removed
-		continue;
+	    যদি (ap->pat == ফাঁকা)		// pattern has been removed
+		চালু;
 
-	    if (group != AUGROUP_ALL && group != ap->group)
-		continue;
+	    যদি (group != AUGROUP_ALL && group != ap->group)
+		চালু;
 
-	    if (pat != NULL && STRCMP(pat, ap->pat) != 0)
-		continue;
+	    যদি (pat != ফাঁকা && STRCMP(pat, ap->pat) != 0)
+		চালু;
 
-	    group_name.string = get_augroup_name(NULL, ap->group);
-	    if (group_name.string == NULL)
+	    group_name.string = get_augroup_name(ফাঁকা, ap->group);
+	    যদি (group_name.string == ফাঁকা)
 		STR_LITERAL_SET(group_name, "");
-	    else
-		group_name.length = STRLEN(group_name.string);
+	    অন্যথা
+		group_name.দৈর্ঘ্য = STRLEN(group_name.string);
 
 	    // iterate through all the commands for this pattern and add one
 	    // item for each cmd.
-	    for (ac = ap->cmds; ac != NULL; ac = ac->next)
+	    জন্য (ac = ap->cmds; ac != ফাঁকা; ac = ac->পরবর্তী)
 	    {
 		event_dict = dict_alloc();
-		if (event_dict == NULL
+		যদি (event_dict == ফাঁকা
 			|| list_append_dict(event_list, event_dict) == FAIL)
 		{
 		    vim_free(pat);
-		    return;
+		    ফেরত;
 		}
 
-		if (dict_add_string_len(event_dict, "event",
-			event_name->string, (int)event_name->length) == FAIL
+		যদি (dict_add_string_len(event_dict, "event",
+			event_name->string, (পূর্ণসংখ্যা)event_name->দৈর্ঘ্য) == FAIL
 			|| dict_add_string_len(event_dict, "group",
-			    group_name.string, (int)group_name.length) == FAIL
+			    group_name.string, (পূর্ণসংখ্যা)group_name.দৈর্ঘ্য) == FAIL
 			|| (ap->buflocal_nr != 0
-				&& (dict_add_number(event_dict, "bufnr",
+				&& (dict_add_সংখ্যা(event_dict, "bufnr",
 						    ap->buflocal_nr) == FAIL))
 			|| dict_add_string(event_dict, "pattern",
 							      ap->pat) == FAIL
@@ -3595,7 +3595,7 @@ f_autocmd_get(typval_T *argvars, typval_T *rettv)
 							   ac->nested) == FAIL)
 		{
 		    vim_free(pat);
-		    return;
+		    ফেরত;
 		}
 	    }
 	}

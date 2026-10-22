@@ -15,7 +15,7 @@
 # include <float.h>
 #endif
 
-typedef enum {
+প্রকারলেখ গণনা {
     ISN_EXEC,	    // execute Ex command line isn_arg.string
     ISN_EXECCONCAT, // execute Ex command from isn_arg.number items on stack
     ISN_EXEC_SPLIT, // execute Ex command from isn_arg.string split at NL
@@ -233,23 +233,23 @@ typedef enum {
 
 
 // arguments to ISN_BCALL
-typedef struct {
-    int	    cbf_idx;	    // index in "global_functions"
-    int	    cbf_argcount;   // number of arguments on top of stack
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা	    cbf_idx;	    // index in "global_functions"
+    পূর্ণসংখ্যা	    cbf_argcount;   // number of arguments on top of stack
 } cbfunc_T;
 
 // arguments to ISN_DCALL
-typedef struct {
-    int	    cdf_idx;	    // index in "def_functions" for ISN_DCALL
-    int	    cdf_argcount;   // number of arguments on top of stack
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা	    cdf_idx;	    // index in "def_functions" for ISN_DCALL
+    পূর্ণসংখ্যা	    cdf_argcount;   // number of arguments on top of stack
 } cdfunc_T;
 
 // arguments to ISN_METHODCALL
-typedef struct {
+প্রকারলেখ কাঠামো {
     class_T *cmf_itf;	    // interface used
-    int	    cmf_idx;	    // index in "def_functions" for ISN_METHODCALL
-    int	    cmf_argcount;   // number of arguments on top of stack
-    int	    cmf_is_super;   // doing "super.Func", use cmf_itf, not cmf_idx
+    পূর্ণসংখ্যা	    cmf_idx;	    // index in "def_functions" for ISN_METHODCALL
+    পূর্ণসংখ্যা	    cmf_argcount;   // number of arguments on top of stack
+    পূর্ণসংখ্যা	    cmf_is_super;   // doing "super.Func", use cmf_itf, not cmf_idx
     ufunc_T *cmf_ufunc;	    // for a generic method: the method of
 			    // "cmf_itf" with the type arguments, NULL
 			    // otherwise
@@ -263,24 +263,24 @@ typedef struct {
 } cmfunc_T;
 
 // arguments to ISN_PCALL
-typedef struct {
-    int	    cpf_top;	    // when TRUE partial is above the arguments
-    int	    cpf_argcount;   // number of arguments on top of stack
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা	    cpf_শীর্ষ;	    // when TRUE partial is above the arguments
+    পূর্ণসংখ্যা	    cpf_argcount;   // number of arguments on top of stack
 } cpfunc_T;
 
 // arguments to ISN_UCALL and ISN_XCALL
-typedef struct {
+প্রকারলেখ কাঠামো {
     char_u  *cuf_name;
-    int	    cuf_argcount;   // number of arguments on top of stack
+    পূর্ণসংখ্যা	    cuf_argcount;   // number of arguments on top of stack
 } cufunc_T;
 
 // arguments to ISN_GETITEM
-typedef struct {
-    varnumber_T	gi_index;
-    int		gi_with_op;
+প্রকারলেখ কাঠামো {
+    varnumber_T	gi_সূচক;
+    পূর্ণসংখ্যা		gi_with_op;
 } getitem_T;
 
-typedef enum {
+প্রকারলেখ গণনা {
     JUMP_ALWAYS,
     JUMP_NEVER,
     JUMP_IF_FALSE,		// pop and jump if false
@@ -291,69 +291,69 @@ typedef enum {
 } jumpwhen_T;
 
 // arguments to ISN_JUMP
-typedef struct {
+প্রকারলেখ কাঠামো {
     jumpwhen_T	jump_when;
-    int		jump_where;	// position to jump to
+    পূর্ণসংখ্যা		jump_where;	// position to jump to
 } jump_T;
 
 // arguments to ISN_JUMP_IF_ARG_SET and ISN_JUMP_IF_ARG_NOT_SET
-typedef struct {
-    int		jump_arg_off;	// argument index, negative
-    int		jump_where;	// position to jump to
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা		jump_arg_off;	// argument index, negative
+    পূর্ণসংখ্যা		jump_where;	// position to jump to
 } jumparg_T;
 
 // arguments to ISN_FOR
-typedef struct {
+প্রকারলেখ কাঠামো {
     short	for_loop_idx;	// loop variable index
-    int		for_end;	// position to jump to after done
+    পূর্ণসংখ্যা		for_end;	// position to jump to after done
 } forloop_T;
 
 // arguments to ISN_WHILE
-typedef struct {
+প্রকারলেখ কাঠামো {
     short	while_funcref_idx;  // variable index for funcref count
-    int		while_end;	    // position to jump to after done
+    পূর্ণসংখ্যা		while_end;	    // position to jump to after done
 } whileloop_T;
 
 // arguments to ISN_ENDLOOP
-typedef struct {
+প্রকারলেখ কাঠামো {
     short    end_funcref_idx;	// variable index of funcrefs.ga_len
     short    end_depth;		// nested loop depth
     short    end_var_idx;	// first variable declared in the loop
-    short    end_var_count;	// number of variables declared in the loop
+    short    end_var_গুনতি;	// number of variables declared in the loop
 } endloop_T;
 
 // indirect arguments to ISN_TRY
-typedef struct {
-    int	    try_catch;	    // position to jump to on throw
-    int	    try_finally;    // :finally or :endtry position to jump to
-    int	    try_endtry;	    // :endtry position to jump to
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা	    try_catch;	    // position to jump to on throw
+    পূর্ণসংখ্যা	    try_finally;    // :finally or :endtry position to jump to
+    পূর্ণসংখ্যা	    try_endtry;	    // :endtry position to jump to
 } tryref_T;
 
 // arguments to ISN_TRY
-typedef struct {
+প্রকারলেখ কাঠামো {
     tryref_T *try_ref;
 } try_T;
 
 // arguments to ISN_TRYCONT
-typedef struct {
-    int	    tct_levels;	    // number of nested try statements
-    int	    tct_where;	    // position to jump to, WHILE or FOR
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা	    tct_levels;	    // number of nested try statements
+    পূর্ণসংখ্যা	    tct_where;	    // position to jump to, WHILE or FOR
 } trycont_T;
 
 // arguments to ISN_ECHO
-typedef struct {
-    int	    echo_with_white;    // :echo instead of :echon
-    int	    echo_count;		// number of expressions
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা	    echo_with_white;    // :echo instead of :echon
+    পূর্ণসংখ্যা	    echo_গুনতি;		// number of expressions
 } echo_T;
 
 // arguments to ISN_OPNR, ISN_OPFLOAT, etc.
-typedef struct {
+প্রকারলেখ কাঠামো {
     exprtype_T	op_type;
-    int		op_ic;	    // TRUE with '#', FALSE with '?', else MAYBE
+    পূর্ণসংখ্যা		op_ic;	    // TRUE with '#', FALSE with '?', else MAYBE
 } opexpr_T;
 
 // arguments to ISN_CHECKTYPE
-typedef struct {
+প্রকারলেখ কাঠামো {
     type_T	*ct_type;
     int8_T	ct_off;		// offset in stack, -1 is bottom
     int8_T	ct_arg_idx;	// argument index or zero
@@ -361,188 +361,188 @@ typedef struct {
 } checktype_T;
 
 // arguments to ISN_STORENR
-typedef struct {
-    int		stnr_idx;
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা		stnr_idx;
     varnumber_T	stnr_val;
 } storenr_T;
 
 // arguments to ISN_STOREOPT and ISN_STOREFUNCOPT
-typedef struct {
+প্রকারলেখ কাঠামো {
     char_u	*so_name;
-    int		so_flags;
+    পূর্ণসংখ্যা		so_flags;
 } storeopt_T;
 
 // arguments to ISN_LOADS and ISN_STORES
-typedef struct {
+প্রকারলেখ কাঠামো {
     char_u	*ls_name;	// variable name (with s: for ISN_STORES)
-    int		ls_sid;		// script ID
+    পূর্ণসংখ্যা		ls_sid;		// script ID
 } loadstore_T;
 
 // arguments to ISN_LOADSCRIPT and ISN_STORESCRIPT
-typedef struct {
-    int		sref_sid;	// script ID
-    int		sref_idx;	// index in sn_var_vals
-    int		sref_seq;	// sn_script_seq when compiled
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা		sref_sid;	// script ID
+    পূর্ণসংখ্যা		sref_idx;	// index in sn_var_vals
+    পূর্ণসংখ্যা		sref_seq;	// sn_script_seq when compiled
     type_T	*sref_type;	// type of the variable when compiled
 } scriptref_T;
 
-typedef struct {
+প্রকারলেখ কাঠামো {
     scriptref_T	*scriptref;
 } script_T;
 
 // arguments to ISN_UNLET
-typedef struct {
+প্রকারলেখ কাঠামো {
     char_u	*ul_name;	// variable name with g:, w:, etc.
-    int		ul_forceit;	// forceit flag
+    পূর্ণসংখ্যা		ul_forceit;	// forceit flag
 } unlet_T;
 
 // extra arguments for funcref_T
-typedef struct {
+প্রকারলেখ কাঠামো {
     char_u	  *fre_func_name;	// function name for legacy function
     loopvarinfo_T fre_loopvar_info;	// info about variables inside loops
     class_T	  *fre_class;		// class for a method
-    int		  fre_object_method;	// class or object method
-    int		  fre_method_idx;	// method index on "fre_class"
-    int		  fre_outer_depth;	// when > 0: use the context of the
+    পূর্ণসংখ্যা		  fre_object_method;	// class or object method
+    পূর্ণসংখ্যা		  fre_method_idx;	// method index on "fre_class"
+    পূর্ণসংখ্যা		  fre_outer_depth;	// when > 0: use the context of the
 					// function this many levels up
 } funcref_extra_T;
 
 // arguments to ISN_FUNCREF
-typedef struct {
-    int		    fr_dfunc_idx;   // function index for :def function
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা		    fr_dfunc_idx;   // function index for :def function
     funcref_extra_T *fr_extra;	    // optional extra information
 } funcref_T;
 
 // arguments to ISN_NEWFUNC
-typedef struct {
+প্রকারলেখ কাঠামো {
     char_u	  *nfa_lambda;	    // name of the lambda already defined
     char_u	  *nfa_global;	    // name of the global function to be created
     loopvarinfo_T nfa_loopvar_info; // ifno about variables inside loops
 } newfuncarg_T;
 
-typedef struct {
+প্রকারলেখ কাঠামো {
     newfuncarg_T *nf_arg;
 } newfunc_T;
 
 // arguments to ISN_CHECKLEN
-typedef struct {
-    int		cl_min_len;	// minimum length
-    int		cl_more_OK;	// longer is allowed
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা		cl_min_len;	// minimum length
+    পূর্ণসংখ্যা		cl_more_OK;	// longer is allowed
 } checklen_T;
 
 // arguments to ISN_SHUFFLE
-typedef struct {
-    int		shfl_item;	// item to move (relative to top of stack)
-    int		shfl_up;	// places to move upwards
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা		shfl_item;	// item to move (relative to top of stack)
+    পূর্ণসংখ্যা		shfl_up;	// places to move upwards
 } shuffle_T;
 
 // arguments to ISN_PUT
-typedef struct {
-    int		put_regname;	// register, can be NUL
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা		put_regname;	// register, can be NUL
     linenr_T	put_lnum;	// line number to put below
 } put_T;
 
 // arguments to ISN_CMDMOD
-typedef struct {
+প্রকারলেখ কাঠামো {
     cmdmod_T	*cf_cmdmod;	// allocated
 } cmod_T;
 
 // arguments to ISN_UNPACK
-typedef struct {
-    int		unp_count;	// number of items to produce
-    int		unp_semicolon;	// last item gets list of remainder
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা		unp_গুনতি;	// number of items to produce
+    পূর্ণসংখ্যা		unp_semicolon;	// last item gets list of remainder
 } unpack_T;
 
 // arguments to ISN_LOADOUTER and ISN_STOREOUTER
-typedef struct {
-    int		outer_idx;	// index
-    int		outer_depth;	// nesting level, stack frames to go up;
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা		outer_idx;	//সূচক
+    পূর্ণসংখ্যা		outer_depth;	// nesting level, stack frames to go up;
 				// negative for a loop variable, the loop
 				// depth is -outer_depth - 1
 } isn_outer_T;
 
 // arguments to ISN_SUBSTITUTE
-typedef struct {
+প্রকারলেখ কাঠামো {
     char_u	*subs_cmd;	// :s command
     isn_T	*subs_instr;	// sequence of instructions
 } subs_T;
 
 // indirect arguments to ISN_TRY
-typedef struct {
-    int		cer_cmdidx;
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা		cer_cmdidx;
     char_u	*cer_cmdline;
-    int		cer_forceit;
+    পূর্ণসংখ্যা		cer_forceit;
 } cexprref_T;
 
 // arguments to ISN_CEXPR_CORE
-typedef struct {
+প্রকারলেখ কাঠামো {
     cexprref_T *cexpr_ref;
 } cexpr_T;
 
 // arguments to ISN_2STRING and ISN_2STRING_ANY
-typedef struct {
-    int		offset;
-    int		flags;
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা		offset;
+    পূর্ণসংখ্যা		flags;
 } tostring_T;
 
 // arguments to ISN_2BOOL
-typedef struct {
-    int		offset;
-    int		invert;
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা		offset;
+    পূর্ণসংখ্যা		invert;
 } tobool_T;
 
 // arguments to ISN_DEBUG
-typedef struct {
+প্রকারলেখ কাঠামো {
     varnumber_T	dbg_var_names_len;  // current number of local variables
-    int		dbg_break_lnum;	    // first line to break after
+    পূর্ণসংখ্যা		dbg_break_lnum;	    // first line to break after
 } debug_T;
 
 // arguments to ISN_DEFER
-typedef struct {
-    int		defer_var_idx;	    // local variable index for defer list
-    int		defer_argcount;	    // number of arguments
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা		defer_var_idx;	    // local variable index for defer list
+    পূর্ণসংখ্যা		defer_argcount;	    // number of arguments
 } deferins_T;
 
 // arguments to ISN_ECHOWINDOW
-typedef struct {
-    int		ewin_count;	    // number of arguments
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা		ewin_গুনতি;	    // number of arguments
     long	ewin_time;	    // time argument (msec)
 } echowin_T;
 
 // arguments to ISN_CONSTRUCT
-typedef struct {
-    int		construct_size;	    // size of object in bytes
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা		construct_আকার;	    // size of object in bytes
     class_T	*construct_class;   // class the object is created from
 } construct_T;
 
 // arguments to ISN_STORE_CLASSMEMBER, ISN_LOAD_CLASSMEMBER, ISN_GET_ITF_MEMBER
-typedef struct {
+প্রকারলেখ কাঠামো {
     class_T	*cm_class;
-    int		cm_idx;
+    পূর্ণসংখ্যা		cm_idx;
 } classmember_T;
 
 // arguments to ISN_STOREINDEX
-typedef struct {
+প্রকারলেখ কাঠামো {
     vartype_T	si_vartype;
     class_T	*si_class;
 } storeindex_T;
 
 // arguments to ISN_LOCKUNLOCK
-typedef struct {
+প্রকারলেখ কাঠামো {
     char_u	*lu_string;	// for exec_command
     class_T	*lu_cl_exec;	// executing, null if not class/obj method
-    int		lu_is_arg;	// is lval_root a function arg
+    পূর্ণসংখ্যা		lu_is_arg;	// is lval_root a function arg
 } lockunlock_T;
 
 /*
  * Instruction
  */
-struct isn_S {
+কাঠামো isn_S {
     isntype_T	isn_type;
-    int		isn_lnum;
-    union {
+    পূর্ণসংখ্যা		isn_lnum;
+    সংঘ {
 	char_u		    *string;
-	varnumber_T	    number;
+	varnumber_T	    সংখ্যা;
 	blob_T		    *blob;
 	vartype_T	    vartype;
 	float_T		    fnumber;
@@ -598,14 +598,14 @@ struct isn_S {
 /*
  * Info about a function defined with :def.  Used in "def_functions".
  */
-struct dfunc_S {
+কাঠামো dfunc_S {
     ufunc_T	*df_ufunc;	    // struct containing most stuff
-    int		df_refcount;	    // how many ufunc_T point to this dfunc_T
-    int		df_idx;		    // index in def_functions
-    char	df_deleted;	    // if TRUE function was deleted
-    char	df_delete_busy;	    // TRUE when in
+    পূর্ণসংখ্যা		df_refcount;	    // how many ufunc_T point to this dfunc_T
+    পূর্ণসংখ্যা		df_idx;		    // index in def_functions
+    অক্ষর	df_deleted;	    // if TRUE function was deleted
+    অক্ষর	df_delete_busy;	    // TRUE when in
 				    // delete_def_function_contents()
-    int		df_script_seq;	    // Value of sctx_T sc_seq when the function
+    পূর্ণসংখ্যা		df_script_seq;	    // Value of sctx_T sc_seq when the function
 				    // was compiled.
     char_u	*df_name;	    // name used for error messages
 
@@ -614,17 +614,17 @@ struct dfunc_S {
 
     // After compiling "df_instr" and/or "df_instr_prof" is not NULL.
     isn_T	*df_instr;	    // function body to be executed
-    int		df_instr_count;	    // size of "df_instr"
-    int		df_instr_debug_count; // size of "df_instr_debug"
+    পূর্ণসংখ্যা		df_instr_গুনতি;	    // size of "df_instr"
+    পূর্ণসংখ্যা		df_instr_debug_গুনতি; // size of "df_instr_debug"
     isn_T	*df_instr_debug;      // like "df_instr" with debugging
 #ifdef FEAT_PROFILE
     isn_T	*df_instr_prof;	     // like "df_instr" with profiling
-    int		df_instr_prof_count; // size of "df_instr_prof"
+    পূর্ণসংখ্যা		df_instr_prof_গুনতি; // size of "df_instr_prof"
 #endif
 
-    int		df_varcount;	    // number of local variables
-    int		df_has_closure;	    // one if a closure was created
-    int		df_defer_var_idx;   // index of local variable that has a list
+    পূর্ণসংখ্যা		df_varcount;	    // number of local variables
+    পূর্ণসংখ্যা		df_has_closure;	    // one if a closure was created
+    পূর্ণসংখ্যা		df_defer_var_idx;   // index of local variable that has a list
 				    // of deferred function calls; zero if not
 				    // set
 };
@@ -636,16 +636,16 @@ struct dfunc_S {
 // - ec_outer:	     stack used for closures
 // - funclocal:	     function-local data
 // - ec_frame_idx:   previous frame index
-#define STACK_FRAME_FUNC_OFF 0
-#define STACK_FRAME_IIDX_OFF 1
-#define STACK_FRAME_INSTR_OFF 2
-#define STACK_FRAME_OUTER_OFF 3
-#define STACK_FRAME_FUNCLOCAL_OFF 4
-#define STACK_FRAME_IDX_OFF 5
-#define STACK_FRAME_SIZE 6
+#define স্তূপ_FRAME_FUNC_OFF 0
+#define স্তূপ_FRAME_IIDX_OFF 1
+#define স্তূপ_FRAME_INSTR_OFF 2
+#define স্তূপ_FRAME_OUTER_OFF 3
+#define স্তূপ_FRAME_FUNCLOCAL_OFF 4
+#define স্তূপ_FRAME_IDX_OFF 5
+#define স্তূপ_FRAME_আকার 6
 
 
-extern garray_T def_functions;
+বাহ্যিক garray_T def_functions;
 
 // Used for "lnum" when a range is to be taken from the stack.
 #define LNUM_VARIABLE_RANGE (-999)
@@ -661,7 +661,7 @@ extern garray_T def_functions;
 	    : ((do_profiling == PROF_YES && (dfunc->df_ufunc)->uf_profiling) \
 		? (dfunc)->df_instr_prof \
 		: (dfunc)->df_instr))
-#else
+#অন্যথা
 # define INSTRUCTIONS(dfunc) \
 	(debug_break_level > 0 || may_break_in_function((dfunc)->df_ufunc) \
 		? (dfunc)->df_instr_debug \
@@ -675,15 +675,15 @@ extern garray_T def_functions;
 // before other instructions.
 // Using 50 should be more than enough of 5 levels of ().
 #define PPSIZE 50
-typedef struct {
+প্রকারলেখ কাঠামো {
     typval_T	pp_tv[PPSIZE];	// stack of ppconst constants
-    int		pp_used;	// active entries in pp_tv[]
-    int		pp_is_const;	// all generated code was constants, used for a
+    পূর্ণসংখ্যা		pp_used;	// active entries in pp_tv[]
+    পূর্ণসংখ্যা		pp_is_const;	// all generated code was constants, used for a
 				// list or dict with constant members
 } ppconst_T;
 
 // values for ctx_skip
-typedef enum {
+প্রকারলেখ গণনা {
     SKIP_NOT,		// condition is a constant, produce code
     SKIP_YES,		// condition is a constant, do NOT produce code
     SKIP_UNKNOWN	// condition is not a constant, produce code
@@ -692,36 +692,36 @@ typedef enum {
 /*
  * Chain of jump instructions where the end label needs to be set.
  */
-typedef struct endlabel_S endlabel_T;
-struct endlabel_S {
-    endlabel_T	*el_next;	    // chain end_label locations
-    int		el_end_label;	    // instruction idx where to set end
+প্রকারলেখ কাঠামো endlabel_S endlabel_T;
+কাঠামো endlabel_S {
+    endlabel_T	*el_পরবর্তী;	    // chain end_label locations
+    পূর্ণসংখ্যা		el_end_label;	    // instruction idx where to set end
 };
 
 /*
  * info specific for the scope of :if / elseif / else
  */
-typedef struct {
-    int		is_seen_else;
-    int		is_seen_skip_not;   // a block was unconditionally executed
-    int		is_had_return;	    // every block ends in :return
-    int		is_if_label;	    // instruction idx at IF or ELSEIF
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা		is_seen_else;
+    পূর্ণসংখ্যা		is_seen_skip_not;   // a block was unconditionally executed
+    পূর্ণসংখ্যা		is_had_return;	    // every block ends in :return
+    পূর্ণসংখ্যা		is_if_label;	    // instruction idx at IF or ELSEIF
     endlabel_T	*is_end_label;	    // instructions to set end label
 } ifscope_T;
 
 // info used by :for and :while needed for ENDLOOP
-typedef struct {
-    int	    li_local_count;	    // ctx_locals.ga_len at loop start
-    int	    li_closure_count;	    // ctx_closure_count at loop start
-    int	    li_funcref_idx;	    // index of var that holds funcref count
-    int	    li_depth;		    // nested loop depth
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা	    li_local_গুনতি;	    // ctx_locals.ga_len at loop start
+    পূর্ণসংখ্যা	    li_closure_গুনতি;	    // ctx_closure_count at loop start
+    পূর্ণসংখ্যা	    li_funcref_idx;	    // index of var that holds funcref count
+    পূর্ণসংখ্যা	    li_depth;		    // nested loop depth
 } loop_info_T;
 
 /*
  * info specific for the scope of :while
  */
-typedef struct {
-    int		ws_top_label;	    // instruction idx at WHILE
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা		ws_শীর্ষ_label;	    // instruction idx at WHILE
     endlabel_T	*ws_end_label;	    // instructions to set end
     loop_info_T ws_loop_info;	    // info for LOOPEND
 } whilescope_T;
@@ -729,8 +729,8 @@ typedef struct {
 /*
  * info specific for the scope of :for
  */
-typedef struct {
-    int		fs_top_label;	    // instruction idx at FOR
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা		fs_শীর্ষ_label;	    // instruction idx at FOR
     endlabel_T	*fs_end_label;	    // break instructions
     loop_info_T	fs_loop_info;	    // info for LOOPEND
 } forscope_T;
@@ -738,16 +738,16 @@ typedef struct {
 /*
  * info specific for the scope of :try
  */
-typedef struct {
-    int		ts_try_label;	    // instruction idx at TRY
+প্রকারলেখ কাঠামো {
+    পূর্ণসংখ্যা		ts_try_label;	    // instruction idx at TRY
     endlabel_T	*ts_end_label;	    // jump to :finally or :endtry
-    int		ts_catch_label;	    // instruction idx of last CATCH
-    int		ts_caught_all;	    // "catch" without argument encountered
-    int		ts_has_finally;	    // "finally" encountered
-    int		ts_no_return;	    // one of the blocks did not end in return
+    পূর্ণসংখ্যা		ts_catch_label;	    // instruction idx of last CATCH
+    পূর্ণসংখ্যা		ts_caught_all;	    // "catch" without argument encountered
+    পূর্ণসংখ্যা		ts_has_finally;	    // "finally" encountered
+    পূর্ণসংখ্যা		ts_no_return;	    // one of the blocks did not end in return
 } tryscope_T;
 
-typedef enum {
+প্রকারলেখ গণনা {
     NO_SCOPE,
     IF_SCOPE,
     WHILE_SCOPE,
@@ -759,14 +759,14 @@ typedef enum {
 /*
  * Info for one scope, pointed to by "ctx_scope".
  */
-typedef struct scope_S scope_T;
-struct scope_S {
+প্রকারলেখ কাঠামো scope_S scope_T;
+কাঠামো scope_S {
     scope_T	*se_outer;	    // scope containing this one
     scopetype_T se_type;
-    int		se_local_count;	    // ctx_locals.ga_len before scope
+    পূর্ণসংখ্যা		se_local_গুনতি;	    // ctx_locals.ga_len before scope
     skip_T	se_skip_save;	    // ctx_skip before the block
-    int		se_loop_depth;	    // number of loop scopes, including this
-    union {
+    পূর্ণসংখ্যা		se_loop_depth;	    // number of loop scopes, including this
+    সংঘ {
 	ifscope_T	se_if;
 	whilescope_T	se_while;
 	forscope_T	se_for;
@@ -777,29 +777,29 @@ struct scope_S {
 /*
  * Entry for "ctx_locals".  Used for arguments and local variables.
  */
-typedef struct {
+প্রকারলেখ কাঠামো {
     char_u	*lv_name;
     type_T	*lv_type;
-    int		lv_idx;		// index of the variable on the stack
-    int		lv_loop_depth;	// depth for variable inside a loop or -1
-    int		lv_loop_idx;	// index of first variable inside a loop or -1
-    int		lv_from_outer;	// nesting level, using ctx_outer scope
-    int		lv_const;	// ASSIGN_VAR (can be assigned to),
+    পূর্ণসংখ্যা		lv_idx;		// index of the variable on the stack
+    পূর্ণসংখ্যা		lv_loop_depth;	// depth for variable inside a loop or -1
+    পূর্ণসংখ্যা		lv_loop_idx;	// index of first variable inside a loop or -1
+    পূর্ণসংখ্যা		lv_from_outer;	// nesting level, using ctx_outer scope
+    পূর্ণসংখ্যা		lv_const;	// ASSIGN_VAR (can be assigned to),
 				// ASSIGN_FINAL (no assignment) or ASSIGN_CONST
 				// (value cannot be changed)
-    int		lv_arg;		// when TRUE this is an argument
+    পূর্ণসংখ্যা		lv_arg;		// when TRUE this is an argument
     ufunc_T	*lv_ufunc;	// for a nested function: its ufunc, see
 				// compile_nested_generic_func()
 } lvar_T;
 
 // Destination for an assignment or ":unlet" with an index.
-typedef enum {
+প্রকারলেখ গণনা {
     dest_local,
     dest_option,
     dest_func_option,
     dest_env,
     dest_global,
-    dest_buffer,
+    dest_বাফার,
     dest_window,
     dest_tab,
     dest_vimvar,
@@ -807,12 +807,12 @@ typedef enum {
     dest_script,
     dest_script_v9,
     dest_reg,
-    dest_expr,
+    dest_রাশিমালা,
 } assign_dest_T;
 
 // Used by compile_lhs() to store information about the LHS of an assignment
 // and one argument of ":unlet" with an index.
-typedef struct {
+প্রকারলেখ কাঠামো {
     assign_dest_T   lhs_dest;	    // type of destination
 
     char_u	    *lhs_name;	    // allocated name excluding the last
@@ -821,71 +821,71 @@ typedef struct {
 				    // "[expr]" or ".name"
     char_u	    *lhs_whole;	    // allocated name including the last
 				    // "[expr]" or ".name" for :redir
-    size_t	    lhs_varlen_total; // length of the variable including
+    size_t	    lhs_varlen_যোগ; // length of the variable including
 				      // any "[expr]" or ".name"
     char_u	    *lhs_dest_end;  // end of the destination, including
 				    // "[expr]" or ".name".
     char_u	    *lhs_end;	    // end including any type
 
-    int		    lhs_has_index;  // has "[expr]" or ".name"
+    পূর্ণসংখ্যা		    lhs_has_সূচক;  // has "[expr]" or ".name"
 
-    int		    lhs_new_local;  // create new local variable
-    int		    lhs_opt_flags;  // for when destination is an option
-    int		    lhs_vimvaridx;  // for when destination is a v:var
+    পূর্ণসংখ্যা		    lhs_new_local;  // create new local variable
+    পূর্ণসংখ্যা		    lhs_opt_flags;  // for when destination is an option
+    পূর্ণসংখ্যা		    lhs_vimvaridx;  // for when destination is a v:var
 
     lvar_T	    lhs_local_lvar; // used for existing local destination
     lvar_T	    lhs_arg_lvar;   // used for argument destination
     lvar_T	    *lhs_lvar;	    // points to destination lvar
 
     class_T	    *lhs_class;		    // for dest_class_member
-    int		    lhs_classmember_idx;    // for dest_class_member
+    পূর্ণসংখ্যা		    lhs_classmember_idx;    // for dest_class_member
 
-    int		    lhs_scriptvar_sid;
-    int		    lhs_scriptvar_idx;
+    পূর্ণসংখ্যা		    lhs_scriptvar_sid;
+    পূর্ণসংখ্যা		    lhs_scriptvar_idx;
 
-    int		    lhs_has_type;   // type was specified
+    পূর্ণসংখ্যা		    lhs_has_type;   // type was specified
     type_T	    *lhs_type;
-    int		    lhs_member_idx;    // object member index
+    পূর্ণসংখ্যা		    lhs_member_idx;    // object member index
     type_T	    *lhs_member_type;  // list/dict/object member type
 
-    int		    lhs_append;	    // used by ISN_REDIREND
+    পূর্ণসংখ্যা		    lhs_append;	    // used by ISN_REDIREND
 } lhs_T;
 
 /*
  * Context for compiling lines of a :def function.
  * Stores info about the local variables and condition stack.
  */
-struct cctx_S {
+কাঠামো cctx_S {
     ufunc_T	*ctx_ufunc;	    // current function
-    int		ctx_lnum;	    // line number in current function
-    char_u	*ctx_line_start;    // start of current line or NULL
+    পূর্ণসংখ্যা		ctx_lnum;	    // line number in current function
+    char_u	*ctx_সারি_start;    // start of current line or NULL
     garray_T	ctx_instr;	    // generated instructions
 
-    int		ctx_prev_lnum;	    // line number below previous command, for
+    পূর্ণসংখ্যা		ctx_পূর্ব_lnum;	    // line number below previous command, for
 				    // debugging
 
     compiletype_T ctx_compile_type;
 
     garray_T	ctx_locals;	    // currently visible local variables
 
-    int		ctx_has_closure;    // set to one if a FUNCREF was used in the
+    পূর্ণসংখ্যা		ctx_has_closure;    // set to one if a FUNCREF was used in the
 				    // function
-    int		ctx_closure_count;  // incremented for each closure created in
+    পূর্ণসংখ্যা		ctx_closure_গুনতি;  // incremented for each closure created in
 				    // the function.
 
     skip_T	ctx_skip;
     scope_T	*ctx_scope;	    // current scope, NULL at toplevel
-    int		ctx_had_return;	    // last seen statement was "return"
-    int		ctx_had_throw;	    // last seen statement was "throw"
+    পূর্ণসংখ্যা		ctx_had_return;	    // last seen statement was "return"
+    পূর্ণসংখ্যা		ctx_had_throw;	    // last seen statement was "throw"
 
     cctx_T	*ctx_outer;	    // outer scope for lambda or nested
 				    // function
-    int		ctx_outer_used;	    // var in ctx_outer was used
+    পূর্ণসংখ্যা		ctx_outer_used;	    // var in ctx_outer was used
 
-    garray_T	ctx_type_stack;	    // type of each item on the stack
+    garray_T	ctx_type_স্তূপ;	    // type of each item on the stack
     garray_T	*ctx_type_list;	    // list of pointers to allocated types
 
-    int		ctx_has_cmdmod;	    // ISN_CMDMOD was generated
+    পূর্ণসংখ্যা		ctx_has_cmdmod;	    // ISN_CMDMOD was generated
 
     lhs_T	ctx_redir_lhs;	    // LHS for ":redir => var", valid when
 				    // lhs_name is not NULL
@@ -894,7 +894,7 @@ struct cctx_S {
 /*
  * List of special functions for "compile_arguments()".
  */
-typedef enum {
+প্রকারলেখ গণনা {
     CA_NOT_SPECIAL,
     CA_SEARCHPAIR,	    // {skip} in searchpair() and searchpairpos()
     CA_SUBSTITUTE,	    // {sub} in substitute(), when prefixed with \=

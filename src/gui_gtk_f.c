@@ -23,22 +23,22 @@
  * 2016  Kazunobu Kuriyama  <kazunobu.kuriyama@gmail.com>
  */
 
-#include "vim.h"
-#include <gtk/gtk.h>	// without this it compiles, but gives errors at
+#অন্তর্ভাব "vim.h"
+#অন্তর্ভাব <gtk/gtk.h>	// without this it compiles, but gives errors at
 			// runtime!
-#include "gui_gtk_f.h"
-#if !GTK_CHECK_VERSION(3,0,0)
+#অন্তর্ভাব "gui_gtk_f.h"
+#যদি !GTK_CHECK_VERSION(3,0,0)
 # include <gtk/gtksignal.h>
 #endif
 #ifdef MSWIN
 # include <gdk/gdkwin32.h>
-#else
+#অন্যথা
 # include <gdk/gdkx.h>
 #endif
 
-typedef struct _GtkFormChild GtkFormChild;
+প্রকারলেখ কাঠামো _GtkFormChild GtkFormChild;
 
-struct _GtkFormChild
+কাঠামো _GtkFormChild
 {
     GtkWidget *widget;
     GdkWindow *window;
@@ -48,62 +48,62 @@ struct _GtkFormChild
 };
 
 
-static void gui_gtk_form_class_init(GtkFormClass *klass);
-#if GTK_CHECK_VERSION(3,0,0)
-static void gui_gtk_form_init(GtkForm *form);
-#else
-static void gui_gtk_form_init(GtkForm *form, void *g_class);
+স্থির শূন্য gui_gtk_form_class_init(GtkFormClass *klass);
+#যদি GTK_CHECK_VERSION(3,0,0)
+স্থির শূন্য gui_gtk_form_init(GtkForm *form);
+#অন্যথা
+স্থির শূন্য gui_gtk_form_init(GtkForm *form, শূন্য *g_class);
 #endif
 
-static void form_realize(GtkWidget *widget);
-static void form_unrealize(GtkWidget *widget);
-static void form_map(GtkWidget *widget);
-static void form_size_request(GtkWidget *widget, GtkRequisition *requisition);
-#if GTK_CHECK_VERSION(3,0,0)
-static void form_get_preferred_width(GtkWidget *widget, gint *minimal_width, gint *natural_width);
-static void form_get_preferred_height(GtkWidget *widget, gint *minimal_height, gint *natural_height);
+স্থির শূন্য form_realize(GtkWidget *widget);
+স্থির শূন্য form_unrealize(GtkWidget *widget);
+স্থির শূন্য form_map(GtkWidget *widget);
+স্থির শূন্য form_আকার_request(GtkWidget *widget, GtkRequisition *requisition);
+#যদি GTK_CHECK_VERSION(3,0,0)
+স্থির শূন্য form_get_preferred_width(GtkWidget *widget, gint *minimal_width, gint *natural_width);
+স্থির শূন্য form_get_preferred_height(GtkWidget *widget, gint *minimal_height, gint *natural_height);
 #endif
-static void form_size_allocate(GtkWidget *widget, GtkAllocation *allocation);
-#if GTK_CHECK_VERSION(3,0,0)
-static gboolean form_draw(GtkWidget *widget, cairo_t *cr);
-#else
-static gint form_expose(GtkWidget *widget, GdkEventExpose *event);
+স্থির শূন্য form_আকার_allocate(GtkWidget *widget, GtkAllocation *allocation);
+#যদি GTK_CHECK_VERSION(3,0,0)
+স্থির gboolean form_draw(GtkWidget *widget, cairo_t *cr);
+#অন্যথা
+স্থির gint form_expose(GtkWidget *widget, GdkEventExpose *event);
 #endif
 
-static void form_remove(GtkContainer *container, GtkWidget *widget);
-static void form_forall(GtkContainer *container, gboolean include_internals, GtkCallback callback, gpointer callback_data);
+স্থির শূন্য form_remove(GtkContainer *container, GtkWidget *widget);
+স্থির শূন্য form_forall(GtkContainer *container, gboolean include_internals, GtkCallback callback, gpointer callback_তথ্য);
 
-static void form_attach_child_window(GtkForm *form, GtkFormChild *child);
-static void form_realize_child(GtkForm *form, GtkFormChild *child);
-static void form_position_child(GtkForm *form, GtkFormChild *child, gboolean force_allocate);
-static void form_position_children(GtkForm *form);
+স্থির শূন্য form_attach_child_window(GtkForm *form, GtkFormChild *child);
+স্থির শূন্য form_realize_child(GtkForm *form, GtkFormChild *child);
+স্থির শূন্য form_position_child(GtkForm *form, GtkFormChild *child, gboolean force_allocate);
+স্থির শূন্য form_position_children(GtkForm *form);
 
-static void form_send_configure(GtkForm *form);
+স্থির শূন্য form_send_configure(GtkForm *form);
 
-static void form_child_map(GtkWidget *widget, gpointer user_data);
-static void form_child_unmap(GtkWidget *widget, gpointer user_data);
+স্থির শূন্য form_child_map(GtkWidget *widget, gpointer user_তথ্য);
+স্থির শূন্য form_child_unmap(GtkWidget *widget, gpointer user_তথ্য);
 
-#if !GTK_CHECK_VERSION(3,0,0)
-static GtkWidgetClass *parent_class = NULL;
+#যদি !GTK_CHECK_VERSION(3,0,0)
+স্থির GtkWidgetClass *parent_class = ফাঁকা;
 #endif
 
 // Public interface
 
     GtkWidget *
-gui_gtk_form_new(void)
+gui_gtk_form_new(শূন্য)
 {
     GtkForm *form;
 
-#if GTK_CHECK_VERSION(3,0,0)
-    form = g_object_new(GTK_TYPE_FORM, NULL);
-#else
+#যদি GTK_CHECK_VERSION(3,0,0)
+    form = g_object_new(GTK_TYPE_FORM, ফাঁকা);
+#অন্যথা
     form = gtk_type_new(gui_gtk_form_get_type());
 #endif
 
-    return GTK_WIDGET(form);
+    ফেরত GTK_WIDGET(form);
 }
 
-    void
+    শূন্য
 gui_gtk_form_put(
 	GtkForm	*form,
 	GtkWidget	*child_widget,
@@ -116,16 +116,16 @@ gui_gtk_form_put(
 
     // LINTED: avoid warning: conversion to 'unsigned long'
     child = g_new(GtkFormChild, 1);
-    if (child == NULL)
-	return;
+    যদি (child == ফাঁকা)
+	ফেরত;
 
     child->widget = child_widget;
-    child->window = NULL;
+    child->window = ফাঁকা;
     child->x = x;
     child->y = y;
-#if GTK_CHECK_VERSION(3,0,0)
-    gtk_widget_set_size_request(child->widget, -1, -1);
-#else
+#যদি GTK_CHECK_VERSION(3,0,0)
+    gtk_widget_set_আকার_request(child->widget, -1, -1);
+#অন্যথা
     child->widget->requisition.width = 0;
     child->widget->requisition.height = 0;
 #endif
@@ -137,19 +137,19 @@ gui_gtk_form_put(
     // it has been realized, or else things will break with GTK2.  Note
     // that gtk_widget_set_parent() realizes the widget if it's visible
     // and its parent is mapped.
-    if (gtk_widget_get_realized(GTK_WIDGET(form)))
+    যদি (gtk_widget_get_realized(GTK_WIDGET(form)))
 	form_attach_child_window(form, child);
 
     gtk_widget_set_parent(child_widget, GTK_WIDGET(form));
 
-    if (gtk_widget_get_realized(GTK_WIDGET(form))
+    যদি (gtk_widget_get_realized(GTK_WIDGET(form))
 	    && !gtk_widget_get_realized(child_widget))
 	form_realize_child(form, child);
 
     form_position_child(form, child, TRUE);
 }
 
-    void
+    শূন্য
 gui_gtk_form_move(
 	GtkForm	*form,
 	GtkWidget	*child_widget,
@@ -161,37 +161,37 @@ gui_gtk_form_move(
 
     g_return_if_fail(GTK_IS_FORM(form));
 
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
+    জন্য (tmp_list = form->children; tmp_list; tmp_list = tmp_list->পরবর্তী)
     {
-	child = tmp_list->data;
-	if (child->widget == child_widget)
+	child = tmp_list->তথ্য;
+	যদি (child->widget == child_widget)
 	{
 	    child->x = x;
 	    child->y = y;
 
 	    form_position_child(form, child, TRUE);
-	    return;
+	    ফেরত;
 	}
     }
 }
 
-    void
+    শূন্য
 gui_gtk_form_freeze(GtkForm *form)
 {
     g_return_if_fail(GTK_IS_FORM(form));
 
-    ++form->freeze_count;
+    ++form->freeze_গুনতি;
 }
 
-    void
+    শূন্য
 gui_gtk_form_thaw(GtkForm *form)
 {
     g_return_if_fail(GTK_IS_FORM(form));
 
-    if (!form->freeze_count)
-	return;
+    যদি (!form->freeze_গুনতি)
+	ফেরত;
 
-    if (!(--form->freeze_count))
+    যদি (!(--form->freeze_গুনতি))
     {
 	form_position_children(form);
 	gtk_widget_queue_draw(GTK_WIDGET(form));
@@ -200,32 +200,32 @@ gui_gtk_form_thaw(GtkForm *form)
 
 // Basic Object handling procedures
 
-#if GTK_CHECK_VERSION(3,0,0)
+#যদি GTK_CHECK_VERSION(3,0,0)
 G_DEFINE_TYPE(GtkForm, gui_gtk_form, GTK_TYPE_CONTAINER)
-#else
+#অন্যথা
     GtkType
-gui_gtk_form_get_type(void)
+gui_gtk_form_get_type(শূন্য)
 {
-    static GtkType form_type = 0;
+    স্থির GtkType form_type = 0;
 
-    if (!form_type)
+    যদি (!form_type)
     {
 	GtkTypeInfo form_info;
 
 	CLEAR_FIELD(form_info);
 	form_info.type_name = "GtkForm";
-	form_info.object_size = sizeof(GtkForm);
-	form_info.class_size = sizeof(GtkFormClass);
+	form_info.object_আকার = আকার(GtkForm);
+	form_info.class_আকার = আকার(GtkFormClass);
 	form_info.class_init_func = (GtkClassInitFunc)gui_gtk_form_class_init;
 	form_info.object_init_func = (GtkObjectInitFunc)gui_gtk_form_init;
 
 	form_type = gtk_type_unique(GTK_TYPE_CONTAINER, &form_info);
     }
-    return form_type;
+    ফেরত form_type;
 }
 #endif // !GTK_CHECK_VERSION(3,0,0)
 
-    static void
+    স্থির শূন্য
 gui_gtk_form_class_init(GtkFormClass *klass)
 {
     GtkWidgetClass *widget_class;
@@ -234,23 +234,23 @@ gui_gtk_form_class_init(GtkFormClass *klass)
     widget_class = (GtkWidgetClass *) klass;
     container_class = (GtkContainerClass *) klass;
 
-#if !GTK_CHECK_VERSION(3,0,0)
+#যদি !GTK_CHECK_VERSION(3,0,0)
     parent_class = gtk_type_class(gtk_container_get_type());
 #endif
 
     widget_class->realize = form_realize;
     widget_class->unrealize = form_unrealize;
     widget_class->map = form_map;
-#if GTK_CHECK_VERSION(3,0,0)
+#যদি GTK_CHECK_VERSION(3,0,0)
     widget_class->get_preferred_width = form_get_preferred_width;
     widget_class->get_preferred_height = form_get_preferred_height;
-#else
-    widget_class->size_request = form_size_request;
+#অন্যথা
+    widget_class->আকার_request = form_আকার_request;
 #endif
-    widget_class->size_allocate = form_size_allocate;
-#if GTK_CHECK_VERSION(3,0,0)
+    widget_class->আকার_allocate = form_আকার_allocate;
+#যদি GTK_CHECK_VERSION(3,0,0)
     widget_class->draw = form_draw;
-#else
+#অন্যথা
     widget_class->expose_event = form_expose;
 #endif
 
@@ -258,26 +258,26 @@ gui_gtk_form_class_init(GtkFormClass *klass)
     container_class->forall = form_forall;
 }
 
-    static void
+    স্থির শূন্য
 gui_gtk_form_init(GtkForm *form
-#if !GTK_CHECK_VERSION(3,0,0)
-	, void *g_class UNUSED
+#যদি !GTK_CHECK_VERSION(3,0,0)
+	, শূন্য *g_class UNUSED
 #endif
 	)
 {
-#if GTK_CHECK_VERSION(3,0,0)
+#যদি GTK_CHECK_VERSION(3,0,0)
     gtk_widget_set_has_window(GTK_WIDGET(form), TRUE);
 #endif
-    form->children = NULL;
-    form->bin_window = NULL;
-    form->freeze_count = 0;
+    form->children = ফাঁকা;
+    form->bin_window = ফাঁকা;
+    form->freeze_গুনতি = 0;
 }
 
 /*
  * Widget methods
  */
 
-    static void
+    স্থির শূন্য
 form_realize(GtkWidget *widget)
 {
     GList *tmp_list;
@@ -297,25 +297,25 @@ form_realize(GtkWidget *widget)
     attributes.y = allocation.y;
     attributes.width = allocation.width;
     attributes.height = allocation.height;
-    attributes.wclass = GDK_INPUT_OUTPUT;
+    attributes.wclass = GDK_প্রবেশ_OUTPUT;
     attributes.visual = gtk_widget_get_visual(widget);
-#if GTK_CHECK_VERSION(3,0,0)
+#যদি GTK_CHECK_VERSION(3,0,0)
     attributes.event_mask = GDK_EXPOSURE_MASK;
-#else
+#অন্যথা
     attributes.colormap = gtk_widget_get_colormap(widget);
     attributes.event_mask = GDK_VISIBILITY_NOTIFY_MASK;
 #endif
 
-#if GTK_CHECK_VERSION(3,0,0)
+#যদি GTK_CHECK_VERSION(3,0,0)
     attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL;
-#else
+#অন্যথা
     attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
 #endif
 
     gtk_widget_set_window(widget,
 			  gdk_window_new(gtk_widget_get_parent_window(widget),
 					 &attributes, attributes_mask));
-    gdk_window_set_user_data(gtk_widget_get_window(widget), widget);
+    gdk_window_set_user_তথ্য(gtk_widget_get_window(widget), widget);
 
     attributes.x = 0;
     attributes.y = 0;
@@ -323,32 +323,32 @@ form_realize(GtkWidget *widget)
 
     form->bin_window = gdk_window_new(gtk_widget_get_window(widget),
 				      &attributes, attributes_mask);
-    gdk_window_set_user_data(form->bin_window, widget);
+    gdk_window_set_user_তথ্য(form->bin_window, widget);
 
-#if GTK_CHECK_VERSION(3,0,0)
+#যদি GTK_CHECK_VERSION(3,0,0)
     {
-	GtkStyleContext * const sctx = gtk_widget_get_style_context(widget);
+	GtkStyleContext * ধ্রুবক sctx = gtk_widget_get_style_context(widget);
 
 	gtk_style_context_add_class(sctx, "gtk-form");
 	gtk_style_context_set_state(sctx, GTK_STATE_FLAG_NORMAL);
-# if !GTK_CHECK_VERSION(3,18,0)
+# যদি !GTK_CHECK_VERSION(3,18,0)
 	gtk_style_context_set_background(sctx, gtk_widget_get_window(widget));
 	gtk_style_context_set_background(sctx, form->bin_window);
 # endif
     }
-#else
+#অন্যথা
     widget->style = gtk_style_attach(widget->style, widget->window);
     gtk_style_set_background(widget->style, widget->window, GTK_STATE_NORMAL);
     gtk_style_set_background(widget->style, form->bin_window, GTK_STATE_NORMAL);
 #endif
 
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
+    জন্য (tmp_list = form->children; tmp_list; tmp_list = tmp_list->পরবর্তী)
     {
-	GtkFormChild *child = tmp_list->data;
+	GtkFormChild *child = tmp_list->তথ্য;
 
 	form_attach_child_window(form, child);
 
-	if (gtk_widget_get_visible(child->widget))
+	যদি (gtk_widget_get_visible(child->widget))
 	    form_realize_child(form, child);
     }
 }
@@ -361,7 +361,7 @@ form_realize(GtkWidget *widget)
 //
 // Well, I reckon at least the gdk_window_show(form->bin_window)
 // is necessary.  GtkForm is anything but a usual container widget.
-    static void
+    স্থির শূন্য
 form_map(GtkWidget *widget)
 {
     GList *tmp_list;
@@ -376,17 +376,17 @@ form_map(GtkWidget *widget)
     gdk_window_show(gtk_widget_get_window(widget));
     gdk_window_show(form->bin_window);
 
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
+    জন্য (tmp_list = form->children; tmp_list; tmp_list = tmp_list->পরবর্তী)
     {
-	GtkFormChild *child = tmp_list->data;
+	GtkFormChild *child = tmp_list->তথ্য;
 
-	if (gtk_widget_get_visible(child->widget)
+	যদি (gtk_widget_get_visible(child->widget)
 		&& !gtk_widget_get_mapped(child->widget))
 	    gtk_widget_map(child->widget);
     }
 }
 
-    static void
+    স্থির শূন্য
 form_unrealize(GtkWidget *widget)
 {
     GList *tmp_list;
@@ -398,15 +398,15 @@ form_unrealize(GtkWidget *widget)
 
     tmp_list = form->children;
 
-    gdk_window_set_user_data(form->bin_window, NULL);
+    gdk_window_set_user_তথ্য(form->bin_window, ফাঁকা);
     gdk_window_destroy(form->bin_window);
-    form->bin_window = NULL;
+    form->bin_window = ফাঁকা;
 
-    while (tmp_list)
+    যখন (tmp_list)
     {
-	GtkFormChild *child = tmp_list->data;
+	GtkFormChild *child = tmp_list->তথ্য;
 
-	if (child->window != NULL)
+	যদি (child->window != ফাঁকা)
 	{
 	    g_signal_handlers_disconnect_by_func(G_OBJECT(child->widget),
 		    FUNC2GENERIC(form_child_map),
@@ -415,64 +415,64 @@ form_unrealize(GtkWidget *widget)
 		    FUNC2GENERIC(form_child_unmap),
 		    child);
 
-	    gdk_window_set_user_data(child->window, NULL);
+	    gdk_window_set_user_তথ্য(child->window, ফাঁকা);
 	    gdk_window_destroy(child->window);
 
-	    child->window = NULL;
+	    child->window = ফাঁকা;
 	}
 
-	tmp_list = tmp_list->next;
+	tmp_list = tmp_list->পরবর্তী;
     }
 
-#if GTK_CHECK_VERSION(3,0,0)
-    if (GTK_WIDGET_CLASS (gui_gtk_form_parent_class)->unrealize)
+#যদি GTK_CHECK_VERSION(3,0,0)
+    যদি (GTK_WIDGET_CLASS (gui_gtk_form_parent_class)->unrealize)
 	 (* GTK_WIDGET_CLASS (gui_gtk_form_parent_class)->unrealize) (widget);
-#else
-    if (GTK_WIDGET_CLASS (parent_class)->unrealize)
+#অন্যথা
+    যদি (GTK_WIDGET_CLASS (parent_class)->unrealize)
 	 (* GTK_WIDGET_CLASS (parent_class)->unrealize) (widget);
 #endif
 }
 
-    static void
-form_size_request(GtkWidget *widget, GtkRequisition *requisition)
+    স্থির শূন্য
+form_আকার_request(GtkWidget *widget, GtkRequisition *requisition)
 {
     g_return_if_fail(GTK_IS_FORM(widget));
-    g_return_if_fail(requisition != NULL);
+    g_return_if_fail(requisition != ফাঁকা);
 
     requisition->width = 1;
     requisition->height = 1;
 }
 
-#if GTK_CHECK_VERSION(3,0,0)
-    static void
+#যদি GTK_CHECK_VERSION(3,0,0)
+    স্থির শূন্য
 form_get_preferred_width(GtkWidget *widget,
 			     gint      *minimal_width,
 			     gint      *natural_width)
 {
     GtkRequisition requisition;
 
-    form_size_request(widget, &requisition);
+    form_আকার_request(widget, &requisition);
 
     *minimal_width = requisition.width;
     *natural_width = requisition.width;
 }
 
-    static void
+    স্থির শূন্য
 form_get_preferred_height(GtkWidget *widget,
 			      gint	*minimal_height,
 			      gint	*natural_height)
 {
     GtkRequisition requisition;
 
-    form_size_request(widget, &requisition);
+    form_আকার_request(widget, &requisition);
 
     *minimal_height = requisition.height;
     *natural_height = requisition.height;
 }
 #endif // GTK_CHECK_VERSION(3,0,0)
 
-    static void
-form_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
+    স্থির শূন্য
+form_আকার_allocate(GtkWidget *widget, GtkAllocation *allocation)
 {
     GList *tmp_list;
     GtkForm *form;
@@ -483,30 +483,30 @@ form_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
 
     gtk_widget_get_allocation(widget, &cur_alloc);
 
-    if (cur_alloc.x == allocation->x
+    যদি (cur_alloc.x == allocation->x
 	    && cur_alloc.y == allocation->y
 	    && cur_alloc.width == allocation->width
 	    && cur_alloc.height == allocation->height)
-	return;
+	ফেরত;
 
     need_reposition = cur_alloc.width != allocation->width
 		   || cur_alloc.height != allocation->height;
     form = GTK_FORM(widget);
 
-    if (need_reposition)
+    যদি (need_reposition)
     {
 	tmp_list = form->children;
 
-	while (tmp_list)
+	যখন (tmp_list)
 	{
-	    GtkFormChild *child = tmp_list->data;
+	    GtkFormChild *child = tmp_list->তথ্য;
 	    form_position_child(form, child, TRUE);
 
-	    tmp_list = tmp_list->next;
+	    tmp_list = tmp_list->পরবর্তী;
 	}
     }
 
-    if (gtk_widget_get_realized(widget))
+    যদি (gtk_widget_get_realized(widget))
     {
 	gdk_window_move_resize(gtk_widget_get_window(widget),
 			       allocation->x, allocation->y,
@@ -516,12 +516,12 @@ form_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
 			       allocation->width, allocation->height);
     }
     gtk_widget_set_allocation(widget, allocation);
-    if (need_reposition)
+    যদি (need_reposition)
 	form_send_configure(form);
 }
 
-#if GTK_CHECK_VERSION(3,0,0)
-    static void
+#যদি GTK_CHECK_VERSION(3,0,0)
+    স্থির শূন্য
 gtk_form_render_background(GtkWidget *widget, cairo_t *cr)
 {
     gtk_render_background(gtk_widget_get_style_context(widget), cr,
@@ -530,22 +530,22 @@ gtk_form_render_background(GtkWidget *widget, cairo_t *cr)
 			  gtk_widget_get_allocated_height(widget));
 }
 
-    static gboolean
+    স্থির gboolean
 form_draw(GtkWidget *widget, cairo_t *cr)
 {
-    GList   *tmp_list = NULL;
-    GtkForm *form     = NULL;
+    GList   *tmp_list = ফাঁকা;
+    GtkForm *form     = ফাঁকা;
 
     g_return_val_if_fail(GTK_IS_FORM(widget), FALSE);
 
     gtk_form_render_background(widget, cr);
 
     form = GTK_FORM(widget);
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
+    জন্য (tmp_list = form->children; tmp_list; tmp_list = tmp_list->পরবর্তী)
     {
-	GtkFormChild * const formchild = tmp_list->data;
+	GtkFormChild * ধ্রুবক formchild = tmp_list->তথ্য;
 
-	if (!gtk_widget_get_has_window(formchild->widget) &&
+	যদি (!gtk_widget_get_has_window(formchild->widget) &&
 		gtk_cairo_should_draw_window(cr, formchild->window))
 	{
 	    // To get gtk_widget_draw() to work, it is required to call
@@ -564,10 +564,10 @@ form_draw(GtkWidget *widget, cairo_t *cr)
 	}
     }
 
-    return GTK_WIDGET_CLASS(gui_gtk_form_parent_class)->draw(widget, cr);
+    ফেরত GTK_WIDGET_CLASS(gui_gtk_form_parent_class)->draw(widget, cr);
 }
-#else // !GTK_CHECK_VERSION(3,0,0)
-    static gint
+#অন্যথা // !GTK_CHECK_VERSION(3,0,0)
+    স্থির gint
 form_expose(GtkWidget *widget, GdkEventExpose *event)
 {
     GList   *tmp_list;
@@ -577,46 +577,46 @@ form_expose(GtkWidget *widget, GdkEventExpose *event)
 
     form = GTK_FORM(widget);
 
-    if (event->window == form->bin_window)
-	return FALSE;
+    যদি (event->window == form->bin_window)
+	ফেরত FALSE;
 
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
+    জন্য (tmp_list = form->children; tmp_list; tmp_list = tmp_list->পরবর্তী)
 	gtk_container_propagate_expose(GTK_CONTAINER(widget),
-		GTK_WIDGET(((GtkFormChild *)tmp_list->data)->widget),
+		GTK_WIDGET(((GtkFormChild *)tmp_list->তথ্য)->widget),
 		event);
 
-    return FALSE;
+    ফেরত FALSE;
 }
 #endif // !GTK_CHECK_VERSION(3,0,0)
 
 // Container method
-    static void
+    স্থির শূন্য
 form_remove(GtkContainer *container, GtkWidget *widget)
 {
     GList *tmp_list;
     GtkForm *form;
-    GtkFormChild *child = NULL;	    // init for gcc
+    GtkFormChild *child = ফাঁকা;	    // init for gcc
 
     g_return_if_fail(GTK_IS_FORM(container));
 
     form = GTK_FORM(container);
 
     tmp_list = form->children;
-    while (tmp_list)
+    যখন (tmp_list)
     {
-	child = tmp_list->data;
-	if (child->widget == widget)
-	    break;
-	tmp_list = tmp_list->next;
+	child = tmp_list->তথ্য;
+	যদি (child->widget == widget)
+	    বিরতি;
+	tmp_list = tmp_list->পরবর্তী;
     }
 
-    if (tmp_list == NULL)
-	return;
+    যদি (tmp_list == ফাঁকা)
+	ফেরত;
 
-#if GTK_CHECK_VERSION(3,0,0)
-    const gboolean was_visible = gtk_widget_get_visible(widget);
+#যদি GTK_CHECK_VERSION(3,0,0)
+    ধ্রুবক gboolean was_visible = gtk_widget_get_visible(widget);
 #endif
-    if (child->window)
+    যদি (child->window)
     {
 	g_signal_handlers_disconnect_by_func(G_OBJECT(child->widget),
 		FUNC2GENERIC(&form_child_map), child);
@@ -625,12 +625,12 @@ form_remove(GtkContainer *container, GtkWidget *widget)
 
 	// FIXME: This will cause problems for reparenting NO_WINDOW
 	// widgets out of a GtkForm
-	gdk_window_set_user_data(child->window, NULL);
+	gdk_window_set_user_তথ্য(child->window, ফাঁকা);
 	gdk_window_destroy(child->window);
     }
     gtk_widget_unparent(widget);
-#if GTK_CHECK_VERSION(3,0,0)
-    if (was_visible)
+#যদি GTK_CHECK_VERSION(3,0,0)
+    যদি (was_visible)
 	gtk_widget_queue_resize(GTK_WIDGET(container));
 #endif
     form->children = g_list_remove_link(form->children, tmp_list);
@@ -638,40 +638,40 @@ form_remove(GtkContainer *container, GtkWidget *widget)
     g_free(child);
 }
 
-    static void
+    স্থির শূন্য
 form_forall(GtkContainer	*container,
 		gboolean	include_internals UNUSED,
 		GtkCallback	callback,
-		gpointer	callback_data)
+		gpointer	callback_তথ্য)
 {
     GtkForm *form;
     GtkFormChild *child;
     GList *tmp_list;
 
     g_return_if_fail(GTK_IS_FORM(container));
-    g_return_if_fail(callback != NULL);
+    g_return_if_fail(callback != ফাঁকা);
 
     form = GTK_FORM(container);
 
     tmp_list = form->children;
-    while (tmp_list)
+    যখন (tmp_list)
     {
-	child = tmp_list->data;
-	tmp_list = tmp_list->next;
+	child = tmp_list->তথ্য;
+	tmp_list = tmp_list->পরবর্তী;
 
-	(*callback) (child->widget, callback_data);
+	(*callback) (child->widget, callback_তথ্য);
     }
 }
 
 // Operations on children
 
-    static void
+    স্থির শূন্য
 form_attach_child_window(GtkForm *form, GtkFormChild *child)
 {
-    if (child->window != NULL)
-	return; // been there, done that
+    যদি (child->window != ফাঁকা)
+	ফেরত; // been there, done that
 
-    if (!gtk_widget_get_has_window(child->widget))
+    যদি (!gtk_widget_get_has_window(child->widget))
     {
 	GtkWidget	*widget;
 	GdkWindowAttr	attributes;
@@ -680,9 +680,9 @@ form_attach_child_window(GtkForm *form, GtkFormChild *child)
 
 	widget = GTK_WIDGET(form);
 
-#if GTK_CHECK_VERSION(3,0,0)
-	gtk_widget_get_preferred_size(child->widget, &requisition, NULL);
-#else
+#যদি GTK_CHECK_VERSION(3,0,0)
+	gtk_widget_get_preferred_আকার(child->widget, &requisition, ফাঁকা);
+#অন্যথা
 	requisition = child->widget->requisition;
 #endif
 	attributes.window_type = GDK_WINDOW_CHILD;
@@ -690,32 +690,32 @@ form_attach_child_window(GtkForm *form, GtkFormChild *child)
 	attributes.y = child->y;
 	attributes.width = requisition.width;
 	attributes.height = requisition.height;
-	attributes.wclass = GDK_INPUT_OUTPUT;
+	attributes.wclass = GDK_প্রবেশ_OUTPUT;
 	attributes.visual = gtk_widget_get_visual(widget);
-#if !GTK_CHECK_VERSION(3,0,0)
+#যদি !GTK_CHECK_VERSION(3,0,0)
 	attributes.colormap = gtk_widget_get_colormap(widget);
 #endif
 	attributes.event_mask = GDK_EXPOSURE_MASK;
 
-#if GTK_CHECK_VERSION(3,0,0)
+#যদি GTK_CHECK_VERSION(3,0,0)
 	attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL;
-#else
+#অন্যথা
 	attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
 #endif
 	child->window = gdk_window_new(form->bin_window,
 				       &attributes, attributes_mask);
-	gdk_window_set_user_data(child->window, widget);
+	gdk_window_set_user_তথ্য(child->window, widget);
 
-#if GTK_CHECK_VERSION(3,0,0)
+#যদি GTK_CHECK_VERSION(3,0,0)
 	{
-	    GtkStyleContext * const sctx = gtk_widget_get_style_context(widget);
+	    GtkStyleContext * ধ্রুবক sctx = gtk_widget_get_style_context(widget);
 
 	    gtk_style_context_set_state(sctx, GTK_STATE_FLAG_NORMAL);
-# if !GTK_CHECK_VERSION(3,18,0)
+# যদি !GTK_CHECK_VERSION(3,18,0)
 	    gtk_style_context_set_background(sctx, child->window);
 # endif
 	}
-#else
+#অন্যথা
 	gtk_style_set_background(widget->style,
 				 child->window,
 				 GTK_STATE_NORMAL);
@@ -731,20 +731,20 @@ form_attach_child_window(GtkForm *form, GtkFormChild *child)
 	g_signal_connect(G_OBJECT(child->widget), "unmap",
 			 G_CALLBACK(&form_child_unmap), child);
     }
-    else if (!gtk_widget_get_realized(child->widget))
+    অন্যথা যদি (!gtk_widget_get_realized(child->widget))
     {
 	gtk_widget_set_parent_window(child->widget, form->bin_window);
     }
 }
 
-    static void
+    স্থির শূন্য
 form_realize_child(GtkForm *form, GtkFormChild *child)
 {
     form_attach_child_window(form, child);
     gtk_widget_realize(child->widget);
 }
 
-    static void
+    স্থির শূন্য
 form_position_child(
     GtkForm		*form,
     GtkFormChild	*child,
@@ -756,15 +756,15 @@ form_position_child(
     x = child->x;
     y = child->y;
 
-    if ((x >= G_MINSHORT) && (x <= G_MAXSHORT) &&
+    যদি ((x >= G_MINSHORT) && (x <= G_MAXSHORT) &&
 	(y >= G_MINSHORT) && (y <= G_MAXSHORT))
     {
-	if (!child->mapped)
+	যদি (!child->mapped)
 	{
-	    if (gtk_widget_get_mapped(GTK_WIDGET(form))
+	    যদি (gtk_widget_get_mapped(GTK_WIDGET(form))
 		    && gtk_widget_get_visible(child->widget))
 	    {
-		if (!gtk_widget_get_mapped(child->widget))
+		যদি (!gtk_widget_get_mapped(child->widget))
 		    gtk_widget_map(child->widget);
 
 		child->mapped = TRUE;
@@ -772,20 +772,20 @@ form_position_child(
 	    }
 	}
 
-	if (force_allocate)
+	যদি (force_allocate)
 	{
 	    GtkAllocation allocation;
 	    GtkRequisition requisition;
 
-#if GTK_CHECK_VERSION(3,0,0)
-	    gtk_widget_get_preferred_size(child->widget, &requisition, NULL);
-#else
+#যদি GTK_CHECK_VERSION(3,0,0)
+	    gtk_widget_get_preferred_আকার(child->widget, &requisition, ফাঁকা);
+#অন্যথা
 	    requisition = child->widget->requisition;
 #endif
 
-	    if (!gtk_widget_get_has_window(child->widget))
+	    যদি (!gtk_widget_get_has_window(child->widget))
 	    {
-		if (child->window)
+		যদি (child->window)
 		{
 		    gdk_window_move_resize(child->window,
 			    x, y,
@@ -796,7 +796,7 @@ form_position_child(
 		allocation.x = 0;
 		allocation.y = 0;
 	    }
-	    else
+	    অন্যথা
 	    {
 		allocation.x = x;
 		allocation.y = y;
@@ -805,37 +805,37 @@ form_position_child(
 	    allocation.width = requisition.width;
 	    allocation.height = requisition.height;
 
-	    gtk_widget_size_allocate(child->widget, &allocation);
+	    gtk_widget_আকার_allocate(child->widget, &allocation);
 	}
     }
-    else
+    অন্যথা
     {
-	if (child->mapped)
+	যদি (child->mapped)
 	{
 	    child->mapped = FALSE;
 
-	    if (gtk_widget_get_mapped(child->widget))
+	    যদি (gtk_widget_get_mapped(child->widget))
 		gtk_widget_unmap(child->widget);
 	}
     }
 }
 
-    static void
+    স্থির শূন্য
 form_position_children(GtkForm *form)
 {
     GList *tmp_list;
 
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
-	form_position_child(form, tmp_list->data, FALSE);
+    জন্য (tmp_list = form->children; tmp_list; tmp_list = tmp_list->পরবর্তী)
+	form_position_child(form, tmp_list->তথ্য, FALSE);
 }
 
-    void
+    শূন্য
 gui_gtk_form_move_resize(GtkForm *form, GtkWidget *widget,
 		     gint x, gint y, gint w, gint h)
 {
-#if GTK_CHECK_VERSION(3,0,0)
-    gtk_widget_set_size_request(widget, w, h);
-#else
+#যদি GTK_CHECK_VERSION(3,0,0)
+    gtk_widget_set_আকার_request(widget, w, h);
+#অন্যথা
     widget->requisition.width  = w;
     widget->requisition.height = h;
 #endif
@@ -843,7 +843,7 @@ gui_gtk_form_move_resize(GtkForm *form, GtkWidget *widget,
     gui_gtk_form_move(form, widget, x, y);
 }
 
-    static void
+    স্থির শূন্য
 form_send_configure(GtkForm *form)
 {
     GtkWidget *widget;
@@ -863,23 +863,23 @@ form_send_configure(GtkForm *form)
     gtk_main_do_event((GdkEvent*)&event);
 }
 
-    static void
-form_child_map(GtkWidget *widget UNUSED, gpointer user_data)
+    স্থির শূন্য
+form_child_map(GtkWidget *widget UNUSED, gpointer user_তথ্য)
 {
     GtkFormChild *child;
 
-    child = (GtkFormChild *)user_data;
+    child = (GtkFormChild *)user_তথ্য;
 
     child->mapped = TRUE;
     gdk_window_show(child->window);
 }
 
-    static void
-form_child_unmap(GtkWidget *widget UNUSED, gpointer user_data)
+    স্থির শূন্য
+form_child_unmap(GtkWidget *widget UNUSED, gpointer user_তথ্য)
 {
     GtkFormChild *child;
 
-    child = (GtkFormChild *)user_data;
+    child = (GtkFormChild *)user_তথ্য;
 
     child->mapped = FALSE;
     gdk_window_hide(child->window);

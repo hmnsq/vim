@@ -1,19 +1,19 @@
 #ifndef __VTERM_INTERNAL_H__
 #define __VTERM_INTERNAL_H__
 
-#include "vterm.h"
+#অন্তর্ভাব "vterm.h"
 
-#include <stdarg.h>
+#অন্তর্ভাব <stdarg.h>
 
-#if defined(__GNUC__) && !defined(__MINGW32__)
+#যদি defined(__GNUC__) && !defined(__MINGW32__)
 # define INTERNAL __attribute__((visibility("internal")))
-#else
+#অন্যথা
 # define INTERNAL
 #endif
 
-#if defined(__GNUC__) || defined(__MINGW32__)
+#যদি defined(__GNUC__) || defined(__MINGW32__)
 # define UNUSED __attribute__((unused))
-#else
+#অন্যথা
 # define UNUSED
 #endif
 
@@ -22,7 +22,7 @@
 # define DEBUG_LOG1(s, a) fprintf(stderr, s, a)
 # define DEBUG_LOG2(s, a, b) fprintf(stderr, s, a, b)
 # define DEBUG_LOG3(s, a, b, c) fprintf(stderr, s, a, b, c)
-#else
+#অন্যথা
 # define DEBUG_LOG(s)
 # define DEBUG_LOG1(s, a)
 # define DEBUG_LOG2(s, a, b)
@@ -39,132 +39,132 @@
 #define BUFIDX_PRIMARY   0
 #define BUFIDX_ALTSCREEN 1
 
-typedef struct VTermEncoding VTermEncoding;
+প্রকারলেখ কাঠামো VTermEncoding VTermEncoding;
 
-typedef struct {
+প্রকারলেখ কাঠামো {
   VTermEncoding *enc;
 
   // This size should be increased if required by other stateful encodings
-  char           data[4*sizeof(uint32_t)];
+  অক্ষর           তথ্য[4*আকার(uint32_t)];
 } VTermEncodingInstance;
 
-struct VTermPen
+কাঠামো VTermPen
 {
   VTermColor fg;
   VTermColor bg;
-  unsigned int bold:1;
-  unsigned int underline:2;
-  unsigned int italic:1;
-  unsigned int blink:1;
-  unsigned int reverse:1;
-  unsigned int conceal:1;
-  unsigned int strike:1;
-  unsigned int font:4; /* To store 0-9 */
-  unsigned int small:1;
-  unsigned int baseline:2;
+  unsigned পূর্ণসংখ্যা bold:1;
+  unsigned পূর্ণসংখ্যা underline:2;
+  unsigned পূর্ণসংখ্যা italic:1;
+  unsigned পূর্ণসংখ্যা blink:1;
+  unsigned পূর্ণসংখ্যা reverse:1;
+  unsigned পূর্ণসংখ্যা conceal:1;
+  unsigned পূর্ণসংখ্যা strike:1;
+  unsigned পূর্ণসংখ্যা font:4; /* To store 0-9 */
+  unsigned পূর্ণসংখ্যা small:1;
+  unsigned পূর্ণসংখ্যা baseline:2;
 };
 
-struct VTermState
+কাঠামো VTermState
 {
   VTerm *vt;
 
-  const VTermStateCallbacks *callbacks;
-  void *cbdata;
-  int callbacks_has_premove;
+  ধ্রুবক VTermStateCallbacks *callbacks;
+  শূন্য *cbdata;
+  পূর্ণসংখ্যা callbacks_has_premove;
 
-  const VTermStateFallbacks *fallbacks;
-  void *fbdata;
+  ধ্রুবক VTermStateFallbacks *fallbacks;
+  শূন্য *fbdata;
 
-  int rows;
-  int cols;
+  পূর্ণসংখ্যা rows;
+  পূর্ণসংখ্যা cols;
 
   /* Current cursor position */
   VTermPos pos;
 
-  int at_phantom; /* True if we're on the "81st" phantom column to defer a wraparound */
+  পূর্ণসংখ্যা at_phantom; /* True if we're on the "81st" phantom column to defer a wraparound */
 
-  int scrollregion_top;
-  int scrollregion_bottom; /* -1 means unbounded */
+  পূর্ণসংখ্যা scrollregion_শীর্ষ;
+  পূর্ণসংখ্যা scrollregion_bottom; /* -1 means unbounded */
 #define SCROLLREGION_BOTTOM(state) ((state)->scrollregion_bottom > -1 ? (state)->scrollregion_bottom : (state)->rows)
-  int scrollregion_left;
-#define SCROLLREGION_LEFT(state)  ((state)->mode.leftrightmargin ? (state)->scrollregion_left : 0)
-  int scrollregion_right; /* -1 means unbounded */
-#define SCROLLREGION_RIGHT(state) ((state)->mode.leftrightmargin && (state)->scrollregion_right > -1 ? (state)->scrollregion_right : (state)->cols)
+  পূর্ণসংখ্যা scrollregion_বাম;
+#define SCROLLREGION_বাম(state)  ((state)->mode.leftrightmargin ? (state)->scrollregion_বাম : 0)
+  পূর্ণসংখ্যা scrollregion_ডান; /* -1 means unbounded */
+#define SCROLLREGION_ডান(state) ((state)->mode.leftrightmargin && (state)->scrollregion_ডান > -1 ? (state)->scrollregion_ডান : (state)->cols)
 
   /* Bitvector of tab stops */
-  unsigned char *tabstops;
+  unsigned অক্ষর *tabstops;
 
   /* Primary and Altscreen; lineinfos[1] is lazily allocated as needed */
-  VTermLineInfo *lineinfos[2];
+  VTerm_সারি_Info *lineinfos[2];
 
   /* lineinfo will == lineinfos[0] or lineinfos[1], depending on altscreen */
-  VTermLineInfo *lineinfo;
+  VTerm_সারি_Info *lineinfo;
 #define ROWWIDTH(state,row) ((state)->lineinfo[(row)].doublewidth ? ((state)->cols / 2) : (state)->cols)
 #define THISROWWIDTH(state) ROWWIDTH(state, (state)->pos.row)
 
   /* Mouse state */
-  int mouse_col, mouse_row;
-  int mouse_buttons;
-  int mouse_flags;
+  পূর্ণসংখ্যা mouse_col, mouse_row;
+  পূর্ণসংখ্যা mouse_buttons;
+  পূর্ণসংখ্যা mouse_flags;
 
-  enum { MOUSE_X10, MOUSE_UTF8, MOUSE_SGR, MOUSE_RXVT } mouse_protocol;
+  গণনা { MOUSE_X10, MOUSE_UTF8, MOUSE_SGR, MOUSE_RXVT } mouse_protocol;
 
   /* Last glyph output, for Unicode recombining purposes */
   uint32_t *combine_chars;
-  size_t combine_chars_size; // Number of ELEMENTS in the above
-  int combine_width; // The width of the glyph above
+  size_t combine_chars_আকার; // Number of ELEMENTS in the above
+  পূর্ণসংখ্যা combine_width; // The width of the glyph above
   VTermPos combine_pos;   // Position before movement
 
-  struct {
-    unsigned int keypad:1;
-    unsigned int cursor:1;
-    unsigned int autowrap:1;
-    unsigned int insert:1;
-    unsigned int newline:1;
-    unsigned int cursor_visible:1;
-    unsigned int cursor_blink:1;
-    unsigned int cursor_shape:2;
-    unsigned int alt_screen:1;
-    unsigned int origin:1;
-    unsigned int screen:1;
-    unsigned int leftrightmargin:1;
-    unsigned int bracketpaste:1;
-    unsigned int report_focus:1;
-    unsigned int modify_other_keys:1;
-    unsigned int kitty_keyboard:1;
+  কাঠামো {
+    unsigned পূর্ণসংখ্যা keypad:1;
+    unsigned পূর্ণসংখ্যা cursor:1;
+    unsigned পূর্ণসংখ্যা autowrap:1;
+    unsigned পূর্ণসংখ্যা ঢোকাও:1;
+    unsigned পূর্ণসংখ্যা newline:1;
+    unsigned পূর্ণসংখ্যা cursor_visible:1;
+    unsigned পূর্ণসংখ্যা cursor_blink:1;
+    unsigned পূর্ণসংখ্যা cursor_shape:2;
+    unsigned পূর্ণসংখ্যা alt_screen:1;
+    unsigned পূর্ণসংখ্যা origin:1;
+    unsigned পূর্ণসংখ্যা screen:1;
+    unsigned পূর্ণসংখ্যা leftrightmargin:1;
+    unsigned পূর্ণসংখ্যা bracketpaste:1;
+    unsigned পূর্ণসংখ্যা report_focus:1;
+    unsigned পূর্ণসংখ্যা modify_other_চাবিগুলি:1;
+    unsigned পূর্ণসংখ্যা kitty_keyboard:1;
   } mode;
 
   VTermEncodingInstance encoding[4], encoding_utf8;
-  int gl_set, gr_set, gsingle_set;
+  পূর্ণসংখ্যা gl_set, gr_set, gsingle_set;
 
-  struct VTermPen pen;
+  কাঠামো VTermPen pen;
 
   VTermColor default_fg;
   VTermColor default_bg;
   VTermColor colors[16]; // Store the 8 ANSI and the 8 ANSI high-brights only
 
-  int bold_is_highbright;
+  পূর্ণসংখ্যা bold_is_highbright;
 
-  unsigned int protected_cell : 1;
+  unsigned পূর্ণসংখ্যা protected_cell : 1;
 
   /* Saved state under DEC mode 1048/1049 */
-  struct {
+  কাঠামো {
     VTermPos pos;
-    struct VTermPen pen;
+    কাঠামো VTermPen pen;
 
-    struct {
-      unsigned int cursor_visible:1;
-      unsigned int cursor_blink:1;
-      unsigned int cursor_shape:2;
+    কাঠামো {
+      unsigned পূর্ণসংখ্যা cursor_visible:1;
+      unsigned পূর্ণসংখ্যা cursor_blink:1;
+      unsigned পূর্ণসংখ্যা cursor_shape:2;
     } mode;
   } saved;
 
   /* Temporary state for DECRQSS parsing */
-  union {
-    char decrqss[4];
-    struct {
+  সংঘ {
+    অক্ষর decrqss[4];
+    কাঠামো {
       uint16_t mask;
-      enum {
+      গণনা {
         SELECTION_INITIAL,
         SELECTION_SELECTED,
         SELECTION_QUERY,
@@ -177,29 +177,29 @@ struct VTermState
     } selection;
   } tmp;
 
-  struct {
-    const VTermSelectionCallbacks *callbacks;
-    void *user;
-    char *buffer;
+  কাঠামো {
+    ধ্রুবক VTermSelectionCallbacks *callbacks;
+    শূন্য *user;
+    অক্ষর *বাফার;
     size_t buflen;
   } selection;
 };
 
-struct VTerm
+কাঠামো VTerm
 {
-  const VTermAllocatorFunctions *allocator;
-  void *allocdata;
+  ধ্রুবক VTermAllocatorFunctions *allocator;
+  শূন্য *allocdata;
 
-  int rows;
-  int cols;
+  পূর্ণসংখ্যা rows;
+  পূর্ণসংখ্যা cols;
 
-  struct {
-    unsigned int utf8:1;
-    unsigned int ctrl8bit:1;
+  কাঠামো {
+    unsigned পূর্ণসংখ্যা utf8:1;
+    unsigned পূর্ণসংখ্যা ctrl8bit:1;
   } mode;
 
-  struct {
-    enum VTermParserState {
+  কাঠামো {
+    গণনা VTermParserState {
       NORMAL,
       CSI_LEADER,
       CSI_ARGS,
@@ -214,84 +214,84 @@ struct VTerm
       SOS,
     } state;
 
-    unsigned int in_esc : 1;
+    unsigned পূর্ণসংখ্যা in_esc : 1;
 
-    int intermedlen;
-    char intermed[INTERMED_MAX];
+    পূর্ণসংখ্যা intermedlen;
+    অক্ষর intermed[INTERMED_MAX];
 
-    union {
-      struct {
-        int leaderlen;
-        char leader[CSI_LEADER_MAX];
+    সংঘ {
+      কাঠামো {
+        পূর্ণসংখ্যা leaderlen;
+        অক্ষর leader[CSI_LEADER_MAX];
 
-        int argi;
+        পূর্ণসংখ্যা argi;
         long args[CSI_ARGS_MAX];
       } csi;
-      struct {
-        int command;
+      কাঠামো {
+        পূর্ণসংখ্যা command;
       } osc;
-      struct {
-        int commandlen;
-        char command[CSI_LEADER_MAX];
+      কাঠামো {
+        পূর্ণসংখ্যা commandlen;
+        অক্ষর command[CSI_LEADER_MAX];
       } dcs;
     } v;
 
-    const VTermParserCallbacks *callbacks;
-    void *cbdata;
+    ধ্রুবক VTermParserCallbacks *callbacks;
+    শূন্য *cbdata;
 
-    int string_initial;
+    পূর্ণসংখ্যা string_initial;
 
-    int emit_nul;
+    পূর্ণসংখ্যা emit_nul;
   } parser;
 
   /* len == malloc()ed size; cur == number of valid bytes */
 
   VTermOutputCallback *outfunc;
-  void                *outdata;
+  শূন্য                *outdata;
 
-  char  *outbuffer;
+  অক্ষর  *outbuffer;
   size_t outbuffer_len;
   size_t outbuffer_cur;
 
-  char  *tmpbuffer;
+  অক্ষর  *tmpbuffer;
   size_t tmpbuffer_len;
 
   VTermState *state;
   VTermScreen *screen;
 
-  int in_backspace;
+  পূর্ণসংখ্যা in_backspace;
 };
 
-struct VTermEncoding {
-  void (*init) (VTermEncoding *enc, void *data);
-  void (*decode)(VTermEncoding *enc, void *data,
-                 uint32_t cp[], int *cpi, int cplen,
-                 const char bytes[], size_t *pos, size_t len);
+কাঠামো VTermEncoding {
+  শূন্য (*init) (VTermEncoding *enc, শূন্য *তথ্য);
+  শূন্য (*decode)(VTermEncoding *enc, শূন্য *তথ্য,
+                 uint32_t cp[], পূর্ণসংখ্যা *cpi, পূর্ণসংখ্যা cplen,
+                 ধ্রুবক অক্ষর bytes[], size_t *pos, size_t len);
 };
 
-typedef enum {
+প্রকারলেখ গণনা {
   ENC_UTF8,
   ENC_SINGLE_94
 } VTermEncodingType;
 
-void *vterm_allocator_malloc(VTerm *vt, size_t size);
-void  vterm_allocator_free(VTerm *vt, void *ptr);
+শূন্য *vterm_allocator_malloc(VTerm *vt, size_t আকার_2);
+শূন্য  vterm_allocator_free(VTerm *vt, শূন্য *ptr);
 
-void vterm_push_output_bytes(VTerm *vt, const char *bytes, size_t len);
-void vterm_push_output_vsprintf(VTerm *vt, const char *format, va_list args);
-void vterm_push_output_sprintf(VTerm *vt, const char *format, ...);
-void vterm_push_output_sprintf_ctrl(VTerm *vt, unsigned char ctrl, const char *fmt, ...);
-void vterm_push_output_sprintf_str(VTerm *vt, unsigned char ctrl, int term, const char *fmt, ...);
+শূন্য vterm_ঠেলো_output_bytes(VTerm *vt, ধ্রুবক অক্ষর *bytes, size_t len);
+শূন্য vterm_ঠেলো_output_vsprintf(VTerm *vt, ধ্রুবক অক্ষর *format, va_list args);
+শূন্য vterm_ঠেলো_output_sprintf(VTerm *vt, ধ্রুবক অক্ষর *format, ...);
+শূন্য vterm_ঠেলো_output_sprintf_ctrl(VTerm *vt, unsigned অক্ষর ctrl, ধ্রুবক অক্ষর *fmt, ...);
+শূন্য vterm_ঠেলো_output_sprintf_str(VTerm *vt, unsigned অক্ষর ctrl, পূর্ণসংখ্যা term, ধ্রুবক অক্ষর *fmt, ...);
 
-void vterm_state_free(VTermState *state);
+শূন্য vterm_state_free(VTermState *state);
 
-void vterm_state_newpen(VTermState *state);
-void vterm_state_resetpen(VTermState *state);
-void vterm_state_setpen(VTermState *state, const long args[], int argcount);
-int  vterm_state_getpen(VTermState *state, long args[], int argcount);
-void vterm_state_savepen(VTermState *state, int save);
+শূন্য vterm_state_newpen(VTermState *state);
+শূন্য vterm_state_resetpen(VTermState *state);
+শূন্য vterm_state_setpen(VTermState *state, ধ্রুবক long args[], পূর্ণসংখ্যা argcount);
+পূর্ণসংখ্যা  vterm_state_getpen(VTermState *state, long args[], পূর্ণসংখ্যা argcount);
+শূন্য vterm_state_savepen(VTermState *state, পূর্ণসংখ্যা save);
 
-enum {
+গণনা {
   C1_SS3 = 0x8f,
   C1_DCS = 0x90,
   C1_CSI = 0x9b,
@@ -299,30 +299,30 @@ enum {
   C1_OSC = 0x9d,
 };
 
-void vterm_state_push_output_sprintf_CSI(VTermState *vts, const char *format, ...);
+শূন্য vterm_state_ঠেলো_output_sprintf_CSI(VTermState *vts, ধ্রুবক অক্ষর *format, ...);
 
-void vterm_screen_free(VTermScreen *screen);
+শূন্য vterm_screen_free(VTermScreen *screen);
 
-VTermEncoding *vterm_lookup_encoding(VTermEncodingType type, char designation);
+VTermEncoding *vterm_lookup_encoding(VTermEncodingType type, অক্ষর designation);
 
-int vterm_unicode_width(uint32_t codepoint);
-int vterm_unicode_is_combining(uint32_t codepoint);
-int vterm_unicode_is_ambiguous(uint32_t codepoint);
-int vterm_get_special_pty_type(void);
+পূর্ণসংখ্যা vterm_unicode_width(uint32_t codepoint);
+পূর্ণসংখ্যা vterm_unicode_is_combining(uint32_t codepoint);
+পূর্ণসংখ্যা vterm_unicode_is_ambiguous(uint32_t codepoint);
+পূর্ণসংখ্যা vterm_get_special_pty_type(শূন্য);
 
-#if (defined(_XOPEN_SOURCE) && _XOPEN_SOURCE >= 500) \
+#যদি (defined(_XOPEN_SOURCE) && _XOPEN_SOURCE >= 500) \
 	|| defined(_ISOC99_SOURCE) || defined(_BSD_SOURCE)
 # undef VSNPRINTF
 # define VSNPRINTF vsnprintf
 # undef SNPRINTF
-#else
+#অন্যথা
 # ifdef VSNPRINTF
 // Use a provided vsnprintf() function.
-int VSNPRINTF(char *str, size_t str_m, const char *fmt, va_list ap);
+পূর্ণসংখ্যা VSNPRINTF(অক্ষর *str, size_t str_m, ধ্রুবক অক্ষর *fmt, va_list ap);
 # endif
 # ifdef SNPRINTF
 // Use a provided snprintf() function.
-int SNPRINTF(char *str, size_t str_m, const char *fmt, ...);
+পূর্ণসংখ্যা SNPRINTF(অক্ষর *str, size_t str_m, ধ্রুবক অক্ষর *fmt, ...);
 # endif
 #endif
 #ifndef SNPRINTF

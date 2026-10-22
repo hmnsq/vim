@@ -41,330 +41,330 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "xinclude.h"
+#অন্তর্ভাব "xinclude.h"
 
 #define MAX_PTR	UINT_MAX
 #define MAX_CNT	UINT_MAX
 
-#define LINE_END(n) (line##n + count##n - 1)
-#define LINE_END_PTR(n) (*line##n + *count##n - 1)
+#define সারি_END(n) (সারি##n + গুনতি##n - 1)
+#define সারি_END_PTR(n) (*সারি##n + *গুনতি##n - 1)
 
-struct histindex {
-	struct record {
-		unsigned int ptr, cnt;
-		struct record *next;
+কাঠামো histindex {
+	কাঠামো record {
+		unsigned পূর্ণসংখ্যা ptr, cnt;
+		কাঠামো record *পরবর্তী;
 	} **records, /* an occurrence */
-	  **line_map; /* map of line to record chain */
+	  **সারি_map; /* map of line to record chain */
 	chastore_t rcha;
-	unsigned int *next_ptrs;
-	unsigned int table_bits,
-		     records_size,
-		     line_map_size;
+	unsigned পূর্ণসংখ্যা *পরবর্তী_ptrs;
+	unsigned পূর্ণসংখ্যা table_bits,
+		     records_আকার,
+		     সারি_map_আকার;
 
-	unsigned int max_chain_length,
-		     key_shift,
+	unsigned পূর্ণসংখ্যা max_chain_দৈর্ঘ্য,
+		     চাবি_shift,
 		     ptr_shift;
 
-	unsigned int cnt,
+	unsigned পূর্ণসংখ্যা cnt,
 		     has_common;
 
 	xdfenv_t *env;
-	xpparam_t const *xpp;
+	xpparam_t ধ্রুবক *xpp;
 };
 
-struct region {
-	unsigned int begin1, end1;
-	unsigned int begin2, end2;
+কাঠামো region {
+	unsigned পূর্ণসংখ্যা begin1, end1;
+	unsigned পূর্ণসংখ্যা begin2, end2;
 };
 
-#define LINE_MAP(i, a) (i->line_map[(a) - i->ptr_shift])
+#define সারি_MAP(i, a) (i->সারি_map[(a) - i->ptr_shift])
 
-#define NEXT_PTR(index, ptr) \
-	(index->next_ptrs[(ptr) - index->ptr_shift])
+#define পরবর্তী_PTR(সূচক, ptr) \
+	(সূচক->পরবর্তী_ptrs[(ptr) - সূচক->ptr_shift])
 
-#define CNT(index, ptr) \
-	((LINE_MAP(index, ptr))->cnt)
+#define CNT(সূচক, ptr) \
+	((সারি_MAP(সূচক, ptr))->cnt)
 
 #define REC(env, s, l) \
 	(&env->xdf##s.recs[l - 1])
 
-static int cmp_recs(xrecord_t *r1, xrecord_t *r2)
+স্থির পূর্ণসংখ্যা cmp_recs(xrecord_t *r1, xrecord_t *r2)
 {
-	return r1->ha == r2->ha;
+	ফেরত r1->ha == r2->ha;
 
 }
 
 #define CMP(i, s1, l1, s2, l2) \
 	(cmp_recs(REC(i->env, s1, l1), REC(i->env, s2, l2)))
 
-#define TABLE_HASH(index, side, line) \
-	XDL_HASHLONG((REC(index->env, side, line))->ha, index->table_bits)
+#define TABLE_HASH(সূচক, side, সারি) \
+	XDL_HASHLONG((REC(সূচক->env, side, সারি))->ha, সূচক->table_bits)
 
-static int scanA(struct histindex *index, int line1, int count1)
+স্থির পূর্ণসংখ্যা scanA(কাঠামো histindex *সূচক, পূর্ণসংখ্যা line1, পূর্ণসংখ্যা count1)
 {
-	unsigned int ptr, tbl_idx;
-	unsigned int chain_len;
-	struct record **rec_chain, *rec;
+	unsigned পূর্ণসংখ্যা ptr, tbl_idx;
+	unsigned পূর্ণসংখ্যা chain_len;
+	কাঠামো record **rec_chain, *rec;
 
-	for (ptr = LINE_END(1); (unsigned int)line1 <= ptr; ptr--) {
-		tbl_idx = TABLE_HASH(index, 1, ptr);
-		rec_chain = index->records + tbl_idx;
+	জন্য (ptr = সারি_END(1); (unsigned পূর্ণসংখ্যা)line1 <= ptr; ptr--) {
+		tbl_idx = TABLE_HASH(সূচক, 1, ptr);
+		rec_chain = সূচক->records + tbl_idx;
 		rec = *rec_chain;
 
 		chain_len = 0;
-		while (rec) {
-			if (CMP(index, 1, rec->ptr, 1, ptr)) {
+		যখন (rec) {
+			যদি (CMP(সূচক, 1, rec->ptr, 1, ptr)) {
 				/*
 				 * ptr is identical to another element. Insert
 				 * it onto the front of the existing element
 				 * chain.
 				 */
-				NEXT_PTR(index, ptr) = rec->ptr;
+				পরবর্তী_PTR(সূচক, ptr) = rec->ptr;
 				rec->ptr = ptr;
 				/* cap rec->cnt at MAX_CNT */
 				rec->cnt = (rec->cnt < MAX_CNT) ? rec->cnt + 1 : rec->cnt;
-				LINE_MAP(index, ptr) = rec;
-				goto continue_scan;
+				সারি_MAP(সূচক, ptr) = rec;
+				যাও continue_scan;
 			}
 
-			rec = rec->next;
+			rec = rec->পরবর্তী;
 			chain_len++;
 		}
 
-		if (chain_len == index->max_chain_length)
-			return -1;
+		যদি (chain_len == সূচক->max_chain_দৈর্ঘ্য)
+			ফেরত -1;
 
 		/*
 		 * This is the first time we have ever seen this particular
 		 * element in the sequence. Construct a new chain for it.
 		 */
-		if (!(rec = xdl_cha_alloc(&index->rcha)))
-			return -1;
+		যদি (!(rec = xdl_cha_alloc(&সূচক->rcha)))
+			ফেরত -1;
 		rec->ptr = ptr;
 		rec->cnt = 1;
-		rec->next = *rec_chain;
+		rec->পরবর্তী = *rec_chain;
 		*rec_chain = rec;
-		LINE_MAP(index, ptr) = rec;
+		সারি_MAP(সূচক, ptr) = rec;
 
 continue_scan:
 		; /* no op */
 	}
 
-	return 0;
+	ফেরত 0;
 }
 
-static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
-	int line1, int count1, int line2, int count2)
+স্থির পূর্ণসংখ্যা try_lcs(কাঠামো histindex *সূচক, কাঠামো region *lcs, পূর্ণসংখ্যা b_ptr,
+	পূর্ণসংখ্যা line1, পূর্ণসংখ্যা count1, পূর্ণসংখ্যা line2, পূর্ণসংখ্যা count2)
 {
-	unsigned int b_next = b_ptr + 1;
-	struct record *rec = index->records[TABLE_HASH(index, 2, b_ptr)];
-	unsigned int as, ae, bs, be, np, rc;
-	int should_break;
+	unsigned পূর্ণসংখ্যা b_পরবর্তী = b_ptr + 1;
+	কাঠামো record *rec = সূচক->records[TABLE_HASH(সূচক, 2, b_ptr)];
+	unsigned পূর্ণসংখ্যা as, ae, bs, be, np, rc;
+	পূর্ণসংখ্যা should_break;
 
-	for (; rec; rec = rec->next) {
-		if (rec->cnt > index->cnt) {
-			if (!index->has_common)
-				index->has_common = CMP(index, 1, rec->ptr, 2, b_ptr);
-			continue;
+	জন্য (; rec; rec = rec->পরবর্তী) {
+		যদি (rec->cnt > সূচক->cnt) {
+			যদি (!সূচক->has_common)
+				সূচক->has_common = CMP(সূচক, 1, rec->ptr, 2, b_ptr);
+			চালু;
 		}
 
 		as = rec->ptr;
-		if (!CMP(index, 1, as, 2, b_ptr))
-			continue;
+		যদি (!CMP(সূচক, 1, as, 2, b_ptr))
+			চালু;
 
-		index->has_common = 1;
-		for (;;) {
+		সূচক->has_common = 1;
+		জন্য (;;) {
 			should_break = 0;
-			np = NEXT_PTR(index, as);
+			np = পরবর্তী_PTR(সূচক, as);
 			bs = b_ptr;
 			ae = as;
 			be = bs;
 			rc = rec->cnt;
 
-			while ((unsigned int)line1 < as && (unsigned int)line2 < bs
-				&& CMP(index, 1, as - 1, 2, bs - 1)) {
+			যখন ((unsigned পূর্ণসংখ্যা)line1 < as && (unsigned পূর্ণসংখ্যা)line2 < bs
+				&& CMP(সূচক, 1, as - 1, 2, bs - 1)) {
 				as--;
 				bs--;
-				if (1 < rc)
-					rc = XDL_MIN(rc, CNT(index, as));
+				যদি (1 < rc)
+					rc = XDL_MIN(rc, CNT(সূচক, as));
 			}
-			while (ae < (unsigned int)LINE_END(1) && be < (unsigned int)LINE_END(2)
-				&& CMP(index, 1, ae + 1, 2, be + 1)) {
+			যখন (ae < (unsigned পূর্ণসংখ্যা)সারি_END(1) && be < (unsigned পূর্ণসংখ্যা)সারি_END(2)
+				&& CMP(সূচক, 1, ae + 1, 2, be + 1)) {
 				ae++;
 				be++;
-				if (1 < rc)
-					rc = XDL_MIN(rc, CNT(index, ae));
+				যদি (1 < rc)
+					rc = XDL_MIN(rc, CNT(সূচক, ae));
 			}
 
-			if (b_next <= be)
-				b_next = be + 1;
-			if (lcs->end1 - lcs->begin1 < ae - as || rc < index->cnt) {
+			যদি (b_পরবর্তী <= be)
+				b_পরবর্তী = be + 1;
+			যদি (lcs->end1 - lcs->begin1 < ae - as || rc < সূচক->cnt) {
 				lcs->begin1 = as;
 				lcs->begin2 = bs;
 				lcs->end1 = ae;
 				lcs->end2 = be;
-				index->cnt = rc;
+				সূচক->cnt = rc;
 			}
 
-			if (np == 0)
-				break;
+			যদি (np == 0)
+				বিরতি;
 
-			while (np <= ae) {
-				np = NEXT_PTR(index, np);
-				if (np == 0) {
+			যখন (np <= ae) {
+				np = পরবর্তী_PTR(সূচক, np);
+				যদি (np == 0) {
 					should_break = 1;
-					break;
+					বিরতি;
 				}
 			}
 
-			if (should_break)
-				break;
+			যদি (should_break)
+				বিরতি;
 
 			as = np;
 		}
 	}
-	return b_next;
+	ফেরত b_পরবর্তী;
 }
 
-static int fall_back_to_classic_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2)
+স্থির পূর্ণসংখ্যা fall_back_to_classic_diff(xpparam_t ধ্রুবক *xpp, xdfenv_t *env,
+		পূর্ণসংখ্যা line1, পূর্ণসংখ্যা count1, পূর্ণসংখ্যা line2, পূর্ণসংখ্যা count2)
 {
 	xpparam_t xpparam;
 
-	memset(&xpparam, 0, sizeof(xpparam));
+	memset(&xpparam, 0, আকার(xpparam));
 	xpparam.flags = xpp->flags & ~XDF_DIFF_ALGORITHM_MASK;
 
-	return xdl_fall_back_diff(env, &xpparam,
+	ফেরত xdl_fall_back_diff(env, &xpparam,
 				  line1, count1, line2, count2);
 }
 
-static inline void free_index(struct histindex *index)
+স্থির অন্তঃরেখ শূন্য free_সূচক(কাঠামো histindex *সূচক)
 {
-	xdl_free(index->records);
-	xdl_free(index->line_map);
-	xdl_free(index->next_ptrs);
-	xdl_cha_free(&index->rcha);
+	xdl_free(সূচক->records);
+	xdl_free(সূচক->সারি_map);
+	xdl_free(সূচক->পরবর্তী_ptrs);
+	xdl_cha_free(&সূচক->rcha);
 }
 
-static int find_lcs(xpparam_t const *xpp, xdfenv_t *env,
-		    struct region *lcs,
-		    int line1, int count1, int line2, int count2)
+স্থির পূর্ণসংখ্যা find_lcs(xpparam_t ধ্রুবক *xpp, xdfenv_t *env,
+		    কাঠামো region *lcs,
+		    পূর্ণসংখ্যা line1, পূর্ণসংখ্যা count1, পূর্ণসংখ্যা line2, পূর্ণসংখ্যা count2)
 {
-	int b_ptr;
-	int ret = -1;
-	struct histindex index;
+	পূর্ণসংখ্যা b_ptr;
+	পূর্ণসংখ্যা ret = -1;
+	কাঠামো histindex সূচক;
 
-	memset(&index, 0, sizeof(index));
+	memset(&সূচক, 0, আকার(সূচক));
 
-	index.env = env;
-	index.xpp = xpp;
+	সূচক.env = env;
+	সূচক.xpp = xpp;
 
-	index.records = NULL;
-	index.line_map = NULL;
+	সূচক.records = ফাঁকা;
+	সূচক.সারি_map = ফাঁকা;
 	/* in case of early xdl_cha_free() */
-	index.rcha.head = NULL;
+	সূচক.rcha.শীর্ষ = ফাঁকা;
 
-	index.table_bits = xdl_hashbits(count1);
-	index.records_size = 1 << index.table_bits;
-	if (!XDL_CALLOC_ARRAY(index.records, index.records_size))
-		goto cleanup;
+	সূচক.table_bits = xdl_hashbits(count1);
+	সূচক.records_আকার = 1 << সূচক.table_bits;
+	যদি (!XDL_CALLOC_ARRAY(সূচক.records, সূচক.records_আকার))
+		যাও cleanup;
 
-	index.line_map_size = count1;
-	if (!XDL_CALLOC_ARRAY(index.line_map, index.line_map_size))
-		goto cleanup;
+	সূচক.সারি_map_আকার = count1;
+	যদি (!XDL_CALLOC_ARRAY(সূচক.সারি_map, সূচক.সারি_map_আকার))
+		যাও cleanup;
 
-	if (!XDL_CALLOC_ARRAY(index.next_ptrs, index.line_map_size))
-		goto cleanup;
+	যদি (!XDL_CALLOC_ARRAY(সূচক.পরবর্তী_ptrs, সূচক.সারি_map_আকার))
+		যাও cleanup;
 
 	/* lines / 4 + 1 comes from xprepare.c:xdl_prepare_ctx() */
-	if (xdl_cha_init(&index.rcha, sizeof(struct record), count1 / 4 + 1) < 0)
-		goto cleanup;
+	যদি (xdl_cha_init(&সূচক.rcha, আকার(কাঠামো record), count1 / 4 + 1) < 0)
+		যাও cleanup;
 
-	index.ptr_shift = line1;
-	index.max_chain_length = 64;
+	সূচক.ptr_shift = line1;
+	সূচক.max_chain_দৈর্ঘ্য = 64;
 
-	if (scanA(&index, line1, count1))
-		goto cleanup;
+	যদি (scanA(&সূচক, line1, count1))
+		যাও cleanup;
 
-	index.cnt = index.max_chain_length + 1;
+	সূচক.cnt = সূচক.max_chain_দৈর্ঘ্য + 1;
 
-	for (b_ptr = line2; b_ptr <= LINE_END(2); )
-		b_ptr = try_lcs(&index, lcs, b_ptr, line1, count1, line2, count2);
+	জন্য (b_ptr = line2; b_ptr <= সারি_END(2); )
+		b_ptr = try_lcs(&সূচক, lcs, b_ptr, line1, count1, line2, count2);
 
-	if (index.has_common && index.max_chain_length < index.cnt)
+	যদি (সূচক.has_common && সূচক.max_chain_দৈর্ঘ্য < সূচক.cnt)
 		ret = 1;
-	else
+	অন্যথা
 		ret = 0;
 
 cleanup:
-	free_index(&index);
-	return ret;
+	free_সূচক(&সূচক);
+	ফেরত ret;
 }
 
-static int histogram_diff(xpparam_t const *xpp, xdfenv_t *env,
-	int line1, int count1, int line2, int count2)
+স্থির পূর্ণসংখ্যা histogram_diff(xpparam_t ধ্রুবক *xpp, xdfenv_t *env,
+	পূর্ণসংখ্যা line1, পূর্ণসংখ্যা count1, পূর্ণসংখ্যা line2, পূর্ণসংখ্যা count2)
 {
-	struct region lcs;
-	int lcs_found;
-	int result;
+	কাঠামো region lcs;
+	পূর্ণসংখ্যা lcs_found;
+	পূর্ণসংখ্যা ফলাফল;
 redo:
-	result = -1;
+	ফলাফল = -1;
 
-	if (count1 <= 0 && count2 <= 0)
-		return 0;
+	যদি (count1 <= 0 && count2 <= 0)
+		ফেরত 0;
 
-	if ((unsigned int)LINE_END(1) >= MAX_PTR)
-		return -1;
+	যদি ((unsigned পূর্ণসংখ্যা)সারি_END(1) >= MAX_PTR)
+		ফেরত -1;
 
-	if (!count1) {
-		while(count2--)
+	যদি (!count1) {
+		যখন(count2--)
 			env->xdf2.changed[line2++ - 1] = true;
-		return 0;
-	} else if (!count2) {
-		while(count1--)
+		ফেরত 0;
+	} অন্যথা যদি (!count2) {
+		যখন(count1--)
 			env->xdf1.changed[line1++ - 1] = true;
-		return 0;
+		ফেরত 0;
 	}
 
-	memset(&lcs, 0, sizeof(lcs));
+	memset(&lcs, 0, আকার(lcs));
 	lcs_found = find_lcs(xpp, env, &lcs, line1, count1, line2, count2);
-	if (lcs_found < 0)
-		goto out;
-	else if (lcs_found)
-		result = fall_back_to_classic_diff(xpp, env, line1, count1, line2, count2);
-	else {
-		if (lcs.begin1 == 0 && lcs.begin2 == 0) {
-			while (count1--)
+	যদি (lcs_found < 0)
+		যাও out;
+	অন্যথা যদি (lcs_found)
+		ফলাফল = fall_back_to_classic_diff(xpp, env, line1, count1, line2, count2);
+	অন্যথা {
+		যদি (lcs.begin1 == 0 && lcs.begin2 == 0) {
+			যখন (count1--)
 				env->xdf1.changed[line1++ - 1] = true;
-			while (count2--)
+			যখন (count2--)
 				env->xdf2.changed[line2++ - 1] = true;
-			result = 0;
-		} else {
-			result = histogram_diff(xpp, env,
+			ফলাফল = 0;
+		} অন্যথা {
+			ফলাফল = histogram_diff(xpp, env,
 						line1, lcs.begin1 - line1,
 						line2, lcs.begin2 - line2);
-			if (result)
-				goto out;
+			যদি (ফলাফল)
+				যাও out;
 			/*
 			 * result = histogram_diff(xpp, env,
 			 *            lcs.end1 + 1, LINE_END(1) - lcs.end1,
 			 *            lcs.end2 + 1, LINE_END(2) - lcs.end2);
 			 * but let's optimize tail recursion ourself:
 			*/
-			count1 = LINE_END(1) - lcs.end1;
+			count1 = সারি_END(1) - lcs.end1;
 			line1 = lcs.end1 + 1;
-			count2 = LINE_END(2) - lcs.end2;
+			count2 = সারি_END(2) - lcs.end2;
 			line2 = lcs.end2 + 1;
-			goto redo;
+			যাও redo;
 		}
 	}
 out:
-	return result;
+	ফেরত ফলাফল;
 }
 
-int xdl_do_histogram_diff(xpparam_t const *xpp, xdfenv_t *env)
+পূর্ণসংখ্যা xdl_do_histogram_diff(xpparam_t ধ্রুবক *xpp, xdfenv_t *env)
 {
-	return histogram_diff(xpp, env,
+	ফেরত histogram_diff(xpp, env,
 		env->xdf1.dstart + 1, env->xdf1.dend - env->xdf1.dstart + 1,
 		env->xdf2.dstart + 1, env->xdf2.dend - env->xdf2.dstart + 1);
 }

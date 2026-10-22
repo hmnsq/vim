@@ -20,31 +20,31 @@
  *
  */
 
-#if !defined(XTYPES_H)
+#যদি !defined(XTYPES_H)
 #define XTYPES_H
 
 
 
-typedef struct s_chanode {
-	struct s_chanode *next;
+প্রকারলেখ কাঠামো s_chanode {
+	কাঠামো s_chanode *পরবর্তী;
 	long icurr;
 } chanode_t;
 
-typedef struct s_chastore {
-	chanode_t *head, *tail;
+প্রকারলেখ কাঠামো s_chastore {
+	chanode_t *শীর্ষ, *লেজ;
 	long isize, nsize;
 	chanode_t *ancur;
 	chanode_t *sncur;
 	long scurr;
 } chastore_t;
 
-typedef struct s_xrecord {
-	char const *ptr;
-	long size;
+প্রকারলেখ কাঠামো s_xrecord {
+	অক্ষর ধ্রুবক *ptr;
+	long আকার_2;
 	unsigned long ha;
 } xrecord_t;
 
-typedef struct s_xdfile {
+প্রকারলেখ কাঠামো s_xdfile {
 	xrecord_t *recs;
 	long nrec;
 	long dstart, dend;
@@ -53,7 +53,7 @@ typedef struct s_xdfile {
 	long nreff;
 } xdfile_t;
 
-typedef struct s_xdfenv {
+প্রকারলেখ কাঠামো s_xdfenv {
 	xdfile_t xdf1, xdf2;
 } xdfenv_t;
 

@@ -15,7 +15,7 @@
 
 # ifndef ASSERT
 #  define ASSERT(c) \
-    if (!(c)) \
+    যদি (!(c)) \
     { \
 	fprintf(stderr, "Assertion failed: line %d, file %s\n", \
 		__LINE__, __FILE__); \
@@ -32,26 +32,26 @@
 # define NB_PRINT		0x00000008
 # define NB_DEBUG_ALL		0xffffffff
 
-# define NBDLEVEL(flags)	(nb_debug != NULL && (nb_dlevel & (flags)))
+# define NBDLEVEL(flags)	(nb_debug != ফাঁকা && (nb_dlevel & (flags)))
 
 # define NBDEBUG_TRACE	1
 
-typedef enum {
+প্রকারলেখ গণনা {
 		WT_ENV = 1,		// look for env var if set
 		WT_WAIT,		// look for ~/.gvimwait if set
 		WT_STOP			// look for ~/.gvimstop if set
 } WtWait;
 
 
-void		 nbdbg(char *, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
+শূন্য		 nbdbg(অক্ষর *, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
 
-void nbdebug_wait(u_int wait_flags, char *wait_var, u_int wait_secs);
-void nbdebug_log_init(char *log_var, char *level_var);
+শূন্য nbdebug_wait(u_int wait_flags, অক্ষর *wait_var, u_int wait_secs);
+শূন্য nbdebug_log_init(অক্ষর *log_var, অক্ষর *level_var);
 
-extern FILE	*nb_debug;
-extern u_int	 nb_dlevel;		// nb_debug verbosity level
+বাহ্যিক FILE	*nb_debug;
+বাহ্যিক u_int	 nb_dlevel;		// nb_debug verbosity level
 
-#else		// not NBDEBUG
+#অন্যথা		// not NBDEBUG
 
 # ifndef ASSERT
 #  define ASSERT(c)
@@ -62,9 +62,9 @@ extern u_int	 nb_dlevel;		// nb_debug verbosity level
  * the variable number of arguments.
  */
 
-void
+শূন্য
 nbdbg(
-	char		*fmt,
+	অক্ষর		*fmt,
 	...)
 {
 }

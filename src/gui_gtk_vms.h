@@ -76,8 +76,8 @@
 
 // INTRINSIC.H omits proto if XtFree is defined
 // VMS_BEGIN_C_PLUS_PLUS
-extern void XtFree(char*);
-extern void XTFREE(char*);
+বাহ্যিক শূন্য XtFree(অক্ষর*);
+বাহ্যিক শূন্য XTFREE(অক্ষর*);
 // VMS_END_C_PLUS_PLUS
 
 #define _XRegisterFilterByType _XREGISTERFILTERBYTYPE
@@ -85,7 +85,7 @@ extern void XTFREE(char*);
 #define XAllocClassHint XALLOCCLASSHINT
 #define XAllocColor XALLOCCOLOR
 #define XAllocColorCells XALLOCCOLORCELLS
-#define XAllocSizeHints XALLOCSIZEHINTS
+#define XAlloc_আকার_Hints XALLOCSIZEHINTS
 #define XAllocWMHints XALLOCWMHINTS
 #define XAutoRepeatOff XAUTOREPEATOFF
 #define XAutoRepeatOn XAUTOREPEATON
@@ -111,7 +111,7 @@ extern void XTFREE(char*);
 #define XCopyArea XCOPYAREA
 #define XCopyGC XCOPYGC
 #define XCopyPlane XCOPYPLANE
-#define XCreateBitmapFromData XCREATEBITMAPFROMDATA
+#define XCreate_Bitmap_From_তথ্য XCREATEBITMAPFROMDATA
 #define XCreateColormap XCREATECOLORMAP
 #define XCreateFontCursor XCREATEFONTCURSOR
 #define XCreateFontSet XCREATEFONTSET
@@ -120,11 +120,11 @@ extern void XTFREE(char*);
 #define XCreateImage XCREATEIMAGE
 #define XCreatePixmap XCREATEPIXMAP
 #define XCreatePixmapCursor XCREATEPIXMAPCURSOR
-#define XCreatePixmapFromBitmapData XCREATEPIXMAPFROMBITMAPDATA
+#define XCreate_Pixmap_From_Bitmap_তথ্য XCREATEPIXMAPFROMBITMAPDATA
 #define XCreateRegion XCREATEREGION
 #define XCreateSimpleWindow XCREATESIMPLEWINDOW
 #define XCreateWindow XCREATEWINDOW
-#define XDefaultRootWindow XDEFAULTROOTWINDOW
+#define XDefault_মূল_Window XDEFAULTROOTWINDOW
 #define XDefaultScreenOfDisplay XDEFAULTSCREENOFDISPLAY
 #define XDefineCursor XDEFINECURSOR
 #define XDeleteProperty XDELETEPROPERTY
@@ -137,8 +137,8 @@ extern void XTFREE(char*);
 #define XDrawArc XDRAWARC
 #define XDrawImageString XDRAWIMAGESTRING
 #define XDrawImageString16 XDRAWIMAGESTRING16
-#define XDrawLine XDRAWLINE
-#define XDrawLines XDRAWLINES
+#define XDraw_সারি XDRAWLINE
+#define XDraw_সারিগুলি XDRAWLINES
 #define XDrawPoint XDRAWPOINT
 #define XDrawPoints XDRAWPOINTS
 #define XDrawRectangle XDRAWRECTANGLE
@@ -149,7 +149,7 @@ extern void XTFREE(char*);
 #define XEqualRegion XEQUALREGION
 #define XEventsQueued XEVENTSQUEUED
 #define XExtentsOfFontSet XEXTENTSOFFONTSET
-#define XFetchBuffer XFETCHBUFFER
+#define XFetch_বাফার XFETCHBUFFER
 #define XFillArc XFILLARC
 #define XFillPolygon XFILLPOLYGON
 #define XFillRectangle XFILLRECTANGLE
@@ -235,7 +235,7 @@ extern void XTFREE(char*);
 #define XQueryColors XQUERYCOLORS
 #define XQueryExtension XQUERYEXTENSION
 #define XQueryPointer XQUERYPOINTER
-#define XQueryTree XQUERYTREE
+#define XQuery_বৃক্ষ XQUERYTREE
 #define XRaiseWindow XRAISEWINDOW
 #define XReconfigureWMWindow XRECONFIGUREWMWINDOW
 #define XRectInRegion XRECTINREGION
@@ -244,10 +244,10 @@ extern void XTFREE(char*);
 #define XResizeWindow XRESIZEWINDOW
 #define XRestackWindows XRESTACKWINDOWS
 #define XRootWindowOfScreen XROOTWINDOWOFSCREEN
-#define XScreenNumberOfScreen XSCREENNUMBEROFSCREEN
+#define XScreen_সংখ্যা_Of_Screen XSCREENNUMBEROFSCREEN
 #define XSelectAsyncEvent XSELECTASYNCEVENT
-#define XSelectAsyncInput XSELECTASYNCINPUT
-#define XSelectInput XSELECTINPUT
+#define XSelect_Async_প্রবেশ XSELECTASYNCINPUT
+#define XSelect_প্রবেশ XSELECTINPUT
 #define XSendEvent XSENDEVENT
 #define XServerVendor XSERVERVENDOR
 #define XSetBackground XSETBACKGROUND
@@ -267,8 +267,8 @@ extern void XTFREE(char*);
 #define XSetICFocus XSETICFOCUS
 #define XSetICValues XSETICVALUES
 #define XSetIOErrorHandler XSETIOERRORHANDLER
-#define XSetInputFocus XSETINPUTFOCUS
-#define XSetLineAttributes XSETLINEATTRIBUTES
+#define XSet_প্রবেশ_Focus XSETINPUTFOCUS
+#define XSet_সারি_Attributes XSETLINEATTRIBUTES
 #define XSetLocaleModifiers XSETLOCALEMODIFIERS
 #define XSetNormalHints XSETNORMALHINTS
 #define XSetRegion XSETREGION
@@ -292,7 +292,7 @@ extern void XTFREE(char*);
 #define XShapeCombineRectangles XSHAPECOMBINERECTANGLES
 #define XShapeGetRectangles XSHAPEGETRECTANGLES
 #define XShrinkRegion XSHRINKREGION
-#define XStoreBuffer XSTOREBUFFER
+#define XStore_বাফার XSTOREBUFFER
 #define XStoreColor XSTORECOLOR
 #define XStoreColors XSTORECOLORS
 #define XStoreName XSTORENAME
@@ -327,7 +327,7 @@ extern void XTFREE(char*);
 #define XmChangeColor XMCHANGECOLOR
 #define XmClipboardCopy XMCLIPBOARDCOPY
 #define XmClipboardEndCopy XMCLIPBOARDENDCOPY
-#define XmClipboardInquireLength XMCLIPBOARDINQUIRELENGTH
+#define Xm_Clipboard_Inquire_দৈর্ঘ্য XMCLIPBOARDINQUIRELENGTH
 #define XmClipboardLock XMCLIPBOARDLOCK
 #define XmClipboardRetrieve XMCLIPBOARDRETRIEVE
 #define XmClipboardStartCopy XMCLIPBOARDSTARTCOPY
@@ -355,8 +355,8 @@ extern void XTFREE(char*);
 #define XmCreatePopupMenu XMCREATEPOPUPMENU
 #define XmCreatePromptDialog XMCREATEPROMPTDIALOG
 #define XmCreatePulldownMenu XMCREATEPULLDOWNMENU
-#define XmCreatePushButton XMCREATEPUSHBUTTON
-#define XmCreatePushButtonGadget XMCREATEPUSHBUTTONGADGET
+#define Xm_Create_ঠেলো_Button XMCREATEPUSHBUTTON
+#define Xm_Create_ঠেলো_Button_Gadget XMCREATEPUSHBUTTONGADGET
 #define XmCreateQuestionDialog XMCREATEQUESTIONDIALOG
 #define XmCreateRadioBox XMCREATERADIOBOX
 #define XmCreateRowColumn XMCREATEROWCOLUMN
@@ -379,7 +379,7 @@ extern void XTFREE(char*);
 #define XmDropSiteUpdate XMDROPSITEUPDATE
 #define XmDropTransferStart XMDROPTRANSFERSTART
 #define XmFileSelectionBoxGetChild XMFILESELECTIONBOXGETCHILD
-#define XmFileSelectionDoSearch XMFILESELECTIONDOSEARCH
+#define Xm_File_Selection_Do_অনুসন্ধান XMFILESELECTIONDOSEARCH
 #define XmFontListAppendEntry XMFONTLISTAPPENDENTRY
 #define XmFontListCopy XMFONTLISTCOPY
 #define XmFontListCreate XMFONTLISTCREATE
@@ -390,9 +390,9 @@ extern void XTFREE(char*);
 #define XmFontListEntryLoad XMFONTLISTENTRYLOAD
 #define XmFontListFree XMFONTLISTFREE
 #define XmFontListFreeFontContext XMFONTLISTFREEFONTCONTEXT
-#define XmFontListGetNextFont XMFONTLISTGETNEXTFONT
+#define Xm_Font_List_Get_পরবর্তী_Font XMFONTLISTGETNEXTFONT
 #define XmFontListInitFontContext XMFONTLISTINITFONTCONTEXT
-#define XmFontListNextEntry XMFONTLISTNEXTENTRY
+#define Xm_Font_List_পরবর্তী_Entry XMFONTLISTNEXTENTRY
 #define XmGetColors XMGETCOLORS
 #define XmGetFocusWidget XMGETFOCUSWIDGET
 #define XmGetMenuCursor XMGETMENUCURSOR
@@ -401,19 +401,19 @@ extern void XTFREE(char*);
 #define XmGetXmDisplay XMGETXMDISPLAY
 #define XmImMbLookupString XMIMMBLOOKUPSTRING
 #define XmImRegister XMIMREGISTER
-#define XmImSetFocusValues XMIMSETFOCUSVALUES
-#define XmImSetValues XMIMSETVALUES
+#define Xm_Im_Set_Focus_মানসমূহ XMIMSETFOCUSVALUES
+#define Xm_Im_Set_মানসমূহ XMIMSETVALUES
 #define XmImUnregister XMIMUNREGISTER
 #define XmImUnsetFocus XMIMUNSETFOCUS
 #define XmInternAtom XMINTERNATOM
 #define XmIsMotifWMRunning XMISMOTIFWMRUNNING
 #define XmListAddItem XMLISTADDITEM
 #define XmListAddItemUnselected XMLISTADDITEMUNSELECTED
-#define XmListAddItemsUnselected XMLISTADDITEMSUNSELECTED
-#define XmListDeleteAllItems XMLISTDELETEALLITEMS
-#define XmListDeleteItemsPos XMLISTDELETEITEMSPOS
+#define Xm_List_Add_বস্তুসমূহ_Unselected XMLISTADDITEMSUNSELECTED
+#define Xm_List_Delete_All_বস্তুসমূহ XMLISTDELETEALLITEMS
+#define Xm_List_Delete_বস্তুসমূহ_Pos XMLISTDELETEITEMSPOS
 #define XmListDeletePos XMLISTDELETEPOS
-#define XmListDeselectAllItems XMLISTDESELECTALLITEMS
+#define Xm_List_Deselect_All_বস্তুসমূহ XMLISTDESELECTALLITEMS
 #define XmListDeselectPos XMLISTDESELECTPOS
 #define XmListGetKbdItemPos XMLISTGETKBDITEMPOS
 #define XmListGetMatchPos XMLISTGETMATCHPOS
@@ -437,8 +437,8 @@ extern void XTFREE(char*);
 #define XmRepTypeGetRecord XMREPTYPEGETRECORD
 #define XmRepTypeInstallTearOffModelCon XMREPTYPEINSTALLTEAROFFMODELCON
 #define XmRepTypeRegister XMREPTYPEREGISTER
-#define XmRepTypeValidValue XMREPTYPEVALIDVALUE
-#define XmScrollBarSetValues XMSCROLLBARSETVALUES
+#define Xm_Rep_Type_Valid_মান XMREPTYPEVALIDVALUE
+#define Xm_Scroll_Bar_Set_মানসমূহ XMSCROLLBARSETVALUES
 #define XmScrolledWindowSetAreas XMSCROLLEDWINDOWSETAREAS
 #define XmSelectionBoxGetChild XMSELECTIONBOXGETCHILD
 #define XmStringByteCompare XMSTRINGBYTECOMPARE
@@ -455,10 +455,10 @@ extern void XTFREE(char*);
 #define XmStringFree XMSTRINGFREE
 #define XmStringFreeContext XMSTRINGFREECONTEXT
 #define XmStringGetLtoR XMSTRINGGETLTOR
-#define XmStringGetNextComponent XMSTRINGGETNEXTCOMPONENT
-#define XmStringGetNextSegment XMSTRINGGETNEXTSEGMENT
+#define Xm_String_Get_পরবর্তী_Component XMSTRINGGETNEXTCOMPONENT
+#define Xm_String_Get_পরবর্তী_Segment XMSTRINGGETNEXTSEGMENT
 #define XmStringInitContext XMSTRINGINITCONTEXT
-#define XmStringLength XMSTRINGLENGTH
+#define Xm_String_দৈর্ঘ্য XMSTRINGLENGTH
 #define XmStringLtoRCreate XMSTRINGLTORCREATE
 #define XmStringNConcat XMSTRINGNCONCAT
 #define XmStringSegmentCreate XMSTRINGSEGMENTCREATE
@@ -469,18 +469,18 @@ extern void XTFREE(char*);
 #define XmTextFieldGetLastPosition XMTEXTFIELDGETLASTPOSITION
 #define XmTextFieldGetSelection XMTEXTFIELDGETSELECTION
 #define XmTextFieldGetString XMTEXTFIELDGETSTRING
-#define XmTextFieldInsert XMTEXTFIELDINSERT
+#define Xm_Text_Field_ঢোকাও XMTEXTFIELDINSERT
 #define XmTextFieldRemove XMTEXTFIELDREMOVE
 #define XmTextFieldSetSelection XMTEXTFIELDSETSELECTION
 #define XmTextFieldSetString XMTEXTFIELDSETSTRING
 #define XmTextGetCursorPosition XMTEXTGETCURSORPOSITION
 #define XmTextGetInsertionPosition XMTEXTGETINSERTIONPOSITION
 #define XmTextGetLastPosition XMTEXTGETLASTPOSITION
-#define XmTextGetMaxLength XMTEXTGETMAXLENGTH
+#define Xm_Text_Get_Max_দৈর্ঘ্য XMTEXTGETMAXLENGTH
 #define XmTextGetSelection XMTEXTGETSELECTION
 #define XmTextGetSelectionPosition XMTEXTGETSELECTIONPOSITION
 #define XmTextGetString XMTEXTGETSTRING
-#define XmTextInsert XMTEXTINSERT
+#define Xm_Text_ঢোকাও XMTEXTINSERT
 #define XmTextRemove XMTEXTREMOVE
 #define XmTextReplace XMTEXTREPLACE
 #define XmTextSetCursorPosition XMTEXTSETCURSORPOSITION
@@ -515,18 +515,18 @@ extern void XTFREE(char*);
 #define XtAddGrab XTADDGRAB
 #define XtAllocateGC XTALLOCATEGC
 #define XtAppAddActions XTAPPADDACTIONS
-#define XtAppAddInput XTAPPADDINPUT
+#define Xt_App_Add_প্রবেশ XTAPPADDINPUT
 #define XtAppAddTimeOut XTAPPADDTIMEOUT
 #define XtAppCreateShell XTAPPCREATESHELL
 #define XtAppInitialize XTAPPINITIALIZE
-#define XtAppNextEvent XTAPPNEXTEVENT
+#define Xt_App_পরবর্তী_Event XTAPPNEXTEVENT
 #define XtAppPeekEvent XTAPPPEEKEVENT
 #define XtAppPending XTAPPPENDING
 #define XtAppProcessEvent XTAPPPROCESSEVENT
 #define XtAppSetErrorHandler XTAPPSETERRORHANDLER
 #define XtAppSetFallbackResources XTAPPSETFALLBACKRESOURCES
 #define XtAppSetWarningHandler XTAPPSETWARNINGHANDLER
-#define XtAppSetWarningMsgHandler XTAPPSETWARNINGMSGHANDLER
+#define Xt_App_Set_Warning_বার্তা_Handler XTAPPSETWARNINGMSGHANDLER
 #define XtAppWarning XTAPPWARNING
 #define XtCallActionProc XTCALLACTIONPROC
 #define XtCallCallbackList XTCALLCALLBACKLIST
@@ -551,15 +551,15 @@ extern void XTFREE(char*);
 #define XtGetApplicationResources XTGETAPPLICATIONRESOURCES
 #define XtGetGC XTGETGC
 #define XtGetMultiClickTime XTGETMULTICLICKTIME
-#define XtGetSelectionValue XTGETSELECTIONVALUE
-#define XtGetSelectionValues XTGETSELECTIONVALUES
+#define Xt_Get_Selection_মান XTGETSELECTIONVALUE
+#define Xt_Get_Selection_মানসমূহ XTGETSELECTIONVALUES
 #define XtGetSubresources XTGETSUBRESOURCES
-#define XtGetValues XTGETVALUES
+#define Xt_Get_মানসমূহ XTGETVALUES
 #define XtGrabKeyboard XTGRABKEYBOARD
 #define XtGrabPointer XTGRABPOINTER
 #define XtHasCallbacks XTHASCALLBACKS
 #define XtInitializeWidgetClass XTINITIALIZEWIDGETCLASS
-#define XtInsertEventHandler XTINSERTEVENTHANDLER
+#define Xt_ঢোকাও_Event_Handler XTINSERTEVENTHANDLER
 #define XtIsManaged XTISMANAGED
 #define XtIsObject XTISOBJECT
 #define XtIsSensitive XTISSENSITIVE
@@ -589,7 +589,7 @@ extern void XTFREE(char*);
 #define XtRemoveCallback XTREMOVECALLBACK
 #define XtRemoveEventHandler XTREMOVEEVENTHANDLER
 #define XtRemoveGrab XTREMOVEGRAB
-#define XtRemoveInput XTREMOVEINPUT
+#define Xt_Remove_প্রবেশ XTREMOVEINPUT
 #define XtRemoveTimeOut XTREMOVETIMEOUT
 #define XtResizeWidget XTRESIZEWIDGET
 #define XtResolvePathname XTRESOLVEPATHNAME
@@ -597,7 +597,7 @@ extern void XTFREE(char*);
 #define XtSetMappedWhenManaged XTSETMAPPEDWHENMANAGED
 #define XtSetSensitive XTSETSENSITIVE
 #define XtSetTypeConverter XTSETTYPECONVERTER
-#define XtSetValues XTSETVALUES
+#define Xt_Set_মানসমূহ XTSETVALUES
 #define XtShellStrings XTSHELLSTRINGS
 #define XtStrings XTSTRINGS
 #define XtToolkitInitialize XTTOOLKITINITIALIZE
@@ -612,8 +612,8 @@ extern void XTFREE(char*);
 #define XtVaCreateManagedWidget XTVACREATEMANAGEDWIDGET
 #define XtVaCreatePopupShell XTVACREATEPOPUPSHELL
 #define XtVaCreateWidget XTVACREATEWIDGET
-#define XtVaGetValues XTVAGETVALUES
-#define XtVaSetValues XTVASETVALUES
+#define Xt_Va_Get_মানসমূহ XTVAGETVALUES
+#define Xt_Va_Set_মানসমূহ XTVASETVALUES
 #define XtWarning XTWARNING
 #define XtWidgetToApplicationContext XTWIDGETTOAPPLICATIONCONTEXT
 #define XtWindow XTWINDOW
@@ -637,13 +637,13 @@ extern void XTFREE(char*);
 #define _XmGetClassExtensionPtr _XMGETCLASSEXTENSIONPTR
 #define _XmGetDefaultFontList _XMGETDEFAULTFONTLIST
 #define _XmGetTextualDragIcon _XMGETTEXTUALDRAGICON
-#define _XmGetWidgetExtData _XMGETWIDGETEXTDATA
+#define Xm_Get_Widget_Ext_তথ্য _XMGETWIDGETEXTDATA
 #define _XmGrabKeyboard _XMGRABKEYBOARD
 #define _XmGrabPointer _XMGRABPOINTER
 #define _XmInheritClass _XMINHERITCLASS
-#define _XmInputInGadget _XMINPUTINGADGET
+#define Xm_প্রবেশ_In_Gadget _XMINPUTINGADGET
 #define _XmMakeGeometryRequest _XMMAKEGEOMETRYREQUEST
-#define _XmMenuPopDown _XMMENUPOPDOWN
+#define Xm_Menu_বের_করো_Down _XMMENUPOPDOWN
 #define _XmMoveObject _XMMOVEOBJECT
 #define _XmNavigChangeManaged _XMNAVIGCHANGEMANAGED
 #define _XmOSBuildFileList _XMOSBUILDFILELIST
@@ -660,7 +660,7 @@ extern void XTFREE(char*);
 #define _XmStrings _XMSTRINGS
 #define _XmToHorizontalPixels _XMTOHORIZONTALPIXELS
 #define _XmToVerticalPixels _XMTOVERTICALPIXELS
-#define _XmTopShadowColorDefault _XMTOPSHADOWCOLORDEFAULT
+#define Xm_শীর্ষ_Shadow_Color_Default _XMTOPSHADOWCOLORDEFAULT
 #define _Xm_fastPtr _XM_FASTPTR
 #define _XtCheckSubclassFlag _XTCHECKSUBCLASSFLAG
 #define _XtInherit _XTINHERIT
@@ -669,8 +669,8 @@ extern void XTFREE(char*);
 #define compositeWidgetClass COMPOSITEWIDGETCLASS
 #define overrideShellWidgetClass OVERRIDESHELLWIDGETCLASS
 #define shellWidgetClass SHELLWIDGETCLASS
-#define topLevelShellClassRec TOPLEVELSHELLCLASSREC
-#define topLevelShellWidgetClass TOPLEVELSHELLWIDGETCLASS
+#define শীর্ষ_Level_Shell_Class_Rec TOPLEVELSHELLCLASSREC
+#define শীর্ষ_Level_Shell_Widget_Class TOPLEVELSHELLWIDGETCLASS
 #define transientShellWidgetClass TRANSIENTSHELLWIDGETCLASS
 #define vendorShellClassRec VENDORSHELLCLASSREC
 #define vendorShellWidgetClass VENDORSHELLWIDGETCLASS
@@ -696,9 +696,9 @@ extern void XTFREE(char*);
 #define xmMessageBoxWidgetClass XMMESSAGEBOXWIDGETCLASS
 #define xmPrimitiveClassRec XMPRIMITIVECLASSREC
 #define xmPrimitiveWidgetClass XMPRIMITIVEWIDGETCLASS
-#define xmPushButtonClassRec XMPUSHBUTTONCLASSREC
-#define xmPushButtonGadgetClass XMPUSHBUTTONGADGETCLASS
-#define xmPushButtonWidgetClass XMPUSHBUTTONWIDGETCLASS
+#define xm_ঠেলো_Button_Class_Rec XMPUSHBUTTONCLASSREC
+#define xm_ঠেলো_Button_Gadget_Class XMPUSHBUTTONGADGETCLASS
+#define xm_ঠেলো_Button_Widget_Class XMPUSHBUTTONWIDGETCLASS
 #define xmRowColumnWidgetClass XMROWCOLUMNWIDGETCLASS
 #define xmSashWidgetClass XMSASHWIDGETCLASS
 #define xmScrollBarWidgetClass XMSCROLLBARWIDGETCLASS
@@ -723,7 +723,7 @@ extern void XTFREE(char*);
 // R5 or earlier
 #define _XtRegisterWindow _XTREGISTERWINDOW
 #define _XtUnregisterWindow _XTUNREGISTERWINDOW
-#else
+#অন্যথা
 // R6 or later
 #define XtRegisterDrawable XTREGISTERDRAWABLE
 #define XtUnregisterDrawable XTUNREGISTERDRAWABLE

@@ -1,2 +1,2 @@
-import sys
+আমদানি sys
 print(sys.version)

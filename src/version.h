@@ -36,13 +36,13 @@
 // For compatibility with the installer from "vim-win32-installer" and WinGet.
 // For details see https://github.com/vim/vim-win32-installer/pull/277
 // and https://github.com/vim/vim-win32-installer/pull/285
-#if VIM_VERSION_PATCHLEVEL < 10
+#যদি VIM_VERSION_PATCHLEVEL < 10
 # define LEADZERO(x) 000 ## x
-#elif VIM_VERSION_PATCHLEVEL < 100
+#নতুবা_যদি VIM_VERSION_PATCHLEVEL < 100
 # define LEADZERO(x) 00 ## x
-#elif VIM_VERSION_PATCHLEVEL < 1000
+#নতুবা_যদি VIM_VERSION_PATCHLEVEL < 1000
 # define LEADZERO(x) 0 ## x
-#else
+#অন্যথা
 # define LEADZERO(x) x
 #endif
 
@@ -60,6 +60,6 @@
 #define VIM_VERSION_SHORT     VIM_VERSION_MAJOR_STR "." VIM_VERSION_MINOR_STR
 #define VIM_VERSION_MEDIUM    VIM_VERSION_SHORT
 #define VIM_VERSION_LONG_ONLY "VIM - Vi IMproved " VIM_VERSION_MEDIUM
-#define VIM_VERSION_LONG_HEAD VIM_VERSION_LONG_ONLY " (" VIM_VERSION_DATE_ONLY
-#define VIM_VERSION_LONG      VIM_VERSION_LONG_HEAD ")"
-#define VIM_VERSION_LONG_DATE VIM_VERSION_LONG_HEAD ", compiled "
+#define VIM_VERSION_LONG_শীর্ষ VIM_VERSION_LONG_ONLY " (" VIM_VERSION_DATE_ONLY
+#define VIM_VERSION_LONG      VIM_VERSION_LONG_শীর্ষ ")"
+#define VIM_VERSION_LONG_DATE VIM_VERSION_LONG_শীর্ষ ", compiled "

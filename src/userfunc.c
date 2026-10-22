@@ -11,33 +11,33 @@
  * userfunc.c: User defined function support
  */
 
-#include "vim.h"
+#অন্তর্ভাব "vim.h"
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 /*
  * All user-defined functions are found in this hashtable.
  */
-static hashtab_T	func_hashtab;
+স্থির hashtab_T	func_hashtab;
 
 // Used by get_func_tv()
-static garray_T funcargs = GA_EMPTY;
+স্থির garray_T funcargs = GA_EMPTY;
 
 // pointer to funccal for currently active function
-static funccall_T *current_funccal = NULL;
+স্থির funccall_T *current_funccal = ফাঁকা;
 
 // Pointer to list of previously used funccal, still around because some
 // item in it is still being used.
-static funccall_T *previous_funccal = NULL;
+স্থির funccall_T *previous_funccal = ফাঁকা;
 
-static void funccal_unref(funccall_T *fc, ufunc_T *fp, int force);
-static void func_clear(ufunc_T *fp, int force);
-static int func_free(ufunc_T *fp, int force);
-static char_u *untrans_function_name(char_u *name);
-static void handle_defer_one(funccall_T *funccal);
-static char_u *trans_function_name_ext(char_u **pp, int *is_global, int skip, int flags, funcdict_T *fdp, partial_T **partial, type_T **type, ufunc_T **ufunc);
+স্থির শূন্য funccal_unref(funccall_T *fc, ufunc_T *fp, পূর্ণসংখ্যা force);
+স্থির শূন্য func_clear(ufunc_T *fp, পূর্ণসংখ্যা force);
+স্থির পূর্ণসংখ্যা func_free(ufunc_T *fp, পূর্ণসংখ্যা force);
+স্থির char_u *untrans_function_name(char_u *name);
+স্থির শূন্য handle_defer_one(funccall_T *funccal);
+স্থির char_u *trans_function_name_ext(char_u **pp, পূর্ণসংখ্যা *is_global, পূর্ণসংখ্যা skip, পূর্ণসংখ্যা flags, funcdict_T *fdp, partial_T **partial, type_T **type, ufunc_T **ufunc);
 
-    void
-func_init(void)
+    শূন্য
+func_init(শূন্য)
 {
     hash_init(&func_hashtab);
 }
@@ -46,9 +46,9 @@ func_init(void)
  * Return the function hash table
  */
     hashtab_T *
-func_tbl_get(void)
+func_tbl_get(শূন্য)
 {
-    return &func_hashtab;
+    ফেরত &func_hashtab;
 }
 
 /*
@@ -60,130 +60,130 @@ func_tbl_get(void)
  * Return a pointer to after the type.
  * When something is wrong return "arg".
  */
-    static char_u *
+    স্থির char_u *
 one_function_arg(
 	char_u	    *arg,
 	garray_T    *newargs,
 	garray_T    *argtypes,
-	int	    types_optional,
+	পূর্ণসংখ্যা	    types_optional,
 	garray_T    *arg_objm,
 	evalarg_T   *evalarg,
 	exarg_T	    *eap,
-	int	    is_vararg,
-	int	    skip)
+	পূর্ণসংখ্যা	    is_vararg,
+	পূর্ণসংখ্যা	    skip)
 {
     char_u	*p = arg;
-    char_u	*arg_copy = NULL;
-    int		is_underscore = FALSE;
+    char_u	*arg_copy = ফাঁকা;
+    পূর্ণসংখ্যা		is_underscore = FALSE;
 
-    while (ASCII_ISALNUM(*p) || *p == '_')
+    যখন (ASCII_ISALNUM(*p) || *p == '_')
 	++p;
-    if (arg == p || SAFE_isdigit(*arg)
-	    || (argtypes == NULL
+    যদি (arg == p || SAFE_isdigit(*arg)
+	    || (argtypes == ফাঁকা
 		&& ((p - arg == 9 && STRNCMP(arg, "firstline", 9) == 0)
 		    || (p - arg == 8 && STRNCMP(arg, "lastline", 8) == 0))))
     {
-	if (!skip)
+	যদি (!skip)
 	    semsg(_(e_illegal_argument_str), arg);
-	return arg;
+	ফেরত arg;
     }
 
     // Extra checks in Vim9 script.
-    if (!skip && argtypes != NULL)
+    যদি (!skip && argtypes != ফাঁকা)
     {
-	int c = *p;
+	পূর্ণসংখ্যা c = *p;
 	*p = NUL;
-	int r = check_reserved_name(arg, FALSE);
+	পূর্ণসংখ্যা r = check_reserved_name(arg, FALSE);
 	*p = c;
-	if (r == FAIL)
-	    return arg;
+	যদি (r == FAIL)
+	    ফেরত arg;
 
 	// Cannot use script var name for argument. In function: also check
 	// local vars and arguments.
-	if (check_defined(arg, p - arg,
-				   evalarg == NULL ? NULL : evalarg->eval_cctx,
-			       eap == NULL ? NULL : eap->cstack, TRUE) == FAIL)
-	    return arg;
+	যদি (check_defined(arg, p - arg,
+				   evalarg == ফাঁকা ? ফাঁকা : evalarg->eval_cctx,
+			       eap == ফাঁকা ? ফাঁকা : eap->cstack, TRUE) == FAIL)
+	    ফেরত arg;
     }
 
-    if (newargs != NULL && ga_grow(newargs, 1) == FAIL)
-	return arg;
-    if (newargs != NULL)
+    যদি (newargs != ফাঁকা && ga_grow(newargs, 1) == FAIL)
+	ফেরত arg;
+    যদি (newargs != ফাঁকা)
     {
-	int	c;
-	int	i;
+	পূর্ণসংখ্যা	c;
+	পূর্ণসংখ্যা	i;
 
 	c = *p;
 	*p = NUL;
 	arg_copy = vim_strsave(arg);
-	if (arg_copy == NULL)
+	যদি (arg_copy == ফাঁকা)
 	{
 	    *p = c;
-	    return arg;
+	    ফেরত arg;
 	}
 	is_underscore = arg_copy[0] == '_' && arg_copy[1] == NUL;
-	if (argtypes == NULL || !is_underscore)
+	যদি (argtypes == ফাঁকা || !is_underscore)
 	    // Check for duplicate argument name.
-	    for (i = 0; i < newargs->ga_len; ++i)
-		if (STRCMP(((char_u **)(newargs->ga_data))[i], arg_copy) == 0)
+	    জন্য (i = 0; i < newargs->ga_len; ++i)
+		যদি (STRCMP(((char_u **)(newargs->ga_তথ্য))[i], arg_copy) == 0)
 		{
 		    semsg(_(e_duplicate_argument_name_str), arg_copy);
 		    vim_free(arg_copy);
-		    return arg;
+		    ফেরত arg;
 		}
-	((char_u **)(newargs->ga_data))[newargs->ga_len] = arg_copy;
+	((char_u **)(newargs->ga_তথ্য))[newargs->ga_len] = arg_copy;
 	newargs->ga_len++;
 
 	*p = c;
     }
 
     // get any type from "arg: type"
-    if (argtypes != NULL && (skip || ga_grow(argtypes, 1) == OK)
-		&& arg_objm != NULL && (skip || ga_grow(arg_objm, 1) == OK))
+    যদি (argtypes != ফাঁকা && (skip || ga_grow(argtypes, 1) == OK)
+		&& arg_objm != ফাঁকা && (skip || ga_grow(arg_objm, 1) == OK))
     {
-	char_u *type = NULL;
+	char_u *type = ফাঁকা;
 
-	if (VIM_ISWHITE(*p) && *skipwhite(p) == ':')
+	যদি (VIM_ISWHITE(*p) && *skipwhite(p) == ':')
 	{
 	    semsg(_(e_no_white_space_allowed_before_colon_str),
-					    arg_copy == NULL ? arg : arg_copy);
+					    arg_copy == ফাঁকা ? arg : arg_copy);
 	    p = skipwhite(p);
 	}
-	if (*p == ':')
+	যদি (*p == ':')
 	{
 	    ++p;
-	    if (!skip && !VIM_ISWHITE(*p))
+	    যদি (!skip && !VIM_ISWHITE(*p))
 	    {
 		semsg(_(e_white_space_required_after_str_str), ":", p - 1);
-		return arg;
+		ফেরত arg;
 	    }
 	    type = skipwhite(p);
 	    p = skip_type(type, TRUE);
-	    if (!skip)
+	    যদি (!skip)
 		type = vim_strnsave(type, p - type);
 	}
-	else if (*skipwhite(p) != '=' && !types_optional && !is_underscore)
+	অন্যথা যদি (*skipwhite(p) != '=' && !types_optional && !is_underscore)
 	{
 	    semsg(_(e_missing_argument_type_for_str),
-					    arg_copy == NULL ? arg : arg_copy);
-	    return arg;
+					    arg_copy == ফাঁকা ? arg : arg_copy);
+	    ফেরত arg;
 	}
-	if (!skip)
+	যদি (!skip)
 	{
-	    if (type == NULL && types_optional)
+	    যদি (type == ফাঁকা && types_optional)
 	    {
 		// lambda arguments default to "any" type
-		if (is_vararg)
+		যদি (is_vararg)
 		    type = vim_strnsave((char_u *)"list<any>", 9);
-		else
+		অন্যথা
 		    type = vim_strnsave((char_u *)"any", 3);
 	    }
-	    ((char_u **)argtypes->ga_data)[argtypes->ga_len++] = type;
-	    ((int8_T *)arg_objm->ga_data)[arg_objm->ga_len++] = FALSE;
+	    ((char_u **)argtypes->ga_তথ্য)[argtypes->ga_len++] = type;
+	    ((int8_T *)arg_objm->ga_তথ্য)[arg_objm->ga_len++] = FALSE;
 	}
     }
 
-    return p;
+    ফেরত p;
 }
 
 /*
@@ -191,30 +191,30 @@ one_function_arg(
  * Get a next line, store it in "eap" if appropriate and put the line in
  * "lines_to_free" to free the line later.
  */
-    static char_u *
-get_function_line(
+    স্থির char_u *
+get_function_সারি(
 	exarg_T		*eap,
-	garray_T	*lines_to_free,
-	int		indent,
+	garray_T	*সারিগুলি_to_free,
+	পূর্ণসংখ্যা		indent,
 	getline_opt_T	getline_options)
 {
     char_u *theline;
 
-    if (eap->ea_getline == NULL)
+    যদি (eap->ea_getline == ফাঁকা)
 	theline = getcmdline(':', 0L, indent, 0);
-    else
+    অন্যথা
 	theline = eap->ea_getline(':', eap->cookie, indent, getline_options);
-    if (theline != NULL)
+    যদি (theline != ফাঁকা)
     {
-	if (lines_to_free->ga_len > 0
-		&& eap->cmdlinep != NULL
-		&& *eap->cmdlinep == ((char_u **)lines_to_free->ga_data)
-						   [lines_to_free->ga_len - 1])
+	যদি (সারিগুলি_to_free->ga_len > 0
+		&& eap->cmdlinep != ফাঁকা
+		&& *eap->cmdlinep == ((char_u **)সারিগুলি_to_free->ga_তথ্য)
+						   [সারিগুলি_to_free->ga_len - 1])
 	    *eap->cmdlinep = theline;
-	(void)ga_add_string(lines_to_free, theline);
+	(শূন্য)ga_add_string(সারিগুলি_to_free, theline);
     }
 
-    return theline;
+    ফেরত theline;
 }
 
 /*
@@ -222,41 +222,41 @@ get_function_line(
  * "argp" should point to just after the "(", possibly to white space.
  * "argp" is advanced just after "endchar".
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 get_function_args(
     char_u	**argp,
     char_u	endchar,
     garray_T	*newargs,
     garray_T	*argtypes,	// NULL unless using :def
-    int		types_optional,	// types optional if "argtypes" is not NULL
+    পূর্ণসংখ্যা		types_optional,	// types optional if "argtypes" is not NULL
     garray_T	*arg_objm,	// NULL unless using :def
     evalarg_T	*evalarg,	// context or NULL
-    int		*varargs,
+    পূর্ণসংখ্যা		*varargs,
     garray_T	*default_args,
-    int		skip,
+    পূর্ণসংখ্যা		skip,
     exarg_T	*eap,		// can be NULL
-    int		in_class,	// non-zero when inside a class or interface
+    পূর্ণসংখ্যা		in_class,	// non-zero when inside a class or interface
     garray_T	*newlines,	// function body lines
-    garray_T	*lines_to_free)
+    garray_T	*সারিগুলি_to_free)
 {
-    int		mustend = FALSE;
+    পূর্ণসংখ্যা		mustend = FALSE;
     char_u	*arg;
     char_u	*p;
-    int		c;
-    int		any_default = FALSE;
+    পূর্ণসংখ্যা		c;
+    পূর্ণসংখ্যা		any_default = FALSE;
     char_u	*whitep = *argp;
-    int		need_expr = FALSE;
+    পূর্ণসংখ্যা		need_রাশিমালা = FALSE;
 
-    if (newargs != NULL)
-	ga_init2(newargs, sizeof(char_u *), 3);
-    if (argtypes != NULL)
-	ga_init2(argtypes, sizeof(char_u *), 3);
-    if (arg_objm != NULL)
-	ga_init2(arg_objm, sizeof(int8_T), 3);
-    if (!skip && default_args != NULL)
-	ga_init2(default_args, sizeof(char_u *), 3);
+    যদি (newargs != ফাঁকা)
+	ga_init2(newargs, আকার(char_u *), 3);
+    যদি (argtypes != ফাঁকা)
+	ga_init2(argtypes, আকার(char_u *), 3);
+    যদি (arg_objm != ফাঁকা)
+	ga_init2(arg_objm, আকার(int8_T), 3);
+    যদি (!skip && default_args != ফাঁকা)
+	ga_init2(default_args, আকার(char_u *), 3);
 
-    if (varargs != NULL)
+    যদি (varargs != ফাঁকা)
 	*varargs = FALSE;
 
     /*
@@ -264,401 +264,401 @@ get_function_args(
      */
     arg = skipwhite(*argp);
     p = arg;
-    while (*p != endchar)
+    যখন (*p != endchar)
     {
-	while (eap != NULL && eap->ea_getline != NULL
+	যখন (eap != ফাঁকা && eap->ea_getline != ফাঁকা
 			 && (*p == NUL || (VIM_ISWHITE(*whitep) && *p == '#')))
 	{
 	    // End of the line, get the next one.
-	    char_u *theline = get_function_line(eap, lines_to_free, 0,
+	    char_u *theline = get_function_সারি(eap, সারিগুলি_to_free, 0,
 							  GETLINE_CONCAT_CONT);
 
-	    if (theline == NULL)
-		break;
+	    যদি (theline == ফাঁকা)
+		বিরতি;
 	    whitep = (char_u *)" ";
 	    p = skipwhite(theline);
 	}
 
-	if (mustend && *p != endchar)
+	যদি (mustend && *p != endchar)
 	{
-	    if (!skip)
+	    যদি (!skip)
 		semsg(_(e_invalid_argument_str), *argp);
-	    goto err_ret;
+	    যাও err_ret;
 	}
-	if (*p == endchar && !need_expr)
-	    break;
+	যদি (*p == endchar && !need_রাশিমালা)
+	    বিরতি;
 
-	if (p[0] == '.' && p[1] == '.' && p[2] == '.')
+	যদি (p[0] == '.' && p[1] == '.' && p[2] == '.')
 	{
-	    if (varargs != NULL)
+	    যদি (varargs != ফাঁকা)
 		*varargs = TRUE;
 	    p += 3;
 	    mustend = TRUE;
 
-	    if (argtypes != NULL)
+	    যদি (argtypes != ফাঁকা)
 	    {
 		// ...name: list<type>
-		if (!eval_isnamec1(*p))
+		যদি (!eval_isnamec1(*p))
 		{
-		    if (!skip)
+		    যদি (!skip)
 			emsg(_(e_missing_name_after_dots));
-		    goto err_ret;
+		    যাও err_ret;
 		}
 
 		arg = p;
 		p = one_function_arg(p, newargs, argtypes, types_optional,
 					arg_objm, evalarg, eap, TRUE, skip);
-		if (p == arg)
-		    break;
-		if (*skipwhite(p) == '=')
+		যদি (p == arg)
+		    বিরতি;
+		যদি (*skipwhite(p) == '=')
 		{
 		    emsg(_(e_cannot_use_default_for_variable_arguments));
-		    break;
+		    বিরতি;
 		}
 	    }
 	}
-	else if (in_class && STRNCMP(p, "this.", 5) == 0)
+	অন্যথা যদি (in_class && STRNCMP(p, "this.", 5) == 0)
 	{
 	    // this.memberName
 	    p += 5;
 	    arg = p;
-	    while (ASCII_ISALNUM(*p) || *p == '_')
+	    যখন (ASCII_ISALNUM(*p) || *p == '_')
 		++p;
 	    char_u *argend = p;
 
 	    // object variable this. can be used only in a constructor
-	    if (STRNCMP(eap->arg, "new", 3) != 0)
+	    যদি (STRNCMP(eap->arg, "new", 3) != 0)
 	    {
 		c = *argend;
 		*argend = NUL;
 		semsg(_(e_cannot_use_an_object_variable_except_with_the_new_method_str), arg);
 		*argend = c;
-		break;
+		বিরতি;
 	    }
 
-	    if (*skipwhite(p) == '=')
+	    যদি (*skipwhite(p) == '=')
 	    {
 		char_u *defval = skipwhite(skipwhite(p) + 1);
-		if (STRNCMP(defval, "v:none", 6) != 0)
+		যদি (STRNCMP(defval, "v:none", 6) != 0)
 		{
-		    semsg(_(e_constructor_default_value_must_be_vnone_str), p);
-		    goto err_ret;
+		    semsg(_(e_constructor_default_মান_must_be_vnone_str), p);
+		    যাও err_ret;
 		}
 		any_default = TRUE;
 		p = defval + 6;
 
-		if (ga_grow(default_args, 1) == FAIL)
-		    goto err_ret;
+		যদি (ga_grow(default_args, 1) == FAIL)
+		    যাও err_ret;
 
-		char_u *expr = vim_strnsave((char_u *)"v:none", 6);
-		if (expr == NULL)
-		    goto err_ret;
-		((char_u **)(default_args->ga_data))
-						 [default_args->ga_len] = expr;
+		char_u *রাশিমালা = vim_strnsave((char_u *)"v:none", 6);
+		যদি (রাশিমালা == ফাঁকা)
+		    যাও err_ret;
+		((char_u **)(default_args->ga_তথ্য))
+						 [default_args->ga_len] = রাশিমালা;
 		default_args->ga_len++;
 	    }
-	    else if (any_default)
+	    অন্যথা যদি (any_default)
 	    {
 		emsg(_(e_non_default_argument_follows_default_argument));
-		goto err_ret;
+		যাও err_ret;
 	    }
 
 	    // TODO: check the argument is indeed a member
-	    if (newargs != NULL && ga_grow(newargs, 1) == FAIL)
-		return FAIL;
-	    if (newargs != NULL)
+	    যদি (newargs != ফাঁকা && ga_grow(newargs, 1) == FAIL)
+		ফেরত FAIL;
+	    যদি (newargs != ফাঁকা)
 	    {
-		((char_u **)(newargs->ga_data))[newargs->ga_len] =
+		((char_u **)(newargs->ga_তথ্য))[newargs->ga_len] =
 					       vim_strnsave(arg, argend - arg);
 		newargs->ga_len++;
 
-		if (argtypes != NULL && ga_grow(argtypes, 1) == OK
-			    && arg_objm != NULL && ga_grow(arg_objm, 1) == OK)
+		যদি (argtypes != ফাঁকা && ga_grow(argtypes, 1) == OK
+			    && arg_objm != ফাঁকা && ga_grow(arg_objm, 1) == OK)
 		{
 		    // TODO: use the actual type
-		    ((char_u **)argtypes->ga_data)[argtypes->ga_len++] =
+		    ((char_u **)argtypes->ga_তথ্য)[argtypes->ga_len++] =
 						  vim_strnsave((char_u *)"any", 3);
-		    ((int8_T *)arg_objm->ga_data)[arg_objm->ga_len++] = TRUE;
+		    ((int8_T *)arg_objm->ga_তথ্য)[arg_objm->ga_len++] = TRUE;
 
 		    // Add a line to the function body for the assignment.
-		    if (ga_grow(newlines, 1) == OK)
+		    যদি (ga_grow(newlines, 1) == OK)
 		    {
 			// "this.name = name"
-			int len = 5 + (argend - arg) + 3 + (argend - arg) + 1;
-			if (any_default)
+			পূর্ণসংখ্যা len = 5 + (argend - arg) + 3 + (argend - arg) + 1;
+			যদি (any_default)
 			    len += 14 + 10;
 			char_u *assignment = alloc(len);
-			if (assignment != NULL)
+			যদি (assignment != ফাঁকা)
 			{
 			    c = *argend;
 			    *argend = NUL;
-			    if (any_default)
-				vim_snprintf((char *)assignment, len,
+			    যদি (any_default)
+				vim_snprintf((অক্ষর *)assignment, len,
 						"ifargisset %d this.%s = %s",
 					   default_args->ga_len - 1, arg, arg);
-			    else
-				vim_snprintf((char *)assignment, len,
+			    অন্যথা
+				vim_snprintf((অক্ষর *)assignment, len,
 						     "this.%s = %s", arg, arg);
 			    *argend = c;
-			    ((char_u **)(newlines->ga_data))[
+			    ((char_u **)(newlines->ga_তথ্য))[
 					      newlines->ga_len++] = assignment;
 			}
 		    }
 		}
 	    }
-	    if (*p == ',')
+	    যদি (*p == ',')
 		++p;
 	}
-	else
+	অন্যথা
 	{
 	    char_u *np;
 
 	    arg = p;
 	    p = one_function_arg(p, newargs, argtypes, types_optional,
 					arg_objm, evalarg, eap, FALSE, skip);
-	    if (p == arg)
-		break;
+	    যদি (p == arg)
+		বিরতি;
 
 	    // Recognize " = expr" but not " == expr".  A lambda can have
 	    // "(a = expr" but "(a == expr" and "(a =~ expr" are not a lambda.
 	    np = skipwhite(p);
-	    if (*np == '=' && np[1] != '=' && np[1] != '~'
-						       && default_args != NULL)
+	    যদি (*np == '=' && np[1] != '=' && np[1] != '~'
+						       && default_args != ফাঁকা)
 	    {
 		typval_T	rettv;
 
 		// find the end of the expression (doesn't evaluate it)
 		any_default = TRUE;
 		p = skipwhite(np + 1);
-		char_u *expr = p;
-		if (eval1(&p, &rettv, NULL) != FAIL)
+		char_u *রাশিমালা = p;
+		যদি (eval1(&p, &rettv, ফাঁকা) != FAIL)
 		{
-		    if (!skip)
+		    যদি (!skip)
 		    {
-			if (ga_grow(default_args, 1) == FAIL)
-			    goto err_ret;
+			যদি (ga_grow(default_args, 1) == FAIL)
+			    যাও err_ret;
 
-			if (need_expr)
-			    need_expr = FALSE;
+			যদি (need_রাশিমালা)
+			    need_রাশিমালা = FALSE;
 			// trim trailing whitespace
-			while (p > expr && VIM_ISWHITE(p[-1]))
+			যখন (p > রাশিমালা && VIM_ISWHITE(p[-1]))
 			    p--;
 			c = *p;
 			*p = NUL;
-			expr = vim_strsave(expr);
-			if (expr == NULL)
+			রাশিমালা = vim_strsave(রাশিমালা);
+			যদি (রাশিমালা == ফাঁকা)
 			{
 			    *p = c;
-			    goto err_ret;
+			    যাও err_ret;
 			}
-			((char_u **)(default_args->ga_data))
-						 [default_args->ga_len] = expr;
+			((char_u **)(default_args->ga_তথ্য))
+						 [default_args->ga_len] = রাশিমালা;
 			default_args->ga_len++;
 			*p = c;
 		    }
 		}
-		else
+		অন্যথা
 		{
 		    mustend = TRUE;
-		    if (*skipwhite(p) == NUL)
-			need_expr = TRUE;
+		    যদি (*skipwhite(p) == NUL)
+			need_রাশিমালা = TRUE;
 		}
 	    }
-	    else if (any_default)
+	    অন্যথা যদি (any_default)
 	    {
 		emsg(_(e_non_default_argument_follows_default_argument));
-		goto err_ret;
+		যাও err_ret;
 	    }
 
-	    if (VIM_ISWHITE(*p) && *skipwhite(p) == ',')
+	    যদি (VIM_ISWHITE(*p) && *skipwhite(p) == ',')
 	    {
 		// Be tolerant when skipping
-		if (!skip)
+		যদি (!skip)
 		{
 		    semsg(_(e_no_white_space_allowed_before_str_str), ",", p);
-		    goto err_ret;
+		    যাও err_ret;
 		}
 		p = skipwhite(p);
 	    }
-	    if (*p == ',')
+	    যদি (*p == ',')
 	    {
 		++p;
 		// Don't give this error when skipping, it makes the "->" not
 		// found in "{k,v -> x}" and give a confusing error.
 		// Allow missing space after comma in legacy functions.
-		if (!skip && argtypes != NULL
+		যদি (!skip && argtypes != ফাঁকা
 				      && !IS_WHITE_OR_NUL(*p) && *p != endchar)
 		{
 		    semsg(_(e_white_space_required_after_str_str), ",", p - 1);
-		    goto err_ret;
+		    যাও err_ret;
 		}
 	    }
-	    else
+	    অন্যথা
 		mustend = TRUE;
 	}
 	whitep = p;
 	p = skipwhite(p);
     }
 
-    if (*p != endchar)
-	goto err_ret;
+    যদি (*p != endchar)
+	যাও err_ret;
     ++p;	// skip "endchar"
 
     *argp = p;
-    return OK;
+    ফেরত OK;
 
 err_ret:
-    if (newargs != NULL)
+    যদি (newargs != ফাঁকা)
 	ga_clear_strings(newargs);
-    if (!skip && default_args != NULL)
+    যদি (!skip && default_args != ফাঁকা)
 	ga_clear_strings(default_args);
-    return FAIL;
+    ফেরত FAIL;
 }
 
 /*
  * Parse the argument types, filling "fp->uf_arg_types".
  * Return OK or FAIL.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 parse_argument_types(
     ufunc_T	*fp,
     garray_T	*argtypes,
-    int		varargs,
+    পূর্ণসংখ্যা		varargs,
     garray_T	*arg_objm,
     ocmember_T	*obj_members,
-    int		obj_member_count,
+    পূর্ণসংখ্যা		obj_member_গুনতি,
     cctx_T	*cctx)
 {
-    int len = 0;
+    পূর্ণসংখ্যা len = 0;
 
-    ga_init2(&fp->uf_type_list, sizeof(type_T *), 10);
-    if (argtypes->ga_len > 0)
+    ga_init2(&fp->uf_type_list, আকার(type_T *), 10);
+    যদি (argtypes->ga_len > 0)
     {
 	// When "varargs" is set the last name/type goes into uf_va_name
 	// and uf_va_type.
 	len = argtypes->ga_len - (varargs ? 1 : 0);
 
-	if (len > 0)
+	যদি (len > 0)
 	    fp->uf_arg_types = ALLOC_CLEAR_MULT(type_T *, len);
-	if (fp->uf_arg_types != NULL)
+	যদি (fp->uf_arg_types != ফাঁকা)
 	{
-	    int	i;
+	    পূর্ণসংখ্যা	i;
 	    type_T	*type;
 
-	    for (i = 0; i < len; ++ i)
+	    জন্য (i = 0; i < len; ++ i)
 	    {
-		char_u *p = ((char_u **)argtypes->ga_data)[i];
+		char_u *p = ((char_u **)argtypes->ga_তথ্য)[i];
 
-		if (p == NULL)
+		যদি (p == ফাঁকা)
 		    // will get the type from the default value
 		    type = &t_unknown;
-		else
+		অন্যথা
 		{
-		    if (arg_objm != NULL && ((int8_T *)arg_objm->ga_data)[i])
+		    যদি (arg_objm != ফাঁকা && ((int8_T *)arg_objm->ga_তথ্য)[i])
 		    {
-			char_u *aname = ((char_u **)fp->uf_args.ga_data)[i];
+			char_u *aname = ((char_u **)fp->uf_args.ga_তথ্য)[i];
 
 			type = &t_any;
-			for (int om = 0; om < obj_member_count; ++om)
+			জন্য (পূর্ণসংখ্যা om = 0; om < obj_member_গুনতি; ++om)
 			{
-			    if (obj_members != NULL
+			    যদি (obj_members != ফাঁকা
 				    && STRCMP(aname,
 					obj_members[om].ocm_name.string) == 0)
 			    {
 				type = obj_members[om].ocm_type;
-				break;
+				বিরতি;
 			    }
 			}
 		    }
-		    else
+		    অন্যথা
 			type = parse_type(&p, &fp->uf_type_list, fp, cctx, TRUE);
 		}
-		if (type == NULL || !valid_declaration_type(type))
-		    return FAIL;
+		যদি (type == ফাঁকা || !valid_declaration_type(type))
+		    ফেরত FAIL;
 		fp->uf_arg_types[i] = type;
-		if (i < fp->uf_args.ga_len
+		যদি (i < fp->uf_args.ga_len
 			&& (type->tt_type == VAR_FUNC
 			    || type->tt_type == VAR_PARTIAL))
 		{
-		    char_u *name = ((char_u **)fp->uf_args.ga_data)[i];
-		    if (obj_members != NULL && *name == '_')
+		    char_u *name = ((char_u **)fp->uf_args.ga_তথ্য)[i];
+		    যদি (obj_members != ফাঁকা && *name == '_')
 			// protected object method
 			name++;
 
-		    if (var_wrong_func_name(name, TRUE))
-			return FAIL;
+		    যদি (var_wrong_func_name(name, TRUE))
+			ফেরত FAIL;
 		}
 	    }
 	}
     }
 
-    if (varargs)
+    যদি (varargs)
     {
 	char_u *p;
 
 	// Move the last argument "...name: type" to uf_va_name and
 	// uf_va_type.
 	--fp->uf_args.ga_len;
-	fp->uf_va_name = ((char_u **)fp->uf_args.ga_data)[fp->uf_args.ga_len];
-	((char_u **)fp->uf_args.ga_data)[fp->uf_args.ga_len] = NULL;
-	p = ((char_u **)argtypes->ga_data)[len];
-	if (p == NULL)
+	fp->uf_va_name = ((char_u **)fp->uf_args.ga_তথ্য)[fp->uf_args.ga_len];
+	((char_u **)fp->uf_args.ga_তথ্য)[fp->uf_args.ga_len] = ফাঁকা;
+	p = ((char_u **)argtypes->ga_তথ্য)[len];
+	যদি (p == ফাঁকা)
 	    // TODO: get type from default value
 	    fp->uf_va_type = &t_list_any;
-	else
+	অন্যথা
 	{
 	    fp->uf_va_type = parse_type(&p, &fp->uf_type_list, fp, cctx, TRUE);
-	    if (fp->uf_va_type != NULL && fp->uf_va_type->tt_type != VAR_LIST)
+	    যদি (fp->uf_va_type != ফাঁকা && fp->uf_va_type->tt_type != VAR_LIST)
 	    {
 		semsg(_(e_variable_arguments_type_must_be_list_str),
-					  ((char_u **)argtypes->ga_data)[len]);
-		return FAIL;
+					  ((char_u **)argtypes->ga_তথ্য)[len]);
+		ফেরত FAIL;
 	    }
 	}
-	if (fp->uf_va_type == NULL)
-	    return FAIL;
+	যদি (fp->uf_va_type == ফাঁকা)
+	    ফেরত FAIL;
     }
 
-    return OK;
+    ফেরত OK;
 }
 
-    static int
+    স্থির পূর্ণসংখ্যা
 parse_return_type(ufunc_T *fp, char_u *ret_type, cctx_T *cctx)
 {
-    if (ret_type == NULL)
+    যদি (ret_type == ফাঁকা)
 	fp->uf_ret_type = &t_void;
-    else
+    অন্যথা
     {
 	char_u *p = ret_type;
 
 	fp->uf_ret_type = parse_type(&p, &fp->uf_type_list, fp, cctx, TRUE);
-	if (fp->uf_ret_type == NULL)
+	যদি (fp->uf_ret_type == ফাঁকা)
 	{
 	    fp->uf_ret_type = &t_void;
-	    return FAIL;
+	    ফেরত FAIL;
 	}
     }
-    return OK;
+    ফেরত OK;
 }
 
 /*
  * Register function "fp" as using "current_funccal" as its scope.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 register_closure(ufunc_T *fp)
 {
-    if (fp->uf_scoped == current_funccal)
+    যদি (fp->uf_scoped == current_funccal)
 	// no change
-	return OK;
+	ফেরত OK;
     funccal_unref(fp->uf_scoped, fp, FALSE);
     fp->uf_scoped = current_funccal;
     current_funccal->fc_refcount++;
 
-    if (ga_grow(&current_funccal->fc_ufuncs, 1) == FAIL)
-	return FAIL;
-    ((ufunc_T **)current_funccal->fc_ufuncs.ga_data)
+    যদি (ga_grow(&current_funccal->fc_ufuncs, 1) == FAIL)
+	ফেরত FAIL;
+    ((ufunc_T **)current_funccal->fc_ufuncs.ga_তথ্য)
 				    [current_funccal->fc_ufuncs.ga_len++] = fp;
-    return OK;
+    ফেরত OK;
 }
 
 /*
@@ -672,46 +672,46 @@ make_ufunc_name_readable(char_u *name, char_u *buf, size_t bufsize)
 {
     size_t len;
 
-    if (name[0] != K_SPECIAL)
-	return name;
+    যদি (name[0] != K_SPECIAL)
+	ফেরত name;
     len = STRLEN(name);
-    if (len + 3 > bufsize)
-	return name;
+    যদি (len + 3 > bufsize)
+	ফেরত name;
 
     mch_memmove(buf + 5, name + 3, len - 2);  // Include trailing NUL
     mch_memmove(buf, "<SNR>", 5);
-    return buf;
+    ফেরত buf;
 }
 
-static char_u	lambda_name[8 + NUMBUFLEN];
+স্থির char_u	lambda_name[8 + NUMBUFLEN];
 
 /*
  * Get a name for a lambda.  Returned in static memory.
  */
     string_T
-get_lambda_name(void)
+get_lambda_name(শূন্য)
 {
-    static int	lambda_no = 0;
-    int		n;
+    স্থির পূর্ণসংখ্যা	lambda_no = 0;
+    পূর্ণসংখ্যা		n;
     string_T	ret;
 
-    n = vim_snprintf((char *)lambda_name, sizeof(lambda_name), "<lambda>%d", ++lambda_no);
-    if (n < 1)
-	ret.length = 0;
-    else if (n >= (int)sizeof(lambda_name))
-	ret.length = sizeof(lambda_name) - 1;
-    else
-	ret.length = (size_t)n;
+    n = vim_snprintf((অক্ষর *)lambda_name, আকার(lambda_name), "<lambda>%d", ++lambda_no);
+    যদি (n < 1)
+	ret.দৈর্ঘ্য = 0;
+    অন্যথা যদি (n >= (পূর্ণসংখ্যা)আকার(lambda_name))
+	ret.দৈর্ঘ্য = আকার(lambda_name) - 1;
+    অন্যথা
+	ret.দৈর্ঘ্য = (size_t)n;
 
     ret.string = lambda_name;
-    return ret;
+    ফেরত ret;
 }
 
 /*
  * Allocate a "ufunc_T" for a function called "name".
  * Makes sure the size is right.
  */
-    static ufunc_T *
+    স্থির ufunc_T *
 alloc_ufunc(char_u *name, size_t namelen)
 {
     size_t  len;
@@ -720,40 +720,40 @@ alloc_ufunc(char_u *name, size_t namelen)
     // When the name is short we need to make sure we allocate enough bytes for
     // the whole struct, including any padding.
     len = offsetof(ufunc_T, uf_name) + namelen + 1;
-    fp = alloc_clear(len < sizeof(ufunc_T) ? sizeof(ufunc_T) : len);
-    if (fp != NULL)
+    fp = alloc_clear(len < আকার(ufunc_T) ? আকার(ufunc_T) : len);
+    যদি (fp != ফাঁকা)
     {
 	// Add a type cast to avoid a warning for an overflow, the uf_name[] array
 	// can actually extend beyond the struct.
-	STRCPY((void *)fp->uf_name, name);
+	STRCPY((শূন্য *)fp->uf_name, name);
 	fp->uf_namelen = namelen;
 
-	if (name[0] == K_SPECIAL)
+	যদি (name[0] == K_SPECIAL)
 	{
 	    len = namelen + 3;		    // including +1 for NUL
 	    fp->uf_name_exp = alloc(len);
-	    if (fp->uf_name_exp != NULL)
-		vim_snprintf((char *)fp->uf_name_exp, len, "<SNR>%s", fp->uf_name + 3);
+	    যদি (fp->uf_name_exp != ফাঁকা)
+		vim_snprintf((অক্ষর *)fp->uf_name_exp, len, "<SNR>%s", fp->uf_name + 3);
 	}
     }
 
-    return fp;
+    ফেরত fp;
 }
 
-#if defined(FEAT_LUA)
+#যদি defined(FEAT_LUA)
 /*
  * Registers a native C callback which can be called from Vim script.
  * Returns the name of the Vim script function.
  */
     char_u *
-register_cfunc(cfunc_T cb, cfunc_free_T cb_free, void *state)
+register_cfunc(cfunc_T cb, cfunc_free_T cb_free, শূন্য *state)
 {
     string_T	name = get_lambda_name();
     ufunc_T	*fp;
 
-    fp = alloc_ufunc(name.string, name.length);
-    if (fp == NULL)
-	return NULL;
+    fp = alloc_ufunc(name.string, name.দৈর্ঘ্য);
+    যদি (fp == ফাঁকা)
+	ফেরত ফাঁকা;
 
     fp->uf_def_status = UF_NOT_COMPILED;
     fp->uf_refcount = 1;
@@ -767,7 +767,7 @@ register_cfunc(cfunc_T cb, cfunc_free_T cb_free, void *state)
 
     hash_add(&func_hashtab, UF2HIKEY(fp), "add C function");
 
-    return name.string;
+    ফেরত name.string;
 }
 #endif
 
@@ -778,52 +778,52 @@ register_cfunc(cfunc_T cb, cfunc_free_T cb_free, void *state)
  * "white_error" to TRUE if there is an error.
  * Return NULL if no valid arrow found.
  */
-    static char_u *
+    স্থির char_u *
 skip_arrow(
 	char_u	*start,
-	int	equal_arrow,
+	পূর্ণসংখ্যা	equal_arrow,
 	char_u	**ret_type,
-	int	*white_error)
+	পূর্ণসংখ্যা	*white_error)
 {
     char_u  *s = start;
     char_u  *bef = start - 2; // "start" points to > of ->
 
-    if (equal_arrow)
+    যদি (equal_arrow)
     {
-	if (*s == ':')
+	যদি (*s == ':')
 	{
-	    if (white_error != NULL && !VIM_ISWHITE(s[1]))
+	    যদি (white_error != ফাঁকা && !VIM_ISWHITE(s[1]))
 	    {
 		*white_error = TRUE;
 		semsg(_(e_white_space_required_after_str_str), ":", s);
-		return NULL;
+		ফেরত ফাঁকা;
 	    }
 	    s = skipwhite(s + 1);
 	    *ret_type = s;
 	    s = skip_type(s, TRUE);
-	    if (s == *ret_type)
+	    যদি (s == *ret_type)
 	    {
 		emsg(_(e_missing_return_type));
-		return NULL;
+		ফেরত ফাঁকা;
 	    }
 	}
 	bef = s;
 	s = skipwhite(s);
-	if (*s != '=')
-	    return NULL;
+	যদি (*s != '=')
+	    ফেরত ফাঁকা;
 	++s;
     }
-    if (*s != '>')
-	return NULL;
-    if (white_error != NULL && ((!VIM_ISWHITE(*bef) && *bef != '{')
+    যদি (*s != '>')
+	ফেরত ফাঁকা;
+    যদি (white_error != ফাঁকা && ((!VIM_ISWHITE(*bef) && *bef != '{')
 		|| !IS_WHITE_OR_NUL(s[1])))
     {
 	*white_error = TRUE;
 	semsg(_(e_white_space_required_before_and_after_str_at_str),
 					       equal_arrow ? "=>" : "->", bef);
-	return NULL;
+	ফেরত ফাঁকা;
     }
-    return skipwhite(s + 1);
+    ফেরত skipwhite(s + 1);
 }
 
 /*
@@ -832,19 +832,19 @@ skip_arrow(
  * Otherwise return FALSE;
  * Do not consider "function(" to be a command.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 is_function_cmd(char_u **cmd)
 {
     char_u *p = *cmd;
 
-    if (checkforcmd(&p, "function", 2))
+    যদি (checkforcmd(&p, "function", 2))
     {
-	if (*p == '(')
-	    return FALSE;
+	যদি (*p == '(')
+	    ফেরত FALSE;
 	*cmd = p;
-	return TRUE;
+	ফেরত TRUE;
     }
-    return FALSE;
+    ফেরত FALSE;
 }
 
 /*
@@ -852,27 +852,27 @@ is_function_cmd(char_u **cmd)
  * variables declared in a block that is visible now but not when the function
  * is compiled or called later.
  */
-    static void
+    স্থির শূন্য
 function_using_block_scopes(ufunc_T *fp, cstack_T *cstack)
 {
-    if (cstack == NULL || cstack->cs_idx < 0)
-	return;
+    যদি (cstack == ফাঁকা || cstack->cs_idx < 0)
+	ফেরত;
 
-    int	    count = cstack->cs_idx + 1;
-    int	    i;
+    পূর্ণসংখ্যা	    গুনতি = cstack->cs_idx + 1;
+    পূর্ণসংখ্যা	    i;
 
-    fp->uf_block_ids = ALLOC_MULT(int, count);
-    if (fp->uf_block_ids != NULL)
+    fp->uf_block_ids = ALLOC_MULT(পূর্ণসংখ্যা, গুনতি);
+    যদি (fp->uf_block_ids != ফাঁকা)
     {
 	mch_memmove(fp->uf_block_ids, cstack->cs_block_id,
-		sizeof(int) * count);
-	fp->uf_block_depth = count;
+		আকার(পূর্ণসংখ্যা) * গুনতি);
+	fp->uf_block_depth = গুনতি;
     }
 
     // Set flag in each block to indicate a function was defined.  This
     // is used to keep the variable when leaving the block, see
     // hide_script_var().
-    for (i = 0; i <= cstack->cs_idx; ++i)
+    জন্য (i = 0; i <= cstack->cs_idx; ++i)
 	cstack->cs_flags[i] |= CSF_FUNC_DEF;
 }
 
@@ -882,26 +882,26 @@ function_using_block_scopes(ufunc_T *fp, cstack_T *cstack)
  * If the ending single quote is missing, then return a pointer to the NUL
  * character.
  */
-    static char_u *
+    স্থির char_u *
 skip_single_quote_string(char_u *p)
 {
     p++;	    // skip the beginning single quote
-    while (*p != NUL)
+    যখন (*p != NUL)
     {
 	// Within the string, a single quote can be escaped by using
 	// two single quotes.
-	if (*p == '\'' && *(p + 1) == '\'')
+	যদি (*p == '\'' && *(p + 1) == '\'')
 	    p += 2;
-	else if (*p == '\'')
+	অন্যথা যদি (*p == '\'')
 	{
 	    p++;    // skip the ending single quote
-	    break;
+	    বিরতি;
 	}
-	else
+	অন্যথা
 	    MB_PTR_ADV(p);
     }
 
-    return p;
+    ফেরত p;
 }
 
 /*
@@ -910,26 +910,26 @@ skip_single_quote_string(char_u *p)
  * If the ending double quote is missing, then return a pointer to the NUL
  * character.
  */
-    static char_u *
+    স্থির char_u *
 skip_double_quote_string(char_u *p)
 {
     p++;	    // skip the beginning double quote
-    while (*p != NUL)
+    যখন (*p != NUL)
     {
 	// Within the string, a double quote can be escaped by
 	// preceding it with a backslash.
-	if (*p == '\\' && *(p + 1) == '"')
+	যদি (*p == '\\' && *(p + 1) == '"')
 	    p += 2;
-	else if (*p == '"')
+	অন্যথা যদি (*p == '"')
 	{
 	    p++;    // skip the ending double quote
-	    break;
+	    বিরতি;
 	}
-	else
+	অন্যথা
 	    MB_PTR_ADV(p);
     }
 
-    return p;
+    ফেরত p;
 }
 
 /*
@@ -937,29 +937,29 @@ skip_double_quote_string(char_u *p)
  * If a comment is not found, then returns a pointer to the end of the
  * string (NUL).
  */
-    static char_u *
-find_start_of_vim9_comment(char_u *line)
+    স্থির char_u *
+find_start_of_vim9_comment(char_u *সারি)
 {
-    char_u	*p = line;
+    char_u	*p = সারি;
 
-    while (*p != NUL)
+    যখন (*p != NUL)
     {
-	if (*p == '\'')
+	যদি (*p == '\'')
 	    // Skip a single quoted string.
 	    p = skip_single_quote_string(p);
-	else if (*p == '"')
+	অন্যথা যদি (*p == '"')
 	    // Skip a double quoted string.
 	    p = skip_double_quote_string(p);
-	else
+	অন্যথা
 	{
-	    if (*p == '#')
+	    যদি (*p == '#')
 		// Found the start of a Vim9 comment
-		break;
+		বিরতি;
 	    MB_PTR_ADV(p);
 	}
     }
 
-    return p;
+    ফেরত p;
 }
 
 /*
@@ -968,126 +968,126 @@ find_start_of_vim9_comment(char_u *line)
  * "newlines" must already have been initialized.
  * "eap->cmdidx" is CMD_function, CMD_def or CMD_block;
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 get_function_body(
 	exarg_T	    *eap,
 	garray_T    *newlines,
-	char_u	    *line_arg_in,
-	garray_T    *lines_to_free)
+	char_u	    *সারি_arg_in,
+	garray_T    *সারিগুলি_to_free)
 {
-    linenr_T	sourcing_lnum_top = SOURCING_LNUM;
+    linenr_T	sourcing_lnum_শীর্ষ = SOURCING_LNUM;
     linenr_T	sourcing_lnum_off;
-    int		saved_wait_return = need_wait_return;
-    char_u	*line_arg = line_arg_in;
-    int		vim9_function = eap->cmdidx == CMD_def
+    পূর্ণসংখ্যা		saved_wait_return = need_wait_return;
+    char_u	*সারি_arg = সারি_arg_in;
+    পূর্ণসংখ্যা		vim9_function = eap->cmdidx == CMD_def
 						   || eap->cmdidx == CMD_block;
 #define MAX_FUNC_NESTING 50
-    char	nesting_def[MAX_FUNC_NESTING];
-    char	nesting_inline[MAX_FUNC_NESTING];
-    int		nesting = 0;
+    অক্ষর	nesting_def[MAX_FUNC_NESTING];
+    অক্ষর	nesting_inline[MAX_FUNC_NESTING];
+    পূর্ণসংখ্যা		nesting = 0;
     getline_opt_T getline_options;
-    int		indent = 2;
-    char_u	*skip_until = NULL;
-    int		ret = FAIL;
-    int		is_heredoc = FALSE;
-    int		heredoc_concat_len = 0;
+    পূর্ণসংখ্যা		indent = 2;
+    char_u	*skip_until = ফাঁকা;
+    পূর্ণসংখ্যা		ret = FAIL;
+    পূর্ণসংখ্যা		is_heredoc = FALSE;
+    পূর্ণসংখ্যা		heredoc_concat_len = 0;
     garray_T	heredoc_ga;
-    char_u	*heredoc_trimmed = NULL;
+    char_u	*heredoc_trimmed = ফাঁকা;
     size_t	heredoc_trimmedlen = 0;
-    int		did_emsg_start = did_emsg;
+    পূর্ণসংখ্যা		did_emsg_start = did_emsg;
 
     ga_init2(&heredoc_ga, 1, 500);
 
     // Detect having skipped over comment lines to find the return
     // type.  Add NULL lines to keep the line count correct.
     sourcing_lnum_off = get_sourced_lnum(eap->ea_getline, eap->cookie);
-    if (SOURCING_LNUM < sourcing_lnum_off)
+    যদি (SOURCING_LNUM < sourcing_lnum_off)
     {
 	sourcing_lnum_off -= SOURCING_LNUM;
-	if (ga_grow(newlines, sourcing_lnum_off) == FAIL)
-	    goto theend;
-	while (sourcing_lnum_off-- > 0)
-	    ((char_u **)(newlines->ga_data))[newlines->ga_len++] = NULL;
+	যদি (ga_grow(newlines, sourcing_lnum_off) == FAIL)
+	    যাও theend;
+	যখন (sourcing_lnum_off-- > 0)
+	    ((char_u **)(newlines->ga_তথ্য))[newlines->ga_len++] = ফাঁকা;
     }
 
     nesting_def[0] = vim9_function;
     nesting_inline[0] = eap->cmdidx == CMD_block;
     getline_options = vim9_function
 				? GETLINE_CONCAT_CONTBAR : GETLINE_CONCAT_CONT;
-    for (;;)
+    জন্য (;;)
     {
 	char_u	*theline;
 	char_u	*p;
 	char_u	*arg;
 
-	if (KeyTyped)
+	যদি (চাবি_Typed)
 	{
-	    msg_scroll = TRUE;
+	    বার্তা_scroll = TRUE;
 	    saved_wait_return = FALSE;
 	}
 	need_wait_return = FALSE;
 
-	if (line_arg != NULL)
+	যদি (সারি_arg != ফাঁকা)
 	{
 	    // Use eap->arg, split up in parts by line breaks.
-	    theline = line_arg;
+	    theline = সারি_arg;
 	    p = vim_strchr(theline, '\n');
-	    if (p == NULL)
-		line_arg += STRLEN(line_arg);
-	    else
+	    যদি (p == ফাঁকা)
+		সারি_arg += STRLEN(সারি_arg);
+	    অন্যথা
 	    {
 		*p = NUL;
-		line_arg = p + 1;
+		সারি_arg = p + 1;
 	    }
 	}
-	else
+	অন্যথা
 	{
-	    theline = get_function_line(eap, lines_to_free, indent,
+	    theline = get_function_সারি(eap, সারিগুলি_to_free, indent,
 							      getline_options);
 	}
-	if (KeyTyped)
-	    lines_left = Rows - 1;
-	if (theline == NULL)
+	যদি (চাবি_Typed)
+	    সারিগুলি_বাম = Rows - 1;
+	যদি (theline == ফাঁকা)
 	{
 	    // Use the start of the function for the line number.
-	    SOURCING_LNUM = sourcing_lnum_top;
-	    if (skip_until != NULL)
+	    SOURCING_LNUM = sourcing_lnum_শীর্ষ;
+	    যদি (skip_until != ফাঁকা)
 		semsg(_(e_missing_heredoc_end_marker_str), skip_until);
-	    else if (nesting_inline[nesting])
+	    অন্যথা যদি (nesting_inline[nesting])
 		emsg(_(e_missing_end_block));
-	    else if (eap->cmdidx == CMD_def)
+	    অন্যথা যদি (eap->cmdidx == CMD_def)
 		emsg(_(e_missing_enddef));
-	    else
+	    অন্যথা
 		emsg(_(e_missing_endfunction));
-	    goto theend;
+	    যাও theend;
 	}
 
 	// Detect line continuation: SOURCING_LNUM increased more than one.
 	sourcing_lnum_off = get_sourced_lnum(eap->ea_getline, eap->cookie);
-	if (SOURCING_LNUM < sourcing_lnum_off)
+	যদি (SOURCING_LNUM < sourcing_lnum_off)
 	    sourcing_lnum_off -= SOURCING_LNUM;
-	else
+	অন্যথা
 	    sourcing_lnum_off = 0;
 
-	if (skip_until != NULL)
+	যদি (skip_until != ফাঁকা)
 	{
 	    // Don't check for ":endfunc"/":enddef" between
 	    // * ":append" and "."
 	    // * ":python <<EOF" and "EOF"
 	    // * ":let {var-name} =<< [trim] {marker}" and "{marker}"
-	    if (heredoc_trimmed == NULL
+	    যদি (heredoc_trimmed == ফাঁকা
 		    || (is_heredoc && skipwhite(theline) == theline)
 		    || STRNCMP(theline, heredoc_trimmed,
 						 heredoc_trimmedlen) == 0)
 	    {
-		if (heredoc_trimmed == NULL)
+		যদি (heredoc_trimmed == ফাঁকা)
 		    p = theline;
-		else if (is_heredoc)
+		অন্যথা যদি (is_heredoc)
 		    p = skipwhite(theline) == theline
 				 ? theline : theline + heredoc_trimmedlen;
-		else
+		অন্যথা
 		    p = theline + heredoc_trimmedlen;
-		if (STRCMP(p, skip_until) == 0)
+		যদি (STRCMP(p, skip_until) == 0)
 		{
 		    VIM_CLEAR(skip_until);
 		    VIM_CLEAR(heredoc_trimmed);
@@ -1096,15 +1096,15 @@ get_function_body(
 				? GETLINE_CONCAT_CONTBAR : GETLINE_CONCAT_CONT;
 		    is_heredoc = FALSE;
 
-		    if (heredoc_concat_len > 0)
+		    যদি (heredoc_concat_len > 0)
 		    {
 			// Replace the starting line with all the concatenated
 			// lines.
 			ga_concat(&heredoc_ga, theline);
-			vim_free(((char_u **)(newlines->ga_data))[
+			vim_free(((char_u **)(newlines->ga_তথ্য))[
 						      heredoc_concat_len - 1]);
-			((char_u **)(newlines->ga_data))[
-				  heredoc_concat_len - 1] = heredoc_ga.ga_data;
+			((char_u **)(newlines->ga_তথ্য))[
+				  heredoc_concat_len - 1] = heredoc_ga.ga_তথ্য;
 			ga_init(&heredoc_ga);
 			heredoc_concat_len = 0;
 			theline += STRLEN(theline);  // skip the "EOF"
@@ -1112,73 +1112,73 @@ get_function_body(
 		}
 	    }
 	}
-	else
+	অন্যথা
 	{
-	    int	    c;
+	    পূর্ণসংখ্যা	    c;
 	    char_u  *end;
 	    char_u  *cmd;
 	    bool    colon = false;
 
 	    // skip ':' and blanks
-	    for (p = theline; VIM_ISWHITE(*p) || *p == ':'; ++p)
+	    জন্য (p = theline; VIM_ISWHITE(*p) || *p == ':'; ++p)
 	    {
-		if (*p == ':')
+		যদি (*p == ':')
 		    colon = true;
 	    }
 
 	    // Check for "endfunction", "enddef" or "}".
 	    // When a ":" follows it must be a dict key; "enddef: value,"
 	    cmd = p;
-	    if (nesting_inline[nesting]
+	    যদি (nesting_inline[nesting]
 		    ? *p == '}'
 		    : (checkforcmd(&p, nesting_def[nesting]
 						? "enddef" : "endfunction", 4)
 			&& *p != ':'))
 	    {
-		if (!nesting_inline[nesting] && nesting_def[nesting]
+		যদি (!nesting_inline[nesting] && nesting_def[nesting]
 								&& p < cmd + 6)
 		    semsg(_(e_command_cannot_be_shortened_str), cmd);
-		if (nesting-- == 0)
+		যদি (nesting-- == 0)
 		{
-		    char_u *nextcmd = NULL;
+		    char_u *nextcmd = ফাঁকা;
 
-		    if (*p == '|' || *p == '}')
+		    যদি (*p == '|' || *p == '}')
 			nextcmd = p + 1;
-		    else if (line_arg != NULL && *skipwhite(line_arg) != NUL)
-			nextcmd = line_arg;
-		    else if (*p != NUL && *p != (vim9_function ? '#' : '"')
+		    অন্যথা যদি (সারি_arg != ফাঁকা && *skipwhite(সারি_arg) != NUL)
+			nextcmd = সারি_arg;
+		    অন্যথা যদি (*p != NUL && *p != (vim9_function ? '#' : '"')
 					   && (vim9_function || p_verbose > 0))
 		    {
-			SOURCING_LNUM = sourcing_lnum_top
+			SOURCING_LNUM = sourcing_lnum_শীর্ষ
 							+ newlines->ga_len + 1;
-			if (eap->cmdidx == CMD_def)
+			যদি (eap->cmdidx == CMD_def)
 			    semsg(_(e_text_found_after_str_str), "enddef", p);
-			else
+			অন্যথা
 			    give_warning2((char_u *)
 				   _("W22: Text found after :endfunction: %s"),
 				   p, TRUE);
 		    }
-		    if (nextcmd != NULL && *skipwhite(nextcmd) != NUL)
+		    যদি (nextcmd != ফাঁকা && *skipwhite(nextcmd) != NUL)
 		    {
 			// Another command follows. If the line came from "eap"
 			// we can simply point into it, otherwise we need to
 			// change "eap->cmdlinep" to point to the last fetched
 			// line.
 			eap->nextcmd = nextcmd;
-			if (lines_to_free->ga_len > 0
+			যদি (সারিগুলি_to_free->ga_len > 0
 				&& *eap->cmdlinep !=
-					    ((char_u **)lines_to_free->ga_data)
-						   [lines_to_free->ga_len - 1])
+					    ((char_u **)সারিগুলি_to_free->ga_তথ্য)
+						   [সারিগুলি_to_free->ga_len - 1])
 			{
 			    // *cmdlinep will be freed later, thus remove the
 			    // line from lines_to_free.
 			    vim_free(*eap->cmdlinep);
-			    *eap->cmdlinep = ((char_u **)lines_to_free->ga_data)
-						   [lines_to_free->ga_len - 1];
-			    --lines_to_free->ga_len;
+			    *eap->cmdlinep = ((char_u **)সারিগুলি_to_free->ga_তথ্য)
+						   [সারিগুলি_to_free->ga_len - 1];
+			    --সারিগুলি_to_free->ga_len;
 			}
 		    }
-		    break;
+		    বিরতি;
 		}
 	    }
 
@@ -1187,19 +1187,19 @@ get_function_body(
 	    // for "enddef".
 	    // We continue to find the end of the function, although we might
 	    // not find it.
-	    else if (nesting_def[nesting])
+	    অন্যথা যদি (nesting_def[nesting])
 	    {
-		if (checkforcmd(&p, "endfunction", 4) && *p != ':')
+		যদি (checkforcmd(&p, "endfunction", 4) && *p != ':')
 		    emsg(_(e_mismatched_endfunction));
 	    }
-	    else if (eap->cmdidx == CMD_def && checkforcmd(&p, "enddef", 4))
+	    অন্যথা যদি (eap->cmdidx == CMD_def && checkforcmd(&p, "enddef", 4))
 		emsg(_(e_mismatched_enddef));
 
 	    // Increase indent inside "if", "while", "for" and "try", decrease
 	    // at "end".
-	    if (indent > 2 && (*p == '}' || STRNCMP(p, "end", 3) == 0))
+	    যদি (indent > 2 && (*p == '}' || STRNCMP(p, "end", 3) == 0))
 		indent -= 2;
-	    else if (STRNCMP(p, "if", 2) == 0
+	    অন্যথা যদি (STRNCMP(p, "if", 2) == 0
 		    || STRNCMP(p, "wh", 2) == 0
 		    || STRNCMP(p, "for", 3) == 0
 		    || STRNCMP(p, "try", 3) == 0)
@@ -1209,24 +1209,24 @@ get_function_body(
 	    // Only recognize "def" inside "def", not inside "function",
 	    // For backwards compatibility, see Test_function_python().
 	    c = *p;
-	    if (is_function_cmd(&p)
+	    যদি (is_function_cmd(&p)
 		    || (eap->cmdidx == CMD_def && checkforcmd(&p, "def", 3)))
 	    {
-		if (*p == '!')
+		যদি (*p == '!')
 		    p = skipwhite(p + 1);
 		p += eval_fname_script(p);
-		vim_free(trans_function_name(&p, NULL, TRUE, 0));
-		if (vim9_function && *p == '<')
+		vim_free(trans_function_name(&p, ফাঁকা, TRUE, 0));
+		যদি (vim9_function && *p == '<')
 		{
 		    // skip generic function
-		    if (skip_generic_func_type_args(&p) == FAIL)
-			goto theend;
+		    যদি (skip_generic_func_type_args(&p) == FAIL)
+			যাও theend;
 		}
-		if (*skipwhite(p) == '(')
+		যদি (*skipwhite(p) == '(')
 		{
-		    if (nesting == MAX_FUNC_NESTING - 1)
+		    যদি (nesting == MAX_FUNC_NESTING - 1)
 			emsg(_(e_function_nesting_too_deep));
-		    else
+		    অন্যথা
 		    {
 			++nesting;
 			nesting_def[nesting] = (c == 'd');
@@ -1236,39 +1236,39 @@ get_function_body(
 		}
 	    }
 
-	    if (nesting_def[nesting] ? *p != '#' : *p != '"')
+	    যদি (nesting_def[nesting] ? *p != '#' : *p != '"')
 	    {
 		// Not a comment line: check for nested inline function.
 
-		if (nesting_inline[nesting])
+		যদি (nesting_inline[nesting])
 		{
 		    // A comment (#) can follow the opening curly brace of a
 		    // block statement.  Need to ignore the comment and look
 		    // for the opening curly brace before the comment.
 		    end = find_start_of_vim9_comment(p) - 1;
 		}
-		else
+		অন্যথা
 		    end = p + STRLEN(p) - 1;
 
-		while (end > p && VIM_ISWHITE(*end))
+		যখন (end > p && VIM_ISWHITE(*end))
 		    --end;
-		if (end > p + 1 && *end == '{' && VIM_ISWHITE(end[-1]))
+		যদি (end > p + 1 && *end == '{' && VIM_ISWHITE(end[-1]))
 		{
-		    int	    is_block;
+		    পূর্ণসংখ্যা	    is_block;
 
 		    // check for trailing "=> {": start of an inline function
 		    --end;
-		    while (end > p && VIM_ISWHITE(*end))
+		    যখন (end > p && VIM_ISWHITE(*end))
 			--end;
 		    is_block = end > p + 2 && end[-1] == '=' && end[0] == '>';
-		    if (!is_block)
-			is_block = find_cmd_block_start(p) != NULL;
+		    যদি (!is_block)
+			is_block = find_cmd_block_start(p) != ফাঁকা;
 
-		    if (is_block)
+		    যদি (is_block)
 		    {
-			if (nesting == MAX_FUNC_NESTING - 1)
+			যদি (nesting == MAX_FUNC_NESTING - 1)
 			    emsg(_(e_function_nesting_too_deep));
-			else
+			অন্যথা
 			{
 			    ++nesting;
 			    nesting_def[nesting] = TRUE;
@@ -1282,21 +1282,21 @@ get_function_body(
 	    // Check for ":append", ":change", ":insert".  Not for :def.
 	    // In Vim9 script a range comes after a colon; without one a
 	    // leading "'" starts a string, not a mark.
-	    if (!vim9_function || colon)
-		p = skip_range(p, FALSE, NULL);
+	    যদি (!vim9_function || colon)
+		p = skip_range(p, FALSE, ফাঁকা);
 	    char_u *tp = p;
-	    if (!vim9_function
+	    যদি (!vim9_function
 		&& (checkforcmd(&p, "append", 1)
 		    || checkforcmd(&p, "change", 1)
 		    || checkforcmd(&p, "insert", 1))
 		    && (*p == '!' || *p == '|' || IS_WHITE_NL_OR_NUL(*p)))
 		skip_until = vim_strnsave((char_u *)".", 1);
-	    else
+	    অন্যথা
 		p = tp;
 
 	    // Check for ":python <<EOF", ":tcl <<EOF", etc.
 	    arg = skipwhite(skiptowhite(p));
-	    if (arg[0] == '<' && arg[1] =='<'
+	    যদি (arg[0] == '<' && arg[1] =='<'
 		    && ((p[0] == 'p' && p[1] == 'y'
 				    && (!ASCII_ISALNUM(p[2]) || p[2] == 't'
 					|| ((p[2] == '3' || p[2] == 'x')
@@ -1315,79 +1315,79 @@ get_function_body(
 	    {
 		// ":python <<" continues until a dot, like ":append"
 		p = skipwhite(arg + 2);
-		if (STRNCMP(p, "trim", 4) == 0
+		যদি (STRNCMP(p, "trim", 4) == 0
 			&& (p[4] == NUL || VIM_ISWHITE(p[4])))
 		{
 		    // Ignore leading white space.
 		    p = skipwhite(p + 4);
 		    heredoc_trimmedlen = skipwhite(theline) - theline;
 		    heredoc_trimmed = vim_strnsave(theline, heredoc_trimmedlen);
-		    if (heredoc_trimmed == NULL)
+		    যদি (heredoc_trimmed == ফাঁকা)
 			heredoc_trimmedlen = 0;
 		}
-		if (*p == NUL)
+		যদি (*p == NUL)
 		    skip_until = vim_strnsave((char_u *)".", 1);
-		else
+		অন্যথা
 		    skip_until = vim_strnsave(p, skiptowhite(p) - p);
 		getline_options = GETLINE_NONE;
 		is_heredoc = TRUE;
-		if (vim9_function && nesting == 0)
+		যদি (vim9_function && nesting == 0)
 		    heredoc_concat_len = newlines->ga_len + 1;
 	    }
 
-	    if (!is_heredoc)
+	    যদি (!is_heredoc)
 	    {
 		// Check for ":cmd v =<< [trim] EOF"
 		//       and ":cmd [a, b] =<< [trim] EOF"
 		//       and "lines =<< [trim] EOF" for Vim9
 		// Where "cmd" can be "let", "var", "final" or "const".
 		arg = p;
-		if (checkforcmd(&arg, "let", 2)
+		যদি (checkforcmd(&arg, "let", 2)
 			|| checkforcmd(&arg, "var", 3)
 			|| checkforcmd(&arg, "final", 5)
 			|| checkforcmd(&arg, "const", 5)
 			|| vim9_function)
 		{
-		    int		save_sc_version = current_sctx.sc_version;
-		    int		var_count = 0;
-		    int		semicolon = 0;
+		    পূর্ণসংখ্যা		save_sc_version = current_sctx.sc_version;
+		    পূর্ণসংখ্যা		var_গুনতি = 0;
+		    পূর্ণসংখ্যা		semicolon = 0;
 
 		    current_sctx.sc_version
 				     = vim9_function ? SCRIPT_VERSION_VIM9 : 1;
-		    arg = skip_var_list(arg, TRUE, &var_count, &semicolon,
+		    arg = skip_var_list(arg, TRUE, &var_গুনতি, &semicolon,
 									 TRUE);
-		    if (arg != NULL)
+		    যদি (arg != ফাঁকা)
 			arg = skipwhite(arg);
 		    current_sctx.sc_version = save_sc_version;
-		    if (arg != NULL && STRNCMP(arg, "=<<", 3) == 0)
+		    যদি (arg != ফাঁকা && STRNCMP(arg, "=<<", 3) == 0)
 		    {
-			int has_trim = FALSE;
+			পূর্ণসংখ্যা has_trim = FALSE;
 
 			p = skipwhite(arg + 3);
-			while (TRUE)
+			যখন (TRUE)
 			{
-			    if (STRNCMP(p, "trim", 4) == 0
+			    যদি (STRNCMP(p, "trim", 4) == 0
 				    && (p[4] == NUL || VIM_ISWHITE(p[4])))
 			    {
 				// Ignore leading white space.
 				p = skipwhite(p + 4);
 				has_trim = TRUE;
-				continue;
+				চালু;
 			    }
-			    if (STRNCMP(p, "eval", 4) == 0
+			    যদি (STRNCMP(p, "eval", 4) == 0
 				    && (p[4] == NUL || VIM_ISWHITE(p[4])))
 			    {
 				// Ignore leading white space.
 				p = skipwhite(p + 4);
-				continue;
+				চালু;
 			    }
-			    break;
+			    বিরতি;
 			}
-			if (has_trim)
+			যদি (has_trim)
 			{
 			    heredoc_trimmedlen = skipwhite(theline) - theline;
 			    heredoc_trimmed = vim_strnsave(theline, heredoc_trimmedlen);
-			    if (heredoc_trimmed == NULL)
+			    যদি (heredoc_trimmed == ফাঁকা)
 				heredoc_trimmedlen = 0;
 			}
 			skip_until = vim_strnsave(p, skiptowhite(p) - p);
@@ -1399,10 +1399,10 @@ get_function_body(
 	}
 
 	// Add the line to the function.
-	if (ga_grow_id(newlines, 1 + sourcing_lnum_off, aid_get_func) == FAIL)
-	    goto theend;
+	যদি (ga_grow_id(newlines, 1 + sourcing_lnum_off, aid_get_func) == FAIL)
+	    যাও theend;
 
-	if (heredoc_concat_len > 0)
+	যদি (heredoc_concat_len > 0)
 	{
 	    // For a :def function "python << EOF" concatenates all the lines,
 	    // to be used for the instruction later.
@@ -1410,38 +1410,38 @@ get_function_body(
 	    GA_CONCAT_LITERAL(&heredoc_ga, "\n");
 	    p = vim_strnsave((char_u *)"", 0);
 	}
-	else
+	অন্যথা
 	{
 	    // Copy the line to newly allocated memory.  get_one_sourceline()
 	    // allocates 250 bytes per line, this saves 80% on average.  The
 	    // cost is an extra alloc/free.
 	    p = vim_strsave(theline);
 	}
-	if (p == NULL)
-	    goto theend;
-	((char_u **)(newlines->ga_data))[newlines->ga_len++] = p;
+	যদি (p == ফাঁকা)
+	    যাও theend;
+	((char_u **)(newlines->ga_তথ্য))[newlines->ga_len++] = p;
 
 	// Add NULL lines for continuation lines, so that the line count is
 	// equal to the index in the growarray.
-	while (sourcing_lnum_off-- > 0)
-	    ((char_u **)(newlines->ga_data))[newlines->ga_len++] = NULL;
+	যখন (sourcing_lnum_off-- > 0)
+	    ((char_u **)(newlines->ga_তথ্য))[newlines->ga_len++] = ফাঁকা;
 
 	// Check for end of eap->arg.
-	if (line_arg != NULL && *line_arg == NUL)
-	    line_arg = NULL;
+	যদি (সারি_arg != ফাঁকা && *সারি_arg == NUL)
+	    সারি_arg = ফাঁকা;
     }
 
     // Return OK when no error was detected here; "did_emsg" may already be
     // set by an earlier error in the same command.
-    if (did_emsg == did_emsg_start)
+    যদি (did_emsg == did_emsg_start)
 	ret = OK;
 
 theend:
     vim_free(skip_until);
     vim_free(heredoc_trimmed);
-    vim_free(heredoc_ga.ga_data);
+    vim_free(heredoc_ga.ga_তথ্য);
     need_wait_return |= saved_wait_return;
-    return ret;
+    ফেরত ret;
 }
 
 /*
@@ -1450,123 +1450,123 @@ theend:
  * When not evaluating "newargs" is NULL.
  * When successful "rettv" is set to a funcref.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 lambda_function_body(
 	char_u	    **arg,
 	typval_T    *rettv,
 	evalarg_T   *evalarg,
 	garray_T    *newargs,
 	garray_T    *argtypes,
-	int	    varargs,
+	পূর্ণসংখ্যা	    varargs,
 	garray_T    *default_args,
 	char_u	    *ret_type)
 {
     char_u	*start = *arg;
-    int		evaluate = (evalarg->eval_flags & EVAL_EVALUATE);
+    পূর্ণসংখ্যা		evaluate = (evalarg->eval_flags & EVAL_EVALUATE);
     garray_T	*gap = &evalarg->eval_ga;
     garray_T	*freegap = &evalarg->eval_freega;
-    ufunc_T	*ufunc = NULL;
+    ufunc_T	*ufunc = ফাঁকা;
     exarg_T	eap;
     garray_T	newlines;
-    char_u	*cmdline = NULL;
-    int		ret = FAIL;
+    char_u	*cmdline = ফাঁকা;
+    পূর্ণসংখ্যা		ret = FAIL;
     partial_T	*pt;
     string_T	name;
-    int		lnum_save = -1;
-    linenr_T	sourcing_lnum_top = SOURCING_LNUM;
-    char_u	*line_arg = NULL;
+    পূর্ণসংখ্যা		lnum_save = -1;
+    linenr_T	sourcing_lnum_শীর্ষ = SOURCING_LNUM;
+    char_u	*সারি_arg = ফাঁকা;
 
     *arg = skipwhite(*arg + 1);
-    if (**arg == '|' || !ends_excmd2(start, *arg))
+    যদি (**arg == '|' || !ends_excmd2(start, *arg))
     {
 	semsg(_(e_trailing_characters_str), *arg);
-	return FAIL;
+	ফেরত FAIL;
     }
 
     // When there is a line break use what follows for the lambda body.
     // Makes lambda body initializers work for object and enum member
     // variables.
-    if (**arg == '\n')
-	line_arg = *arg + 1;
+    যদি (**arg == '\n')
+	সারি_arg = *arg + 1;
 
     CLEAR_FIELD(eap);
     eap.cmdidx = CMD_block;
     eap.forceit = FALSE;
     eap.cmdlinep = &cmdline;
     eap.skip = !evaluate;
-    if (evalarg->eval_cctx != NULL)
+    যদি (evalarg->eval_cctx != ফাঁকা)
 	fill_exarg_from_cctx(&eap, evalarg->eval_cctx);
-    else
+    অন্যথা
     {
 	eap.ea_getline = evalarg->eval_getline;
 	eap.cookie = evalarg->eval_cookie;
     }
 
-    ga_init2(&newlines, sizeof(char_u *), 10);
-    if (get_function_body(&eap, &newlines, line_arg,
+    ga_init2(&newlines, আকার(char_u *), 10);
+    যদি (get_function_body(&eap, &newlines, সারি_arg,
 					     &evalarg->eval_tofree_ga) == FAIL)
-	goto erret;
+	যাও erret;
 
     // When inside a lambda must add the function lines to evalarg.eval_ga.
-    evalarg->eval_break_count += newlines.ga_len;
-    if (gap->ga_itemsize > 0)
+    evalarg->eval_break_গুনতি += newlines.ga_len;
+    যদি (gap->ga_itemsize > 0)
     {
-	int	idx;
+	পূর্ণসংখ্যা	idx;
 	char_u	*last;
 	size_t  plen;
 	char_u  *pnl;
 
-	for (idx = 0; idx < newlines.ga_len; ++idx)
+	জন্য (idx = 0; idx < newlines.ga_len; ++idx)
 	{
-	    char_u  *p = ((char_u **)newlines.ga_data)[idx];
-	    if (p == NULL)
+	    char_u  *p = ((char_u **)newlines.ga_তথ্য)[idx];
+	    যদি (p == ফাঁকা)
 		// comment line in the lambda body
-		continue;
+		চালু;
 
 	    p = skipwhite(p);
 
-	    if (ga_grow(gap, 1) == FAIL || ga_grow(freegap, 1) == FAIL)
-		goto erret;
+	    যদি (ga_grow(gap, 1) == FAIL || ga_grow(freegap, 1) == FAIL)
+		যাও erret;
 
 	    // Going to concatenate the lines after parsing.  For an empty or
 	    // comment line use an empty string.
 	    // Insert NL characters at the start of each line, the string will
 	    // be split again later in .get_lambda_tv().
-	    if (*p == NUL || vim9_comment_start(p))
+	    যদি (*p == NUL || vim9_comment_start(p))
 	    {
 		p = (char_u *)"";
 		plen = 0;
 	    }
-	    else
+	    অন্যথা
 		plen = STRLEN(p);
 	    pnl = vim_strnsave((char_u *)"\n", plen + 1);
-	    if (pnl != NULL)
+	    যদি (pnl != ফাঁকা)
 		mch_memmove(pnl + 1, p, plen + 1);
-	    ((char_u **)gap->ga_data)[gap->ga_len++] = pnl;
-	    ((char_u **)freegap->ga_data)[freegap->ga_len++] = pnl;
+	    ((char_u **)gap->ga_তথ্য)[gap->ga_len++] = pnl;
+	    ((char_u **)freegap->ga_তথ্য)[freegap->ga_len++] = pnl;
 	}
-	if (ga_grow(gap, 1) == FAIL || ga_grow(freegap, 1) == FAIL)
-	    goto erret;
-	if (eap.nextcmd != NULL)
+	যদি (ga_grow(gap, 1) == FAIL || ga_grow(freegap, 1) == FAIL)
+	    যাও erret;
+	যদি (eap.nextcmd != ফাঁকা)
 	{
 	    // more is following after the "}", which was skipped
 	    last = cmdline;
 	    plen = STRLEN(last);
 	}
-	else
+	অন্যথা
 	{
 	    // nothing is following the "}"
 	    last = (char_u *)"}";
 	    plen = 1;
 	}
 	pnl = vim_strnsave((char_u *)"\n", plen + 1);
-	if (pnl != NULL)
+	যদি (pnl != ফাঁকা)
 	    mch_memmove(pnl + 1, last, plen + 1);
-	((char_u **)gap->ga_data)[gap->ga_len++] = pnl;
-	((char_u **)freegap->ga_data)[freegap->ga_len++] = pnl;
+	((char_u **)gap->ga_তথ্য)[gap->ga_len++] = pnl;
+	((char_u **)freegap->ga_তথ্য)[freegap->ga_len++] = pnl;
     }
 
-    if (eap.nextcmd != NULL)
+    যদি (eap.nextcmd != ফাঁকা)
     {
 	garray_T *tfgap = &evalarg->eval_tofree_ga;
 
@@ -1574,89 +1574,89 @@ lambda_function_body(
 	*arg = eap.nextcmd;
 
 	// "arg" points into cmdline, need to keep the line and free it later.
-	if (ga_grow(tfgap, 1) == OK)
+	যদি (ga_grow(tfgap, 1) == OK)
 	{
-	    ((char_u **)(tfgap->ga_data))[tfgap->ga_len++] = cmdline;
+	    ((char_u **)(tfgap->ga_তথ্য))[tfgap->ga_len++] = cmdline;
 	    evalarg->eval_using_cmdline = TRUE;
 	}
     }
-    else
+    অন্যথা
 	*arg = (char_u *)"";
 
-    if (!evaluate)
+    যদি (!evaluate)
     {
 	ret = OK;
-	goto erret;
+	যাও erret;
     }
 
     name = get_lambda_name();
-    ufunc = alloc_ufunc(name.string, name.length);
-    if (ufunc == NULL)
-	goto erret;
-    if (hash_add(&func_hashtab, UF2HIKEY(ufunc), "add function") == FAIL)
-	goto erret;
+    ufunc = alloc_ufunc(name.string, name.দৈর্ঘ্য);
+    যদি (ufunc == ফাঁকা)
+	যাও erret;
+    যদি (hash_add(&func_hashtab, UF2HIKEY(ufunc), "add function") == FAIL)
+	যাও erret;
     ufunc->uf_flags = FC_LAMBDA;
     ufunc->uf_refcount = 1;
     ufunc->uf_args = *newargs;
-    newargs->ga_data = NULL;
+    newargs->ga_তথ্য = ফাঁকা;
     ufunc->uf_def_args = *default_args;
-    default_args->ga_data = NULL;
+    default_args->ga_তথ্য = ফাঁকা;
     ufunc->uf_func_type = &t_func_any;
 
     // error messages are for the first function line
     lnum_save = SOURCING_LNUM;
-    SOURCING_LNUM = sourcing_lnum_top;
+    SOURCING_LNUM = sourcing_lnum_শীর্ষ;
 
     // parse argument types, the type variables of the function being
     // compiled may be used
-    if (parse_argument_types(ufunc, argtypes, varargs, NULL, NULL, 0,
+    যদি (parse_argument_types(ufunc, argtypes, varargs, ফাঁকা, ফাঁকা, 0,
 					    evalarg->eval_cctx) == FAIL)
     {
 	SOURCING_LNUM = lnum_save;
-	goto erret;
+	যাও erret;
     }
 
     // parse the return type, if any
-    if (parse_return_type(ufunc, ret_type, evalarg->eval_cctx) == FAIL)
-	goto erret;
+    যদি (parse_return_type(ufunc, ret_type, evalarg->eval_cctx) == FAIL)
+	যাও erret;
 
     pt = ALLOC_CLEAR_ONE(partial_T);
-    if (pt == NULL)
-	goto erret;
+    যদি (pt == ফাঁকা)
+	যাও erret;
     pt->pt_func = ufunc;
     pt->pt_refcount = 1;
 
-    ufunc->uf_lines = newlines;
-    newlines.ga_data = NULL;
-    if (sandbox)
+    ufunc->uf_সারিগুলি = newlines;
+    newlines.ga_তথ্য = ফাঁকা;
+    যদি (sandbox)
 	ufunc->uf_flags |= FC_SANDBOX;
-    if (!ASCII_ISUPPER(*ufunc->uf_name))
+    যদি (!ASCII_ISUPPER(*ufunc->uf_name))
 	ufunc->uf_flags |= FC_VIM9;
     ufunc->uf_script_ctx = current_sctx;
     ufunc->uf_script_ctx_version = current_sctx.sc_version;
-    ufunc->uf_script_ctx.sc_lnum += sourcing_lnum_top;
+    ufunc->uf_script_ctx.sc_lnum += sourcing_lnum_শীর্ষ;
     set_function_type(ufunc);
 
     function_using_block_scopes(ufunc, evalarg->eval_cstack);
 
     rettv->vval.v_partial = pt;
     rettv->v_type = VAR_PARTIAL;
-    ufunc = NULL;
+    ufunc = ফাঁকা;
     ret = OK;
 
 erret:
-    if (lnum_save >= 0)
+    যদি (lnum_save >= 0)
 	SOURCING_LNUM = lnum_save;
     ga_clear_strings(&newlines);
-    if (newargs != NULL)
+    যদি (newargs != ফাঁকা)
 	ga_clear_strings(newargs);
     ga_clear_strings(default_args);
-    if (ufunc != NULL)
+    যদি (ufunc != ফাঁকা)
     {
 	func_clear(ufunc, TRUE);
 	func_free(ufunc, TRUE);
     }
-    return ret;
+    ফেরত ret;
 }
 
 /*
@@ -1665,15 +1665,15 @@ erret:
  * When "types_optional" is TRUE optionally take argument types.
  * Return OK or FAIL.  Returns NOTDONE for dict or {expr}.
  */
-    int
+    পূর্ণসংখ্যা
 get_lambda_tv(
 	char_u	    **arg,
 	typval_T    *rettv,
-	int	    types_optional,
+	পূর্ণসংখ্যা	    types_optional,
 	evalarg_T   *evalarg,
 	cctx_T	    *cctx)
 {
-    int		evaluate = evalarg != NULL
+    পূর্ণসংখ্যা		evaluate = evalarg != ফাঁকা
 				      && (evalarg->eval_flags & EVAL_EVALUATE);
     garray_T	newargs;
     garray_T	newlines;
@@ -1681,24 +1681,24 @@ get_lambda_tv(
     garray_T	argtypes;
     garray_T	default_args;
     garray_T	arg_objm;
-    ufunc_T	*fp = NULL;
-    partial_T   *pt = NULL;
-    int		varargs;
-    char_u	*ret_type = NULL;
-    int		ret;
+    ufunc_T	*fp = ফাঁকা;
+    partial_T   *pt = ফাঁকা;
+    পূর্ণসংখ্যা		varargs;
+    char_u	*ret_type = ফাঁকা;
+    পূর্ণসংখ্যা		ret;
     char_u	*s;
     char_u	*start, *end;
-    int		*old_eval_lavars = eval_lavars_used;
-    int		eval_lavars = FALSE;
-    char_u	*tofree2 = NULL;
-    int		equal_arrow = **arg == '(';
-    int		white_error = FALSE;
-    int		called_emsg_start = called_emsg;
-    int		vim9script = in_vim9script();
+    পূর্ণসংখ্যা		*old_eval_lavars = eval_lavars_used;
+    পূর্ণসংখ্যা		eval_lavars = FALSE;
+    char_u	*tofree2 = ফাঁকা;
+    পূর্ণসংখ্যা		equal_arrow = **arg == '(';
+    পূর্ণসংখ্যা		white_error = FALSE;
+    পূর্ণসংখ্যা		called_emsg_start = called_emsg;
+    পূর্ণসংখ্যা		vim9script = in_vim9script();
     long	start_lnum = SOURCING_LNUM;
 
-    if (equal_arrow && !vim9script)
-	return NOTDONE;
+    যদি (equal_arrow && !vim9script)
+	ফেরত NOTDONE;
 
     ga_init(&newargs);
     ga_init(&newlines);
@@ -1706,182 +1706,182 @@ get_lambda_tv(
     // First, check if this is really a lambda expression. "->" or "=>" must
     // be found after the arguments.
     s = *arg + 1;
-    ret = get_function_args(&s, equal_arrow ? ')' : '-', NULL,
-	    types_optional ? &argtypes : NULL, types_optional,
-			types_optional ? &arg_objm : NULL, evalarg,
-			NULL, &default_args, TRUE, NULL, FALSE, NULL, NULL);
-    if (ret == FAIL || skip_arrow(s, equal_arrow, &ret_type, NULL) == NULL)
+    ret = get_function_args(&s, equal_arrow ? ')' : '-', ফাঁকা,
+	    types_optional ? &argtypes : ফাঁকা, types_optional,
+			types_optional ? &arg_objm : ফাঁকা, evalarg,
+			ফাঁকা, &default_args, TRUE, ফাঁকা, FALSE, ফাঁকা, ফাঁকা);
+    যদি (ret == FAIL || skip_arrow(s, equal_arrow, &ret_type, ফাঁকা) == ফাঁকা)
     {
-	if (types_optional)
+	যদি (types_optional)
 	{
 	    ga_clear_strings(&argtypes);
 	    ga_clear(&arg_objm);
 	}
-	return called_emsg == called_emsg_start ? NOTDONE : FAIL;
+	ফেরত called_emsg == called_emsg_start ? NOTDONE : FAIL;
     }
 
     // Parse the arguments for real.
-    if (evaluate)
+    যদি (evaluate)
 	pnewargs = &newargs;
-    else
-	pnewargs = NULL;
+    অন্যথা
+	pnewargs = ফাঁকা;
     *arg += 1;
     ret = get_function_args(arg, equal_arrow ? ')' : '-', pnewargs,
-	    types_optional ? &argtypes : NULL, types_optional,
-			types_optional ? &arg_objm : NULL, evalarg,
+	    types_optional ? &argtypes : ফাঁকা, types_optional,
+			types_optional ? &arg_objm : ফাঁকা, evalarg,
 					    &varargs, &default_args,
-					    FALSE, NULL, FALSE, NULL, NULL);
-    if (ret == FAIL
+					    FALSE, ফাঁকা, FALSE, ফাঁকা, ফাঁকা);
+    যদি (ret == FAIL
 		  || (s = skip_arrow(*arg, equal_arrow, &ret_type,
-		equal_arrow || vim9script ? &white_error : NULL)) == NULL)
+		equal_arrow || vim9script ? &white_error : ফাঁকা)) == ফাঁকা)
     {
-	if (types_optional)
+	যদি (types_optional)
 	{
 	    ga_clear_strings(&argtypes);
 	    ga_clear(&arg_objm);
 	}
 	ga_clear_strings(&newargs);
-	return white_error ? FAIL : NOTDONE;
+	ফেরত white_error ? FAIL : NOTDONE;
     }
     *arg = s;
 
     // Skipping over linebreaks may make "ret_type" invalid, make a copy.
-    if (ret_type != NULL)
+    যদি (ret_type != ফাঁকা)
     {
 	ret_type = vim_strsave(ret_type);
 	tofree2 = ret_type;
     }
 
     // Set up a flag for checking local variables and arguments.
-    if (evaluate)
+    যদি (evaluate)
 	eval_lavars_used = &eval_lavars;
 
     *arg = skipwhite_and_linebreak(*arg, evalarg);
 
     // Recognize "{" as the start of a function body.
-    if (equal_arrow && **arg == '{')
+    যদি (equal_arrow && **arg == '{')
     {
-	if (evalarg == NULL)
+	যদি (evalarg == ফাঁকা)
 	    // cannot happen?
-	    goto theend;
+	    যাও theend;
 	SOURCING_LNUM = start_lnum;  // used for where lambda is defined
-	if (lambda_function_body(arg, rettv, evalarg, pnewargs,
-			   types_optional ? &argtypes : NULL, varargs,
+	যদি (lambda_function_body(arg, rettv, evalarg, pnewargs,
+			   types_optional ? &argtypes : ফাঁকা, varargs,
 			   &default_args, ret_type) == FAIL)
-	    goto errret;
-	goto theend;
+	    যাও errret;
+	যাও theend;
     }
-    if (default_args.ga_len > 0)
+    যদি (default_args.ga_len > 0)
     {
-	emsg(_(e_cannot_use_default_values_in_lambda));
-	goto errret;
+	emsg(_(e_cannot_use_default_মানসমূহ_in_lambda));
+	যাও errret;
     }
 
     // Get the start and the end of the expression.
     start = *arg;
-    ret = skip_expr_concatenate(arg, &start, &end, evalarg);
-    if (ret == FAIL)
-	goto errret;
+    ret = skip_রাশিমালা_concatenate(arg, &start, &end, evalarg);
+    যদি (ret == FAIL)
+	যাও errret;
 
-    if (!equal_arrow)
+    যদি (!equal_arrow)
     {
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg != '}')
+	যদি (**arg != '}')
 	{
-	    semsg(_(e_expected_right_curly_str), *arg);
-	    goto errret;
+	    semsg(_(e_expected_ডান_curly_str), *arg);
+	    যাও errret;
 	}
 	++*arg;
     }
 
-    if (evaluate)
+    যদি (evaluate)
     {
-	int	    len;
-	int	    flags = FC_LAMBDA;
+	পূর্ণসংখ্যা	    len;
+	পূর্ণসংখ্যা	    flags = FC_LAMBDA;
 	char_u	    *p;
-	char_u	    *line_end;
+	char_u	    *সারি_end;
 	string_T    name = get_lambda_name();
 
-	fp = alloc_ufunc(name.string, name.length);
-	if (fp == NULL)
-	    goto errret;
+	fp = alloc_ufunc(name.string, name.দৈর্ঘ্য);
+	যদি (fp == ফাঁকা)
+	    যাও errret;
 	fp->uf_def_status = UF_NOT_COMPILED;
 	pt = ALLOC_CLEAR_ONE(partial_T);
-	if (pt == NULL)
-	    goto errret;
+	যদি (pt == ফাঁকা)
+	    যাও errret;
 
-	ga_init2(&newlines, sizeof(char_u *), 1);
-	if (ga_grow(&newlines, 1) == FAIL)
-	    goto errret;
+	ga_init2(&newlines, আকার(char_u *), 1);
+	যদি (ga_grow(&newlines, 1) == FAIL)
+	    যাও errret;
 
 	// If there are line breaks, we need to split up the string.
-	line_end = vim_strchr(start, '\n');
-	if (line_end == NULL || line_end > end)
-	    line_end = end;
+	সারি_end = vim_strchr(start, '\n');
+	যদি (সারি_end == ফাঁকা || সারি_end > end)
+	    সারি_end = end;
 
 	// Add "return " before the expression (or the first line).
-	len = 7 + (int)(line_end - start) + 1;
+	len = 7 + (পূর্ণসংখ্যা)(সারি_end - start) + 1;
 	p = alloc(len);
-	if (p == NULL)
-	    goto errret;
-	((char_u **)(newlines.ga_data))[newlines.ga_len++] = p;
+	যদি (p == ফাঁকা)
+	    যাও errret;
+	((char_u **)(newlines.ga_তথ্য))[newlines.ga_len++] = p;
 	STRCPY(p, "return ");
-	vim_strncpy(p + 7, start, line_end - start);
+	vim_strncpy(p + 7, start, সারি_end - start);
 
-	if (line_end != end)
+	যদি (সারি_end != end)
 	{
 	    // Add more lines, split by line breaks.  Thus is used when a
 	    // lambda with { cmds } is encountered.
-	    while (line_end < end && *line_end == '\n')
+	    যখন (সারি_end < end && *সারি_end == '\n')
 	    {
-		if (ga_grow(&newlines, 1) == FAIL)
-		    goto errret;
-		start = line_end + 1;
-		line_end = vim_strchr(start, '\n');
-		if (line_end == NULL || line_end > end)
-		    line_end = end;
-		((char_u **)(newlines.ga_data))[newlines.ga_len++] =
-					 vim_strnsave(start, line_end - start);
+		যদি (ga_grow(&newlines, 1) == FAIL)
+		    যাও errret;
+		start = সারি_end + 1;
+		সারি_end = vim_strchr(start, '\n');
+		যদি (সারি_end == ফাঁকা || সারি_end > end)
+		    সারি_end = end;
+		((char_u **)(newlines.ga_তথ্য))[newlines.ga_len++] =
+					 vim_strnsave(start, সারি_end - start);
 	    }
 	}
 
-	if (strstr((char *)p + 7, "a:") == NULL)
+	যদি (strstr((অক্ষর *)p + 7, "a:") == ফাঁকা)
 	    // No a: variables are used for sure.
 	    flags |= FC_NOARGS;
 
 	fp->uf_refcount = 1;
 	fp->uf_args = newargs;
 	ga_init(&fp->uf_def_args);
-	if (types_optional)
+	যদি (types_optional)
 	{
-	    if (parse_argument_types(fp, &argtypes,
-				vim9script && varargs, NULL, NULL, 0,
+	    যদি (parse_argument_types(fp, &argtypes,
+				vim9script && varargs, ফাঁকা, ফাঁকা, 0,
 				cctx) == FAIL)
-		goto errret;
-	    if (ret_type != NULL)
+		যাও errret;
+	    যদি (ret_type != ফাঁকা)
 	    {
 		fp->uf_ret_type = parse_type(&ret_type, &fp->uf_type_list,
-					     NULL, cctx, TRUE);
-		if (fp->uf_ret_type == NULL)
-		    goto errret;
+					     ফাঁকা, cctx, TRUE);
+		যদি (fp->uf_ret_type == ফাঁকা)
+		    যাও errret;
 	    }
-	    else
+	    অন্যথা
 		fp->uf_ret_type = &t_unknown;
 	}
 
-	fp->uf_lines = newlines;
-	if (current_funccal != NULL && eval_lavars)
+	fp->uf_সারিগুলি = newlines;
+	যদি (current_funccal != ফাঁকা && eval_lavars)
 	{
 	    flags |= FC_CLOSURE;
-	    if (register_closure(fp) == FAIL)
-		goto errret;
+	    যদি (register_closure(fp) == FAIL)
+		যাও errret;
 	}
 
 #ifdef FEAT_PROFILE
-	if (prof_def_func())
+	যদি (prof_def_func())
 	    func_do_profile(fp);
 #endif
-	if (sandbox)
+	যদি (sandbox)
 	    flags |= FC_SANDBOX;
 	// In legacy script a lambda can be called with more args than
 	// uf_args.ga_len.  In Vim9 script "...name" has to be used.
@@ -1905,24 +1905,24 @@ get_lambda_tv(
 theend:
     eval_lavars_used = old_eval_lavars;
     vim_free(tofree2);
-    if (types_optional)
+    যদি (types_optional)
     {
 	ga_clear_strings(&argtypes);
 	ga_clear(&arg_objm);
     }
 
-    return OK;
+    ফেরত OK;
 
 errret:
     ga_clear_strings(&newargs);
     ga_clear_strings(&newlines);
     ga_clear_strings(&default_args);
-    if (types_optional)
+    যদি (types_optional)
     {
 	ga_clear_strings(&argtypes);
 	ga_clear(&arg_objm);
     }
-    if (fp != NULL)
+    যদি (fp != ফাঁকা)
     {
 	vim_free(fp->uf_arg_types);
 	vim_free(fp->uf_name_exp);
@@ -1933,7 +1933,7 @@ errret:
     vim_free(pt);
     vim_free(tofree2);
     eval_lavars_used = old_eval_lavars;
-    return FAIL;
+    ফেরত FAIL;
 }
 
 /*
@@ -1949,39 +1949,39 @@ errret:
     char_u *
 deref_func_name(
 	char_u	    *name,
-	int	    *lenp,
+	পূর্ণসংখ্যা	    *lenp,
 	partial_T   **partialp,
 	type_T	    **type,
-	int	    no_autoload,
-	int	    new_function,
-	int	    *found_var)
+	পূর্ণসংখ্যা	    no_autoload,
+	পূর্ণসংখ্যা	    new_function,
+	পূর্ণসংখ্যা	    *found_var)
 {
     dictitem_T	*v;
-    typval_T	*tv = NULL;
-    int		cc;
-    char_u	*s = NULL;
+    typval_T	*tv = ফাঁকা;
+    পূর্ণসংখ্যা		cc;
+    char_u	*s = ফাঁকা;
     hashtab_T	*ht;
-    int		did_type = FALSE;
+    পূর্ণসংখ্যা		did_type = FALSE;
 
-    if (partialp != NULL)
-	*partialp = NULL;
+    যদি (partialp != ফাঁকা)
+	*partialp = ফাঁকা;
 
     cc = name[*lenp];
     name[*lenp] = NUL;
 
     v = find_var_also_in_script(name, &ht, no_autoload);
     name[*lenp] = cc;
-    if (v != NULL)
+    যদি (v != ফাঁকা)
     {
 	tv = &v->di_tv;
     }
-    else if (in_vim9script() || STRNCMP(name, "s:", 2) == 0)
+    অন্যথা যদি (in_vim9script() || STRNCMP(name, "s:", 2) == 0)
     {
 	imported_T  *import;
 	char_u	    *p = name;
-	int	    len = *lenp;
+	পূর্ণসংখ্যা	    len = *lenp;
 
-	if (STRNCMP(name, "s:", 2) == 0)
+	যদি (STRNCMP(name, "s:", 2) == 0)
 	{
 	    p = name + 2;
 	    len -= 2;
@@ -1989,88 +1989,88 @@ deref_func_name(
 	import = find_imported(p, len, FALSE);
 
 	// imported function from another script
-	if (import != NULL)
+	যদি (import != ফাঁকা)
 	{
 	    name[len] = NUL;
-	    if (new_function)
+	    যদি (new_function)
 		semsg(_(e_redefining_imported_item_str), name);
-	    else
+	    অন্যথা
 		semsg(_(e_cannot_use_str_itself_it_is_imported), name);
 	    name[len] = cc;
 	    *lenp = 0;
-	    return (char_u *)"";	// just in case
+	    ফেরত (char_u *)"";	// just in case
 	}
     }
 
-    if (tv != NULL)
+    যদি (tv != ফাঁকা)
     {
-	if (found_var != NULL)
+	যদি (found_var != ফাঁকা)
 	    *found_var = TRUE;
-	if (tv->v_type == VAR_FUNC)
+	যদি (tv->v_type == VAR_FUNC)
 	{
-	    if (tv->vval.v_string == NULL)
+	    যদি (tv->vval.v_string == ফাঁকা)
 	    {
 		*lenp = 0;
-		return (char_u *)"";	// just in case
+		ফেরত (char_u *)"";	// just in case
 	    }
 	    s = tv->vval.v_string;
 	    char_u *p = generic_func_find_open_bracket(s);
-	    if (p != NULL && generic_func_find_open_bracket(name) != NULL)
+	    যদি (p != ফাঁকা && generic_func_find_open_bracket(name) != ফাঁকা)
 	    {
 		// the funcref name already has generic types but types are
 		// specified when using the funcref.
 		*lenp = 0;
-		return (char_u *)"";
+		ফেরত (char_u *)"";
 	    }
-	    if (p != NULL)
+	    যদি (p != ফাঁকা)
 		*lenp = p - s;
-	    else
-		*lenp = (int)STRLEN(s);
+	    অন্যথা
+		*lenp = (পূর্ণসংখ্যা)STRLEN(s);
 	}
-	else if (tv->v_type == VAR_PARTIAL)
+	অন্যথা যদি (tv->v_type == VAR_PARTIAL)
 	{
 	    partial_T *pt = tv->vval.v_partial;
 
-	    if (pt == NULL)
+	    যদি (pt == ফাঁকা)
 	    {
 		*lenp = 0;
-		return (char_u *)"";	// just in case
+		ফেরত (char_u *)"";	// just in case
 	    }
-	    if (partialp != NULL)
+	    যদি (partialp != ফাঁকা)
 		*partialp = pt;
 	    s = partial_name(pt);
-	    *lenp = (int)STRLEN(s);
+	    *lenp = (পূর্ণসংখ্যা)STRLEN(s);
 	}
 
-	if (s != NULL)
+	যদি (s != ফাঁকা)
 	{
-	    if (!did_type && type != NULL && ht == get_script_local_ht())
+	    যদি (!did_type && type != ফাঁকা && ht == get_script_local_ht())
 	    {
 		svar_T  *sv = find_typval_in_script(tv, 0, TRUE);
 
-		if (sv != NULL)
+		যদি (sv != ফাঁকা)
 		    *type = sv->sv_type;
 	    }
-	    return s;
+	    ফেরত s;
 	}
     }
 
-    return name;
+    ফেরত name;
 }
 
 /*
  * Give an error message with a function name.  Handle <SNR> things.
  * "ermsg" is to be passed without translation, use N_() instead of _().
  */
-    void
-emsg_funcname(char *ermsg, char_u *name)
+    শূন্য
+emsg_funcname(অক্ষর *ermsg, char_u *name)
 {
     char_u	*p = name;
 
-    if (name[0] == K_SPECIAL && name[1] != NUL && name[2] != NUL)
+    যদি (name[0] == K_SPECIAL && name[1] != NUL && name[2] != NUL)
 	p = concat_str((char_u *)"<SNR>", name + 3);
     semsg(_(ermsg), p);
-    if (p != name)
+    যদি (p != name)
 	vim_free(p);
 }
 
@@ -2079,122 +2079,122 @@ emsg_funcname(char *ermsg, char_u *name)
  * Return them in "*argvars[MAX_FUNC_ARGS + 1]" and the count in "argcount".
  * On failure FAIL is returned but the "argvars[argcount]" are still set.
  */
-    int
+    পূর্ণসংখ্যা
 get_func_arguments(
 	char_u	    **arg,
 	evalarg_T   *evalarg,
-	int	    partial_argc,
+	পূর্ণসংখ্যা	    partial_argc,
 	typval_T    *argvars,
-	int	    *argcount,
-	int	    is_builtin)
+	পূর্ণসংখ্যা	    *argcount,
+	পূর্ণসংখ্যা	    is_builtin)
 {
     char_u	*argp = *arg;
-    int		ret = OK;
-    int		vim9script = in_vim9script();
-    int		evaluate = evalarg == NULL
+    পূর্ণসংখ্যা		ret = OK;
+    পূর্ণসংখ্যা		vim9script = in_vim9script();
+    পূর্ণসংখ্যা		evaluate = evalarg == ফাঁকা
 			       ? FALSE : (evalarg->eval_flags & EVAL_EVALUATE);
 
-    while (*argcount < MAX_FUNC_ARGS - partial_argc)
+    যখন (*argcount < MAX_FUNC_ARGS - partial_argc)
     {
 	// skip the '(' or ',' and possibly line breaks
 	argp = skipwhite_and_linebreak(argp + 1, evalarg);
 
-	if (*argp == ')' || *argp == ',' || *argp == NUL)
-	    break;
+	যদি (*argp == ')' || *argp == ',' || *argp == NUL)
+	    বিরতি;
 
-	int arg_idx = *argcount;
-	if (eval1(&argp, &argvars[arg_idx], evalarg) == FAIL)
+	পূর্ণসংখ্যা arg_idx = *argcount;
+	যদি (eval1(&argp, &argvars[arg_idx], evalarg) == FAIL)
 	{
 	    ret = FAIL;
-	    break;
+	    বিরতি;
 	}
 	++*argcount;
-	if (!is_builtin && check_typval_is_value(&argvars[arg_idx]) == FAIL)
+	যদি (!is_builtin && check_typval_is_মান(&argvars[arg_idx]) == FAIL)
 	{
 	    ret = FAIL;
-	    break;
+	    বিরতি;
 	}
 
 	// The comma should come right after the argument, but this wasn't
 	// checked previously, thus only enforce it in Vim9 script.
-	if (vim9script)
+	যদি (vim9script)
 	{
-	    if (*argp != ',' && *skipwhite(argp) == ',')
+	    যদি (*argp != ',' && *skipwhite(argp) == ',')
 	    {
-		if (evaluate)
+		যদি (evaluate)
 		    semsg(_(e_no_white_space_allowed_before_str_str),
 								    ",", argp);
 		ret = FAIL;
-		break;
+		বিরতি;
 	    }
 	}
-	else
+	অন্যথা
 	    argp = skipwhite(argp);
-	if (*argp != ',')
-	    break;
-	if (vim9script && !IS_WHITE_NL_OR_NUL(argp[1]))
+	যদি (*argp != ',')
+	    বিরতি;
+	যদি (vim9script && !IS_WHITE_NL_OR_NUL(argp[1]))
 	{
-	    if (evaluate)
+	    যদি (evaluate)
 		semsg(_(e_white_space_required_after_str_str), ",", argp);
 	    ret = FAIL;
-	    break;
+	    বিরতি;
 	}
     }
 
     argp = skipwhite_and_linebreak(argp, evalarg);
-    if (*argp == ')')
+    যদি (*argp == ')')
 	++argp;
-    else
+    অন্যথা
 	ret = FAIL;
     *arg = argp;
-    return ret;
+    ফেরত ret;
 }
 
 /*
  * Call a function and put the result in "rettv".
  * Return OK or FAIL.
  */
-    int
+    পূর্ণসংখ্যা
 get_func_tv(
     char_u	*name,		// name of the function
-    int		len,		// length of "name" or -1 to use strlen()
+    পূর্ণসংখ্যা		len,		// length of "name" or -1 to use strlen()
     typval_T	*rettv,
     char_u	**arg,		// argument, pointing to the '('
     evalarg_T	*evalarg,	// for line continuation
     funcexe_T	*funcexe)	// various values
 {
     char_u	*argp;
-    int		ret;
+    পূর্ণসংখ্যা		ret;
     typval_T	argvars[MAX_FUNC_ARGS + 1];	// vars for arguments
-    int		argcount = 0;			// number of arguments found
-    int		vim9script = in_vim9script();
-    int		evaluate = evalarg == NULL
+    পূর্ণসংখ্যা		argcount = 0;			// number of arguments found
+    পূর্ণসংখ্যা		vim9script = in_vim9script();
+    পূর্ণসংখ্যা		evaluate = evalarg == ফাঁকা
 			       ? FALSE : (evalarg->eval_flags & EVAL_EVALUATE);
 
     argp = *arg;
     ret = get_func_arguments(&argp, evalarg,
-	    (funcexe->fe_partial == NULL ? 0 : funcexe->fe_partial->pt_argc),
+	    (funcexe->fe_partial == ফাঁকা ? 0 : funcexe->fe_partial->pt_argc),
 			       argvars, &argcount, builtin_function(name, -1));
 
-    if (ret == OK)
+    যদি (ret == OK)
     {
-	int	i = 0;
-	int	did_emsg_before = did_emsg;
+	পূর্ণসংখ্যা	i = 0;
+	পূর্ণসংখ্যা	did_emsg_before = did_emsg;
 
-	if (get_vim_var_nr(VV_TESTING))
+	যদি (get_vim_var_nr(VV_TESTING))
 	{
 	    // Prepare for calling test_garbagecollect_now(), need to know
 	    // what variables are used on the call stack.
-	    if (funcargs.ga_itemsize == 0)
-		ga_init2(&funcargs, sizeof(typval_T *), 50);
-	    for (i = 0; i < argcount; ++i)
-		if (ga_grow(&funcargs, 1) == OK)
-		    ((typval_T **)funcargs.ga_data)[funcargs.ga_len++] =
+	    যদি (funcargs.ga_itemsize == 0)
+		ga_init2(&funcargs, আকার(typval_T *), 50);
+	    জন্য (i = 0; i < argcount; ++i)
+		যদি (ga_grow(&funcargs, 1) == OK)
+		    ((typval_T **)funcargs.ga_তথ্য)[funcargs.ga_len++] =
 								  &argvars[i];
 	}
 
 	ret = call_func(name, len, rettv, argcount, argvars, funcexe);
-	if (vim9script && did_emsg > did_emsg_before)
+	যদি (vim9script && did_emsg > did_emsg_before)
 	{
 	    // An error in a builtin function does not return FAIL, but we do
 	    // want to abort further processing if an error was given.
@@ -2204,32 +2204,32 @@ get_func_tv(
 
 	funcargs.ga_len -= i;
     }
-    else if (!aborting() && evaluate)
+    অন্যথা যদি (!aborting() && evaluate)
     {
-	if (argcount == MAX_FUNC_ARGS)
+	যদি (argcount == MAX_FUNC_ARGS)
 	    emsg_funcname(e_too_many_arguments_for_function_str_2, name);
-	else
+	অন্যথা
 	    emsg_funcname(e_invalid_arguments_for_function_str, name);
     }
 
-    while (--argcount >= 0)
+    যখন (--argcount >= 0)
 	clear_tv(&argvars[argcount]);
 
-    if (vim9script)
+    যদি (vim9script)
 	*arg = argp;
-    else
+    অন্যথা
 	*arg = skipwhite(argp);
-    return ret;
+    ফেরত ret;
 }
 
 /*
  * Return TRUE if "p" starts with "<SID>" or "s:".
  * Only works if eval_fname_script() returned non-zero for "p"!
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 eval_fname_sid(char_u *p)
 {
-    return (*p == 's' || TOUPPER_ASC(p[2]) == 'I');
+    ফেরত (*p == 's' || TOUPPER_ASC(p[2]) == 'I');
 }
 
 /*
@@ -2251,97 +2251,97 @@ fname_trans_sid(
     size_t	fname_buflen;
 
     script_name = name + eval_fname_script(name);
-    if (script_name == name)
-	return name;  // no prefix
+    যদি (script_name == name)
+	ফেরত name;  // no prefix
 
     fname_buf[0] = K_SPECIAL;
     fname_buf[1] = KS_EXTRA;
-    fname_buf[2] = (int)KE_SNR;
+    fname_buf[2] = (পূর্ণসংখ্যা)KE_SNR;
     fname_buflen = 3;
-    if (!eval_fname_sid(name))	// "<SID>" or "s:"
+    যদি (!eval_fname_sid(name))	// "<SID>" or "s:"
 	fname_buf[fname_buflen] = NUL;
-    else
+    অন্যথা
     {
-	if (current_sctx.sc_sid <= 0)
+	যদি (current_sctx.sc_sid <= 0)
 	    *error = FCERR_SCRIPT;
-	else
+	অন্যথা
 	{
-	    fname_buflen += vim_snprintf((char *)fname_buf + 3,
+	    fname_buflen += vim_snprintf((অক্ষর *)fname_buf + 3,
 						FLEN_FIXED - 3,
 						"%ld_",
 						(long)current_sctx.sc_sid);
 	}
     }
     fnamelen = fname_buflen + STRLEN(script_name);
-    if (fnamelen < FLEN_FIXED)
+    যদি (fnamelen < FLEN_FIXED)
     {
 	STRCPY(fname_buf + fname_buflen, script_name);
 	fname = fname_buf;
     }
-    else
+    অন্যথা
     {
 	fname = alloc(fnamelen + 1);
-	if (fname == NULL)
+	যদি (fname == ফাঁকা)
 	    *error = FCERR_OTHER;
-	else
+	অন্যথা
 	{
 	    *tofree = fname;
-	    vim_snprintf((char *)fname, fnamelen + 1, "%s%s", fname_buf, script_name);
+	    vim_snprintf((অক্ষর *)fname, fnamelen + 1, "%s%s", fname_buf, script_name);
 	}
     }
-    return fname;
+    ফেরত fname;
 }
 
 /*
  * Concatenate the script ID and function name into  "<SNR>99_name".
  * "buffer" must have size MAX_FUNC_NAME_LEN.
  */
-    void
-func_name_with_sid(char_u *name, int sid, char_u *buffer)
+    শূন্য
+func_name_with_sid(char_u *name, পূর্ণসংখ্যা sid, char_u *বাফার)
 {
     // A script-local function is stored as "<SNR>99_name".
-    buffer[0] = K_SPECIAL;
-    buffer[1] = KS_EXTRA;
-    buffer[2] = (int)KE_SNR;
-    vim_snprintf((char *)buffer + 3, MAX_FUNC_NAME_LEN - 3, "%ld_%s",
+    বাফার[0] = K_SPECIAL;
+    বাফার[1] = KS_EXTRA;
+    বাফার[2] = (পূর্ণসংখ্যা)KE_SNR;
+    vim_snprintf((অক্ষর *)বাফার + 3, MAX_FUNC_NAME_LEN - 3, "%ld_%s",
 							      (long)sid, name);
 }
 
 /*
  * Find a function "name" in script "sid".
  */
-    static ufunc_T *
-find_func_with_sid(char_u *name, int sid)
+    স্থির ufunc_T *
+find_func_with_sid(char_u *name, পূর্ণসংখ্যা sid)
 {
     hashitem_T	    *hi;
-    char_u	    buffer[MAX_FUNC_NAME_LEN];
+    char_u	    বাফার[MAX_FUNC_NAME_LEN];
 
-    if (!SCRIPT_ID_VALID(sid))
-	return NULL;	// not in a script
+    যদি (!SCRIPT_ID_VALID(sid))
+	ফেরত ফাঁকা;	// not in a script
 
-    func_name_with_sid(name, sid, buffer);
-    hi = hash_find(&func_hashtab, buffer);
-    if (!HASHITEM_EMPTY(hi))
-	return HI2UF(hi);
-    return NULL;
+    func_name_with_sid(name, sid, বাফার);
+    hi = hash_find(&func_hashtab, বাফার);
+    যদি (!HASHITEM_EMPTY(hi))
+	ফেরত HI2UF(hi);
+    ফেরত ফাঁকা;
 }
 
 /*
  * Find a function "name" in script "sid" prefixing the autoload prefix.
  */
-    static ufunc_T *
-find_func_with_prefix(char_u *name, int sid)
+    স্থির ufunc_T *
+find_func_with_prefix(char_u *name, পূর্ণসংখ্যা sid)
 {
     hashitem_T	    *hi;
-    char_u	    buffer[MAX_FUNC_NAME_LEN];
+    char_u	    বাফার[MAX_FUNC_NAME_LEN];
     scriptitem_T    *si;
 
-    if (vim_strchr(name, AUTOLOAD_CHAR) != NULL)
-	return NULL;	// already has the prefix
-    if (!SCRIPT_ID_VALID(sid))
-	return NULL;	// not in a script
+    যদি (vim_strchr(name, AUTOLOAD_CHAR) != ফাঁকা)
+	ফেরত ফাঁকা;	// already has the prefix
+    যদি (!SCRIPT_ID_VALID(sid))
+	ফেরত ফাঁকা;	// not in a script
     si = SCRIPT_ITEM(sid);
-    if (si->sn_autoload_prefix != NULL)
+    যদি (si->sn_autoload_prefix != ফাঁকা)
     {
 	size_t	len = STRLEN(si->sn_autoload_prefix) + STRLEN(name) + 1;
 	char_u	*auto_name;
@@ -2349,28 +2349,28 @@ find_func_with_prefix(char_u *name, int sid)
 
 	// skip a "<SNR>99_" prefix
 	namep = untrans_function_name(name);
-	if (namep == NULL)
+	যদি (namep == ফাঁকা)
 	    namep = name;
 
 	// An exported function in an autoload script is stored as
 	// "dir#path#name".
-	if (len < sizeof(buffer))
-	    auto_name = buffer;
-	else
+	যদি (len < আকার(বাফার))
+	    auto_name = বাফার;
+	অন্যথা
 	    auto_name = alloc(len);
-	if (auto_name != NULL)
+	যদি (auto_name != ফাঁকা)
 	{
-	    vim_snprintf((char *)auto_name, len, "%s%s",
+	    vim_snprintf((অক্ষর *)auto_name, len, "%s%s",
 						si->sn_autoload_prefix, namep);
 	    hi = hash_find(&func_hashtab, auto_name);
-	    if (auto_name != buffer)
+	    যদি (auto_name != বাফার)
 		vim_free(auto_name);
-	    if (!HASHITEM_EMPTY(hi))
-		return HI2UF(hi);
+	    যদি (!HASHITEM_EMPTY(hi))
+		ফেরত HI2UF(hi);
 	}
     }
 
-    return NULL;
+    ফেরত ফাঁকা;
 }
 
 /*
@@ -2381,48 +2381,48 @@ find_func_with_prefix(char_u *name, int sid)
  * Return NULL for unknown function.
  */
     ufunc_T *
-find_func_even_dead(char_u *name, int flags)
+find_func_even_dead(char_u *name, পূর্ণসংখ্যা flags)
 {
     hashitem_T	*hi;
     ufunc_T	*func;
 
-    if ((flags & FFED_IS_GLOBAL) == 0)
+    যদি ((flags & FFED_IS_GLOBAL) == 0)
     {
 	// Find script-local function before global one.
-	if (in_vim9script() && eval_isnamec1(*name)
+	যদি (in_vim9script() && eval_isnamec1(*name)
 					   && (name[1] != ':' || *name == 's'))
 	{
 	    func = find_func_with_sid(name[0] == 's' && name[1] == ':'
 				       ? name + 2 : name, current_sctx.sc_sid);
-	    if (func != NULL)
-		return func;
+	    যদি (func != ফাঁকা)
+		ফেরত func;
 	}
-	if (in_vim9script() && STRNCMP(name, "<SNR>", 5) == 0)
+	যদি (in_vim9script() && STRNCMP(name, "<SNR>", 5) == 0)
 	{
 	    char_u  *p = name + 5;
 	    long    sid;
 
 	    // printable "<SNR>123_Name" form
 	    sid = getdigits(&p);
-	    if (*p == '_')
+	    যদি (*p == '_')
 	    {
-		func = find_func_with_sid(p + 1, (int)sid);
-		if (func != NULL)
-		    return func;
+		func = find_func_with_sid(p + 1, (পূর্ণসংখ্যা)sid);
+		যদি (func != ফাঁকা)
+		    ফেরত func;
 	    }
 	}
     }
 
-    if ((flags & FFED_NO_GLOBAL) == 0)
+    যদি ((flags & FFED_NO_GLOBAL) == 0)
     {
 	hi = hash_find(&func_hashtab,
 				STRNCMP(name, "g:", 2) == 0 ? name + 2 : name);
-	if (!HASHITEM_EMPTY(hi))
-	    return HI2UF(hi);
+	যদি (!HASHITEM_EMPTY(hi))
+	    ফেরত HI2UF(hi);
     }
 
     // Find autoload function if this is an autoload script.
-    return find_func_with_prefix(name[0] == 's' && name[1] == ':'
+    ফেরত find_func_with_prefix(name[0] == 's' && name[1] == ':'
 				       ? name + 2 : name, current_sctx.sc_sid);
 }
 
@@ -2432,34 +2432,34 @@ find_func_even_dead(char_u *name, int flags)
  * Return NULL for unknown or dead function.
  */
     ufunc_T *
-find_func(char_u *name, int is_global)
+find_func(char_u *name, পূর্ণসংখ্যা is_global)
 {
     ufunc_T	*fp = find_func_even_dead(name, is_global ? FFED_IS_GLOBAL : 0);
 
-    if (fp != NULL && (fp->uf_flags & FC_DEAD) == 0)
-	return fp;
-    return NULL;
+    যদি (fp != ফাঁকা && (fp->uf_flags & FC_DEAD) == 0)
+	ফেরত fp;
+    ফেরত ফাঁকা;
 }
 
 /*
  * Return TRUE if "ufunc" is a global function.
  */
-    int
+    পূর্ণসংখ্যা
 func_is_global(ufunc_T *ufunc)
 {
-    return ufunc->uf_name[0] != K_SPECIAL;
+    ফেরত ufunc->uf_name[0] != K_SPECIAL;
 }
 
 /*
  * Return TRUE if "ufunc" must be called with a g: prefix in Vim9 script.
  */
-    int
+    পূর্ণসংখ্যা
 func_requires_g_prefix(ufunc_T *ufunc)
 {
-    return func_is_global(ufunc)
+    ফেরত func_is_global(ufunc)
 	    && (ufunc->uf_flags & FC_LAMBDA) == 0
 	    && !IS_GENERIC_FUNC(ufunc)
-	    && vim_strchr(ufunc->uf_name, AUTOLOAD_CHAR) == NULL
+	    && vim_strchr(ufunc->uf_name, AUTOLOAD_CHAR) == ফাঁকা
 	    && !SAFE_isdigit(ufunc->uf_name[0]);
 }
 
@@ -2468,55 +2468,55 @@ func_requires_g_prefix(ufunc_T *ufunc)
  * "buf" must be able to hold the function name plus three bytes.
  * Takes care of script-local function names.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 cat_func_name(char_u *buf, size_t bufsize, ufunc_T *fp)
 {
-    int	len;
+    পূর্ণসংখ্যা	len;
 
-    if (!func_is_global(fp))
-	len = vim_snprintf((char *)buf, bufsize, "<SNR>%s", fp->uf_name + 3);
-    else
-	len = vim_snprintf((char *)buf, bufsize, "%s", fp->uf_name);
+    যদি (!func_is_global(fp))
+	len = vim_snprintf((অক্ষর *)buf, bufsize, "<SNR>%s", fp->uf_name + 3);
+    অন্যথা
+	len = vim_snprintf((অক্ষর *)buf, bufsize, "%s", fp->uf_name);
 
-    return (len >= (int)bufsize) ? (int)bufsize - 1 : len;
+    ফেরত (len >= (পূর্ণসংখ্যা)bufsize) ? (পূর্ণসংখ্যা)bufsize - 1 : len;
 }
 
 /*
  * Add a number variable "name" to dict "dp" with value "nr".
  */
-    static void
+    স্থির শূন্য
 add_nr_var(
     dict_T	*dp,
     dictitem_T	*v,
-    char	*name,
+    অক্ষর	*name,
     varnumber_T nr)
 {
-    STRCPY(v->di_key, name);
+    STRCPY(v->di_চাবি, name);
     v->di_flags = DI_FLAGS_RO | DI_FLAGS_FIX;
     hash_add(&dp->dv_hashtab, DI2HIKEY(v), "add variable");
-    v->di_tv.v_type = VAR_NUMBER;
+    v->di_tv.v_type = VAR_সংখ্যা;
     v->di_tv.v_lock = VAR_FIXED;
-    v->di_tv.vval.v_number = nr;
+    v->di_tv.vval.v_সংখ্যা = nr;
 }
 
 /*
  * Free "fc".
  */
-    static void
+    স্থির শূন্য
 free_funccal(funccall_T *fc)
 {
-    int	i;
+    পূর্ণসংখ্যা	i;
 
-    for (i = 0; i < fc->fc_ufuncs.ga_len; ++i)
+    জন্য (i = 0; i < fc->fc_ufuncs.ga_len; ++i)
     {
-	ufunc_T *fp = ((ufunc_T **)(fc->fc_ufuncs.ga_data))[i];
+	ufunc_T *fp = ((ufunc_T **)(fc->fc_ufuncs.ga_তথ্য))[i];
 
 	// When garbage collecting a funccall_T may be freed before the
 	// function that references it, clear its uf_scoped field.
 	// The function may have been redefined and point to another
 	// funccall_T, don't clear it then.
-	if (fp != NULL && fp->uf_scoped == fc)
-	    fp->uf_scoped = NULL;
+	যদি (fp != ফাঁকা && fp->uf_scoped == fc)
+	    fp->uf_scoped = ফাঁকা;
     }
     ga_clear(&fc->fc_ufuncs);
 
@@ -2529,7 +2529,7 @@ free_funccal(funccall_T *fc)
  * Can be called only when "fc" is kept beyond the period of it called,
  * i.e. after cleanup_function_call(fc).
  */
-   static void
+   স্থির শূন্য
 free_funccal_contents(funccall_T *fc)
 {
     listitem_T	*li;
@@ -2541,7 +2541,7 @@ free_funccal_contents(funccall_T *fc)
     vars_clear(&fc->fc_l_avars.dv_hashtab);
 
     // Free the a:000 variables.
-    FOR_ALL_LIST_ITEMS(&fc->fc_l_varlist, li)
+    FOR_ALL_LIST_বস্তুসমূহ(&fc->fc_l_varlist, li)
 	clear_tv(&li->li_tv);
 
     free_funccal(fc);
@@ -2551,38 +2551,38 @@ free_funccal_contents(funccall_T *fc)
  * Handle the last part of returning from a function: free the local hashtable.
  * Unless it is still in use by a closure.
  */
-    static void
+    স্থির শূন্য
 cleanup_function_call(funccall_T *fc)
 {
-    int	may_free_fc = fc->fc_refcount <= 0;
-    int	free_fc = TRUE;
+    পূর্ণসংখ্যা	may_free_fc = fc->fc_refcount <= 0;
+    পূর্ণসংখ্যা	free_fc = TRUE;
 
     current_funccal = fc->fc_caller;
 
     // Free all l: variables if not referred.
-    if (may_free_fc && fc->fc_l_vars.dv_refcount == DO_NOT_FREE_CNT)
+    যদি (may_free_fc && fc->fc_l_vars.dv_refcount == DO_NOT_FREE_CNT)
 	vars_clear(&fc->fc_l_vars.dv_hashtab);
-    else
+    অন্যথা
 	free_fc = FALSE;
 
     // If the a:000 list and the l: and a: dicts are not referenced and
     // there is no closure using it, we can free the funccall_T and what's
     // in it.
-    if (may_free_fc && fc->fc_l_avars.dv_refcount == DO_NOT_FREE_CNT)
+    যদি (may_free_fc && fc->fc_l_avars.dv_refcount == DO_NOT_FREE_CNT)
 	vars_clear_ext(&fc->fc_l_avars.dv_hashtab, FALSE);
-    else
+    অন্যথা
     {
-	int	    todo;
+	পূর্ণসংখ্যা	    todo;
 	hashitem_T  *hi;
 	dictitem_T  *di;
 
 	free_fc = FALSE;
 
 	// Make a copy of the a: variables, since we didn't do that above.
-	todo = (int)fc->fc_l_avars.dv_hashtab.ht_used;
-	FOR_ALL_HASHTAB_ITEMS(&fc->fc_l_avars.dv_hashtab, hi, todo)
+	todo = (পূর্ণসংখ্যা)fc->fc_l_avars.dv_hashtab.ht_used;
+	FOR_ALL_HASHTAB_বস্তুসমূহ(&fc->fc_l_avars.dv_hashtab, hi, todo)
 	{
-	    if (!HASHITEM_EMPTY(hi))
+	    যদি (!HASHITEM_EMPTY(hi))
 	    {
 		--todo;
 		di = HI2DI(hi);
@@ -2591,24 +2591,24 @@ cleanup_function_call(funccall_T *fc)
 	}
     }
 
-    if (may_free_fc && fc->fc_l_varlist.lv_refcount == DO_NOT_FREE_CNT)
-	fc->fc_l_varlist.lv_first = NULL;
-    else
+    যদি (may_free_fc && fc->fc_l_varlist.lv_refcount == DO_NOT_FREE_CNT)
+	fc->fc_l_varlist.lv_first = ফাঁকা;
+    অন্যথা
     {
 	listitem_T *li;
 
 	free_fc = FALSE;
 
 	// Make a copy of the a:000 items, since we didn't do that above.
-	FOR_ALL_LIST_ITEMS(&fc->fc_l_varlist, li)
+	FOR_ALL_LIST_বস্তুসমূহ(&fc->fc_l_varlist, li)
 	    copy_tv(&li->li_tv, &li->li_tv);
     }
 
-    if (free_fc)
+    যদি (free_fc)
 	free_funccal(fc);
-    else
+    অন্যথা
     {
-	static int made_copy = 0;
+	স্থির পূর্ণসংখ্যা made_copy = 0;
 
 	// "fc" is still in use.  This can happen when returning "a:000",
 	// assigning "l:" to a global variable or defining a closure.
@@ -2616,10 +2616,10 @@ cleanup_function_call(funccall_T *fc)
 	fc->fc_caller = previous_funccal;
 	previous_funccal = fc;
 
-	if (want_garbage_collect)
+	যদি (want_garbage_collect)
 	    // If garbage collector is ready, clear count.
 	    made_copy = 0;
-	else if (++made_copy >= (int)((4096 * 1024) / sizeof(*fc)))
+	অন্যথা যদি (++made_copy >= (পূর্ণসংখ্যা)((4096 * 1024) / আকার(*fc)))
 	{
 	    // We have made a lot of copies, worth 4 Mbyte.  This can happen
 	    // when repetitively calling a function that creates a reference to
@@ -2634,10 +2634,10 @@ cleanup_function_call(funccall_T *fc)
 /*
  * Return TRUE if "name" is a numbered function, ignoring a "g:" prefix.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 numbered_function(char_u *name)
 {
-    return SAFE_isdigit(*name)
+    ফেরত SAFE_isdigit(*name)
 	    || (name[0] == 'g' && name[1] == ':' && SAFE_isdigit(name[2]));
 }
 
@@ -2650,10 +2650,10 @@ numbered_function(char_u *name)
  * using function() does not count as a reference, because the function is
  * looked up by name.
  */
-    int
+    পূর্ণসংখ্যা
 func_name_refcount(char_u *name)
 {
-    return numbered_function(name) || (name[0] == '<' && name[1] == 'l');
+    ফেরত numbered_function(name) || (name[0] == '<' && name[1] == 'l');
 }
 
 /*
@@ -2661,31 +2661,31 @@ func_name_refcount(char_u *name)
  * becomes zero.  "fp" is detached from "fc".
  * When "force" is TRUE we are exiting.
  */
-    static void
-funccal_unref(funccall_T *fc, ufunc_T *fp, int force)
+    স্থির শূন্য
+funccal_unref(funccall_T *fc, ufunc_T *fp, পূর্ণসংখ্যা force)
 {
     funccall_T	**pfc;
-    int		i;
+    পূর্ণসংখ্যা		i;
 
-    if (fc == NULL)
-	return;
+    যদি (fc == ফাঁকা)
+	ফেরত;
 
-    if (--fc->fc_refcount <= 0 && (force || (
+    যদি (--fc->fc_refcount <= 0 && (force || (
 		fc->fc_l_varlist.lv_refcount == DO_NOT_FREE_CNT
 		&& fc->fc_l_vars.dv_refcount == DO_NOT_FREE_CNT
 		&& fc->fc_l_avars.dv_refcount == DO_NOT_FREE_CNT)))
-	for (pfc = &previous_funccal; *pfc != NULL; pfc = &(*pfc)->fc_caller)
+	জন্য (pfc = &previous_funccal; *pfc != ফাঁকা; pfc = &(*pfc)->fc_caller)
 	{
-	    if (fc == *pfc)
+	    যদি (fc == *pfc)
 	    {
 		*pfc = fc->fc_caller;
 		free_funccal_contents(fc);
-		return;
+		ফেরত;
 	    }
 	}
-    for (i = 0; i < fc->fc_ufuncs.ga_len; ++i)
-	if (((ufunc_T **)(fc->fc_ufuncs.ga_data))[i] == fp)
-	    ((ufunc_T **)(fc->fc_ufuncs.ga_data))[i] = NULL;
+    জন্য (i = 0; i < fc->fc_ufuncs.ga_len; ++i)
+	যদি (((ufunc_T **)(fc->fc_ufuncs.ga_তথ্য))[i] == fp)
+	    ((ufunc_T **)(fc->fc_ufuncs.ga_তথ্য))[i] = ফাঁকা;
 }
 
 /*
@@ -2693,68 +2693,68 @@ funccal_unref(funccall_T *fc, ufunc_T *fp, int force)
  * deleted while it still has references this was already done.
  * Return TRUE if the entry was deleted, FALSE if it wasn't found.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 func_remove(ufunc_T *fp)
 {
     hashitem_T	*hi;
 
     // Return if it was already virtually deleted.
-    if (fp->uf_flags & FC_DEAD)
-	return FALSE;
+    যদি (fp->uf_flags & FC_DEAD)
+	ফেরত FALSE;
 
     hi = hash_find(&func_hashtab, UF2HIKEY(fp));
     // Another function with the same name may be in the table, e.g. a global
     // function with the name of a class method, do not remove it.
-    if (HASHITEM_EMPTY(hi) || HI2UF(hi) != fp)
-	return FALSE;
+    যদি (HASHITEM_EMPTY(hi) || HI2UF(hi) != fp)
+	ফেরত FALSE;
 
     // When there is a def-function index do not actually remove the
     // function, so we can find the index when defining the function again.
     // Do remove it when it's a copy.
-    if (fp->uf_def_status == UF_COMPILED && (fp->uf_flags & FC_COPY) == 0)
+    যদি (fp->uf_def_status == UF_COMPILED && (fp->uf_flags & FC_COPY) == 0)
     {
 	fp->uf_flags |= FC_DEAD;
-	return FALSE;
+	ফেরত FALSE;
     }
     hash_remove(&func_hashtab, hi, "remove function");
     fp->uf_flags |= FC_DELETED;
-    return TRUE;
+    ফেরত TRUE;
 }
 
-    static void
-func_clear_items(ufunc_T *fp)
+    স্থির শূন্য
+func_clear_বস্তুসমূহ(ufunc_T *fp)
 {
     ga_clear_strings(&(fp->uf_args));
     ga_clear_strings(&(fp->uf_def_args));
-    ga_clear_strings(&(fp->uf_lines));
+    ga_clear_strings(&(fp->uf_সারিগুলি));
     VIM_CLEAR(fp->uf_arg_types);
     VIM_CLEAR(fp->uf_block_ids);
     VIM_CLEAR(fp->uf_va_name);
     clear_func_type_list(&fp->uf_type_list, &fp->uf_func_type);
 
-    if (IS_GENERIC_FUNC(fp))
-	generic_func_clear_items(fp);
+    যদি (IS_GENERIC_FUNC(fp))
+	generic_func_clear_বস্তুসমূহ(fp);
 
     // Increment the refcount of this function to avoid it being freed
     // recursively when the partial is freed.
     fp->uf_refcount += 3;
     partial_unref(fp->uf_partial);
-    fp->uf_partial = NULL;
+    fp->uf_partial = ফাঁকা;
     fp->uf_refcount -= 3;
 
 #ifdef FEAT_LUA
-    if (fp->uf_cb_free != NULL)
+    যদি (fp->uf_cb_free != ফাঁকা)
     {
 	fp->uf_cb_free(fp->uf_cb_state);
-	fp->uf_cb_free = NULL;
+	fp->uf_cb_free = ফাঁকা;
     }
 
-    fp->uf_cb_state = NULL;
-    fp->uf_cb = NULL;
+    fp->uf_cb_state = ফাঁকা;
+    fp->uf_cb = ফাঁকা;
 #endif
 #ifdef FEAT_PROFILE
-    VIM_CLEAR(fp->uf_tml_count);
-    VIM_CLEAR(fp->uf_tml_total);
+    VIM_CLEAR(fp->uf_tml_গুনতি);
+    VIM_CLEAR(fp->uf_tml_যোগ);
     VIM_CLEAR(fp->uf_tml_self);
 #endif
 }
@@ -2764,15 +2764,15 @@ func_clear_items(ufunc_T *fp)
  * itself, use func_free() for that.
  * When "force" is TRUE we are exiting.
  */
-    static void
-func_clear(ufunc_T *fp, int force)
+    স্থির শূন্য
+func_clear(ufunc_T *fp, পূর্ণসংখ্যা force)
 {
-    if (fp->uf_cleared)
-	return;
+    যদি (fp->uf_cleared)
+	ফেরত;
     fp->uf_cleared = TRUE;
 
     // clear this function
-    func_clear_items(fp);
+    func_clear_বস্তুসমূহ(fp);
     funccal_unref(fp->uf_scoped, fp, force);
     unlink_def_function(fp);
 }
@@ -2783,37 +2783,37 @@ func_clear(ufunc_T *fp, int force)
  * When "force" is TRUE we are exiting.
  * Returns OK when the function was actually freed.
  */
-    static int
-func_free(ufunc_T *fp, int force)
+    স্থির পূর্ণসংখ্যা
+func_free(ufunc_T *fp, পূর্ণসংখ্যা force)
 {
     // Only remove it when not done already, otherwise we would remove a newer
     // version of the function with the same name.
-    if ((fp->uf_flags & (FC_DELETED | FC_REMOVED)) == 0)
+    যদি ((fp->uf_flags & (FC_DELETED | FC_REMOVED)) == 0)
 	func_remove(fp);
 
-    if ((fp->uf_flags & FC_DEAD) == 0 || force)
+    যদি ((fp->uf_flags & FC_DEAD) == 0 || force)
     {
-	if (fp->uf_dfunc_idx > 0)
+	যদি (fp->uf_dfunc_idx > 0)
 	    unlink_def_function(fp);
 	VIM_CLEAR(fp->uf_name_exp);
 	vim_free(fp);
-	return OK;
+	ফেরত OK;
     }
-    return FAIL;
+    ফেরত FAIL;
 }
 
 /*
  * Free all things that a function contains and free the function itself.
  * When "force" is TRUE we are exiting.
  */
-    void
-func_clear_free(ufunc_T *fp, int force)
+    শূন্য
+func_clear_free(ufunc_T *fp, পূর্ণসংখ্যা force)
 {
     func_clear(fp, force);
-    if (force || fp->uf_dfunc_idx == 0 || func_name_refcount(fp->uf_name)
+    যদি (force || fp->uf_dfunc_idx == 0 || func_name_refcount(fp->uf_name)
 						   || (fp->uf_flags & FC_COPY))
 	func_free(fp, force);
-    else
+    অন্যথা
 	fp->uf_flags |= FC_DEAD;
 }
 
@@ -2821,7 +2821,7 @@ func_clear_free(ufunc_T *fp, int force)
  * Copy already defined function "lambda" to a new function with name "global".
  * This is for when a compiled function defines a global function.
  */
-    int
+    পূর্ণসংখ্যা
 copy_lambda_to_global_func(
 	char_u		*lambda,
 	char_u		*global,
@@ -2829,49 +2829,49 @@ copy_lambda_to_global_func(
 	ectx_T		*ectx)
 {
     ufunc_T *ufunc = find_func_even_dead(lambda, FFED_IS_GLOBAL);
-    ufunc_T *fp = NULL;
+    ufunc_T *fp = ফাঁকা;
 
-    if (ufunc == NULL)
+    যদি (ufunc == ফাঁকা)
     {
 	semsg(_(e_lambda_function_not_found_str), lambda);
-	return FAIL;
+	ফেরত FAIL;
     }
 
     fp = find_func(global, TRUE);
-    if (fp != NULL)
+    যদি (fp != ফাঁকা)
     {
 	// TODO: handle ! to overwrite
 	semsg(_(e_function_str_already_exists_add_bang_to_replace), global);
-	return FAIL;
+	ফেরত FAIL;
     }
 
     fp = alloc_ufunc(global, STRLEN(global));
-    if (fp == NULL)
-	return FAIL;
+    যদি (fp == ফাঁকা)
+	ফেরত FAIL;
 
     fp->uf_varargs = ufunc->uf_varargs;
     fp->uf_flags = (ufunc->uf_flags & ~FC_VIM9) | FC_COPY;
     fp->uf_def_status = ufunc->uf_def_status;
     fp->uf_dfunc_idx = ufunc->uf_dfunc_idx;
-    if (ga_copy_strings(&ufunc->uf_args, &fp->uf_args) == FAIL
+    যদি (ga_copy_strings(&ufunc->uf_args, &fp->uf_args) == FAIL
 	    || ga_copy_strings(&ufunc->uf_def_args, &fp->uf_def_args)
 								    == FAIL
-	    || ga_copy_strings(&ufunc->uf_lines, &fp->uf_lines) == FAIL)
-	goto failed;
+	    || ga_copy_strings(&ufunc->uf_সারিগুলি, &fp->uf_সারিগুলি) == FAIL)
+	যাও failed;
 
-    if (ufunc->uf_arg_types != NULL)
+    যদি (ufunc->uf_arg_types != ফাঁকা)
     {
 	fp->uf_arg_types = ALLOC_MULT(type_T *, fp->uf_args.ga_len);
-	if (fp->uf_arg_types == NULL)
-	    goto failed;
+	যদি (fp->uf_arg_types == ফাঁকা)
+	    যাও failed;
 	mch_memmove(fp->uf_arg_types, ufunc->uf_arg_types,
-				    sizeof(type_T *) * fp->uf_args.ga_len);
+				    আকার(type_T *) * fp->uf_args.ga_len);
     }
-    if (ufunc->uf_va_name != NULL)
+    যদি (ufunc->uf_va_name != ফাঁকা)
     {
 	fp->uf_va_name = vim_strsave(ufunc->uf_va_name);
-	if (fp->uf_va_name == NULL)
-	    goto failed;
+	যদি (fp->uf_va_name == ফাঁকা)
+	    যাও failed;
     }
     fp->uf_ret_type = ufunc->uf_ret_type;
 
@@ -2885,48 +2885,48 @@ copy_lambda_to_global_func(
     // Create a partial to store the context of the function where it was
     // instantiated.  Only needs to be done once.  Do this on the original
     // function, "dfunc->df_ufunc" will point to it.
-    if ((ufunc->uf_flags & FC_CLOSURE) && ufunc->uf_partial == NULL)
+    যদি ((ufunc->uf_flags & FC_CLOSURE) && ufunc->uf_partial == ফাঁকা)
     {
 	partial_T   *pt = ALLOC_CLEAR_ONE(partial_T);
 
-	if (pt == NULL)
-	    goto failed;
-	if (fill_partial_and_closure(pt, ufunc, loopvarinfo, ectx) == FAIL)
+	যদি (pt == ফাঁকা)
+	    যাও failed;
+	যদি (fill_partial_and_closure(pt, ufunc, loopvarinfo, ectx) == FAIL)
 	{
 	    vim_free(pt);
-	    goto failed;
+	    যাও failed;
 	}
 	ufunc->uf_partial = pt;
     }
 
-    return OK;
+    ফেরত OK;
 
 failed:
     func_clear_free(fp, TRUE);
-    return FAIL;
+    ফেরত FAIL;
 }
 
-static int	funcdepth = 0;
+স্থির পূর্ণসংখ্যা	funcdepth = 0;
 
 /*
  * Increment the function call depth count.
  * Return FAIL when going over 'maxfuncdepth'.
  * Otherwise return OK, must call funcdepth_decrement() later!
  */
-    int
-funcdepth_increment(void)
+    পূর্ণসংখ্যা
+funcdepth_increment(শূন্য)
 {
-    if (funcdepth >= p_mfd)
+    যদি (funcdepth >= p_mfd)
     {
 	emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
-	return FAIL;
+	ফেরত FAIL;
     }
     ++funcdepth;
-    return OK;
+    ফেরত OK;
 }
 
-    void
-funcdepth_decrement(void)
+    শূন্য
+funcdepth_decrement(শূন্য)
 {
     --funcdepth;
 }
@@ -2934,10 +2934,10 @@ funcdepth_decrement(void)
 /*
  * Get the current function call depth.
  */
-    int
-funcdepth_get(void)
+    পূর্ণসংখ্যা
+funcdepth_get(শূন্য)
 {
-    return funcdepth;
+    ফেরত funcdepth;
 }
 
 /*
@@ -2945,8 +2945,8 @@ funcdepth_get(void)
  * guarantee funcdepth_decrement() can be called exactly the same number of
  * times as funcdepth_increment().
  */
-    void
-funcdepth_restore(int depth)
+    শূন্য
+funcdepth_restore(পূর্ণসংখ্যা depth)
 {
     funcdepth = depth;
 }
@@ -2962,22 +2962,22 @@ create_funccal(ufunc_T *fp, typval_T *rettv)
 {
     funccall_T *fc = ALLOC_CLEAR_ONE(funccall_T);
 
-    if (fc == NULL)
-	return NULL;
+    যদি (fc == ফাঁকা)
+	ফেরত ফাঁকা;
     fc->fc_caller = current_funccal;
     current_funccal = fc;
     fc->fc_func = fp;
     func_ptr_ref(fp);
     fc->fc_rettv = rettv;
-    return fc;
+    ফেরত fc;
 }
 
 /*
  * To be called when returning from a compiled function; restores
  * current_funccal.
  */
-    void
-remove_funccal(void)
+    শূন্য
+remove_funccal(শূন্য)
 {
     funccall_T *fc = current_funccal;
 
@@ -2988,10 +2988,10 @@ remove_funccal(void)
 /*
  * Call a user function.
  */
-    static funcerror_T
+    স্থির funcerror_T
 call_user_func(
     ufunc_T	*fp,		// pointer to function
-    int		argcount,	// nr of args
+    পূর্ণসংখ্যা		argcount,	// nr of args
     typval_T	*argvars,	// arguments
     typval_T	*rettv,		// return value
     funcexe_T	*funcexe,	// context
@@ -2999,22 +2999,22 @@ call_user_func(
 {
     sctx_T	save_current_sctx;
     ectx_T	*save_current_ectx;
-    int		using_sandbox = FALSE;
-    int		save_sticky_cmdmod_flags = sticky_cmdmod_flags;
+    পূর্ণসংখ্যা		using_sandbox = FALSE;
+    পূর্ণসংখ্যা		save_sticky_cmdmod_flags = sticky_cmdmod_flags;
     funccall_T	*fc;
-    int		save_did_emsg;
+    পূর্ণসংখ্যা		save_did_emsg;
     funcerror_T retval = FCERR_NONE;
-    int		default_arg_err = FALSE;
+    পূর্ণসংখ্যা		default_arg_err = FALSE;
     dictitem_T	*v;
-    int		fixvar_idx = 0;	// index in fc_fixvar[]
-    int		i;
-    int		ai;
-    int		islambda = FALSE;
+    পূর্ণসংখ্যা		fixvar_idx = 0;	// index in fc_fixvar[]
+    পূর্ণসংখ্যা		i;
+    পূর্ণসংখ্যা		ai;
+    পূর্ণসংখ্যা		islambda = FALSE;
     char_u	numbuf[NUMBUFLEN];
     char_u	*name;
     size_t	namelen;
     typval_T	*tv_to_free[MAX_FUNC_ARGS];
-    int		tv_to_free_len = 0;
+    পূর্ণসংখ্যা		tv_to_free_len = 0;
 #ifdef FEAT_PROFILE
     profinfo_T	profile_info;
 #endif
@@ -3025,55 +3025,55 @@ call_user_func(
 #endif
 
     // If depth of calling is getting too high, don't execute the function.
-    if (funcdepth_increment() == FAIL)
+    যদি (funcdepth_increment() == FAIL)
     {
-	rettv->v_type = VAR_NUMBER;
-	rettv->vval.v_number = -1;
-	return FCERR_FAILED;
+	rettv->v_type = VAR_সংখ্যা;
+	rettv->vval.v_সংখ্যা = -1;
+	ফেরত FCERR_FAILED;
     }
 
-    line_breakcheck();		// check for CTRL-C hit
+    সারি_breakcheck();		// check for CTRL-C hit
 
     fc = create_funccal(fp, rettv);
-    if (fc == NULL)
-	return FCERR_OTHER;
+    যদি (fc == ফাঁকা)
+	ফেরত FCERR_OTHER;
     fc->fc_level = ex_nesting_level;
     // Check if this function has a breakpoint.
     fc->fc_breakpoint = dbg_find_breakpoint(FALSE, fp->uf_name, (linenr_T)0);
     fc->fc_dbg_tick = debug_tick;
     // Set up fields for closure.
-    ga_init2(&fc->fc_ufuncs, sizeof(ufunc_T *), 1);
+    ga_init2(&fc->fc_ufuncs, আকার(ufunc_T *), 1);
 
-    if (fp->uf_def_status != UF_NOT_COMPILED)
+    যদি (fp->uf_def_status != UF_NOT_COMPILED)
     {
-	if (fp->uf_flags & FC_SANDBOX)
+	যদি (fp->uf_flags & FC_SANDBOX)
 	{
 	    using_sandbox = TRUE;
 	    ++sandbox;
 	}
 #ifdef FEAT_PROFILE
-	ufunc_T *caller = fc->fc_caller == NULL ? NULL : fc->fc_caller->fc_func;
+	ufunc_T *caller = fc->fc_caller == ফাঁকা ? ফাঁকা : fc->fc_caller->fc_func;
 #endif
 	// Execute the function, possibly compiling it first.
 #ifdef FEAT_PROFILE
-	if (do_profiling == PROF_YES)
+	যদি (do_profiling == PROF_YES)
 	    profile_may_start_func(&profile_info, fp, caller);
 #endif
 	sticky_cmdmod_flags = 0;
-	if (call_def_function(fp, argcount, argvars, 0,
+	যদি (call_def_function(fp, argcount, argvars, 0,
 		   funcexe->fe_partial, funcexe->fe_object, fc, rettv) == FAIL)
 	    retval = FCERR_FAILED;
-	if (using_sandbox)
+	যদি (using_sandbox)
 	    --sandbox;
 	funcdepth_decrement();
 #ifdef FEAT_PROFILE
-	if (do_profiling == PROF_YES && (fp->uf_profiling
-				  || (caller != NULL && caller->uf_profiling)))
+	যদি (do_profiling == PROF_YES && (fp->uf_profiling
+				  || (caller != ফাঁকা && caller->uf_profiling)))
 	    profile_may_end_func(&profile_info, fp, caller);
 #endif
 	remove_funccal();
 	sticky_cmdmod_flags = save_sticky_cmdmod_flags;
-	return retval;
+	ফেরত retval;
     }
 
     islambda = fp->uf_flags & FC_LAMBDA;
@@ -3087,12 +3087,12 @@ call_user_func(
      * Init l: variables.
      */
     init_var_dict(&fc->fc_l_vars, &fc->fc_l_vars_var, VAR_DEF_SCOPE);
-    if (selfdict != NULL)
+    যদি (selfdict != ফাঁকা)
     {
 	// Set l:self to "selfdict".  Use "name" to avoid a warning from
 	// some compiler that checks the destination size.
 	v = &fc->fc_fixvar[fixvar_idx++].var;
-	name = v->di_key;
+	name = v->di_চাবি;
 	STRCPY(name, "self");
 	v->di_flags = DI_FLAGS_RO | DI_FLAGS_FIX;
 	hash_add(&fc->fc_l_vars.dv_hashtab, DI2HIKEY(v), "set self dictionary");
@@ -3108,17 +3108,17 @@ call_user_func(
      * Set a:000 to a list with room for the "..." arguments.
      */
     init_var_dict(&fc->fc_l_avars, &fc->fc_l_avars_var, VAR_SCOPE);
-    if ((fp->uf_flags & FC_NOARGS) == 0)
+    যদি ((fp->uf_flags & FC_NOARGS) == 0)
 	add_nr_var(&fc->fc_l_avars, &fc->fc_fixvar[fixvar_idx++].var, "0",
 				(varnumber_T)(argcount >= fp->uf_args.ga_len
 				    ? argcount - fp->uf_args.ga_len : 0));
     fc->fc_l_avars.dv_lock = VAR_FIXED;
-    if ((fp->uf_flags & FC_NOARGS) == 0)
+    যদি ((fp->uf_flags & FC_NOARGS) == 0)
     {
 	// Use "name" to avoid a warning from some compiler that checks the
 	// destination size.
 	v = &fc->fc_fixvar[fixvar_idx++].var;
-	name = v->di_key;
+	name = v->di_চাবি;
 	STRCPY(name, "000");
 	v->di_flags = DI_FLAGS_RO | DI_FLAGS_FIX;
 	hash_add(&fc->fc_l_avars.dv_hashtab, DI2HIKEY(v), "function argument");
@@ -3136,70 +3136,70 @@ call_user_func(
      * Set a:N to the "..." arguments.
      * Skipped when no a: variables used (in lambda).
      */
-    if ((fp->uf_flags & FC_NOARGS) == 0)
+    যদি ((fp->uf_flags & FC_NOARGS) == 0)
     {
 	add_nr_var(&fc->fc_l_avars, &fc->fc_fixvar[fixvar_idx++].var,
 			      "firstline", (varnumber_T)funcexe->fe_firstline);
 	add_nr_var(&fc->fc_l_avars, &fc->fc_fixvar[fixvar_idx++].var,
 				"lastline", (varnumber_T)funcexe->fe_lastline);
     }
-    for (i = 0; i < argcount || i < fp->uf_args.ga_len; ++i)
+    জন্য (i = 0; i < argcount || i < fp->uf_args.ga_len; ++i)
     {
-	int	    addlocal = FALSE;
+	পূর্ণসংখ্যা	    addlocal = FALSE;
 	typval_T    def_rettv;
-	int	    isdefault = FALSE;
+	পূর্ণসংখ্যা	    isdefault = FALSE;
 
 	ai = i - fp->uf_args.ga_len;
-	if (ai < 0)
+	যদি (ai < 0)
 	{
 	    // named argument a:name
 	    name = FUNCARG(fp, i);
-	    if (islambda)
+	    যদি (islambda)
 		addlocal = TRUE;
 
 	    // evaluate named argument default expression
 	    isdefault = ai + fp->uf_def_args.ga_len >= 0
 		       && (i >= argcount || (argvars[i].v_type == VAR_SPECIAL
-				   && argvars[i].vval.v_number == VVAL_NONE));
-	    if (isdefault)
+				   && argvars[i].vval.v_সংখ্যা == VVAL_NONE));
+	    যদি (isdefault)
 	    {
-		char_u	    *default_expr = NULL;
+		char_u	    *default_রাশিমালা = ফাঁকা;
 
-		def_rettv.v_type = VAR_NUMBER;
-		def_rettv.vval.v_number = -1;
+		def_rettv.v_type = VAR_সংখ্যা;
+		def_rettv.vval.v_সংখ্যা = -1;
 
-		default_expr = ((char_u **)(fp->uf_def_args.ga_data))
+		default_রাশিমালা = ((char_u **)(fp->uf_def_args.ga_তথ্য))
 						 [ai + fp->uf_def_args.ga_len];
-		if (eval1(&default_expr, &def_rettv, &EVALARG_EVALUATE) == FAIL)
+		যদি (eval1(&default_রাশিমালা, &def_rettv, &EVALARG_EVALUATE) == FAIL)
 		{
 		    default_arg_err = 1;
-		    break;
+		    বিরতি;
 		}
 	    }
 
 	    namelen = STRLEN(name);
 	}
-	else
+	অন্যথা
 	{
-	    if ((fp->uf_flags & FC_NOARGS) != 0)
+	    যদি ((fp->uf_flags & FC_NOARGS) != 0)
 		// Bail out if no a: arguments used (in lambda).
-		break;
+		বিরতি;
 
 	    // "..." argument a:1, a:2, etc.
-	    namelen = vim_snprintf((char *)numbuf, sizeof(numbuf), "%d", ai + 1);
+	    namelen = vim_snprintf((অক্ষর *)numbuf, আকার(numbuf), "%d", ai + 1);
 	    name = numbuf;
 	}
-	if (fixvar_idx < FIXVAR_CNT && namelen <= VAR_SHORT_LEN)
+	যদি (fixvar_idx < FIXVAR_CNT && namelen <= VAR_SHORT_LEN)
 	{
 	    v = &fc->fc_fixvar[fixvar_idx++].var;
 	    v->di_flags = DI_FLAGS_RO | DI_FLAGS_FIX;
-	    STRCPY(v->di_key, name);
+	    STRCPY(v->di_চাবি, name);
 	}
-	else
+	অন্যথা
 	{
 	    v = dictitem_alloc(name);
-	    if (v == NULL)
-		break;
+	    যদি (v == ফাঁকা)
+		বিরতি;
 	    v->di_flags |= DI_FLAGS_RO | DI_FLAGS_FIX;
 	}
 
@@ -3208,21 +3208,21 @@ call_user_func(
 	v->di_tv = isdefault ? def_rettv : argvars[i];
 	v->di_tv.v_lock = VAR_FIXED;
 
-	if (isdefault)
+	যদি (isdefault)
 	    // Need to free this later, no matter where it's stored.
 	    tv_to_free[tv_to_free_len++] = &v->di_tv;
 
-	if (addlocal)
+	যদি (addlocal)
 	{
 	    // Named arguments should be accessed without the "a:" prefix in
 	    // lambda expressions.  Add to the l: dict.
 	    copy_tv(&v->di_tv, &v->di_tv);
 	    hash_add(&fc->fc_l_vars.dv_hashtab, DI2HIKEY(v), "local variable");
 	}
-	else
+	অন্যথা
 	    hash_add(&fc->fc_l_avars.dv_hashtab, DI2HIKEY(v), "add variable");
 
-	if (ai >= 0 && ai < MAX_FUNC_ARGS)
+	যদি (ai >= 0 && ai < MAX_FUNC_ARGS)
 	{
 	    listitem_T *li = &fc->fc_l_listitems[ai];
 
@@ -3235,63 +3235,63 @@ call_user_func(
     // Don't redraw while executing the function.
     ++RedrawingDisabled;
 
-    if (fp->uf_flags & FC_SANDBOX)
+    যদি (fp->uf_flags & FC_SANDBOX)
     {
 	using_sandbox = TRUE;
 	++sandbox;
     }
 
-    estack_push_ufunc(fp, 1);
+    estack_ঠেলো_ufunc(fp, 1);
     ESTACK_CHECK_SETUP;
-    if (p_verbose >= 12)
+    যদি (p_verbose >= 12)
     {
 	++no_wait_return;
 	verbose_enter_scroll();
 
 	smsg(_("calling %s"), SOURCING_NAME);
-	if (p_verbose >= 14)
+	যদি (p_verbose >= 14)
 	{
-	    char_u	buf[MSG_BUF_LEN];
+	    char_u	buf[বার্তা_BUF_LEN];
 	    char_u	numbuf2[NUMBUFLEN];
 	    char_u	*tofree;
 	    char_u	*s;
 
-	    msg_puts("(");
-	    for (i = 0; i < argcount; ++i)
+	    বার্তা_puts("(");
+	    জন্য (i = 0; i < argcount; ++i)
 	    {
-		if (i > 0)
-		    msg_puts(", ");
-		if (argvars[i].v_type == VAR_NUMBER)
-		    msg_outnum((long)argvars[i].vval.v_number);
-		else
+		যদি (i > 0)
+		    বার্তা_puts(", ");
+		যদি (argvars[i].v_type == VAR_সংখ্যা)
+		    বার্তা_outnum((long)argvars[i].vval.v_সংখ্যা);
+		অন্যথা
 		{
 		    // Do not want errors such as E724 here.
 		    ++emsg_off;
 		    s = tv2string(&argvars[i], &tofree, numbuf2, 0);
 		    --emsg_off;
-		    if (s != NULL)
+		    যদি (s != ফাঁকা)
 		    {
-			if (vim_strsize(s) > MSG_BUF_CLEN)
+			যদি (vim_strsize(s) > বার্তা_BUF_CLEN)
 			{
-			    trunc_string(s, buf, MSG_BUF_CLEN, MSG_BUF_LEN);
+			    trunc_string(s, buf, বার্তা_BUF_CLEN, বার্তা_BUF_LEN);
 			    s = buf;
 			}
-			msg_puts((char *)s);
+			বার্তা_puts((অক্ষর *)s);
 			vim_free(tofree);
 		    }
 		}
 	    }
-	    msg_puts(")");
+	    বার্তা_puts(")");
 	}
-	msg_puts("\n");   // don't overwrite this either
+	বার্তা_puts("\n");   // don't overwrite this either
 
 	verbose_leave_scroll();
 	--no_wait_return;
     }
 #ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
+    যদি (do_profiling == PROF_YES)
 	profile_may_start_func(&profile_info, fp,
-			fc->fc_caller == NULL ? NULL : fc->fc_caller->fc_func);
+			fc->fc_caller == ফাঁকা ? ফাঁকা : fc->fc_caller->fc_func);
 #endif
 
     // "legacy" does not apply to commands in the function
@@ -3307,69 +3307,69 @@ call_user_func(
     save_did_emsg = did_emsg;
     did_emsg = FALSE;
 
-    if (default_arg_err && (fp->uf_flags & FC_ABORT || trylevel > 0 ))
+    যদি (default_arg_err && (fp->uf_flags & FC_ABORT || trylevel > 0 ))
     {
 	did_emsg = TRUE;
 	retval = FCERR_FAILED;
     }
-    else if (islambda)
+    অন্যথা যদি (islambda)
     {
-	char_u *p = *(char_u **)fp->uf_lines.ga_data + 7;
+	char_u *p = *(char_u **)fp->uf_সারিগুলি.ga_তথ্য + 7;
 
 	// A Lambda always has the command "return {expr}".  It is much faster
 	// to evaluate {expr} directly.
 	++ex_nesting_level;
-	(void)eval1(&p, rettv, &EVALARG_EVALUATE);
+	(শূন্য)eval1(&p, rettv, &EVALARG_EVALUATE);
 	--ex_nesting_level;
     }
-    else
+    অন্যথা
 	// call do_cmdline() to execute the lines
-	do_cmdline(NULL, get_func_line, (void *)fc,
+	do_cmdline(ফাঁকা, get_func_সারি, (শূন্য *)fc,
 				     DOCMD_NOWAIT|DOCMD_VERBOSE|DOCMD_REPEAT);
 
     // Invoke functions added with ":defer".
     handle_defer_one(current_funccal);
 
-    if (RedrawingDisabled > 0)
+    যদি (RedrawingDisabled > 0)
 	--RedrawingDisabled;
 
     // when the function was aborted because of an error, return -1
-    if ((did_emsg && (fp->uf_flags & FC_ABORT)) || rettv->v_type == VAR_UNKNOWN)
+    যদি ((did_emsg && (fp->uf_flags & FC_ABORT)) || rettv->v_type == VAR_UNKNOWN)
     {
 	clear_tv(rettv);
-	rettv->v_type = VAR_NUMBER;
-	rettv->vval.v_number = -1;
+	rettv->v_type = VAR_সংখ্যা;
+	rettv->vval.v_সংখ্যা = -1;
 
 	// In corner cases returning a "failed" value is not backwards
 	// compatible.  Only do this for Vim9 script.
-	if (in_vim9script())
+	যদি (in_vim9script())
 	    retval = FCERR_FAILED;
     }
 
 #ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
+    যদি (do_profiling == PROF_YES)
     {
-	ufunc_T *caller = fc->fc_caller == NULL ? NULL : fc->fc_caller->fc_func;
+	ufunc_T *caller = fc->fc_caller == ফাঁকা ? ফাঁকা : fc->fc_caller->fc_func;
 
-	if (fp->uf_profiling || (caller != NULL && caller->uf_profiling))
+	যদি (fp->uf_profiling || (caller != ফাঁকা && caller->uf_profiling))
 	    profile_may_end_func(&profile_info, fp, caller);
     }
 #endif
 
     // when being verbose, mention the return value
-    if (p_verbose >= 12)
+    যদি (p_verbose >= 12)
     {
 	++no_wait_return;
 	verbose_enter_scroll();
 
-	if (aborting())
+	যদি (aborting())
 	    smsg(_("%s aborted"), SOURCING_NAME);
-	else if (fc->fc_rettv->v_type == VAR_NUMBER)
+	অন্যথা যদি (fc->fc_rettv->v_type == VAR_সংখ্যা)
 	    smsg(_("%s returning #%ld"), SOURCING_NAME,
-					    (long)fc->fc_rettv->vval.v_number);
-	else
+					    (long)fc->fc_rettv->vval.v_সংখ্যা);
+	অন্যথা
 	{
-	    char_u	buf[MSG_BUF_LEN];
+	    char_u	buf[বার্তা_BUF_LEN];
 	    char_u	numbuf2[NUMBUFLEN];
 	    char_u	*tofree;
 	    char_u	*s;
@@ -3380,43 +3380,43 @@ call_user_func(
 	    ++emsg_off;
 	    s = tv2string(fc->fc_rettv, &tofree, numbuf2, 0);
 	    --emsg_off;
-	    if (s != NULL)
+	    যদি (s != ফাঁকা)
 	    {
-		if (vim_strsize(s) > MSG_BUF_CLEN)
+		যদি (vim_strsize(s) > বার্তা_BUF_CLEN)
 		{
-		    trunc_string(s, buf, MSG_BUF_CLEN, MSG_BUF_LEN);
+		    trunc_string(s, buf, বার্তা_BUF_CLEN, বার্তা_BUF_LEN);
 		    s = buf;
 		}
 		smsg(_("%s returning %s"), SOURCING_NAME, s);
 		vim_free(tofree);
 	    }
 	}
-	msg_puts("\n");   // don't overwrite this either
+	বার্তা_puts("\n");   // don't overwrite this either
 
 	verbose_leave_scroll();
 	--no_wait_return;
     }
 
     ESTACK_CHECK_NOW;
-    estack_pop();
+    estack_বের_করো();
     current_sctx = save_current_sctx;
     restore_current_ectx(save_current_ectx);
 
 #ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
+    যদি (do_profiling == PROF_YES)
 	script_prof_restore(&profile_info.pi_wait_start);
 #endif
-    if (using_sandbox)
+    যদি (using_sandbox)
 	--sandbox;
     sticky_cmdmod_flags = save_sticky_cmdmod_flags;
 
-    if (p_verbose >= 12 && SOURCING_NAME != NULL)
+    যদি (p_verbose >= 12 && SOURCING_NAME != ফাঁকা)
     {
 	++no_wait_return;
 	verbose_enter_scroll();
 
 	smsg(_("continuing in %s"), SOURCING_NAME);
-	msg_puts("\n");   // don't overwrite this either
+	বার্তা_puts("\n");   // don't overwrite this either
 
 	verbose_leave_scroll();
 	--no_wait_return;
@@ -3424,11 +3424,11 @@ call_user_func(
 
     did_emsg |= save_did_emsg;
     funcdepth_decrement();
-    for (i = 0; i < tv_to_free_len; ++i)
+    জন্য (i = 0; i < tv_to_free_len; ++i)
 	clear_tv(tv_to_free[i]);
     cleanup_function_call(fc);
 
-    return retval;
+    ফেরত retval;
 }
 
 /*
@@ -3436,15 +3436,15 @@ call_user_func(
  * Return FCERR_UNKNOWN if OK, FCERR_TOOFEW or FCERR_TOOMANY otherwise.
  */
     funcerror_T
-check_user_func_argcount(ufunc_T *fp, int argcount)
+check_user_func_argcount(ufunc_T *fp, পূর্ণসংখ্যা argcount)
 {
-    int regular_args = fp->uf_args.ga_len;
+    পূর্ণসংখ্যা regular_args = fp->uf_args.ga_len;
 
-    if (argcount < regular_args - fp->uf_def_args.ga_len)
-	return FCERR_TOOFEW;
-    else if (!has_varargs(fp) && argcount > regular_args)
-	return FCERR_TOOMANY;
-    return FCERR_UNKNOWN;
+    যদি (argcount < regular_args - fp->uf_def_args.ga_len)
+	ফেরত FCERR_TOOFEW;
+    অন্যথা যদি (!has_varargs(fp) && argcount > regular_args)
+	ফেরত FCERR_TOOMANY;
+    ফেরত FCERR_UNKNOWN;
 }
 
 /*
@@ -3453,7 +3453,7 @@ check_user_func_argcount(ufunc_T *fp, int argcount)
     funcerror_T
 call_user_func_check(
 	ufunc_T	    *fp,
-	int	    argcount,
+	পূর্ণসংখ্যা	    argcount,
 	typval_T    *argvars,
 	typval_T    *rettv,
 	funcexe_T   *funcexe,
@@ -3462,27 +3462,27 @@ call_user_func_check(
     funcerror_T error = FCERR_NONE;
 
 #ifdef FEAT_LUA
-    if (fp->uf_flags & FC_CFUNC)
+    যদি (fp->uf_flags & FC_CFUNC)
     {
 	cfunc_T cb = fp->uf_cb;
 
-	return (*cb)(argcount, argvars, rettv, fp->uf_cb_state);
+	ফেরত (*cb)(argcount, argvars, rettv, fp->uf_cb_state);
     }
 #endif
 
-    if (fp->uf_flags & FC_RANGE && funcexe->fe_doesrange != NULL)
+    যদি (fp->uf_flags & FC_RANGE && funcexe->fe_doesrange != ফাঁকা)
 	*funcexe->fe_doesrange = TRUE;
     error = check_user_func_argcount(fp, argcount);
-    if (error != FCERR_UNKNOWN)
-	return error;
+    যদি (error != FCERR_UNKNOWN)
+	ফেরত error;
 
-    if ((fp->uf_flags & FC_DICT) && selfdict == NULL)
+    যদি ((fp->uf_flags & FC_DICT) && selfdict == ফাঁকা)
     {
 	error = FCERR_DICT;
     }
-    else
+    অন্যথা
     {
-	int		did_save_redo = FALSE;
+	পূর্ণসংখ্যা		did_save_redo = FALSE;
 	save_redo_T	save_redo;
 
 	/*
@@ -3490,57 +3490,57 @@ call_user_func_check(
 	 * Save and restore search patterns, script variables and
 	 * redo buffer.
 	 */
-	save_search_patterns();
-	if (!ins_compl_active())
+	save_অনুসন্ধান_patterns();
+	যদি (!ins_compl_active())
 	{
 	    saveRedobuff(&save_redo);
 	    did_save_redo = TRUE;
 	}
 	++fp->uf_calls;
 	error = call_user_func(fp, argcount, argvars, rettv, funcexe,
-				   (fp->uf_flags & FC_DICT) ? selfdict : NULL);
-	if (--fp->uf_calls <= 0 && fp->uf_refcount <= 0)
+				   (fp->uf_flags & FC_DICT) ? selfdict : ফাঁকা);
+	যদি (--fp->uf_calls <= 0 && fp->uf_refcount <= 0)
 	    // Function was unreferenced while being used, free it now.
 	    func_clear_free(fp, FALSE);
-	if (did_save_redo)
+	যদি (did_save_redo)
 	    restoreRedobuff(&save_redo);
-	restore_search_patterns();
+	restore_অনুসন্ধান_patterns();
     }
 
-    return error;
+    ফেরত error;
 }
 
-static funccal_entry_T *funccal_stack = NULL;
+স্থির funccal_entry_T *funccal_স্তূপ = ফাঁকা;
 
 /*
  * Save the current function call pointer, and set it to NULL.
  * Used when executing autocommands and for ":source".
  */
-    void
+    শূন্য
 save_funccal(funccal_entry_T *entry)
 {
-    entry->top_funccal = current_funccal;
-    entry->next = funccal_stack;
-    funccal_stack = entry;
-    current_funccal = NULL;
+    entry->শীর্ষ_funccal = current_funccal;
+    entry->পরবর্তী = funccal_স্তূপ;
+    funccal_স্তূপ = entry;
+    current_funccal = ফাঁকা;
 }
 
-    void
-restore_funccal(void)
+    শূন্য
+restore_funccal(শূন্য)
 {
-    if (funccal_stack == NULL)
+    যদি (funccal_স্তূপ == ফাঁকা)
 	internal_error("restore_funccal()");
-    else
+    অন্যথা
     {
-	current_funccal = funccal_stack->top_funccal;
-	funccal_stack = funccal_stack->next;
+	current_funccal = funccal_স্তূপ->শীর্ষ_funccal;
+	funccal_স্তূপ = funccal_স্তূপ->পরবর্তী;
     }
 }
 
     funccall_T *
-get_current_funccal(void)
+get_current_funccal(শূন্য)
 {
-    return current_funccal;
+    ফেরত current_funccal;
 }
 
 /*
@@ -3549,17 +3549,17 @@ get_current_funccal(void)
  * - not executing an autocommand
  * Note that when an autocommand sources a script the result is FALSE;
  */
-    int
-at_script_level(void)
+    পূর্ণসংখ্যা
+at_script_level(শূন্য)
 {
-    return current_funccal == NULL && autocmd_match == NULL;
+    ফেরত current_funccal == ফাঁকা && autocmd_match == ফাঁকা;
 }
 
 /*
  * Mark all functions of script "sid" as deleted.
  */
-    void
-delete_script_functions(int sid)
+    শূন্য
+delete_script_functions(পূর্ণসংখ্যা sid)
 {
     hashitem_T	*hi;
     ufunc_T	*fp;
@@ -3569,37 +3569,37 @@ delete_script_functions(int sid)
 
     buf[0] = K_SPECIAL;
     buf[1] = KS_EXTRA;
-    buf[2] = (int)KE_SNR;
-    len = 3 + vim_snprintf((char *)buf + 3, sizeof(buf) - 3, "%d_", sid);
+    buf[2] = (পূর্ণসংখ্যা)KE_SNR;
+    len = 3 + vim_snprintf((অক্ষর *)buf + 3, আকার(buf) - 3, "%d_", sid);
 
-    while (todo > 0)
+    যখন (todo > 0)
     {
 	todo = func_hashtab.ht_used;
-	FOR_ALL_HASHTAB_ITEMS(&func_hashtab, hi, todo)
-	    if (!HASHITEM_EMPTY(hi))
+	FOR_ALL_HASHTAB_বস্তুসমূহ(&func_hashtab, hi, todo)
+	    যদি (!HASHITEM_EMPTY(hi))
 	    {
 		fp = HI2UF(hi);
-		if (STRNCMP(fp->uf_name, buf, len) == 0)
+		যদি (STRNCMP(fp->uf_name, buf, len) == 0)
 		{
-		    int changed = func_hashtab.ht_changed;
+		    পূর্ণসংখ্যা changed = func_hashtab.ht_changed;
 
 		    fp->uf_flags |= FC_DEAD;
 
-		    if (fp->uf_calls > 0)
+		    যদি (fp->uf_calls > 0)
 		    {
 			// Function is executing, don't free it but do remove
 			// it from the hashtable.
-			if (func_remove(fp))
+			যদি (func_remove(fp))
 			    fp->uf_refcount--;
 		    }
-		    else
+		    অন্যথা
 		    {
 			func_clear(fp, TRUE);
 			// When clearing a function another function can be
 			// cleared as a side effect.  When that happens start
 			// over.
-			if (changed != func_hashtab.ht_changed)
-			    break;
+			যদি (changed != func_hashtab.ht_changed)
+			    বিরতি;
 		    }
 		}
 		--todo;
@@ -3607,33 +3607,33 @@ delete_script_functions(int sid)
     }
 }
 
-#if defined(EXITFREE)
-    void
-free_all_functions(void)
+#যদি defined(EXITFREE)
+    শূন্য
+free_all_functions(শূন্য)
 {
     hashitem_T	*hi;
     ufunc_T	*fp;
     long_u	skipped = 0;
     long_u	todo = 1;
-    int		changed;
+    পূর্ণসংখ্যা		changed;
 
     // Clean up the current_funccal chain and the funccal stack.
-    while (current_funccal != NULL)
+    যখন (current_funccal != ফাঁকা)
     {
 	clear_tv(current_funccal->fc_rettv);
 	cleanup_function_call(current_funccal);
-	if (current_funccal == NULL && funccal_stack != NULL)
+	যদি (current_funccal == ফাঁকা && funccal_স্তূপ != ফাঁকা)
 	    restore_funccal();
     }
 
     // First clear what the functions contain.  Since this may lower the
     // reference count of a function, it may also free a function and change
     // the hash table. Restart if that happens.
-    while (todo > 0)
+    যখন (todo > 0)
     {
 	todo = func_hashtab.ht_used;
-	FOR_ALL_HASHTAB_ITEMS(&func_hashtab, hi, todo)
-	    if (!HASHITEM_EMPTY(hi))
+	FOR_ALL_HASHTAB_বস্তুসমূহ(&func_hashtab, hi, todo)
+	    যদি (!HASHITEM_EMPTY(hi))
 	    {
 		// clear the def function index now
 		fp = HI2UF(hi);
@@ -3642,16 +3642,16 @@ free_all_functions(void)
 
 		// Only free functions that are not refcounted, those are
 		// supposed to be freed when no longer referenced.
-		if (func_name_refcount(fp->uf_name))
+		যদি (func_name_refcount(fp->uf_name))
 		    ++skipped;
-		else
+		অন্যথা
 		{
 		    changed = func_hashtab.ht_changed;
 		    func_clear(fp, TRUE);
-		    if (changed != func_hashtab.ht_changed)
+		    যদি (changed != func_hashtab.ht_changed)
 		    {
 			skipped = 0;
-			break;
+			বিরতি;
 		    }
 		}
 		--todo;
@@ -3661,31 +3661,31 @@ free_all_functions(void)
     // Now actually free the functions.  Need to start all over every time,
     // because func_free() may change the hash table.
     skipped = 0;
-    while (func_hashtab.ht_used > skipped)
+    যখন (func_hashtab.ht_used > skipped)
     {
 	todo = func_hashtab.ht_used;
-	FOR_ALL_HASHTAB_ITEMS(&func_hashtab, hi, todo)
-	    if (!HASHITEM_EMPTY(hi))
+	FOR_ALL_HASHTAB_বস্তুসমূহ(&func_hashtab, hi, todo)
+	    যদি (!HASHITEM_EMPTY(hi))
 	    {
 		--todo;
 		// Only free functions that are not refcounted, those are
 		// supposed to be freed when no longer referenced.
 		fp = HI2UF(hi);
-		if (func_name_refcount(fp->uf_name))
+		যদি (func_name_refcount(fp->uf_name))
 		    ++skipped;
-		else
+		অন্যথা
 		{
-		    if (func_free(fp, FALSE) == OK)
+		    যদি (func_free(fp, FALSE) == OK)
 		    {
 			skipped = 0;
-			break;
+			বিরতি;
 		    }
 		    // did not actually free it
 		    ++skipped;
 		}
 	    }
     }
-    if (skipped == 0)
+    যদি (skipped == 0)
 	hash_clear(&func_hashtab);
 
     free_def_functions();
@@ -3698,29 +3698,29 @@ free_all_functions(void)
  * name.
  * "len" is the length of "name", or -1 for NUL terminated.
  */
-    int
-builtin_function(char_u *name, int len)
+    পূর্ণসংখ্যা
+builtin_function(char_u *name, পূর্ণসংখ্যা len)
 {
-    int i;
+    পূর্ণসংখ্যা i;
 
-    if (!ASCII_ISLOWER(name[0]) || name[1] == ':')
-	return FALSE;
-    for (i = 0; name[i] != NUL && (len < 0 || i < len); ++i)
+    যদি (!ASCII_ISLOWER(name[0]) || name[1] == ':')
+	ফেরত FALSE;
+    জন্য (i = 0; name[i] != NUL && (len < 0 || i < len); ++i)
     {
-	if (name[i] == AUTOLOAD_CHAR)
-	    return FALSE;
-	if (!eval_isnamec(name[i]))
+	যদি (name[i] == AUTOLOAD_CHAR)
+	    ফেরত FALSE;
+	যদি (!eval_isnamec(name[i]))
 	{
 	    // "name.something" is not a builtin function
-	    if (name[i] == '.')
-		return FALSE;
-	    break;
+	    যদি (name[i] == '.')
+		ফেরত FALSE;
+	    বিরতি;
 	}
     }
-    return TRUE;
+    ফেরত TRUE;
 }
 
-    int
+    পূর্ণসংখ্যা
 func_call(
     char_u	*name,
     typval_T	*args,
@@ -3731,35 +3731,35 @@ func_call(
     list_T	*l = args->vval.v_list;
     listitem_T	*item;
     typval_T	argv[MAX_FUNC_ARGS + 1];
-    int		argc = 0;
-    int		r = 0;
+    পূর্ণসংখ্যা		argc = 0;
+    পূর্ণসংখ্যা		r = 0;
 
     CHECK_LIST_MATERIALIZE(l);
-    FOR_ALL_LIST_ITEMS(l, item)
+    FOR_ALL_LIST_বস্তুসমূহ(l, item)
     {
-	if (argc == MAX_FUNC_ARGS - (partial == NULL ? 0 : partial->pt_argc))
+	যদি (argc == MAX_FUNC_ARGS - (partial == ফাঁকা ? 0 : partial->pt_argc))
 	{
 	    emsg(_(e_too_many_arguments));
-	    break;
+	    বিরতি;
 	}
 	// Make a copy of each argument.  This is needed to be able to set
 	// v_lock to VAR_FIXED in the copy without changing the original list.
 	copy_tv(&item->li_tv, &argv[argc++]);
     }
 
-    if (item == NULL)
+    যদি (item == ফাঁকা)
     {
 	funcexe_T	funcexe;
-	int		namelen = -1;
+	পূর্ণসংখ্যা		namelen = -1;
 
-	if (in_vim9script())
+	যদি (in_vim9script())
 	{
 	    char_u *p = generic_func_find_open_bracket(name);
 
-	    if (p != NULL)
+	    যদি (p != ফাঁকা)
 	    {
-		if (skip_generic_func_type_args(&p) == FAIL)
-		    goto done;
+		যদি (skip_generic_func_type_args(&p) == FAIL)
+		    যাও done;
 		namelen = p - name + 1;
 	    }
 	}
@@ -3769,10 +3769,10 @@ func_call(
 	funcexe.fe_lastline = curwin->w_cursor.lnum;
 	funcexe.fe_evaluate = TRUE;
 	funcexe.fe_partial = partial;
-	if (partial != NULL)
+	যদি (partial != ফাঁকা)
 	{
 	    funcexe.fe_object = partial->pt_obj;
-	    if (funcexe.fe_object != NULL)
+	    যদি (funcexe.fe_object != ফাঁকা)
 		++funcexe.fe_object->obj_refcount;
 	}
 	funcexe.fe_selfdict = selfdict;
@@ -3780,53 +3780,53 @@ func_call(
     }
 
     // Free the arguments.
-    while (argc > 0)
+    যখন (argc > 0)
 	clear_tv(&argv[--argc]);
 
 done:
-    return r;
+    ফেরত r;
 }
 
-static int callback_depth = 0;
+স্থির পূর্ণসংখ্যা callback_depth = 0;
 
-    int
-get_callback_depth(void)
+    পূর্ণসংখ্যা
+get_callback_depth(শূন্য)
 {
-    return callback_depth;
+    ফেরত callback_depth;
 }
 
 /*
  * Invoke call_func() with a callback.
  * Returns FAIL if the callback could not be called.
  */
-    int
+    পূর্ণসংখ্যা
 call_callback(
     callback_T	*callback,
-    int		len,		// length of "name" or -1 to use strlen()
+    পূর্ণসংখ্যা		len,		// length of "name" or -1 to use strlen()
     typval_T	*rettv,		// return value goes here
-    int		argcount,	// number of "argvars"
+    পূর্ণসংখ্যা		argcount,	// number of "argvars"
     typval_T	*argvars)	// vars for arguments, must have "argcount"
 				// PLUS ONE elements!
 {
     funcexe_T	funcexe;
-    int		ret;
+    পূর্ণসংখ্যা		ret;
 
-    if (callback->cb_name == NULL || *callback->cb_name == NUL)
-	return FAIL;
+    যদি (callback->cb_name == ফাঁকা || *callback->cb_name == NUL)
+	ফেরত FAIL;
 
-    if (callback_depth > p_mfd)
+    যদি (callback_depth > p_mfd)
     {
 	emsg(_(e_command_too_recursive));
-	return FAIL;
+	ফেরত FAIL;
     }
 
     CLEAR_FIELD(funcexe);
     funcexe.fe_evaluate = TRUE;
     funcexe.fe_partial = callback->cb_partial;
-    if (callback->cb_partial != NULL)
+    যদি (callback->cb_partial != ফাঁকা)
     {
 	funcexe.fe_object = callback->cb_partial->pt_obj;
-	if (funcexe.fe_object != NULL)
+	যদি (funcexe.fe_object != ফাঁকা)
 	    ++funcexe.fe_object->obj_refcount;
     }
     ++callback_depth;
@@ -3836,13 +3836,13 @@ call_callback(
 
     // When a :def function was called that uses :try an error would be turned
     // into an exception.  Need to give the error here.
-    if (need_rethrow && current_exception != NULL && trylevel == 0)
+    যদি (need_rethrow && current_exception != ফাঁকা && trylevel == 0)
     {
 	need_rethrow = FALSE;
 	handle_did_throw();
     }
 
-    return ret;
+    ফেরত ret;
 }
 
 /*
@@ -3853,61 +3853,61 @@ call_callback(
     varnumber_T
 call_callback_retnr(
     callback_T	*callback,
-    int		argcount,	// number of "argvars"
+    পূর্ণসংখ্যা		argcount,	// number of "argvars"
     typval_T	*argvars)	// vars for arguments, must have "argcount"
 				// PLUS ONE elements!
 {
     typval_T	rettv;
     varnumber_T	retval;
 
-    if (call_callback(callback, -1, &rettv, argcount, argvars) == FAIL)
-	return -2;
+    যদি (call_callback(callback, -1, &rettv, argcount, argvars) == FAIL)
+	ফেরত -2;
 
-    retval = tv_get_number_chk(&rettv, NULL);
+    retval = tv_get_সংখ্যা_chk(&rettv, ফাঁকা);
     clear_tv(&rettv);
-    return retval;
+    ফেরত retval;
 }
 
 /*
  * Give an error message for the result of a function.
  * Nothing if "error" is FCERR_NONE.
  */
-    void
-user_func_error(funcerror_T error, char_u *name, int found_var)
+    শূন্য
+user_func_error(funcerror_T error, char_u *name, পূর্ণসংখ্যা found_var)
 {
-    switch (error)
+    নির্বাচন (error)
     {
-	case FCERR_UNKNOWN:
-		if (found_var)
+	ক্ষেত্র FCERR_UNKNOWN:
+		যদি (found_var)
 		    emsg_funcname(e_not_callable_type_str, name);
-		else
+		অন্যথা
 		    emsg_funcname(e_unknown_function_str, name);
-		break;
-	case FCERR_NOTMETHOD:
+		বিরতি;
+	ক্ষেত্র FCERR_NOTMETHOD:
 		emsg_funcname(e_cannot_use_function_as_method_str, name);
-		break;
-	case FCERR_DELETED:
+		বিরতি;
+	ক্ষেত্র FCERR_DELETED:
 		emsg_funcname(e_function_was_deleted_str, name);
-		break;
-	case FCERR_TOOMANY:
+		বিরতি;
+	ক্ষেত্র FCERR_TOOMANY:
 		emsg_funcname(e_too_many_arguments_for_function_str, name);
-		break;
-	case FCERR_TOOFEW:
+		বিরতি;
+	ক্ষেত্র FCERR_TOOFEW:
 		emsg_funcname(e_not_enough_arguments_for_function_str, name);
-		break;
-	case FCERR_SCRIPT:
+		বিরতি;
+	ক্ষেত্র FCERR_SCRIPT:
 		emsg_funcname(e_using_sid_not_in_script_context_str, name);
-		break;
-	case FCERR_DICT:
+		বিরতি;
+	ক্ষেত্র FCERR_DICT:
 		emsg_funcname(e_calling_dict_function_without_dictionary_str,
 									 name);
-		break;
-	case FCERR_OTHER:
-	case FCERR_FAILED:
+		বিরতি;
+	ক্ষেত্র FCERR_OTHER:
+	ক্ষেত্র FCERR_FAILED:
 		// assume the error message was already given
-		break;
-	case FCERR_NONE:
-		break;
+		বিরতি;
+	ক্ষেত্র FCERR_NONE:
+		বিরতি;
     }
 }
 
@@ -3919,24 +3919,24 @@ user_func_error(funcerror_T error, char_u *name, int found_var)
  * "funcexe->fe_evaluate" is FALSE;
  * Returns an FCERR_ value.
  */
-    static funcerror_T
+    স্থির funcerror_T
 may_check_argument_types(
 	funcexe_T   *funcexe,
 	typval_T    *argvars,
-	int	    argcount,
-	int	    base_included,
+	পূর্ণসংখ্যা	    argcount,
+	পূর্ণসংখ্যা	    base_included,
 	char_u	    *name)
 {
-    if (funcexe->fe_check_type != NULL && funcexe->fe_evaluate)
+    যদি (funcexe->fe_check_type != ফাঁকা && funcexe->fe_evaluate)
     {
 	// Check that the argument types are OK for the types of the funcref.
-	if (check_argument_types(funcexe->fe_check_type,
+	যদি (check_argument_types(funcexe->fe_check_type,
 			  argvars, argcount,
-			  base_included ? NULL : funcexe->fe_basetv,
+			  base_included ? ফাঁকা : funcexe->fe_basetv,
 			  name) == FAIL)
-	    return FCERR_OTHER;
+	    ফেরত FCERR_OTHER;
     }
-    return FCERR_NONE;
+    ফেরত FCERR_NONE;
 }
 
 /*
@@ -3945,31 +3945,31 @@ may_check_argument_types(
  * Return FAIL when the function can't be called,  OK otherwise.
  * Also returns OK when an error was encountered while executing the function.
  */
-    int
+    পূর্ণসংখ্যা
 call_func(
     char_u	*funcname,	// name of the function
-    int		len,		// length of "name" or -1 to use strlen()
+    পূর্ণসংখ্যা		len,		// length of "name" or -1 to use strlen()
     typval_T	*rettv,		// return value goes here
-    int		argcount_in,	// number of "argvars"
+    পূর্ণসংখ্যা		argcount_in,	// number of "argvars"
     typval_T	*argvars_in,	// vars for arguments, must have "argcount"
 				// PLUS ONE elements!
     funcexe_T	*funcexe)	// more arguments
 {
-    int		ret = FAIL;
+    পূর্ণসংখ্যা		ret = FAIL;
     funcerror_T	error = FCERR_NONE;
-    int		i;
-    ufunc_T	*fp = NULL;
+    পূর্ণসংখ্যা		i;
+    ufunc_T	*fp = ফাঁকা;
     char_u	fname_buf[FLEN_FIXED + 1];
-    char_u	*tofree = NULL;
-    char_u	*fname = NULL;
-    char_u	*name = NULL;
-    int		argcount = argcount_in;
+    char_u	*tofree = ফাঁকা;
+    char_u	*fname = ফাঁকা;
+    char_u	*name = ফাঁকা;
+    পূর্ণসংখ্যা		argcount = argcount_in;
     typval_T	*argvars = argvars_in;
     dict_T	*selfdict = funcexe->fe_selfdict;
     typval_T	argv[MAX_FUNC_ARGS + 1]; // used when "partial" or
 					 // "funcexe->fe_basetv" is not NULL
-    int		argv_clear = 0;
-    int		argv_base = 0;
+    পূর্ণসংখ্যা		argv_clear = 0;
+    পূর্ণসংখ্যা		argv_base = 0;
     partial_T	*partial = funcexe->fe_partial;
     type_T	check_type;
     type_T	*check_type_args[MAX_FUNC_ARGS];
@@ -3981,62 +3981,62 @@ call_func(
 
     generic_func_args_table_init(&gfatab);
 
-    if (partial != NULL)
+    যদি (partial != ফাঁকা)
 	fp = partial->pt_func;
-    if (fp == NULL)
+    যদি (fp == ফাঁকা)
 	fp = funcexe->fe_ufunc;
 
-    if (fp == NULL)
+    যদি (fp == ফাঁকা)
     {
-	if (in_vim9script())
+	যদি (in_vim9script())
 	{
 	    char_u *p = generic_func_find_open_bracket(funcname);
 
-	    if (p != NULL)
+	    যদি (p != ফাঁকা)
 	    {
 		len = p - funcname;
-		if (parse_generic_func_type_args(funcname, len, p, &gfatab,
-						funcexe->fe_cctx) == NULL)
-		    goto theend;
+		যদি (parse_generic_func_type_args(funcname, len, p, &gfatab,
+						funcexe->fe_cctx) == ফাঁকা)
+		    যাও theend;
 	    }
 	}
 
 	// Make a copy of the name, if it comes from a funcref variable it
 	// could be changed or deleted in the called function.
 	name = len > 0 ? vim_strnsave(funcname, len) : vim_strsave(funcname);
-	if (name == NULL)
-	    goto theend;
+	যদি (name == ফাঁকা)
+	    যাও theend;
 
 	fname = fname_trans_sid(name, fname_buf, &tofree, &error);
     }
 
-    if (funcexe->fe_doesrange != NULL)
+    যদি (funcexe->fe_doesrange != ফাঁকা)
 	*funcexe->fe_doesrange = FALSE;
 
-    if (partial != NULL)
+    যদি (partial != ফাঁকা)
     {
 	// When the function has a partial with a dict and there is a dict
 	// argument, use the dict argument.  That is backwards compatible.
 	// When the dict was bound explicitly use the one from the partial.
-	if (partial->pt_dict != NULL && (selfdict == NULL || !partial->pt_auto))
+	যদি (partial->pt_dict != ফাঁকা && (selfdict == ফাঁকা || !partial->pt_auto))
 	    selfdict = partial->pt_dict;
-	if (error == FCERR_NONE && partial->pt_argc > 0)
+	যদি (error == FCERR_NONE && partial->pt_argc > 0)
 	{
-	    for (argv_clear = 0; argv_clear < partial->pt_argc; ++argv_clear)
+	    জন্য (argv_clear = 0; argv_clear < partial->pt_argc; ++argv_clear)
 	    {
-		if (argv_clear + argcount_in >= MAX_FUNC_ARGS)
+		যদি (argv_clear + argcount_in >= MAX_FUNC_ARGS)
 		{
 		    error = FCERR_TOOMANY;
-		    goto theend;
+		    যাও theend;
 		}
 		copy_tv(&partial->pt_argv[argv_clear], &argv[argv_clear]);
 	    }
-	    for (i = 0; i < argcount_in; ++i)
+	    জন্য (i = 0; i < argcount_in; ++i)
 		argv[i + argv_clear] = argvars_in[i];
 	    argvars = argv;
 	    argcount = partial->pt_argc + argcount_in;
 
-	    if (funcexe->fe_check_type != NULL
+	    যদি (funcexe->fe_check_type != ফাঁকা
 				  && funcexe->fe_check_type->tt_argcount != -1)
 	    {
 		// Now funcexe->fe_check_type is missing the added arguments,
@@ -4045,7 +4045,7 @@ call_func(
 		funcexe->fe_check_type = &check_type;
 		check_type.tt_args = check_type_args;
 		CLEAR_FIELD(check_type_args);
-		for (i = 0; i < check_type.tt_argcount; ++i)
+		জন্য (i = 0; i < check_type.tt_argcount; ++i)
 		    check_type_args[i + partial->pt_argc] =
 							 check_type.tt_args[i];
 		check_type.tt_argcount += partial->pt_argc;
@@ -4054,97 +4054,97 @@ call_func(
 	}
     }
 
-    if (error == FCERR_NONE)
+    যদি (error == FCERR_NONE)
 	// check the argument types if possible
 	error = may_check_argument_types(funcexe, argvars, argcount, FALSE,
-					     (name != NULL) ? name : funcname);
+					     (name != ফাঁকা) ? name : funcname);
 
-    if (error == FCERR_NONE && funcexe->fe_evaluate)
+    যদি (error == FCERR_NONE && funcexe->fe_evaluate)
     {
 	char_u *rfname = fname;
-	int	is_global = FALSE;
+	পূর্ণসংখ্যা	is_global = FALSE;
 
 	// Skip "g:" before a function name.
-	if (fp == NULL && fname[0] == 'g' && fname[1] == ':')
+	যদি (fp == ফাঁকা && fname[0] == 'g' && fname[1] == ':')
 	{
 	    is_global = TRUE;
 	    rfname = fname + 2;
 	}
 
-	rettv->v_type = VAR_NUMBER;	// default rettv is number zero
-	rettv->vval.v_number = 0;
+	rettv->v_type = VAR_সংখ্যা;	// default rettv is number zero
+	rettv->vval.v_সংখ্যা = 0;
 	error = FCERR_UNKNOWN;
 
-	if (fp != NULL || !builtin_function(rfname, -1))
+	যদি (fp != ফাঁকা || !builtin_function(rfname, -1))
 	{
 	    /*
 	     * User defined function.
 	     */
-	    if (fp == NULL)
+	    যদি (fp == ফাঁকা)
 	    {
 		fp = find_func(rfname, is_global);
-		if (fp != NULL && !is_global && in_vim9script()
+		যদি (fp != ফাঁকা && !is_global && in_vim9script()
 						 && func_requires_g_prefix(fp))
 		    // In Vim9 script g: is required to find a global
 		    // non-autoload function.
-		    fp = NULL;
+		    fp = ফাঁকা;
 	    }
 
 	    // Trigger FuncUndefined event, may load the function.
-	    if (fp == NULL
+	    যদি (fp == ফাঁকা
 		    && apply_autocmds(EVENT_FUNCUNDEFINED,
-						    rfname, rfname, TRUE, NULL)
+						    rfname, rfname, TRUE, ফাঁকা)
 		    && !aborting())
 	    {
 		// executed an autocommand, search for the function again
 		fp = find_func(rfname, is_global);
 	    }
 	    // Try loading a package.
-	    if (fp == NULL && script_autoload(rfname, TRUE) && !aborting())
+	    যদি (fp == ফাঁকা && script_autoload(rfname, TRUE) && !aborting())
 	    {
 		// loaded a package, search for the function again
 		fp = find_func(rfname, is_global);
 	    }
-	    if (fp == NULL)
+	    যদি (fp == ফাঁকা)
 	    {
 		char_u *p = untrans_function_name(rfname);
 
 		// If using Vim9 script try not local to the script.
 		// Don't do this if the name starts with "s:".
-		if (p != NULL && (funcname[0] != 's' || funcname[1] != ':'))
+		যদি (p != ফাঁকা && (funcname[0] != 's' || funcname[1] != ':'))
 		    fp = find_func(p, is_global);
 	    }
 
-	    if (partial == NULL && fp != NULL && IS_GENERIC_FUNC(fp))
+	    যদি (partial == ফাঁকা && fp != ফাঁকা && IS_GENERIC_FUNC(fp))
 	    {
 		// generic function call
 		fp = generic_func_get(fp, &gfatab);
-		if (fp == NULL)
+		যদি (fp == ফাঁকা)
 		{
 		    error = FCERR_FAILED;
-		    goto theend;
+		    যাও theend;
 		}
 	    }
-	    else if (generic_func_args_table_size(&gfatab) > 0)
+	    অন্যথা যদি (generic_func_args_table_আকার(&gfatab) > 0)
 	    {
-		emsg_funcname(fp != NULL ? e_not_a_generic_function_str
+		emsg_funcname(fp != ফাঁকা ? e_not_a_generic_function_str
 				: e_unknown_generic_function_str, rfname);
 		error = FCERR_FAILED;
-		goto theend;
+		যাও theend;
 	    }
 
-	    if (fp != NULL && (fp->uf_flags & FC_DELETED))
+	    যদি (fp != ফাঁকা && (fp->uf_flags & FC_DELETED))
 		error = FCERR_DELETED;
-	    else if (fp != NULL)
+	    অন্যথা যদি (fp != ফাঁকা)
 	    {
-		int need_arg_check = FALSE;
-		if (funcexe->fe_check_type == NULL)
+		পূর্ণসংখ্যা need_arg_check = FALSE;
+		যদি (funcexe->fe_check_type == ফাঁকা)
 		{
 		    funcexe->fe_check_type = fp->uf_func_type;
 		    need_arg_check = TRUE;
 		}
 
-		if (funcexe->fe_argv_func != NULL)
+		যদি (funcexe->fe_argv_func != ফাঁকা)
 		{
 		    // postponed filling in the arguments, do it now
 		    argcount = funcexe->fe_argv_func(argcount, argvars,
@@ -4152,10 +4152,10 @@ call_func(
 		    need_arg_check = TRUE;
 		}
 
-		if (funcexe->fe_basetv != NULL)
+		যদি (funcexe->fe_basetv != ফাঁকা)
 		{
 		    // Method call: base->Method()
-		    mch_memmove(&argv[1], argvars, sizeof(typval_T) * argcount);
+		    mch_memmove(&argv[1], argvars, আকার(typval_T) * argcount);
 		    argv[0] = *funcexe->fe_basetv;
 		    argcount++;
 		    argvars = argv;
@@ -4165,16 +4165,16 @@ call_func(
 
 		// Check the argument types now that the function type and all
 		// argument values are known, if not done above.
-		if (need_arg_check)
+		যদি (need_arg_check)
 		    error = may_check_argument_types(funcexe, argvars, argcount,
-				       TRUE, (name != NULL) ? name : funcname);
+				       TRUE, (name != ফাঁকা) ? name : funcname);
 
-		if (error == FCERR_NONE || error == FCERR_UNKNOWN)
+		যদি (error == FCERR_NONE || error == FCERR_UNKNOWN)
 		    error = call_user_func_check(fp, argcount, argvars, rettv,
 							    funcexe, selfdict);
 	    }
 	}
-	else if (funcexe->fe_basetv != NULL)
+	অন্যথা যদি (funcexe->fe_basetv != ফাঁকা)
 	{
 	    /*
 	     * expr->method(): Find the method name in the table, call its
@@ -4183,7 +4183,7 @@ call_func(
 	    error = call_internal_method(fname, argcount, argvars, rettv,
 							   funcexe->fe_basetv);
 	}
-	else
+	অন্যথা
 	{
 	    /*
 	     * Find the function name in the table, call its implementation.
@@ -4203,7 +4203,7 @@ call_func(
 	 */
 	update_force_abort();
     }
-    if (error == FCERR_NONE)
+    যদি (error == FCERR_NONE)
 	ret = OK;
 
 theend:
@@ -4211,19 +4211,19 @@ theend:
      * Report an error unless the argument evaluation or function call has been
      * cancelled due to an aborting error, an interrupt, or an exception.
      */
-    if (!aborting())
-	user_func_error(error, (name != NULL) ? name : funcname,
+    যদি (!aborting())
+	user_func_error(error, (name != ফাঁকা) ? name : funcname,
 							funcexe->fe_found_var);
 
     // clear the copies made from the partial
-    while (argv_clear > 0)
+    যখন (argv_clear > 0)
 	clear_tv(&argv[--argv_clear + argv_base]);
 
     vim_free(tofree);
     vim_free(name);
     generic_func_args_table_clear(&gfatab);
 
-    return ret;
+    ফেরত ret;
 }
 
 /*
@@ -4232,51 +4232,51 @@ theend:
  * To be used by "expr" options.
  * Returns NOTDONE when the function could not be found.
  */
-    int
+    পূর্ণসংখ্যা
 call_simple_func(
     char_u	*funcname,	// name of the function
     size_t	len,		// length of "name"
     typval_T	*rettv)		// return value goes here
 {
-    int		ret = FAIL;
+    পূর্ণসংখ্যা		ret = FAIL;
     funcerror_T	error = FCERR_NONE;
     char_u	fname_buf[FLEN_FIXED + 1];
-    char_u	*tofree = NULL;
+    char_u	*tofree = ফাঁকা;
     char_u	*name;
     char_u	*fname;
     char_u	*rfname;
-    int		is_global = FALSE;
+    পূর্ণসংখ্যা		is_global = FALSE;
     ufunc_T	*fp;
 
-    rettv->v_type = VAR_NUMBER;	// default rettv is number zero
-    rettv->vval.v_number = 0;
+    rettv->v_type = VAR_সংখ্যা;	// default rettv is number zero
+    rettv->vval.v_সংখ্যা = 0;
 
     // Make a copy of the name, an option can be changed in the function.
     name = vim_strnsave(funcname, len);
-    if (name == NULL)
-	return ret;
+    যদি (name == ফাঁকা)
+	ফেরত ret;
 
     fname = fname_trans_sid(name, fname_buf, &tofree, &error);
 
     // Skip "g:" before a function name.
-    if (fname[0] == 'g' && fname[1] == ':')
+    যদি (fname[0] == 'g' && fname[1] == ':')
     {
 	is_global = TRUE;
 	rfname = fname + 2;
     }
-    else
+    অন্যথা
 	rfname = fname;
     fp = find_func(rfname, is_global);
-    if (fp != NULL && !is_global && in_vim9script()
+    যদি (fp != ফাঁকা && !is_global && in_vim9script()
 						 && func_requires_g_prefix(fp))
 	// In Vim9 script g: is required to find a global non-autoload
 	// function.
-	fp = NULL;
-    if (fp == NULL)
+	fp = ফাঁকা;
+    যদি (fp == ফাঁকা)
 	ret = NOTDONE;
-    else if (fp != NULL && (fp->uf_flags & FC_DELETED))
+    অন্যথা যদি (fp != ফাঁকা && (fp->uf_flags & FC_DELETED))
 	error = FCERR_DELETED;
-    else if (fp != NULL)
+    অন্যথা যদি (fp != ফাঁকা)
     {
 	typval_T argvars[1];
 	funcexe_T	funcexe;
@@ -4285,8 +4285,8 @@ call_simple_func(
 	CLEAR_FIELD(funcexe);
 	funcexe.fe_evaluate = TRUE;
 
-	error = call_user_func_check(fp, 0, argvars, rettv, &funcexe, NULL);
-	if (error == FCERR_NONE)
+	error = call_user_func_check(fp, 0, argvars, rettv, &funcexe, ফাঁকা);
+	যদি (error == FCERR_NONE)
 	    ret = OK;
     }
 
@@ -4294,123 +4294,123 @@ call_simple_func(
     vim_free(tofree);
     vim_free(name);
 
-    return ret;
+    ফেরত ret;
 }
 
     char_u *
 printable_func_name(ufunc_T *fp)
 {
-    return fp->uf_name_exp != NULL ? fp->uf_name_exp : fp->uf_name;
+    ফেরত fp->uf_name_exp != ফাঁকা ? fp->uf_name_exp : fp->uf_name;
 }
 
 /*
  * When "prev_ht_changed" does not equal "ht_changed" give an error and return
  * TRUE.  Otherwise return FALSE.
  */
-    static int
-function_list_modified(int prev_ht_changed)
+    স্থির পূর্ণসংখ্যা
+function_list_modified(পূর্ণসংখ্যা পূর্ব_ht_changed)
 {
-    if (prev_ht_changed != func_hashtab.ht_changed)
+    যদি (পূর্ব_ht_changed != func_hashtab.ht_changed)
     {
 	emsg(_(e_function_list_was_modified));
-	return TRUE;
+	ফেরত TRUE;
     }
-    return FALSE;
+    ফেরত FALSE;
 }
 
 /*
  * List the head of the function: "function name(arg1, arg2)".
  */
-    static int
-list_func_head(ufunc_T *fp, int indent)
+    স্থির পূর্ণসংখ্যা
+list_func_শীর্ষ(ufunc_T *fp, পূর্ণসংখ্যা indent)
 {
-    int		prev_ht_changed = func_hashtab.ht_changed;
-    int		j;
+    পূর্ণসংখ্যা		পূর্ব_ht_changed = func_hashtab.ht_changed;
+    পূর্ণসংখ্যা		j;
 
-    msg_start();
+    বার্তা_start();
 
     // a timer at the more prompt may have deleted the function
-    if (function_list_modified(prev_ht_changed))
-	return FAIL;
+    যদি (function_list_modified(পূর্ব_ht_changed))
+	ফেরত FAIL;
 
-    if (indent)
-	msg_puts("   ");
-    if (fp->uf_def_status != UF_NOT_COMPILED)
-	msg_puts("def ");
-    else
-	msg_puts("function ");
-    msg_puts((char *)printable_func_name(fp));
-    msg_putchar('(');
-    for (j = 0; j < fp->uf_args.ga_len; ++j)
+    যদি (indent)
+	বার্তা_puts("   ");
+    যদি (fp->uf_def_status != UF_NOT_COMPILED)
+	বার্তা_puts("def ");
+    অন্যথা
+	বার্তা_puts("function ");
+    বার্তা_puts((অক্ষর *)printable_func_name(fp));
+    বার্তা_putchar('(');
+    জন্য (j = 0; j < fp->uf_args.ga_len; ++j)
     {
-	if (j)
-	    msg_puts(", ");
-	msg_puts((char *)FUNCARG(fp, j));
-	if (fp->uf_arg_types != NULL)
+	যদি (j)
+	    বার্তা_puts(", ");
+	বার্তা_puts((অক্ষর *)FUNCARG(fp, j));
+	যদি (fp->uf_arg_types != ফাঁকা)
 	{
-	    char *tofree;
+	    অক্ষর *tofree;
 
-	    msg_puts(": ");
-	    msg_puts(type_name(fp->uf_arg_types[j], &tofree));
+	    বার্তা_puts(": ");
+	    বার্তা_puts(type_name(fp->uf_arg_types[j], &tofree));
 	    vim_free(tofree);
 	}
-	if (j >= fp->uf_args.ga_len - fp->uf_def_args.ga_len)
+	যদি (j >= fp->uf_args.ga_len - fp->uf_def_args.ga_len)
 	{
-	    msg_puts(" = ");
-	    msg_puts(((char **)(fp->uf_def_args.ga_data))
+	    বার্তা_puts(" = ");
+	    বার্তা_puts(((অক্ষর **)(fp->uf_def_args.ga_তথ্য))
 		       [j - fp->uf_args.ga_len + fp->uf_def_args.ga_len]);
 	}
     }
-    if (fp->uf_varargs)
+    যদি (fp->uf_varargs)
     {
-	if (j)
-	    msg_puts(", ");
-	msg_puts("...");
+	যদি (j)
+	    বার্তা_puts(", ");
+	বার্তা_puts("...");
     }
-    if (fp->uf_va_name != NULL)
+    যদি (fp->uf_va_name != ফাঁকা)
     {
-	if (!fp->uf_varargs)
+	যদি (!fp->uf_varargs)
 	{
-	    if (j)
-		msg_puts(", ");
-	    msg_puts("...");
+	    যদি (j)
+		বার্তা_puts(", ");
+	    বার্তা_puts("...");
 	}
-	msg_puts((char *)fp->uf_va_name);
-	if (fp->uf_va_type != NULL)
+	বার্তা_puts((অক্ষর *)fp->uf_va_name);
+	যদি (fp->uf_va_type != ফাঁকা)
 	{
-	    char *tofree;
+	    অক্ষর *tofree;
 
-	    msg_puts(": ");
-	    msg_puts(type_name(fp->uf_va_type, &tofree));
+	    বার্তা_puts(": ");
+	    বার্তা_puts(type_name(fp->uf_va_type, &tofree));
 	    vim_free(tofree);
 	}
     }
-    msg_putchar(')');
+    বার্তা_putchar(')');
 
-    if (fp->uf_def_status != UF_NOT_COMPILED)
+    যদি (fp->uf_def_status != UF_NOT_COMPILED)
     {
-	if (fp->uf_ret_type != &t_void)
+	যদি (fp->uf_ret_type != &t_void)
 	{
-	    char *tofree;
+	    অক্ষর *tofree;
 
-	    msg_puts(": ");
-	    msg_puts(type_name(fp->uf_ret_type, &tofree));
+	    বার্তা_puts(": ");
+	    বার্তা_puts(type_name(fp->uf_ret_type, &tofree));
 	    vim_free(tofree);
 	}
     }
-    else if (fp->uf_flags & FC_ABORT)
-	msg_puts(" abort");
-    if (fp->uf_flags & FC_RANGE)
-	msg_puts(" range");
-    if (fp->uf_flags & FC_DICT)
-	msg_puts(" dict");
-    if (fp->uf_flags & FC_CLOSURE)
-	msg_puts(" closure");
-    msg_clr_eos();
-    if (p_verbose > 0)
-	last_set_msg(fp->uf_script_ctx);
+    অন্যথা যদি (fp->uf_flags & FC_ABORT)
+	বার্তা_puts(" abort");
+    যদি (fp->uf_flags & FC_RANGE)
+	বার্তা_puts(" range");
+    যদি (fp->uf_flags & FC_DICT)
+	বার্তা_puts(" dict");
+    যদি (fp->uf_flags & FC_CLOSURE)
+	বার্তা_puts(" closure");
+    বার্তা_clr_eos();
+    যদি (p_verbose > 0)
+	last_set_বার্তা(fp->uf_script_ctx);
 
-    return OK;
+    ফেরত OK;
 }
 
 /*
@@ -4430,206 +4430,206 @@ list_func_head(ufunc_T *fp, int indent)
     char_u *
 trans_function_name(
     char_u	**pp,
-    int		*is_global,
-    int		skip,		// only find the end, don't evaluate
-    int		flags)
+    পূর্ণসংখ্যা		*is_global,
+    পূর্ণসংখ্যা		skip,		// only find the end, don't evaluate
+    পূর্ণসংখ্যা		flags)
 {
-    return trans_function_name_ext(pp, is_global, skip, flags,
-	    NULL, NULL, NULL, NULL);
+    ফেরত trans_function_name_ext(pp, is_global, skip, flags,
+	    ফাঁকা, ফাঁকা, ফাঁকা, ফাঁকা);
 }
 
 /*
  * trans_function_name() with extra arguments.
  * "fdp", "partial", "type" and "ufunc" can be NULL.
  */
-    static char_u *
+    স্থির char_u *
 trans_function_name_ext(
     char_u	**pp,
-    int		*is_global,
-    int		skip,		// only find the end, don't evaluate
-    int		flags,
+    পূর্ণসংখ্যা		*is_global,
+    পূর্ণসংখ্যা		skip,		// only find the end, don't evaluate
+    পূর্ণসংখ্যা		flags,
     funcdict_T	*fdp,		// return: info about dictionary used
     partial_T	**partial,	// return: partial of a FuncRef
     type_T	**type,		// return: type of funcref
     ufunc_T	**ufunc)	// return: function
 {
-    char_u	*name = NULL;
+    char_u	*name = ফাঁকা;
     char_u	*start;
     char_u	*end;
-    int		lead;
+    পূর্ণসংখ্যা		lead;
     char_u	sid_buf[20];
-    int		len;
-    int		extra = 0;
-    int		prefix_g = FALSE;
+    পূর্ণসংখ্যা		len;
+    পূর্ণসংখ্যা		extra = 0;
+    পূর্ণসংখ্যা		prefix_g = FALSE;
     lval_T	lv;
-    int		vim9script = in_vim9script();
-    int		vim9_local;
+    পূর্ণসংখ্যা		vim9script = in_vim9script();
+    পূর্ণসংখ্যা		vim9_local;
 
-    if (fdp != NULL)
+    যদি (fdp != ফাঁকা)
 	CLEAR_POINTER(fdp);
     start = *pp;
 
     // Check for hard coded <SNR>: already translated function ID (from a user
     // command).
-    if ((*pp)[0] == K_SPECIAL && (*pp)[1] == KS_EXTRA
-						   && (*pp)[2] == (int)KE_SNR)
+    যদি ((*pp)[0] == K_SPECIAL && (*pp)[1] == KS_EXTRA
+						   && (*pp)[2] == (পূর্ণসংখ্যা)KE_SNR)
     {
 	*pp += 3;
 	len = get_id_len(pp) + 3;
-	return vim_strnsave(start, len);
+	ফেরত vim_strnsave(start, len);
     }
 
     // A name starting with "<SID>" or "<SNR>" is local to a script.  But
     // don't skip over "s:", get_lval() needs it for "s:dict.func".
     lead = eval_fname_script(start);
-    if (lead > 2)
+    যদি (lead > 2)
 	start += lead;
 
     // Note that TFN_ flags use the same values as GLV_ flags.
-    end = get_lval(start, NULL, &lv, FALSE, skip,
+    end = get_lval(start, ফাঁকা, &lv, FALSE, skip,
 			flags | GLV_READ_ONLY | GLV_PREFER_FUNC,
 					      lead > 2 ? 0 : FNE_CHECK_START);
-    if (end == start || (vim9script && end != NULL
+    যদি (end == start || (vim9script && end != ফাঁকা
 				   && end[-1] == AUTOLOAD_CHAR && *end == '('))
     {
-	if (!skip)
+	যদি (!skip)
 	    emsg(_(e_function_name_required));
-	goto theend;
+	যাও theend;
     }
-    if (end == NULL || (lv.ll_tv != NULL && (lead > 2 || lv.ll_range)))
+    যদি (end == ফাঁকা || (lv.ll_tv != ফাঁকা && (lead > 2 || lv.ll_range)))
     {
 	/*
 	 * Report an invalid expression in braces, unless the expression
 	 * evaluation has been cancelled due to an aborting error, an
 	 * interrupt, or an exception.
 	 */
-	if (!aborting())
+	যদি (!aborting())
 	{
-	    if (end != NULL)
+	    যদি (end != ফাঁকা)
 		semsg(_(e_invalid_argument_str), start);
 	}
-	else
-	    *pp = find_name_end(start, NULL, NULL, FNE_INCL_BR);
-	goto theend;
+	অন্যথা
+	    *pp = find_name_end(start, ফাঁকা, ফাঁকা, FNE_INCL_BR);
+	যাও theend;
     }
 
-    if (lv.ll_ufunc != NULL)
+    যদি (lv.ll_ufunc != ফাঁকা)
     {
-	if (ufunc != NULL)
+	যদি (ufunc != ফাঁকা)
 	    *ufunc = lv.ll_ufunc;
 	name = vim_strnsave(lv.ll_ufunc->uf_name, lv.ll_ufunc->uf_namelen);
 	*pp = end;
-	goto theend;
+	যাও theend;
     }
 
-    if (lv.ll_tv != NULL)
+    যদি (lv.ll_tv != ফাঁকা)
     {
-	if (fdp != NULL)
+	যদি (fdp != ফাঁকা)
 	{
 	    fdp->fd_dict = lv.ll_dict;
 	    fdp->fd_newkey = lv.ll_newkey;
-	    lv.ll_newkey = NULL;
+	    lv.ll_newkey = ফাঁকা;
 	    fdp->fd_di = lv.ll_di;
 	}
-	if (lv.ll_tv->v_type == VAR_FUNC && lv.ll_tv->vval.v_string != NULL)
+	যদি (lv.ll_tv->v_type == VAR_FUNC && lv.ll_tv->vval.v_string != ফাঁকা)
 	{
 	    name = vim_strsave(lv.ll_tv->vval.v_string);
 	    *pp = end;
 	}
-	else if (lv.ll_tv->v_type == VAR_CLASS
-					     && lv.ll_tv->vval.v_class != NULL)
+	অন্যথা যদি (lv.ll_tv->v_type == VAR_CLASS
+					     && lv.ll_tv->vval.v_class != ফাঁকা)
 	{
 	    name = vim_strnsave(lv.ll_tv->vval.v_class->class_name.string,
-		lv.ll_tv->vval.v_class->class_name.length);
+		lv.ll_tv->vval.v_class->class_name.দৈর্ঘ্য);
 	    *pp = end;
 	}
-	else if (lv.ll_tv->v_type == VAR_PARTIAL
-					  && lv.ll_tv->vval.v_partial != NULL)
+	অন্যথা যদি (lv.ll_tv->v_type == VAR_PARTIAL
+					  && lv.ll_tv->vval.v_partial != ফাঁকা)
 	{
 	    name = vim_strsave(partial_name(lv.ll_tv->vval.v_partial));
 	    *pp = end;
-	    if (partial != NULL)
+	    যদি (partial != ফাঁকা)
 		*partial = lv.ll_tv->vval.v_partial;
 	}
-	else
+	অন্যথা
 	{
-	    if (!skip && !(flags & TFN_QUIET) && (fdp == NULL
-			     || lv.ll_dict == NULL || fdp->fd_newkey == NULL))
+	    যদি (!skip && !(flags & TFN_QUIET) && (fdp == ফাঁকা
+			     || lv.ll_dict == ফাঁকা || fdp->fd_newkey == ফাঁকা))
 		emsg(_(e_funcref_required));
-	    else
+	    অন্যথা
 		*pp = end;
-	    name = NULL;
+	    name = ফাঁকা;
 	}
-	goto theend;
+	যাও theend;
     }
 
-    if (lv.ll_name == NULL)
+    যদি (lv.ll_name == ফাঁকা)
     {
 	// Error found, but continue after the function name.
 	*pp = end;
-	goto theend;
+	যাও theend;
     }
 
     // Check if the name is a Funcref.  If so, use the value.
-    if (lv.ll_exp_name != NULL)
+    যদি (lv.ll_exp_name != ফাঁকা)
     {
-	len = (int)STRLEN(lv.ll_exp_name);
+	len = (পূর্ণসংখ্যা)STRLEN(lv.ll_exp_name);
 	name = deref_func_name(lv.ll_exp_name, &len, partial, type,
-			  flags & TFN_NO_AUTOLOAD, flags & TFN_NEW_FUNC, NULL);
-	if (name == lv.ll_exp_name)
-	    name = NULL;
+			  flags & TFN_NO_AUTOLOAD, flags & TFN_NEW_FUNC, ফাঁকা);
+	যদি (name == lv.ll_exp_name)
+	    name = ফাঁকা;
     }
-    else if (lv.ll_sid > 0)
+    অন্যথা যদি (lv.ll_sid > 0)
     {
 	scriptitem_T	*si = SCRIPT_ITEM(lv.ll_sid);
-	int		cc = *lv.ll_name_end;
+	পূর্ণসংখ্যা		cc = *lv.ll_name_end;
 
 	// function in another script.  Prefix <SNR>99_ or the autoload prefix.
 	*lv.ll_name_end = NUL;
-	if (si->sn_autoload_prefix != NULL)
+	যদি (si->sn_autoload_prefix != ফাঁকা)
 	{
 	    name = concat_str(si->sn_autoload_prefix, lv.ll_name);
 	}
-	else
+	অন্যথা
 	{
 	    sid_buf[0] = K_SPECIAL;
 	    sid_buf[1] = KS_EXTRA;
-	    sid_buf[2] = (int)KE_SNR;
-	    vim_snprintf((char *)sid_buf + 3, sizeof(sid_buf) - 3,
+	    sid_buf[2] = (পূর্ণসংখ্যা)KE_SNR;
+	    vim_snprintf((অক্ষর *)sid_buf + 3, আকার(sid_buf) - 3,
 						      "%ld_", (long)lv.ll_sid);
 	    name = concat_str(sid_buf, lv.ll_name);
 	}
 	*lv.ll_name_end = cc;
 	*pp = end;
-	goto theend;
+	যাও theend;
     }
-    else if (!(flags & TFN_NO_DEREF))
+    অন্যথা যদি (!(flags & TFN_NO_DEREF))
     {
-	len = (int)(end - *pp);
+	len = (পূর্ণসংখ্যা)(end - *pp);
 	name = deref_func_name(*pp, &len, partial, type,
-			  flags & TFN_NO_AUTOLOAD, flags & TFN_NEW_FUNC, NULL);
-	if (name == *pp)
-	    name = NULL;
+			  flags & TFN_NO_AUTOLOAD, flags & TFN_NEW_FUNC, ফাঁকা);
+	যদি (name == *pp)
+	    name = ফাঁকা;
     }
-    if (name != NULL)
+    যদি (name != ফাঁকা)
     {
 	name = vim_strsave(name);
 	*pp = end;
-	if (name != NULL && STRNCMP(name, "<SNR>", 5) == 0)
+	যদি (name != ফাঁকা && STRNCMP(name, "<SNR>", 5) == 0)
 	{
 	    // Change "<SNR>" to the byte sequence.
 	    name[0] = K_SPECIAL;
 	    name[1] = KS_EXTRA;
-	    name[2] = (int)KE_SNR;
+	    name[2] = (পূর্ণসংখ্যা)KE_SNR;
 	    mch_memmove(name + 3, name + 5, STRLEN(name + 5) + 1);
 	}
-	goto theend;
+	যাও theend;
     }
 
-    if (lv.ll_exp_name != NULL)
+    যদি (lv.ll_exp_name != ফাঁকা)
     {
-	len = (int)STRLEN(lv.ll_exp_name);
-	if (lead <= 2 && lv.ll_name == lv.ll_exp_name
+	len = (পূর্ণসংখ্যা)STRLEN(lv.ll_exp_name);
+	যদি (lead <= 2 && lv.ll_name == lv.ll_exp_name
 					 && STRNCMP(lv.ll_name, "s:", 2) == 0)
 	{
 	    // When there was "s:" already or the name expanded to get a
@@ -4639,18 +4639,18 @@ trans_function_name_ext(
 	    lead = 2;
 	}
     }
-    else
+    অন্যথা
     {
 	// skip over "s:" and "g:"
-	if (lead == 2 || (lv.ll_name[0] == 'g' && lv.ll_name[1] == ':'))
+	যদি (lead == 2 || (lv.ll_name[0] == 'g' && lv.ll_name[1] == ':'))
 	{
-	    if (lv.ll_name[0] == 'g')
+	    যদি (lv.ll_name[0] == 'g')
 	    {
-		if (is_global != NULL)
+		যদি (is_global != ফাঁকা)
 		{
 		    *is_global = TRUE;
 		}
-		else
+		অন্যথা
 		{
 		    // dropping "g:" without setting "is_global" won't work in
 		    // Vim9 script, put it back later
@@ -4660,13 +4660,13 @@ trans_function_name_ext(
 	    }
 	    lv.ll_name += 2;
 	}
-	len = (int)(end - lv.ll_name);
+	len = (পূর্ণসংখ্যা)(end - lv.ll_name);
     }
-    if (len <= 0)
+    যদি (len <= 0)
     {
-	if (!skip)
+	যদি (!skip)
 	    emsg(_(e_function_name_required));
-	goto theend;
+	যাও theend;
     }
 
     // In Vim9 script a user function is script-local by default, unless it
@@ -4679,43 +4679,43 @@ trans_function_name_ext(
      * Accept <SID>name() inside a script, translate into <SNR>123_name().
      * Accept <SNR>123_name() outside a script.
      */
-    if (skip)
+    যদি (skip)
 	lead = 0;	// do nothing
-    else if (lead > 0 || vim9_local)
+    অন্যথা যদি (lead > 0 || vim9_local)
     {
-	if (!vim9_local)
+	যদি (!vim9_local)
 	{
-	    if (vim9script && lead == 2 && !ASCII_ISUPPER(*lv.ll_name)
+	    যদি (vim9script && lead == 2 && !ASCII_ISUPPER(*lv.ll_name)
 						   && current_script_is_vim9())
 	    {
 		semsg(_(e_function_name_must_start_with_capital_str), start);
-		goto theend;
+		যাও theend;
 	    }
 	    lead = 3;
 	}
-	if (vim9_local || (lv.ll_exp_name != NULL
+	যদি (vim9_local || (lv.ll_exp_name != ফাঁকা
 					     && eval_fname_sid(lv.ll_exp_name))
 						       || eval_fname_sid(*pp))
 	{
 	    size_t  sid_buflen;
 
 	    // It's script-local, "s:" or "<SID>"
-	    if (current_sctx.sc_sid <= 0)
+	    যদি (current_sctx.sc_sid <= 0)
 	    {
 		emsg(_(e_using_sid_not_in_script_context));
-		goto theend;
+		যাও theend;
 	    }
-	    sid_buflen = vim_snprintf((char *)sid_buf, sizeof(sid_buf), "%ld_", (long)current_sctx.sc_sid);
-	    if (vim9_local)
-		extra = 3 + (int)sid_buflen;
-	    else
-		lead += (int)sid_buflen;
+	    sid_buflen = vim_snprintf((অক্ষর *)sid_buf, আকার(sid_buf), "%ld_", (long)current_sctx.sc_sid);
+	    যদি (vim9_local)
+		extra = 3 + (পূর্ণসংখ্যা)sid_buflen;
+	    অন্যথা
+		lead += (পূর্ণসংখ্যা)sid_buflen;
 	}
     }
     // The function name must start with an upper case letter (unless it is a
     // Vim9 class new() function or a Vim9 class private method or one of the
     // supported Vim9 object builtin functions)
-    else if (!(flags & TFN_INT)
+    অন্যথা যদি (!(flags & TFN_INT)
 	    && (builtin_function(lv.ll_name, len)
 				   || (vim9script && *lv.ll_name == '_'))
 	    && !((flags & TFN_IN_CLASS)
@@ -4725,31 +4725,31 @@ trans_function_name_ext(
 	semsg(_(vim9script ? e_function_name_must_start_with_capital_str
 			   : e_function_name_must_start_with_capital_or_s_str),
 									start);
-	goto theend;
+	যাও theend;
     }
-    if (!skip && !(flags & TFN_QUIET) && !(flags & TFN_NO_DEREF))
+    যদি (!skip && !(flags & TFN_QUIET) && !(flags & TFN_NO_DEREF))
     {
 	char_u *cp = vim_strchr(lv.ll_name, ':');
 
-	if (cp != NULL && cp < end)
+	যদি (cp != ফাঁকা && cp < end)
 	{
 	    semsg(_(e_function_name_cannot_contain_colon_str), start);
-	    goto theend;
+	    যাও theend;
 	}
     }
 
     name = alloc(len + lead + extra + 1);
-    if (name != NULL)
+    যদি (name != ফাঁকা)
     {
-	if (!skip && (lead > 0 || vim9_local))
+	যদি (!skip && (lead > 0 || vim9_local))
 	{
 	    name[0] = K_SPECIAL;
 	    name[1] = KS_EXTRA;
-	    name[2] = (int)KE_SNR;
-	    if (vim9_local || lead > 3)	// If it's "<SID>"
+	    name[2] = (পূর্ণসংখ্যা)KE_SNR;
+	    যদি (vim9_local || lead > 3)	// If it's "<SID>"
 		STRCPY(name + 3, sid_buf);
 	}
-	else if (prefix_g)
+	অন্যথা যদি (prefix_g)
 	{
 	    name[0] = 'g';
 	    name[1] = ':';
@@ -4761,7 +4761,7 @@ trans_function_name_ext(
 
 theend:
     clear_lval(&lv);
-    return name;
+    ফেরত name;
 }
 
 /*
@@ -4771,18 +4771,18 @@ theend:
  * This can be used to first search for a script-local function and fall back
  * to the global function if not found.
  */
-    static char_u *
+    স্থির char_u *
 untrans_function_name(char_u *name)
 {
     char_u *p;
 
-    if (*name == K_SPECIAL && in_vim9script())
+    যদি (*name == K_SPECIAL && in_vim9script())
     {
 	p = vim_strchr(name, '_');
-	if (p != NULL)
-	    return p + 1;
+	যদি (p != ফাঁকা)
+	    ফেরত p + 1;
     }
-    return NULL;
+    ফেরত ফাঁকা;
 }
 
 /*
@@ -4795,50 +4795,50 @@ untrans_function_name(char_u *name)
     char_u *
 get_scriptlocal_funcname(char_u *funcname)
 {
-    char	sid_buf[25];
+    অক্ষর	sid_buf[25];
     size_t	sid_buflen;
-    int		off;
+    পূর্ণসংখ্যা		off;
     char_u	*newname;
     size_t	newnamesize;
     char_u	*p = funcname;
 
-    if (funcname == NULL)
-	return NULL;
+    যদি (funcname == ফাঁকা)
+	ফেরত ফাঁকা;
 
-    if (STRNCMP(funcname, "s:", 2) != 0
+    যদি (STRNCMP(funcname, "s:", 2) != 0
 		&& STRNCMP(funcname, "<SID>", 5) != 0)
     {
 	ufunc_T	    *ufunc;
 
 	// The function name does not have a script-local prefix.  Try finding
 	// it when in a Vim9 script and there is no "g:" prefix.
-	if (!in_vim9script() || STRNCMP(funcname, "g:", 2) == 0)
-	    return NULL;
+	যদি (!in_vim9script() || STRNCMP(funcname, "g:", 2) == 0)
+	    ফেরত ফাঁকা;
 	ufunc = find_func(funcname, FALSE);
-	if (ufunc == NULL || func_is_global(ufunc)
-			      || (p = vim_strchr(ufunc->uf_name, '_')) == NULL)
-	    return NULL;
+	যদি (ufunc == ফাঁকা || func_is_global(ufunc)
+			      || (p = vim_strchr(ufunc->uf_name, '_')) == ফাঁকা)
+	    ফেরত ফাঁকা;
 	++p;
 	off = 0;
     }
-    else
+    অন্যথা
 	off = *funcname == 's' ? 2 : 5;
 
-    if (!SCRIPT_ID_VALID(current_sctx.sc_sid))
+    যদি (!SCRIPT_ID_VALID(current_sctx.sc_sid))
     {
 	emsg(_(e_using_sid_not_in_script_context));
-	return NULL;
+	ফেরত ফাঁকা;
     }
     // Expand s: prefix into <SNR>nr_<name>
-    sid_buflen = vim_snprintf(sid_buf, sizeof(sid_buf), "<SNR>%ld_",
+    sid_buflen = vim_snprintf(sid_buf, আকার(sid_buf), "<SNR>%ld_",
 	    (long)current_sctx.sc_sid);
     newnamesize = sid_buflen + STRLEN(p + off) + 1;
     newname = alloc(newnamesize);
-    if (newname == NULL)
-	return NULL;
-    vim_snprintf((char *)newname, newnamesize, "%s%s", sid_buf, p + off);
+    যদি (newname == ফাঁকা)
+	ফেরত ফাঁকা;
+    vim_snprintf((অক্ষর *)newname, newnamesize, "%s%s", sid_buf, p + off);
 
-    return newname;
+    ফেরত newname;
 }
 
 /*
@@ -4850,12 +4850,12 @@ alloc_printable_func_name(char_u *fname)
 {
     char_u *n = alloc(STRLEN(fname + 3) + 6);
 
-    if (n != NULL)
+    যদি (n != ফাঁকা)
     {
 	STRCPY(n, "<SNR>");
 	STRCPY(n + 5, fname + 3);
     }
-    return n;
+    ফেরত n;
 }
 
 /*
@@ -4865,58 +4865,58 @@ alloc_printable_func_name(char_u *fname)
     char_u *
 save_function_name(
 	char_u	    **name,
-	int	    *is_global,
-	int	    skip,
-	int	    flags,
+	পূর্ণসংখ্যা	    *is_global,
+	পূর্ণসংখ্যা	    skip,
+	পূর্ণসংখ্যা	    flags,
 	funcdict_T  *fudi)
 {
     char_u *p = *name;
     char_u *saved;
 
-    if (STRNCMP(p, "<lambda>", 8) == 0)
+    যদি (STRNCMP(p, "<lambda>", 8) == 0)
     {
 	p += 8;
-	(void)getdigits(&p);
+	(শূন্য)getdigits(&p);
 	saved = vim_strnsave(*name, p - *name);
-	if (fudi != NULL)
+	যদি (fudi != ফাঁকা)
 	    CLEAR_POINTER(fudi);
     }
-    else
+    অন্যথা
 	saved = trans_function_name_ext(&p, is_global, skip,
-						flags, fudi, NULL, NULL, NULL);
+						flags, fudi, ফাঁকা, ফাঁকা, ফাঁকা);
     *name = p;
-    return saved;
+    ফেরত saved;
 }
 
 /*
  * List functions.  When "regmatch" is NULL all of then.
  * Otherwise functions matching "regmatch".
  */
-    void
+    শূন্য
 list_functions(regmatch_T *regmatch)
 {
-    int		prev_ht_changed = func_hashtab.ht_changed;
+    পূর্ণসংখ্যা		পূর্ব_ht_changed = func_hashtab.ht_changed;
     long_u	todo = func_hashtab.ht_used;
     hashitem_T	*hi;
 
-    for (hi = func_hashtab.ht_array; todo > 0 && !got_int; ++hi)
+    জন্য (hi = func_hashtab.ht_array; todo > 0 && !got_int; ++hi)
     {
-	if (!HASHITEM_EMPTY(hi))
+	যদি (!HASHITEM_EMPTY(hi))
 	{
 	    ufunc_T	*fp = HI2UF(hi);
 
 	    --todo;
-	    if ((fp->uf_flags & FC_DEAD) == 0
-		    && (regmatch == NULL
+	    যদি ((fp->uf_flags & FC_DEAD) == 0
+		    && (regmatch == ফাঁকা
 			? !message_filtered(fp->uf_name)
 			    && !func_name_refcount(fp->uf_name)
 			: !SAFE_isdigit(*fp->uf_name)
 			    && vim_regexec(regmatch, fp->uf_name, 0)))
 	    {
-		if (list_func_head(fp, FALSE) == FAIL)
-		    return;
-		if (function_list_modified(prev_ht_changed))
-		    return;
+		যদি (list_func_শীর্ষ(fp, FALSE) == FAIL)
+		    ফেরত;
+		যদি (function_list_modified(পূর্ব_ht_changed))
+		    ফেরত;
 	    }
 	}
     }
@@ -4925,14 +4925,14 @@ list_functions(regmatch_T *regmatch)
 /*
  * ":function /pat": list functions matching pattern.
  */
-    static char_u *
+    স্থির char_u *
 list_functions_matching_pat(exarg_T *eap)
 {
     char_u	*p;
     char_u	c;
 
     p = skip_regexp(eap->arg + 1, '/', TRUE);
-    if (!eap->skip)
+    যদি (!eap->skip)
     {
 	regmatch_T	regmatch;
 
@@ -4940,97 +4940,97 @@ list_functions_matching_pat(exarg_T *eap)
 	*p = NUL;
 	regmatch.regprog = vim_regcomp(eap->arg + 1, RE_MAGIC);
 	*p = c;
-	if (regmatch.regprog != NULL)
+	যদি (regmatch.regprog != ফাঁকা)
 	{
 	    regmatch.rm_ic = p_ic;
 	    list_functions(&regmatch);
 	    vim_regfree(regmatch.regprog);
 	}
     }
-    if (*p == '/')
+    যদি (*p == '/')
 	++p;
 
-    return p;
+    ফেরত p;
 }
 
 /*
  * List function "name".
  * Returns the function pointer or NULL on failure.
  */
-    static ufunc_T *
-list_one_function(exarg_T *eap, char_u *name, char_u *p, int is_global)
+    স্থির ufunc_T *
+list_one_function(exarg_T *eap, char_u *name, char_u *p, পূর্ণসংখ্যা is_global)
 {
-    ufunc_T	*fp = NULL;
-    int		j;
+    ufunc_T	*fp = ফাঁকা;
+    পূর্ণসংখ্যা		j;
 
-    if (!ends_excmd(*skipwhite(p)))
+    যদি (!ends_excmd(*skipwhite(p)))
     {
 	semsg(_(e_trailing_characters_str), p);
-	return NULL;
+	ফেরত ফাঁকা;
     }
 
     set_nextcmd(eap, p);
 
-    if (eap->nextcmd != NULL)
+    যদি (eap->nextcmd != ফাঁকা)
 	*p = NUL;
 
-    if (eap->skip || got_int)
-	return NULL;
+    যদি (eap->skip || got_int)
+	ফেরত ফাঁকা;
 
     fp = find_func(name, is_global);
-    if (fp == NULL && ASCII_ISUPPER(*eap->arg))
+    যদি (fp == ফাঁকা && ASCII_ISUPPER(*eap->arg))
     {
 	char_u *up = untrans_function_name(name);
 
 	// With Vim9 script the name was made script-local, if not
 	// found try again with the original name.
-	if (up != NULL)
+	যদি (up != ফাঁকা)
 	    fp = find_func(up, FALSE);
     }
 
-    if (fp == NULL)
+    যদি (fp == ফাঁকা)
     {
 	emsg_funcname(e_undefined_function_str, eap->arg);
-	return NULL;
+	ফেরত ফাঁকা;
     }
 
     // Check no function was added or removed from a timer, e.g. at
     // the more prompt.  "fp" may then be invalid.
-    int prev_ht_changed = func_hashtab.ht_changed;
+    পূর্ণসংখ্যা পূর্ব_ht_changed = func_hashtab.ht_changed;
 
-    if (list_func_head(fp, TRUE) != OK)
-	return fp;
+    যদি (list_func_শীর্ষ(fp, TRUE) != OK)
+	ফেরত fp;
 
-    for (j = 0; j < fp->uf_lines.ga_len && !got_int; ++j)
+    জন্য (j = 0; j < fp->uf_সারিগুলি.ga_len && !got_int; ++j)
     {
-	if (FUNCLINE(fp, j) == NULL)
-	    continue;
-	msg_putchar('\n');
-	msg_outnum((long)(j + 1));
-	if (j < 9)
-	    msg_putchar(' ');
-	if (j < 99)
-	    msg_putchar(' ');
-	if (function_list_modified(prev_ht_changed))
-	    break;
-	msg_prt_line(FUNCLINE(fp, j), FALSE);
+	যদি (FUNCLINE(fp, j) == ফাঁকা)
+	    চালু;
+	বার্তা_putchar('\n');
+	বার্তা_outnum((long)(j + 1));
+	যদি (j < 9)
+	    বার্তা_putchar(' ');
+	যদি (j < 99)
+	    বার্তা_putchar(' ');
+	যদি (function_list_modified(পূর্ব_ht_changed))
+	    বিরতি;
+	বার্তা_prt_সারি(FUNCLINE(fp, j), FALSE);
 	out_flush();	// show a line at a time
 	ui_breakcheck();
     }
 
-    if (!got_int)
+    যদি (!got_int)
     {
-	msg_putchar('\n');
-	if (!function_list_modified(prev_ht_changed))
+	বার্তা_putchar('\n');
+	যদি (!function_list_modified(পূর্ব_ht_changed))
 	{
-	    if (fp->uf_def_status != UF_NOT_COMPILED)
-		msg_puts("   enddef");
-	    else
-		msg_puts("   endfunction");
+	    যদি (fp->uf_def_status != UF_NOT_COMPILED)
+		বার্তা_puts("   enddef");
+	    অন্যথা
+		বার্তা_puts("   endfunction");
 	}
     }
 
-    return fp;
+    ফেরত fp;
 }
 
 /*
@@ -5047,60 +5047,60 @@ list_one_function(exarg_T *eap, char_u *name, char_u *p, int is_global)
 define_function(
 	exarg_T	    *eap,
 	char_u	    *name_arg,
-	garray_T    *lines_to_free,
-	int	    class_flags,
+	garray_T    *সারিগুলি_to_free,
+	পূর্ণসংখ্যা	    class_flags,
 	ocmember_T  *obj_members,
-	int         obj_member_count,
+	পূর্ণসংখ্যা         obj_member_গুনতি,
 	cctx_T	    *cctx)
 {
-    int		j;
-    int		saved_did_emsg = FALSE;
+    পূর্ণসংখ্যা		j;
+    পূর্ণসংখ্যা		saved_did_emsg = FALSE;
     char_u	*name = name_arg;
     size_t	namelen = 0;
-    int		is_global = FALSE;
+    পূর্ণসংখ্যা		is_global = FALSE;
     char_u	*p;
     char_u	*arg;
     char_u	*whitep;
-    char_u	*line_arg = NULL;
+    char_u	*সারি_arg = ফাঁকা;
     garray_T	newargs;
     garray_T	argtypes;
     garray_T	arg_objm;
     garray_T	default_args;
     garray_T	newlines;
     gfargs_tab_T gfatab;
-    int		varargs = FALSE;
-    int		flags = 0;
-    char_u	*ret_type = NULL;
-    ufunc_T	*fp = NULL;
-    int		fp_allocated = FALSE;
-    int		free_fp = FALSE;
-    int		overwrite = FALSE;
+    পূর্ণসংখ্যা		varargs = FALSE;
+    পূর্ণসংখ্যা		flags = 0;
+    char_u	*ret_type = ফাঁকা;
+    ufunc_T	*fp = ফাঁকা;
+    পূর্ণসংখ্যা		fp_allocated = FALSE;
+    পূর্ণসংখ্যা		free_fp = FALSE;
+    পূর্ণসংখ্যা		overwrite = FALSE;
     dictitem_T	*v;
     funcdict_T	fudi;
-    static int	func_nr = 0;	    // number for nameless function
-    int		paren;
+    স্থির পূর্ণসংখ্যা	func_nr = 0;	    // number for nameless function
+    পূর্ণসংখ্যা		paren;
     hashitem_T	*hi;
-    linenr_T	sourcing_lnum_top;
-    int		vim9script = in_vim9script();
-    imported_T	*import = NULL;
+    linenr_T	sourcing_lnum_শীর্ষ;
+    পূর্ণসংখ্যা		vim9script = in_vim9script();
+    imported_T	*import = ফাঁকা;
 
     // ":function" without argument: list functions.
-    if (ends_excmd2(eap->cmd, eap->arg))
+    যদি (ends_excmd2(eap->cmd, eap->arg))
     {
-	if (!eap->skip)
-	    list_functions(NULL);
+	যদি (!eap->skip)
+	    list_functions(ফাঁকা);
 	set_nextcmd(eap, eap->arg);
-	return NULL;
+	ফেরত ফাঁকা;
     }
 
     /*
      * ":function /pat": list functions matching pattern.
      */
-    if (*eap->arg == '/')
+    যদি (*eap->arg == '/')
     {
 	p = list_functions_matching_pat(eap);
 	set_nextcmd(eap, p);
-	return NULL;
+	ফেরত ফাঁকা;
     }
 
     ga_init(&newargs);
@@ -5126,73 +5126,73 @@ define_function(
      * g:func	    global function name, same as "func"
      */
     p = eap->arg;
-    if (name_arg != NULL)
+    যদি (name_arg != ফাঁকা)
     {
 	// nested function, argument is (args).
 	paren = TRUE;
 	CLEAR_FIELD(fudi);
     }
-    else
+    অন্যথা
     {
-	if (vim9script)
+	যদি (vim9script)
 	{
-	    if (p[0] == 's' && p[1] == ':')
+	    যদি (p[0] == 's' && p[1] == ':')
 	    {
 		semsg(_(e_cannot_use_s_colon_in_vim9_script_str), p);
-		return NULL;
+		ফেরত ফাঁকা;
 	    }
 	    p = to_name_end(p, TRUE);
-	    if (*skipwhite(p) == '.' && vim_strchr(p, '(') != NULL)
+	    যদি (*skipwhite(p) == '.' && vim_strchr(p, '(') != ফাঁকা)
 	    {
 		semsg(_(e_cannot_define_dict_func_in_vim9_script_str),
 								     eap->arg);
-		return NULL;
+		ফেরত ফাঁকা;
 	    }
 
 	    p = eap->arg;
 	}
 
-	int tfn_flags = TFN_NO_AUTOLOAD | TFN_NEW_FUNC
+	পূর্ণসংখ্যা tfn_flags = TFN_NO_AUTOLOAD | TFN_NEW_FUNC
 				       | (class_flags != 0 ? TFN_IN_CLASS : 0);
 	name = save_function_name(&p, &is_global, eap->skip, tfn_flags, &fudi);
-	paren = (vim_strchr(p, '(') != NULL);
-	if (name == NULL && (fudi.fd_dict == NULL || !paren) && !eap->skip)
+	paren = (vim_strchr(p, '(') != ফাঁকা);
+	যদি (name == ফাঁকা && (fudi.fd_dict == ফাঁকা || !paren) && !eap->skip)
 	{
 	    /*
 	     * Return on an invalid expression in braces, unless the expression
 	     * evaluation has been cancelled due to an aborting error, an
 	     * interrupt, or an exception.
 	     */
-	    if (!aborting())
+	    যদি (!aborting())
 	    {
-		if (!eap->skip && fudi.fd_newkey != NULL)
-		    semsg(_(e_key_not_present_in_dictionary_str),
+		যদি (!eap->skip && fudi.fd_newkey != ফাঁকা)
+		    semsg(_(e_চাবি_not_present_in_dictionary_str),
 							       fudi.fd_newkey);
 		vim_free(fudi.fd_newkey);
-		return NULL;
+		ফেরত ফাঁকা;
 	    }
-	    else
+	    অন্যথা
 		eap->skip = TRUE;
 	}
 
 	// For "export def FuncName()" in an autoload script the function name
 	// is stored with the legacy autoload name "dir#script#FuncName" so
 	// that it can also be found in legacy script.
-	if (is_export && name != NULL)
+	যদি (is_export && name != ফাঁকা)
 	{
 	    char_u *prefixed = may_prefix_autoload(name);
 
-	    if (prefixed != NULL && prefixed != name)
+	    যদি (prefixed != ফাঁকা && prefixed != name)
 	    {
 		vim_free(name);
 		name = prefixed;
 	    }
 	}
-	else if (paren && vim9script && name != NULL
-				    && vim_strchr(name, AUTOLOAD_CHAR) != NULL)
+	অন্যথা যদি (paren && vim9script && name != ফাঁকা
+				    && vim_strchr(name, AUTOLOAD_CHAR) != ফাঁকা)
 	{
 	    emsg(_(e_cannot_use_name_with_hash_in_vim9_script_use_export_instead));
-	    goto ret_free;
+	    যাও ret_free;
 	}
     }
 
@@ -5204,194 +5204,194 @@ define_function(
     /*
      * ":function func" with only function name: list function.
      */
-    if (!paren)
+    যদি (!paren)
     {
 	fp = list_one_function(eap, name, p, is_global);
-	goto ret_free;
+	যাও ret_free;
     }
 
     /*
      * :function func<type, type..>() is a generic function
      */
     p = skipwhite(p);
-    if (vim9script && eap->cmdidx == CMD_def && *p == '<')
+    যদি (vim9script && eap->cmdidx == CMD_def && *p == '<')
     {
 	// generic function
 	p = parse_generic_func_type_params(name, p, &gfatab, cctx);
-	if (p == NULL)
-	    goto ret_free;
+	যদি (p == ফাঁকা)
+	    যাও ret_free;
     }
 
     /*
      * ":function name(arg1, arg2)" Define function.
      */
     p = skipwhite(p);
-    if (*p != '(')
+    যদি (*p != '(')
     {
-	if (!eap->skip)
+	যদি (!eap->skip)
 	{
 	    semsg(_(e_missing_paren_str), eap->arg);
-	    goto ret_free;
+	    যাও ret_free;
 	}
 	// attempt to continue by skipping some text
-	if (vim_strchr(p, '(') != NULL)
+	যদি (vim_strchr(p, '(') != ফাঁকা)
 	    p = vim_strchr(p, '(');
     }
 
-    if ((vim9script || eap->cmdidx == CMD_def) && VIM_ISWHITE(p[-1]))
+    যদি ((vim9script || eap->cmdidx == CMD_def) && VIM_ISWHITE(p[-1]))
     {
 	semsg(_(e_no_white_space_allowed_before_str_str), "(", p - 1);
-	goto ret_free;
+	যাও ret_free;
     }
 
     // In Vim9 script only global functions can be redefined.
-    if (vim9script && eap->forceit && !is_global)
+    যদি (vim9script && eap->forceit && !is_global)
     {
 	emsg(_(e_no_bang_allowed));
-	goto ret_free;
+	যাও ret_free;
     }
 
-    ga_init2(&newlines, sizeof(char_u *), 10);
+    ga_init2(&newlines, আকার(char_u *), 10);
 
-    if (!eap->skip && name_arg == NULL)
+    যদি (!eap->skip && name_arg == ফাঁকা)
     {
 	// Check the name of the function.  Unless it's a dictionary function
 	// (that we are overwriting).
-	if (name != NULL)
+	যদি (name != ফাঁকা)
 	    arg = name;
-	else
+	অন্যথা
 	    arg = fudi.fd_newkey;
-	if (arg != NULL && (fudi.fd_di == NULL
+	যদি (arg != ফাঁকা && (fudi.fd_di == ফাঁকা
 				     || (fudi.fd_di->di_tv.v_type != VAR_FUNC
 				 && fudi.fd_di->di_tv.v_type != VAR_PARTIAL)))
 	{
 	    char_u  *name_base = arg;
-	    int	    i;
+	    পূর্ণসংখ্যা	    i;
 
 	    // When defining a dictionary function with bracket notation
 	    // (e.g. obj['foo-bar']()), the key is a dictionary key and is not
 	    // required to follow function naming rules.  Skip the identifier
 	    // check in that case.
-	    if (arg != fudi.fd_newkey)
+	    যদি (arg != fudi.fd_newkey)
 	    {
-		if (*arg == K_SPECIAL)
+		যদি (*arg == K_SPECIAL)
 		{
 		    name_base = vim_strchr(arg, '_');
-		    if (name_base == NULL)
+		    যদি (name_base == ফাঁকা)
 			name_base = arg + 3;
-		    else
+		    অন্যথা
 			++name_base;
 		}
-		for (i = 0; name_base[i] != NUL && (i == 0
+		জন্য (i = 0; name_base[i] != NUL && (i == 0
 					    ? eval_isnamec1(name_base[i])
 					    : eval_isnamec(name_base[i])); ++i)
 		    ;
-		if (name_base[i] != NUL)
+		যদি (name_base[i] != NUL)
 		{
 		    emsg_funcname(e_invalid_argument_str, arg);
-		    goto ret_free;
+		    যাও ret_free;
 		}
 
 		// In Vim9 script a function cannot have the same name as a
 		// variable.
-		if (vim9script && *arg == K_SPECIAL
-		    && eval_variable(name_base, i, 0, NULL,
-			NULL, EVAL_VAR_NOAUTOLOAD + EVAL_VAR_IMPORT
+		যদি (vim9script && *arg == K_SPECIAL
+		    && eval_variable(name_base, i, 0, ফাঁকা,
+			ফাঁকা, EVAL_VAR_NOAUTOLOAD + EVAL_VAR_IMPORT
 						     + EVAL_VAR_NO_FUNC) == OK)
 		{
 		    semsg(_(e_redefining_script_item_str), name_base);
-		    goto ret_free;
+		    যাও ret_free;
 		}
 	    }
 	}
 	// Disallow using the g: dict.
-	if (fudi.fd_dict != NULL && fudi.fd_dict->dv_scope == VAR_DEF_SCOPE)
+	যদি (fudi.fd_dict != ফাঁকা && fudi.fd_dict->dv_scope == VAR_DEF_SCOPE)
 	{
 	    emsg(_(e_cannot_use_g_here));
-	    goto ret_free;
+	    যাও ret_free;
 	}
     }
 
     // This may get more lines and make the pointers into the first line
     // invalid.
     ++p;
-    if (get_function_args(&p, ')', &newargs,
-			 eap->cmdidx == CMD_def ? &argtypes : NULL, FALSE,
-			 eap->cmdidx == CMD_def ? &arg_objm : NULL,
-			 NULL, &varargs, &default_args, eap->skip,
-			 eap, class_flags, &newlines, lines_to_free) == FAIL)
-	goto errret_2;
+    যদি (get_function_args(&p, ')', &newargs,
+			 eap->cmdidx == CMD_def ? &argtypes : ফাঁকা, FALSE,
+			 eap->cmdidx == CMD_def ? &arg_objm : ফাঁকা,
+			 ফাঁকা, &varargs, &default_args, eap->skip,
+			 eap, class_flags, &newlines, সারিগুলি_to_free) == FAIL)
+	যাও errret_2;
     whitep = p;
 
-    if (eap->cmdidx == CMD_def)
+    যদি (eap->cmdidx == CMD_def)
     {
 	// find the return type: :def Func(): type
-	if (*skipwhite(p) == ':')
+	যদি (*skipwhite(p) == ':')
 	{
-	    if (*p != ':')
+	    যদি (*p != ':')
 	    {
 		semsg(_(e_no_white_space_allowed_before_colon_str), p);
 		p = skipwhite(p);
 	    }
-	    else if (!IS_WHITE_OR_NUL(p[1]))
+	    অন্যথা যদি (!IS_WHITE_OR_NUL(p[1]))
 		semsg(_(e_white_space_required_after_str_str), ":", p);
 	    ret_type = skipwhite(p + 1);
 	    p = skip_type(ret_type, FALSE);
-	    if (p > ret_type)
+	    যদি (p > ret_type)
 	    {
 		ret_type = vim_strnsave(ret_type, p - ret_type);
 		whitep = p;
 		p = skipwhite(p);
 	    }
-	    else
+	    অন্যথা
 	    {
 		semsg(_(e_expected_type_str), ret_type);
-		ret_type = NULL;
+		ret_type = ফাঁকা;
 	    }
 	}
 	p = skipwhite(p);
     }
-    else
+    অন্যথা
 	// find extra arguments "range", "dict", "abort" and "closure"
-	for (;;)
+	জন্য (;;)
 	{
 	    whitep = p;
 	    p = skipwhite(p);
-	    if (STRNCMP(p, "range", 5) == 0)
+	    যদি (STRNCMP(p, "range", 5) == 0)
 	    {
 		flags |= FC_RANGE;
 		p += 5;
 	    }
-	    else if (STRNCMP(p, "dict", 4) == 0)
+	    অন্যথা যদি (STRNCMP(p, "dict", 4) == 0)
 	    {
 		flags |= FC_DICT;
 		p += 4;
 	    }
-	    else if (STRNCMP(p, "abort", 5) == 0)
+	    অন্যথা যদি (STRNCMP(p, "abort", 5) == 0)
 	    {
 		flags |= FC_ABORT;
 		p += 5;
 	    }
-	    else if (STRNCMP(p, "closure", 7) == 0)
+	    অন্যথা যদি (STRNCMP(p, "closure", 7) == 0)
 	    {
 		flags |= FC_CLOSURE;
 		p += 7;
-		if (current_funccal == NULL)
+		যদি (current_funccal == ফাঁকা)
 		{
-		    emsg_funcname(e_closure_function_should_not_be_at_top_level_str,
-			    name == NULL ? (char_u *)"" : name);
-		    goto erret;
+		    emsg_funcname(e_closure_function_should_not_be_at_শীর্ষ_level_str,
+			    name == ফাঁকা ? (char_u *)"" : name);
+		    যাও erret;
 		}
 	    }
-	    else
-		break;
+	    অন্যথা
+		বিরতি;
 	}
 
     // When there is a line break use what follows for the function body.
     // Makes 'exe "func Test()\n...\nendfunc"' work.
-    if (*p == '\n')
-	line_arg = p + 1;
-    else if (*p != NUL
+    যদি (*p == '\n')
+	সারি_arg = p + 1;
+    অন্যথা যদি (*p != NUL
 	    && !(*p == '"' && (!vim9script || eap->cmdidx == CMD_function)
 						     && eap->cmdidx != CMD_def)
 	    && !(VIM_ISWHITE(*whitep) && *p == '#'
@@ -5404,167 +5404,167 @@ define_function(
      * Read the body of the function, until "}", ":endfunction" or ":enddef" is
      * found.
      */
-    if (KeyTyped)
+    যদি (চাবি_Typed)
     {
 	// Check if the function already exists, don't let the user type the
 	// whole function before telling him it doesn't work!  For a script we
 	// need to skip the body to be able to find what follows.
-	if (!eap->skip && !eap->forceit)
+	যদি (!eap->skip && !eap->forceit)
 	{
-	    if (fudi.fd_dict != NULL && fudi.fd_newkey == NULL)
+	    যদি (fudi.fd_dict != ফাঁকা && fudi.fd_newkey == ফাঁকা)
 		emsg(_(e_dictionary_entry_already_exists));
-	    else if (name != NULL && find_func(name, is_global) != NULL)
+	    অন্যথা যদি (name != ফাঁকা && find_func(name, is_global) != ফাঁকা)
 		emsg_funcname(e_function_str_already_exists_add_bang_to_replace, name);
 	}
 
-	if (!eap->skip && did_emsg)
-	    goto erret;
+	যদি (!eap->skip && did_emsg)
+	    যাও erret;
 
-	msg_putchar('\n');	    // don't overwrite the function name
-	cmdline_row = msg_row;
+	বার্তা_putchar('\n');	    // don't overwrite the function name
+	cmdline_row = বার্তা_row;
     }
 
     // Save the starting line number.
-    sourcing_lnum_top = SOURCING_LNUM;
+    sourcing_lnum_শীর্ষ = SOURCING_LNUM;
 
     // Do not define the function when getting the body fails, when the header
     // had an error (the body is still read to find the end) and when skipping.
-    if (((class_flags & CF_INTERFACE) == 0
+    যদি (((class_flags & CF_INTERFACE) == 0
 		&& (class_flags & CF_ABSTRACT_METHOD) == 0
-		&& (get_function_body(eap, &newlines, line_arg, lines_to_free)
+		&& (get_function_body(eap, &newlines, সারি_arg, সারিগুলি_to_free)
 							== FAIL || did_emsg))
 	    || eap->skip)
-	goto erret;
+	যাও erret;
 
     /*
      * If there are no errors, add the function
      */
-    if (fudi.fd_dict != NULL)
+    যদি (fudi.fd_dict != ফাঁকা)
     {
-	char	numbuf[NUMBUFLEN];
+	অক্ষর	numbuf[NUMBUFLEN];
 
-	fp = NULL;
-	if (fudi.fd_newkey == NULL && !eap->forceit)
+	fp = ফাঁকা;
+	যদি (fudi.fd_newkey == ফাঁকা && !eap->forceit)
 	{
 	    emsg(_(e_dictionary_entry_already_exists));
-	    goto erret;
+	    যাও erret;
 	}
-	if (fudi.fd_di == NULL)
+	যদি (fudi.fd_di == ফাঁকা)
 	{
 	    // Can't add a function to a locked dictionary
-	    if (value_check_lock(fudi.fd_dict->dv_lock, eap->arg, FALSE))
-		goto erret;
+	    যদি (মান_check_lock(fudi.fd_dict->dv_lock, eap->arg, FALSE))
+		যাও erret;
 	}
 	    // Can't change an existing function if it is locked
-	else if (value_check_lock(fudi.fd_di->di_tv.v_lock, eap->arg, FALSE))
-	    goto erret;
+	অন্যথা যদি (মান_check_lock(fudi.fd_di->di_tv.v_lock, eap->arg, FALSE))
+	    যাও erret;
 
 	// Give the function a sequential number.  Can only be used with a
 	// Funcref!
 	vim_free(name);
-	namelen = vim_snprintf(numbuf, sizeof(numbuf), "%d", ++func_nr);
+	namelen = vim_snprintf(numbuf, আকার(numbuf), "%d", ++func_nr);
 	name = vim_strnsave((char_u *)numbuf, namelen);
-	if (name == NULL)
-	    goto erret;
+	যদি (name == ফাঁকা)
+	    যাও erret;
     }
-    else if (class_flags == 0)
+    অন্যথা যদি (class_flags == 0)
     {
 	hashtab_T	*ht;
 	char_u		*find_name = name;
-	int		var_conflict = FALSE;
-	int		ffed_flags = is_global ? FFED_IS_GLOBAL : 0;
+	পূর্ণসংখ্যা		var_conflict = FALSE;
+	পূর্ণসংখ্যা		ffed_flags = is_global ? FFED_IS_GLOBAL : 0;
 
 	v = find_var(name, &ht, TRUE);
-	if (v != NULL && (vim9script || v->di_tv.v_type == VAR_FUNC))
+	যদি (v != ফাঁকা && (vim9script || v->di_tv.v_type == VAR_FUNC))
 	    var_conflict = TRUE;
 
-	if (SCRIPT_ID_VALID(current_sctx.sc_sid))
+	যদি (SCRIPT_ID_VALID(current_sctx.sc_sid))
 	{
 	    scriptitem_T *si = SCRIPT_ITEM(current_sctx.sc_sid);
 
-	    if (si->sn_autoload_prefix != NULL)
+	    যদি (si->sn_autoload_prefix != ফাঁকা)
 	    {
-		if (is_export)
+		যদি (is_export)
 		{
 		    find_name = name + STRLEN(si->sn_autoload_prefix);
 		    v = find_var(find_name, &ht, TRUE);
-		    if (v != NULL)
+		    যদি (v != ফাঁকা)
 			var_conflict = TRUE;
 		    // Only check if the function already exists in the script,
 		    // global functions can be shadowed.
 		    ffed_flags |= FFED_NO_GLOBAL;
 		}
-		else
+		অন্যথা
 		{
 		    char_u *prefixed = may_prefix_autoload(name);
 
-		    if (prefixed != NULL && prefixed != name)
+		    যদি (prefixed != ফাঁকা && prefixed != name)
 		    {
 			v = find_var(prefixed, &ht, TRUE);
-			if (v != NULL)
+			যদি (v != ফাঁকা)
 			    var_conflict = TRUE;
 			vim_free(prefixed);
 		    }
 		}
 	    }
 	}
-	if (var_conflict)
+	যদি (var_conflict)
 	{
 	    emsg_funcname(e_function_name_conflicts_with_variable_str, name);
-	    goto erret;
+	    যাও erret;
 	}
 
 	fp = find_func_even_dead(find_name, ffed_flags);
-	if (vim9script)
+	যদি (vim9script)
 	{
 	    char_u *uname = untrans_function_name(name);
 
-	    import = find_imported(uname == NULL ? name : uname, 0, FALSE);
+	    import = find_imported(uname == ফাঁকা ? name : uname, 0, FALSE);
 	}
 
-	if (fp != NULL || import != NULL)
+	যদি (fp != ফাঁকা || import != ফাঁকা)
 	{
-	    int dead = fp != NULL && (fp->uf_flags & FC_DEAD);
+	    পূর্ণসংখ্যা dead = fp != ফাঁকা && (fp->uf_flags & FC_DEAD);
 
 	    // Function can be replaced with "function!" and when sourcing the
 	    // same script again, but only once.
 	    // A name that is used by an import can not be overruled.
-	    if (import != NULL
+	    যদি (import != ফাঁকা
 		    || (!dead && !eap->forceit
 			&& (fp->uf_script_ctx.sc_sid != current_sctx.sc_sid
 			  || fp->uf_script_ctx.sc_seq == current_sctx.sc_seq)))
 	    {
-		SOURCING_LNUM = sourcing_lnum_top;
-		if (vim9script)
+		SOURCING_LNUM = sourcing_lnum_শীর্ষ;
+		যদি (vim9script)
 		    emsg_funcname(e_name_already_defined_str, name);
-		else
+		অন্যথা
 		    emsg_funcname(e_function_str_already_exists_add_bang_to_replace, name);
-		goto errret_keep;
+		যাও errret_keep;
 	    }
-	    if (fp->uf_calls > 0)
+	    যদি (fp->uf_calls > 0)
 	    {
 		emsg_funcname(
 			    e_cannot_redefine_function_str_it_is_in_use, name);
-		goto errret_keep;
+		যাও errret_keep;
 	    }
-	    if (fp->uf_refcount > 1)
+	    যদি (fp->uf_refcount > 1)
 	    {
 		// This function is referenced somewhere, don't redefine it but
 		// create a new one.
 		--fp->uf_refcount;
 		fp->uf_flags |= FC_REMOVED;
-		fp = NULL;
+		fp = ফাঁকা;
 		overwrite = TRUE;
 	    }
-	    else
+	    অন্যথা
 	    {
 		char_u *exp_name = fp->uf_name_exp;
 
 		// redefine existing function, keep the expanded name
 		VIM_CLEAR(name);
 		namelen = 0;
-		fp->uf_name_exp = NULL;
-		func_clear_items(fp);
+		fp->uf_name_exp = ফাঁকা;
+		func_clear_বস্তুসমূহ(fp);
 		fp->uf_name_exp = exp_name;
 		fp->uf_flags &= ~FC_DEAD;
 #ifdef FEAT_PROFILE
@@ -5576,76 +5576,76 @@ define_function(
 	}
     }
 
-    if (fp == NULL)
+    যদি (fp == ফাঁকা)
     {
-	if (fudi.fd_dict == NULL && vim_strchr(name, AUTOLOAD_CHAR) != NULL)
+	যদি (fudi.fd_dict == ফাঁকা && vim_strchr(name, AUTOLOAD_CHAR) != ফাঁকা)
 	{
-	    int	    slen, plen;
+	    পূর্ণসংখ্যা	    slen, plen;
 	    char_u  *scriptname;
 
 	    // Check that the autoload name matches the script name.
 	    j = FAIL;
-	    if (SOURCING_NAME != NULL)
+	    যদি (SOURCING_NAME != ফাঁকা)
 	    {
 		scriptname = autoload_name(name);
-		if (scriptname != NULL)
+		যদি (scriptname != ফাঁকা)
 		{
 		    p = vim_strchr(scriptname, '/');
-		    plen = (int)STRLEN(p);
-		    slen = (int)STRLEN(SOURCING_NAME);
-		    if (slen > plen && fnamecmp(p,
+		    plen = (পূর্ণসংখ্যা)STRLEN(p);
+		    slen = (পূর্ণসংখ্যা)STRLEN(SOURCING_NAME);
+		    যদি (slen > plen && fnamecmp(p,
 					    SOURCING_NAME + slen - plen) == 0)
 			j = OK;
 		    vim_free(scriptname);
 		}
 	    }
-	    if (j == FAIL)
+	    যদি (j == FAIL)
 	    {
 		linenr_T save_lnum = SOURCING_LNUM;
 
-		SOURCING_LNUM = sourcing_lnum_top;
+		SOURCING_LNUM = sourcing_lnum_শীর্ষ;
 		semsg(_(e_function_name_does_not_match_script_file_name_str),
 									 name);
 		SOURCING_LNUM = save_lnum;
-		goto erret;
+		যাও erret;
 	    }
 	}
 
-	if (namelen == 0)
+	যদি (namelen == 0)
 	    namelen = STRLEN(name);
 	fp = alloc_ufunc(name, namelen);
-	if (fp == NULL)
-	    goto erret;
+	যদি (fp == ফাঁকা)
+	    যাও erret;
 	fp_allocated = TRUE;
 
-	if (fudi.fd_dict != NULL)
+	যদি (fudi.fd_dict != ফাঁকা)
 	{
 	    char_u *func_name = vim_strnsave(name, namelen);
 
-	    if (func_name == NULL)
+	    যদি (func_name == ফাঁকা)
 	    {
 		VIM_CLEAR(fp);
-		goto erret;
+		যাও erret;
 	    }
-	    if (fudi.fd_di == NULL)
+	    যদি (fudi.fd_di == ফাঁকা)
 	    {
 		// add new dict entry
 		fudi.fd_di = dictitem_alloc(fudi.fd_newkey);
-		if (fudi.fd_di == NULL)
+		যদি (fudi.fd_di == ফাঁকা)
 		{
 		    vim_free(func_name);
 		    VIM_CLEAR(fp);
-		    goto erret;
+		    যাও erret;
 		}
-		if (dict_add(fudi.fd_dict, fudi.fd_di) == FAIL)
+		যদি (dict_add(fudi.fd_dict, fudi.fd_di) == FAIL)
 		{
 		    vim_free(fudi.fd_di);
 		    vim_free(func_name);
 		    VIM_CLEAR(fp);
-		    goto erret;
+		    যাও erret;
 		}
 	    }
-	    else
+	    অন্যথা
 		// overwrite existing dict entry
 		clear_tv(&fudi.fd_di->di_tv);
 	    fudi.fd_di->di_tv.v_type = VAR_FUNC;
@@ -5660,14 +5660,14 @@ define_function(
     fp->uf_ret_type = &t_any;
     fp->uf_func_type = &t_func_any;
 
-    if (eap->cmdidx == CMD_def)
+    যদি (eap->cmdidx == CMD_def)
     {
-	int	    lnum_save = SOURCING_LNUM;
+	পূর্ণসংখ্যা	    lnum_save = SOURCING_LNUM;
 	cstack_T    *cstack = eap->cstack;
 
 	fp->uf_def_status = UF_TO_BE_COMPILED;
 
-	if (generic_func_args_table_size(&gfatab) > 0)
+	যদি (generic_func_args_table_আকার(&gfatab) > 0)
 	{
 	    // initialize generic function state
 	    flags |= FC_GENERIC;
@@ -5675,7 +5675,7 @@ define_function(
 	}
 
 	// error messages are for the first function line
-	SOURCING_LNUM = sourcing_lnum_top;
+	SOURCING_LNUM = sourcing_lnum_শীর্ষ;
 
 	// The function may use script variables from the context.
 	function_using_block_scopes(fp, cstack);
@@ -5684,96 +5684,96 @@ define_function(
 	// In that case, the imported file will be sourced.  To avoid treating
 	// everything in the imported file as exported, temporarily reset
 	// is_export.
-	int save_is_export = is_export;
+	পূর্ণসংখ্যা save_is_export = is_export;
 	is_export = FALSE;
 
-	if (parse_argument_types(fp, &argtypes, varargs, &arg_objm,
-				obj_members, obj_member_count, cctx) == FAIL)
+	যদি (parse_argument_types(fp, &argtypes, varargs, &arg_objm,
+				obj_members, obj_member_গুনতি, cctx) == FAIL)
 	{
 	    SOURCING_LNUM = lnum_save;
 	    free_fp = fp_allocated;
 	    is_export = save_is_export;
-	    goto erret;
+	    যাও erret;
 	}
 	varargs = FALSE;
 
 	// parse the return type, if any
-	if (parse_return_type(fp, ret_type, cctx) == FAIL)
+	যদি (parse_return_type(fp, ret_type, cctx) == FAIL)
 	{
 	    SOURCING_LNUM = lnum_save;
 	    free_fp = fp_allocated;
 	    is_export = save_is_export;
-	    goto erret;
+	    যাও erret;
 	}
 	is_export = save_is_export;
 	SOURCING_LNUM = lnum_save;
     }
-    else
+    অন্যথা
 	fp->uf_def_status = UF_NOT_COMPILED;
 
-    if (fp_allocated)
+    যদি (fp_allocated)
     {
 	// insert the new function in the function list
-	if (overwrite)
+	যদি (overwrite)
 	{
 	    hi = hash_find(&func_hashtab, name);
-	    hi->hi_key = UF2HIKEY(fp);
+	    hi->hi_চাবি = UF2HIKEY(fp);
 	}
-	else if (class_flags == 0 && hash_add(&func_hashtab,
+	অন্যথা যদি (class_flags == 0 && hash_add(&func_hashtab,
 					 UF2HIKEY(fp), "add function") == FAIL)
 	{
 	    free_fp = TRUE;
-	    goto erret;
+	    যাও erret;
 	}
 	fp->uf_refcount = 1;
     }
 
-    fp->uf_lines = newlines;
-    newlines.ga_data = NULL;
-    if ((flags & FC_CLOSURE) != 0)
+    fp->uf_সারিগুলি = newlines;
+    newlines.ga_তথ্য = ফাঁকা;
+    যদি ((flags & FC_CLOSURE) != 0)
     {
-	if (register_closure(fp) == FAIL)
-	    goto erret;
+	যদি (register_closure(fp) == FAIL)
+	    যাও erret;
     }
-    else
-	fp->uf_scoped = NULL;
+    অন্যথা
+	fp->uf_scoped = ফাঁকা;
 
 #ifdef FEAT_PROFILE
-    if (prof_def_func())
+    যদি (prof_def_func())
 	func_do_profile(fp);
 #endif
     fp->uf_varargs = varargs;
-    if (sandbox)
+    যদি (sandbox)
 	flags |= FC_SANDBOX;
-    if (vim9script && !ASCII_ISUPPER(*fp->uf_name))
+    যদি (vim9script && !ASCII_ISUPPER(*fp->uf_name))
 	flags |= FC_VIM9;
     fp->uf_flags = flags;
     fp->uf_calls = 0;
     fp->uf_cleared = FALSE;
     fp->uf_script_ctx = current_sctx;
     fp->uf_script_ctx_version = current_sctx.sc_version;
-    fp->uf_script_ctx.sc_lnum += sourcing_lnum_top;
-    if (is_export)
+    fp->uf_script_ctx.sc_lnum += sourcing_lnum_শীর্ষ;
+    যদি (is_export)
     {
 	fp->uf_flags |= FC_EXPORT;
 	// let do_one_cmd() know the export worked.
 	is_export = FALSE;
     }
 
-    if (eap->cmdidx == CMD_def)
+    যদি (eap->cmdidx == CMD_def)
 	set_function_type(fp);
-    else if (fp->uf_script_ctx.sc_version == SCRIPT_VERSION_VIM9)
+    অন্যথা যদি (fp->uf_script_ctx.sc_version == SCRIPT_VERSION_VIM9)
 	// :func does not use Vim9 script syntax, even in a Vim9 script file
 	fp->uf_script_ctx.sc_version = SCRIPT_VERSION_MAX;
 
     // If test_override('defcompile' 1) is used, then compile the function now
-    if (eap->cmdidx == CMD_def && override_defcompile)
-	defcompile_function(fp, NULL);
+    যদি (eap->cmdidx == CMD_def && override_defcompile)
+	defcompile_function(fp, ফাঁকা);
 
-    goto ret_free;
+    যাও ret_free;
 
 erret:
-    if (fp != NULL)
+    যদি (fp != ফাঁকা)
     {
 	// these were set to "newargs" and "default_args", which are cleared
 	// below
@@ -5781,17 +5781,17 @@ erret:
 	ga_init(&fp->uf_def_args);
     }
 errret_2:
-    if (fp != NULL)
+    যদি (fp != ফাঁকা)
     {
 	VIM_CLEAR(fp->uf_arg_types);
 	VIM_CLEAR(fp->uf_va_name);
 	VIM_CLEAR(fp->uf_name_exp);
 	clear_func_type_list(&fp->uf_type_list, &fp->uf_func_type);
 	// the generic types were moved from "gfatab" to "fp"
-	if (IS_GENERIC_FUNC(fp))
-	    generic_func_clear_items(fp);
+	যদি (IS_GENERIC_FUNC(fp))
+	    generic_func_clear_বস্তুসমূহ(fp);
     }
-    if (free_fp)
+    যদি (free_fp)
 	VIM_CLEAR(fp);
 errret_keep:
     ga_clear_strings(&newargs);
@@ -5805,56 +5805,56 @@ ret_free:
     ga_clear(&gfatab.gfat_param_types);
     generic_func_args_table_clear(&gfatab);
     vim_free(fudi.fd_newkey);
-    if (name != name_arg)
+    যদি (name != name_arg)
 	vim_free(name);
     vim_free(ret_type);
     did_emsg |= saved_did_emsg;
 
-    return fp;
+    ফেরত fp;
 }
 
 /*
  * ":function"
  */
-    void
+    শূন্য
 ex_function(exarg_T *eap)
 {
-    garray_T lines_to_free;
+    garray_T সারিগুলি_to_free;
 
-    ga_init2(&lines_to_free, sizeof(char_u *), 50);
-    (void)define_function(eap, NULL, &lines_to_free, 0, NULL, 0, NULL);
-    ga_clear_strings(&lines_to_free);
+    ga_init2(&সারিগুলি_to_free, আকার(char_u *), 50);
+    (শূন্য)define_function(eap, ফাঁকা, &সারিগুলি_to_free, 0, ফাঁকা, 0, ফাঁকা);
+    ga_clear_strings(&সারিগুলি_to_free);
 }
 
-    int
-get_func_arity(char_u *name, int *required, int *optional, int *varargs)
+    পূর্ণসংখ্যা
+get_func_arity(char_u *name, পূর্ণসংখ্যা *required, পূর্ণসংখ্যা *optional, পূর্ণসংখ্যা *varargs)
 {
-    ufunc_T	*ufunc = NULL;
-    int		argcount = 0;
-    int		min_argcount = 0;
-    int		idx;
+    ufunc_T	*ufunc = ফাঁকা;
+    পূর্ণসংখ্যা		argcount = 0;
+    পূর্ণসংখ্যা		min_argcount = 0;
+    পূর্ণসংখ্যা		idx;
 
     idx = find_internal_func(name);
-    if (idx >= 0)
+    যদি (idx >= 0)
     {
 	internal_func_get_argcount(idx, &argcount, &min_argcount);
 	*varargs = FALSE;
     }
-    else
+    অন্যথা
     {
 	char_u	fname_buf[FLEN_FIXED + 1];
-	char_u	*tofree = NULL;
+	char_u	*tofree = ফাঁকা;
 	funcerror_T error = FCERR_NONE;
 	char_u	*fname;
 
 	// May need to translate <SNR>123_ to K_SNR.
 	fname = fname_trans_sid(name, fname_buf, &tofree, &error);
-	if (error == FCERR_NONE)
+	যদি (error == FCERR_NONE)
 	    ufunc = find_func(fname, FALSE);
 	vim_free(tofree);
 
-	if (ufunc == NULL)
-	    return FAIL;
+	যদি (ufunc == ফাঁকা)
+	    ফেরত FAIL;
 
 	argcount = ufunc->uf_args.ga_len;
 	min_argcount = ufunc->uf_args.ga_len - ufunc->uf_def_args.ga_len;
@@ -5864,7 +5864,7 @@ get_func_arity(char_u *name, int *required, int *optional, int *varargs)
     *required = min_argcount;
     *optional = argcount - min_argcount;
 
-    return OK;
+    ফেরত OK;
 }
 
 /*
@@ -5879,79 +5879,79 @@ find_func_by_name(char_u *name, compiletype_T *compile_type)
     char_u	*arg = name;
     char_u	*fname;
     ufunc_T	*ufunc;
-    int		is_global = FALSE;
-    char_u	*bracket_start = NULL;
+    পূর্ণসংখ্যা		is_global = FALSE;
+    char_u	*bracket_start = ফাঁকা;
     char_u	*generic_func_name = name;
 
-    if (STRNCMP(arg, "profile", 7) == 0 && VIM_ISWHITE(arg[7]))
+    যদি (STRNCMP(arg, "profile", 7) == 0 && VIM_ISWHITE(arg[7]))
     {
 	*compile_type = CT_PROFILE;
 	arg = skipwhite(arg + 7);
     }
-    else if (STRNCMP(arg, "debug", 5) == 0 && VIM_ISWHITE(arg[5]))
+    অন্যথা যদি (STRNCMP(arg, "debug", 5) == 0 && VIM_ISWHITE(arg[5]))
     {
 	*compile_type = CT_DEBUG;
 	arg = skipwhite(arg + 5);
     }
 
-    if (STRNCMP(arg, "<lambda>", 8) == 0)
+    যদি (STRNCMP(arg, "<lambda>", 8) == 0)
     {
 	arg += 8;
-	(void)getdigits(&arg);
+	(শূন্য)getdigits(&arg);
 	fname = vim_strnsave(name, arg - name);
     }
-    else
+    অন্যথা
     {
 	// First try finding a method in a class, trans_function_name() will
 	// give an error if the function is not found.
 	ufunc = find_class_func(&arg);
-	if (ufunc != NULL)
-	    return ufunc;
+	যদি (ufunc != ফাঁকা)
+	    ফেরত ufunc;
 
 	fname = trans_function_name_ext(&arg, &is_global, FALSE,
 		      TFN_INT | TFN_QUIET | TFN_NO_AUTOLOAD | TFN_NO_DECL,
-		      NULL, NULL, NULL, &ufunc);
-	if (ufunc != NULL)
+		      ফাঁকা, ফাঁকা, ফাঁকা, &ufunc);
+	যদি (ufunc != ফাঁকা)
 	{
 	    vim_free(fname);
-	    return ufunc;
+	    ফেরত ufunc;
 	}
-	if (fname != NULL && *arg == '<')
+	যদি (fname != ফাঁকা && *arg == '<')
 	{
 	    generic_func_name = name;
 	    bracket_start = arg;
-	    if (skip_generic_func_type_args(&arg) == FAIL)
+	    যদি (skip_generic_func_type_args(&arg) == FAIL)
 	    {
 		vim_free(fname);
-		return NULL;
+		ফেরত ফাঁকা;
 	    }
 	}
     }
-    if (fname == NULL)
+    যদি (fname == ফাঁকা)
     {
 	semsg(_(e_invalid_argument_str), name);
-	return NULL;
+	ফেরত ফাঁকা;
     }
-    if (!ends_excmd2(name, arg))
+    যদি (!ends_excmd2(name, arg))
     {
 	vim_free(fname);
 	emsg(ex_errmsg(e_trailing_characters_str, arg));
-	return NULL;
+	ফেরত ফাঁকা;
     }
 
     ufunc = find_func(fname, is_global);
-    if (ufunc == NULL)
+    যদি (ufunc == ফাঁকা)
     {
 	char_u *p = untrans_function_name(fname);
 
-	if (p != NULL)
+	যদি (p != ফাঁকা)
 	    // Try again without making it script-local.
 	    ufunc = find_func(p, FALSE);
 
-	if (ufunc == NULL)
+	যদি (ufunc == ফাঁকা)
 	{
 	    bracket_start = generic_func_find_open_bracket(fname);
-	    if (bracket_start != NULL)
+	    যদি (bracket_start != ফাঁকা)
 	    {
 		generic_func_name = fname;
 		*bracket_start = NUL;
@@ -5961,10 +5961,10 @@ find_func_by_name(char_u *name, compiletype_T *compile_type)
 	}
     }
 
-    if (ufunc != NULL)
+    যদি (ufunc != ফাঁকা)
     {
 	// handle generic functions
-	if (bracket_start == NULL)
+	যদি (bracket_start == ফাঁকা)
 	    bracket_start = generic_func_name + STRLEN(generic_func_name);
 
 	ufunc = eval_generic_func(ufunc, generic_func_name, &bracket_start);
@@ -5972,52 +5972,52 @@ find_func_by_name(char_u *name, compiletype_T *compile_type)
 
     vim_free(fname);
 
-    if (ufunc == NULL)
+    যদি (ufunc == ফাঁকা)
 	semsg(_(e_cannot_find_function_str), name);
-    return ufunc;
+    ফেরত ufunc;
 }
 
 /*
  * Compile the :def function "ufunc".  If "cl" is not NULL, then compile the
  * class or object method "ufunc" in "cl".
  */
-    void
+    শূন্য
 defcompile_function(ufunc_T *ufunc, class_T *cl)
 {
     compiletype_T compile_type = CT_NONE;
 
-    if (func_needs_compiling(ufunc, compile_type))
-	(void)compile_def_function(ufunc, FALSE, compile_type, NULL);
-    else
+    যদি (func_needs_compiling(ufunc, compile_type))
+	(শূন্য)compile_def_function(ufunc, FALSE, compile_type, ফাঁকা);
+    অন্যথা
 	smsg(_("Function %s%s%s does not need compiling"),
-				cl != NULL ? cl->class_name.string : (char_u *)"",
-				cl != NULL ? (char_u *)"." : (char_u *)"",
+				cl != ফাঁকা ? cl->class_name.string : (char_u *)"",
+				cl != ফাঁকা ? (char_u *)"." : (char_u *)"",
 				ufunc->uf_name);
 }
 
 /*
  * Compile all the :def functions defined in the current script
  */
-    static void
-defcompile_funcs_in_script(void)
+    স্থির শূন্য
+defcompile_funcs_in_script(শূন্য)
 {
     long	todo = (long)func_hashtab.ht_used;
-    int		changed = func_hashtab.ht_changed;
+    পূর্ণসংখ্যা		changed = func_hashtab.ht_changed;
     hashitem_T	*hi;
 
-    for (hi = func_hashtab.ht_array; todo > 0 && !got_int; ++hi)
+    জন্য (hi = func_hashtab.ht_array; todo > 0 && !got_int; ++hi)
     {
-	if (!HASHITEM_EMPTY(hi))
+	যদি (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
 	    ufunc_T *ufunc = HI2UF(hi);
-	    if (ufunc->uf_script_ctx.sc_sid == current_sctx.sc_sid
+	    যদি (ufunc->uf_script_ctx.sc_sid == current_sctx.sc_sid
 		    && ufunc->uf_def_status == UF_TO_BE_COMPILED
 		    && (ufunc->uf_flags & FC_DEAD) == 0)
 	    {
-		(void)compile_def_function(ufunc, FALSE, CT_NONE, NULL);
+		(শূন্য)compile_def_function(ufunc, FALSE, CT_NONE, ফাঁকা);
 
-		if (func_hashtab.ht_changed != changed)
+		যদি (func_hashtab.ht_changed != changed)
 		{
 		    // a function has been added or removed, need to start
 		    // over
@@ -6036,29 +6036,29 @@ defcompile_funcs_in_script(void)
  * be compiled or the one specified by the argument.
  * Skips dead functions.  Doesn't do profiling.
  */
-    void
+    শূন্য
 ex_defcompile(exarg_T *eap)
 {
-    if (*eap->arg != NUL)
+    যদি (*eap->arg != NUL)
     {
 	typval_T tv;
 
-	if (is_class_name(eap->arg, &tv))
+	যদি (is_class_name(eap->arg, &tv))
 	{
 	    class_T *cl = tv.vval.v_class;
 
-	    if (cl != NULL)
+	    যদি (cl != ফাঁকা)
 		defcompile_class(cl);
 	}
-	else
+	অন্যথা
 	{
 	    compiletype_T compile_type = CT_NONE;
 	    ufunc_T *ufunc = find_func_by_name(eap->arg, &compile_type);
-	    if (ufunc != NULL)
-		defcompile_function(ufunc, NULL);
+	    যদি (ufunc != ফাঁকা)
+		defcompile_function(ufunc, ফাঁকা);
 	}
     }
-    else
+    অন্যথা
     {
 	defcompile_funcs_in_script();
 
@@ -6072,174 +6072,174 @@ ex_defcompile(exarg_T *eap)
  * Return 2 if "p" starts with "s:".
  * Return 0 otherwise.
  */
-    int
+    পূর্ণসংখ্যা
 eval_fname_script(char_u *p)
 {
     // Use MB_STRICMP() because in Turkish comparing the "I" may not work with
     // the standard library function.
-    if (p[0] == '<' && (MB_STRNICMP(p + 1, "SID>", 4) == 0
+    যদি (p[0] == '<' && (MB_STRNICMP(p + 1, "SID>", 4) == 0
 				       || MB_STRNICMP(p + 1, "SNR>", 4) == 0))
-	return 5;
-    if (p[0] == 's' && p[1] == ':')
-	return 2;
-    return 0;
+	ফেরত 5;
+    যদি (p[0] == 's' && p[1] == ':')
+	ফেরত 2;
+    ফেরত 0;
 }
 
-    int
-translated_function_exists(char_u *name, int is_global)
+    পূর্ণসংখ্যা
+translated_function_exists(char_u *name, পূর্ণসংখ্যা is_global)
 {
-    if (builtin_function(name, -1))
-	return has_internal_func(name);
-    return find_func(name, is_global) != NULL;
+    যদি (builtin_function(name, -1))
+	ফেরত has_internal_func(name);
+    ফেরত find_func(name, is_global) != ফাঁকা;
 }
 
 /*
  * Return TRUE when "ufunc" has old-style "..." varargs
  * or named varargs "...name: type".
  */
-    int
+    পূর্ণসংখ্যা
 has_varargs(ufunc_T *ufunc)
 {
-    return ufunc->uf_varargs || ufunc->uf_va_name != NULL;
+    ফেরত ufunc->uf_varargs || ufunc->uf_va_name != ফাঁকা;
 }
 
 /*
  * Return TRUE if a function "name" exists.
  * If "no_defef" is TRUE, do not dereference a Funcref.
  */
-    int
-function_exists(char_u *name, int no_deref)
+    পূর্ণসংখ্যা
+function_exists(char_u *name, পূর্ণসংখ্যা no_deref)
 {
     char_u  *nm = name;
     char_u  *p;
-    int	    n = FALSE;
-    int	    flag;
-    int	    is_global = FALSE;
+    পূর্ণসংখ্যা	    n = FALSE;
+    পূর্ণসংখ্যা	    flag;
+    পূর্ণসংখ্যা	    is_global = FALSE;
 
     flag = TFN_INT | TFN_QUIET | TFN_NO_AUTOLOAD;
-    if (no_deref)
+    যদি (no_deref)
 	flag |= TFN_NO_DEREF;
     p = trans_function_name(&nm, &is_global, FALSE, flag);
     nm = skipwhite(nm);
 
     // Only accept "funcname", "funcname ", "funcname (..." and
     // "funcname(...", not "funcname!...".
-    if (p != NULL && (*nm == NUL || *nm == '('))
+    যদি (p != ফাঁকা && (*nm == NUL || *nm == '('))
 	n = translated_function_exists(p, is_global);
     vim_free(p);
-    return n;
+    ফেরত n;
 }
 
 /*
  * Add what getinfo() reports for the user defined function "name" to "d".
  * Returns FAIL when there is no such function.
  */
-    int
+    পূর্ণসংখ্যা
 user_func_info(char_u *name, dict_T *d)
 {
     char_u	*nm = name;
     char_u	*p;
-    int		is_global = FALSE;
-    ufunc_T	*fp = NULL;
+    পূর্ণসংখ্যা		is_global = FALSE;
+    ufunc_T	*fp = ফাঁকা;
     list_T	*args;
-    int		is_def;
-    char	*tofree;
+    পূর্ণসংখ্যা		is_def;
+    অক্ষর	*tofree;
 
-    if (*name == NUL)
-	return FAIL;
+    যদি (*name == NUL)
+	ফেরত FAIL;
     p = trans_function_name(&nm, &is_global, FALSE,
 			 TFN_INT | TFN_QUIET | TFN_NO_AUTOLOAD | TFN_NO_DEREF);
-    if (p != NULL && *skipwhite(nm) == NUL)
+    যদি (p != ফাঁকা && *skipwhite(nm) == NUL)
 	fp = find_func(p, is_global);
     vim_free(p);
-    if (fp == NULL)
-	return FAIL;
+    যদি (fp == ফাঁকা)
+	ফেরত FAIL;
 
     is_def = fp->uf_def_status != UF_NOT_COMPILED;
     dict_add_string(d, "name", printable_func_name(fp));
     dict_add_string(d, "kind", (char_u *)(is_def ? "def" : "function"));
     dict_add_bool(d, "available", TRUE);
     args = list_alloc();
-    if (args == NULL || dict_add_list(d, "args", args) == FAIL)
+    যদি (args == ফাঁকা || dict_add_list(d, "args", args) == FAIL)
     {
 	list_unref(args);
-	return FAIL;
+	ফেরত FAIL;
     }
-    for (int j = 0; j < fp->uf_args.ga_len; ++j)
+    জন্য (পূর্ণসংখ্যা j = 0; j < fp->uf_args.ga_len; ++j)
     {
 	dict_T	*arg = dict_alloc();
 
-	if (arg == NULL || list_append_dict(args, arg) == FAIL)
+	যদি (arg == ফাঁকা || list_append_dict(args, arg) == FAIL)
 	{
 	    dict_unref(arg);
-	    return FAIL;
+	    ফেরত FAIL;
 	}
 	dict_add_string(arg, "name", FUNCARG(fp, j));
-	if (fp->uf_arg_types == NULL)
+	যদি (fp->uf_arg_types == ফাঁকা)
 	    dict_add_string(arg, "type", (char_u *)"any");
-	else
+	অন্যথা
 	{
 	    dict_add_string(arg, "type",
 			     (char_u *)type_name(fp->uf_arg_types[j], &tofree));
 	    vim_free(tofree);
 	}
-	if (j >= fp->uf_args.ga_len - fp->uf_def_args.ga_len)
-	    dict_add_string(arg, "default", ((char_u **)fp->uf_def_args.ga_data)
+	যদি (j >= fp->uf_args.ga_len - fp->uf_def_args.ga_len)
+	    dict_add_string(arg, "default", ((char_u **)fp->uf_def_args.ga_তথ্য)
 			     [j - fp->uf_args.ga_len + fp->uf_def_args.ga_len]);
     }
-    if (has_varargs(fp))
+    যদি (has_varargs(fp))
     {
 	dict_T	*va = dict_alloc();
 
-	if (va == NULL || dict_add_dict(d, "varargs", va) == FAIL)
+	যদি (va == ফাঁকা || dict_add_dict(d, "varargs", va) == FAIL)
 	{
 	    dict_unref(va);
-	    return FAIL;
+	    ফেরত FAIL;
 	}
 	dict_add_string(va, "name",
-			 fp->uf_va_name == NULL ? (char_u *)"" : fp->uf_va_name);
-	if (fp->uf_va_type == NULL)
+			 fp->uf_va_name == ফাঁকা ? (char_u *)"" : fp->uf_va_name);
+	যদি (fp->uf_va_type == ফাঁকা)
 	    dict_add_string(va, "type", (char_u *)"list<any>");
-	else
+	অন্যথা
 	{
 	    dict_add_string(va, "type",
 				 (char_u *)type_name(fp->uf_va_type, &tofree));
 	    vim_free(tofree);
 	}
     }
-    if (is_def)
+    যদি (is_def)
     {
 	dict_add_string(d, "returns",
 				 (char_u *)type_name(fp->uf_ret_type, &tofree));
 	vim_free(tofree);
     }
-    else
+    অন্যথা
 	dict_add_string(d, "returns", (char_u *)"any");
     dict_add_bool(d, "abort", (fp->uf_flags & FC_ABORT) != 0);
     dict_add_bool(d, "range", (fp->uf_flags & FC_RANGE) != 0);
     dict_add_bool(d, "dict", (fp->uf_flags & FC_DICT) != 0);
     dict_add_bool(d, "closure", (fp->uf_flags & FC_CLOSURE) != 0);
-    dict_add_number(d, "sid", fp->uf_script_ctx.sc_sid);
-    dict_add_number(d, "lnum", fp->uf_script_ctx.sc_lnum);
-    return OK;
+    dict_add_সংখ্যা(d, "sid", fp->uf_script_ctx.sc_sid);
+    dict_add_সংখ্যা(d, "lnum", fp->uf_script_ctx.sc_lnum);
+    ফেরত OK;
 }
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#যদি defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
     char_u *
-get_expanded_name(char_u *name, int check)
+get_expanded_name(char_u *name, পূর্ণসংখ্যা check)
 {
     char_u	*nm = name;
     char_u	*p;
-    int		is_global = FALSE;
+    পূর্ণসংখ্যা		is_global = FALSE;
 
     p = trans_function_name(&nm, &is_global, FALSE, TFN_INT|TFN_QUIET);
 
-    if (p != NULL && *nm == NUL
+    যদি (p != ফাঁকা && *nm == NUL
 		       && (!check || translated_function_exists(p, is_global)))
-	return p;
+	ফেরত p;
 
     vim_free(p);
-    return NULL;
+    ফেরত ফাঁকা;
 }
 #endif
 
@@ -6248,51 +6248,51 @@ get_expanded_name(char_u *name, int check)
  * function names.
  */
     char_u *
-get_user_func_name(expand_T *xp, int idx)
+get_user_func_name(expand_T *xp, পূর্ণসংখ্যা idx)
 {
-    static long_u	done;
-    static int		changed;
-    static hashitem_T	*hi;
+    স্থির long_u	done;
+    স্থির পূর্ণসংখ্যা		changed;
+    স্থির hashitem_T	*hi;
     ufunc_T		*fp;
 
-    if (idx == 0)
+    যদি (idx == 0)
     {
 	done = 0;
 	hi = func_hashtab.ht_array;
 	changed = func_hashtab.ht_changed;
     }
-    if (changed == func_hashtab.ht_changed && done < func_hashtab.ht_used)
+    যদি (changed == func_hashtab.ht_changed && done < func_hashtab.ht_used)
     {
-	int len;
+	পূর্ণসংখ্যা len;
 
-	if (done++ > 0)
+	যদি (done++ > 0)
 	    ++hi;
-	while (HASHITEM_EMPTY(hi))
+	যখন (HASHITEM_EMPTY(hi))
 	    ++hi;
 	fp = HI2UF(hi);
 
 	// don't show dead, dict and lambda functions
-	if ((fp->uf_flags & FC_DEAD) || (fp->uf_flags & FC_DICT)
+	যদি ((fp->uf_flags & FC_DEAD) || (fp->uf_flags & FC_DICT)
 				|| STRNCMP(fp->uf_name, "<lambda>", 8) == 0)
-	    return (char_u *)"";
+	    ফেরত (char_u *)"";
 
-	if (fp->uf_namelen + 4 >= IOSIZE)
-	    return fp->uf_name;	// prevents overflow
+	যদি (fp->uf_namelen + 4 >= IOSIZE)
+	    ফেরত fp->uf_name;	// prevents overflow
 
 	len = cat_func_name(IObuff, IOSIZE, fp);
-	if (xp->xp_context != EXPAND_USER_FUNC
+	যদি (xp->xp_context != EXPAND_USER_FUNC
 				       && xp->xp_context != EXPAND_DISASSEMBLE)
 	{
 	    STRCPY(IObuff + len, "(");
-	    if (!has_varargs(fp) && fp->uf_args.ga_len == 0)
+	    যদি (!has_varargs(fp) && fp->uf_args.ga_len == 0)
 	    {
 		++len;
 		STRCPY(IObuff + len, ")");
 	    }
 	}
-	return IObuff;
+	ফেরত IObuff;
     }
-    return NULL;
+    ফেরত ফাঁকা;
 }
 
 /*
@@ -6303,11 +6303,11 @@ get_user_func_name(expand_T *xp, int idx)
  * Returns NULL when out of memory.
  */
     ufunc_T *
-copy_function(ufunc_T *fp, int extra_namelen)
+copy_function(ufunc_T *fp, পূর্ণসংখ্যা extra_namelen)
 {
     ufunc_T *ufunc = alloc_ufunc(fp->uf_name, fp->uf_namelen + extra_namelen);
-    if (ufunc == NULL)
-	return NULL;
+    যদি (ufunc == ফাঁকা)
+	ফেরত ফাঁকা;
 
     // Most things can just be copied.
     // The call to alloc_ufunc() above allocates a new uf_name_exp.  So save
@@ -6318,27 +6318,27 @@ copy_function(ufunc_T *fp, int extra_namelen)
 
     ufunc->uf_def_status = UF_TO_BE_COMPILED;
     ufunc->uf_dfunc_idx = 0;
-    ufunc->uf_class = NULL;
+    ufunc->uf_class = ফাঁকা;
 #ifdef FEAT_PROFILE
     // The copy gets its own profiling data, see below.
     ufunc->uf_profiling = FALSE;
     ufunc->uf_prof_initialized = FALSE;
-    ufunc->uf_tml_count = NULL;
-    ufunc->uf_tml_total = NULL;
-    ufunc->uf_tml_self = NULL;
+    ufunc->uf_tml_গুনতি = ফাঁকা;
+    ufunc->uf_tml_যোগ = ফাঁকা;
+    ufunc->uf_tml_self = ফাঁকা;
 #endif
 
     ga_copy_strings(&fp->uf_args, &ufunc->uf_args);
     ga_copy_strings(&fp->uf_def_args, &ufunc->uf_def_args);
 
-    if (ufunc->uf_arg_types != NULL)
+    যদি (ufunc->uf_arg_types != ফাঁকা)
     {
 	// "uf_arg_types" is an allocated array, make a copy.
 	type_T **at = ALLOC_CLEAR_MULT(type_T *, ufunc->uf_args.ga_len);
-	if (at != NULL)
+	যদি (at != ফাঁকা)
 	{
 	    mch_memmove(at, ufunc->uf_arg_types,
-				     sizeof(type_T *) * ufunc->uf_args.ga_len);
+				     আকার(type_T *) * ufunc->uf_args.ga_len);
 	    ufunc->uf_arg_types = at;
 	}
     }
@@ -6356,7 +6356,7 @@ copy_function(ufunc_T *fp, int extra_namelen)
     // copy generic function related state
     copy_generic_function(fp, ufunc);
 
-    if (ufunc->uf_va_name != NULL)
+    যদি (ufunc->uf_va_name != ফাঁকা)
 	ufunc->uf_va_name = vim_strsave(ufunc->uf_va_name);
 
     // TODO:
@@ -6364,105 +6364,105 @@ copy_function(ufunc_T *fp, int extra_namelen)
     //    type_T	*uf_func_type;
 
     ufunc->uf_block_depth = 0;
-    ufunc->uf_block_ids = NULL;
+    ufunc->uf_block_ids = ফাঁকা;
 
-    ga_copy_strings(&fp->uf_lines, &ufunc->uf_lines);
+    ga_copy_strings(&fp->uf_সারিগুলি, &ufunc->uf_সারিগুলি);
 
 #ifdef FEAT_PROFILE
     // Profile the copy when the function is profiled, e.g. after
     // ":profile! file", which only applies when a function is defined.
-    if (fp->uf_profiling)
+    যদি (fp->uf_profiling)
 	func_do_profile(ufunc);
 #endif
 
     ufunc->uf_refcount = 1;
 
-    return ufunc;
+    ফেরত ufunc;
 }
 
 /*
  * ":delfunction {name}"
  */
-    void
+    শূন্য
 ex_delfunction(exarg_T *eap)
 {
-    ufunc_T	*fp = NULL;
+    ufunc_T	*fp = ফাঁকা;
     char_u	*p;
     char_u	*name;
     funcdict_T	fudi;
-    int		is_global = FALSE;
+    পূর্ণসংখ্যা		is_global = FALSE;
 
     p = eap->arg;
     name = trans_function_name_ext(&p, &is_global, eap->skip, TFN_NO_DECL, &fudi,
-							     NULL, NULL, NULL);
+							     ফাঁকা, ফাঁকা, ফাঁকা);
     vim_free(fudi.fd_newkey);
-    if (name == NULL)
+    যদি (name == ফাঁকা)
     {
-	if (fudi.fd_dict != NULL && !eap->skip)
+	যদি (fudi.fd_dict != ফাঁকা && !eap->skip)
 	    emsg(_(e_funcref_required));
-	return;
+	ফেরত;
     }
-    if (!ends_excmd(*skipwhite(p)))
+    যদি (!ends_excmd(*skipwhite(p)))
     {
 	vim_free(name);
 	semsg(_(e_trailing_characters_str), p);
-	return;
+	ফেরত;
     }
     set_nextcmd(eap, p);
-    if (eap->nextcmd != NULL)
+    যদি (eap->nextcmd != ফাঁকা)
 	*p = NUL;
 
-    if (numbered_function(name) && fudi.fd_dict == NULL)
+    যদি (numbered_function(name) && fudi.fd_dict == ফাঁকা)
     {
-	if (!eap->skip)
+	যদি (!eap->skip)
 	    semsg(_(e_invalid_argument_str), eap->arg);
 	vim_free(name);
-	return;
+	ফেরত;
     }
-    if (!eap->skip)
+    যদি (!eap->skip)
 	fp = find_func(name, is_global);
     vim_free(name);
 
-    if (!eap->skip)
+    যদি (!eap->skip)
     {
-	if (fp == NULL)
+	যদি (fp == ফাঁকা)
 	{
-	    if (!eap->forceit)
+	    যদি (!eap->forceit)
 		semsg(_(e_unknown_function_str), eap->arg);
-	    return;
+	    ফেরত;
 	}
-	if (fp->uf_calls > 0)
+	যদি (fp->uf_calls > 0)
 	{
 	    semsg(_(e_cannot_delete_function_str_it_is_in_use), eap->arg);
-	    return;
+	    ফেরত;
 	}
-	if (fp->uf_flags & FC_VIM9)
+	যদি (fp->uf_flags & FC_VIM9)
 	{
 	    semsg(_(e_cannot_delete_vim9_script_function_str), eap->arg);
-	    return;
+	    ফেরত;
 	}
 
-	if (fudi.fd_dict != NULL)
+	যদি (fudi.fd_dict != ফাঁকা)
 	{
 	    // Delete the dict item that refers to the function, it will
 	    // invoke func_unref() and possibly delete the function.
 	    dictitem_remove(fudi.fd_dict, fudi.fd_di, "delfunction");
 	}
-	else
+	অন্যথা
 	{
 	    // A normal function (not a numbered function or lambda) has a
 	    // refcount of 1 for the entry in the hashtable.  When deleting
 	    // it and the refcount is more than one, it should be kept.
 	    // A numbered function and lambda should be kept if the refcount is
 	    // one or more.
-	    if (fp->uf_refcount > (func_name_refcount(fp->uf_name) ? 0 : 1))
+	    যদি (fp->uf_refcount > (func_name_refcount(fp->uf_name) ? 0 : 1))
 	    {
 		// Function is still referenced somewhere.  Don't free it but
 		// do remove it from the hashtable.
-		if (func_remove(fp))
+		যদি (func_remove(fp))
 		    fp->uf_refcount--;
 	    }
-	    else
+	    অন্যথা
 		func_clear_free(fp, FALSE);
 	}
     }
@@ -6472,18 +6472,18 @@ ex_delfunction(exarg_T *eap)
  * Unreference a Function: decrement the reference count and free it when it
  * becomes zero.
  */
-    void
+    শূন্য
 func_unref(char_u *name)
 {
-    ufunc_T *fp = NULL;
+    ufunc_T *fp = ফাঁকা;
 
-    if (name == NULL || !func_name_refcount(name))
-	return;
+    যদি (name == ফাঁকা || !func_name_refcount(name))
+	ফেরত;
     fp = find_func(name, FALSE);
-    if (fp == NULL && numbered_function(name))
+    যদি (fp == ফাঁকা && numbered_function(name))
     {
 #ifdef EXITFREE
-	if (!entered_free_all_mem)
+	যদি (!entered_free_all_mem)
 #endif
 	    internal_error("func_unref()");
     }
@@ -6495,17 +6495,17 @@ func_unref(char_u *name)
  * becomes zero.
  * Also when it becomes one and uf_partial points to the function.
  */
-    void
+    শূন্য
 func_ptr_unref(ufunc_T *fp)
 {
-    if (fp != NULL && (--fp->uf_refcount <= 0
-		|| (fp->uf_refcount == 1 && fp->uf_partial != NULL
+    যদি (fp != ফাঁকা && (--fp->uf_refcount <= 0
+		|| (fp->uf_refcount == 1 && fp->uf_partial != ফাঁকা
 					 && fp->uf_partial->pt_refcount <= 1
 					 && fp->uf_partial->pt_func == fp)))
     {
 	// Only delete it when it's not being used.  Otherwise it's done
 	// when "uf_calls" becomes zero.
-	if (fp->uf_calls == 0)
+	যদি (fp->uf_calls == 0)
 	    func_clear_free(fp, FALSE);
     }
 }
@@ -6513,17 +6513,17 @@ func_ptr_unref(ufunc_T *fp)
 /*
  * Count a reference to a Function.
  */
-    void
+    শূন্য
 func_ref(char_u *name)
 {
     ufunc_T *fp;
 
-    if (name == NULL || !func_name_refcount(name))
-	return;
+    যদি (name == ফাঁকা || !func_name_refcount(name))
+	ফেরত;
     fp = find_func(name, FALSE);
-    if (fp != NULL)
+    যদি (fp != ফাঁকা)
 	++fp->uf_refcount;
-    else if (numbered_function(name))
+    অন্যথা যদি (numbered_function(name))
 	// Only give an error for a numbered function.
 	// Fail silently, when named or lambda function isn't found.
 	internal_error("func_ref()");
@@ -6532,10 +6532,10 @@ func_ref(char_u *name)
 /*
  * Count a reference to a Function.
  */
-    void
+    শূন্য
 func_ptr_ref(ufunc_T *fp)
 {
-    if (fp != NULL)
+    যদি (fp != ফাঁকা)
 	++fp->uf_refcount;
 }
 
@@ -6543,10 +6543,10 @@ func_ptr_ref(ufunc_T *fp)
  * Return TRUE if items in "fc" do not have "copyID".  That means they are not
  * referenced from anywhere that is in use.
  */
-    static int
-can_free_funccal(funccall_T *fc, int copyID)
+    স্থির পূর্ণসংখ্যা
+can_free_funccal(funccall_T *fc, পূর্ণসংখ্যা copyID)
 {
-    return (fc->fc_l_varlist.lv_copyID != copyID
+    ফেরত (fc->fc_l_varlist.lv_copyID != copyID
 	    && fc->fc_l_vars.dv_copyID != copyID
 	    && fc->fc_l_avars.dv_copyID != copyID
 	    && fc->fc_copyID != copyID);
@@ -6555,37 +6555,37 @@ can_free_funccal(funccall_T *fc, int copyID)
 /*
  * ":return [expr]"
  */
-    void
+    শূন্য
 ex_return(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
     typval_T	rettv;
-    int		returning = FALSE;
+    পূর্ণসংখ্যা		returning = FALSE;
     evalarg_T	evalarg;
 
-    if (current_funccal == NULL)
+    যদি (current_funccal == ফাঁকা)
     {
 	emsg(_(e_return_not_inside_function));
-	return;
+	ফেরত;
     }
 
     init_evalarg(&evalarg);
     evalarg.eval_flags = eap->skip ? 0 : EVAL_EVALUATE;
 
-    if (eap->skip)
+    যদি (eap->skip)
 	++emsg_skip;
 
-    eap->nextcmd = NULL;
-    if ((*arg != NUL && *arg != '|' && *arg != '\n')
+    eap->nextcmd = ফাঁকা;
+    যদি ((*arg != NUL && *arg != '|' && *arg != '\n')
 				  && eval0(arg, &rettv, eap, &evalarg) != FAIL)
     {
-	if (!eap->skip)
+	যদি (!eap->skip)
 	    returning = do_return(eap, FALSE, TRUE, &rettv);
-	else
+	অন্যথা
 	    clear_tv(&rettv);
     }
     // It's safer to return also on error.
-    else if (!eap->skip)
+    অন্যথা যদি (!eap->skip)
     {
 	// In return statement, cause_abort should be force_abort.
 	update_force_abort();
@@ -6594,19 +6594,19 @@ ex_return(exarg_T *eap)
 	 * Return unless the expression evaluation has been cancelled due to an
 	 * aborting error, an interrupt, or an exception.
 	 */
-	if (!aborting())
-	    returning = do_return(eap, FALSE, TRUE, NULL);
+	যদি (!aborting())
+	    returning = do_return(eap, FALSE, TRUE, ফাঁকা);
     }
 
     // When skipping or the return gets pending, advance to the next command
     // in this line (!returning).  Otherwise, ignore the rest of the line.
     // Following lines will be ignored by get_func_line().
-    if (returning)
-	eap->nextcmd = NULL;
-    else if (eap->nextcmd == NULL)	    // no argument
+    যদি (returning)
+	eap->nextcmd = ফাঁকা;
+    অন্যথা যদি (eap->nextcmd == ফাঁকা)	    // no argument
 	set_nextcmd(eap, arg);
 
-    if (eap->skip)
+    যদি (eap->skip)
 	--emsg_skip;
     clear_evalarg(&evalarg, eap);
 }
@@ -6614,7 +6614,7 @@ ex_return(exarg_T *eap)
 /*
  * Lower level implementation of "call".  Only called when not skipping.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 ex_call_inner(
 	exarg_T	    *eap,
 	char_u	    *name,
@@ -6624,23 +6624,23 @@ ex_call_inner(
 	evalarg_T   *evalarg)
 {
     linenr_T	lnum;
-    int		doesrange;
+    পূর্ণসংখ্যা		doesrange;
     typval_T	rettv;
-    int		failed = FALSE;
+    পূর্ণসংখ্যা		failed = FALSE;
 
     lnum = eap->line1;
-    for ( ; lnum <= eap->line2; ++lnum)
+    জন্য ( ; lnum <= eap->line2; ++lnum)
     {
 	funcexe_T funcexe;
 
-	if (eap->addr_count > 0)
+	যদি (eap->addr_গুনতি > 0)
 	{
-	    if (lnum > curbuf->b_ml.ml_line_count)
+	    যদি (lnum > curbuf->b_ml.ml_সারি_গুনতি)
 	    {
 		// If the function deleted lines or switched to another buffer
 		// the line number may become invalid.
 		emsg(_(e_invalid_range));
-		break;
+		বিরতি;
 	    }
 	    curwin->w_cursor.lnum = lnum;
 	    curwin->w_cursor.col = 0;
@@ -6651,41 +6651,41 @@ ex_call_inner(
 	funcexe = *funcexe_init;
 	funcexe.fe_doesrange = &doesrange;
 	rettv.v_type = VAR_UNKNOWN;	// clear_tv() uses this
-	if (get_func_tv(name, -1, &rettv, arg, evalarg, &funcexe) == FAIL)
+	যদি (get_func_tv(name, -1, &rettv, arg, evalarg, &funcexe) == FAIL)
 	{
 	    failed = TRUE;
-	    break;
+	    বিরতি;
 	}
-	if (has_watchexpr())
+	যদি (has_watchexpr())
 	    dbg_check_breakpoint(eap);
 
 	// Handle a function returning a Funcref, Dictionary or List.
-	if (handle_subscript(arg, NULL, &rettv,
+	যদি (handle_subscript(arg, ফাঁকা, &rettv,
 					      &EVALARG_EVALUATE, TRUE) == FAIL)
 	{
 	    failed = TRUE;
-	    break;
+	    বিরতি;
 	}
 
 	clear_tv(&rettv);
-	if (doesrange)
-	    break;
+	যদি (doesrange)
+	    বিরতি;
 
 	// Stop when immediately aborting on error, or when an interrupt
 	// occurred or an exception was thrown but not caught.
 	// get_func_tv() returned OK, so that the check for trailing
 	// characters below is executed.
-	if (aborting())
-	    break;
+	যদি (aborting())
+	    বিরতি;
     }
-    return failed;
+    ফেরত failed;
 }
 
 /*
  * Core part of ":defer func(arg)".  "arg" points to the "(" and is advanced.
  * Returns FAIL or OK.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 ex_defer_inner(
 	char_u	    *name,
 	char_u	    **arg,
@@ -6694,64 +6694,64 @@ ex_defer_inner(
 	evalarg_T   *evalarg)
 {
     typval_T	argvars[MAX_FUNC_ARGS + 1];	// vars for arguments
-    int		partial_argc = 0;		// number of partial arguments
-    int		argcount = 0;			// number of arguments found
-    int		r;
+    পূর্ণসংখ্যা		partial_argc = 0;		// number of partial arguments
+    পূর্ণসংখ্যা		argcount = 0;			// number of arguments found
+    পূর্ণসংখ্যা		r;
 
-    if (current_funccal == NULL)
+    যদি (current_funccal == ফাঁকা)
     {
 	semsg(_(e_str_not_inside_function), "defer");
-	return FAIL;
+	ফেরত FAIL;
     }
-    if (partial != NULL)
+    যদি (partial != ফাঁকা)
     {
-	if (partial->pt_dict != NULL)
+	যদি (partial->pt_dict != ফাঁকা)
 	{
 	    emsg(_(e_cannot_use_partial_with_dictionary_for_defer));
-	    return FAIL;
+	    ফেরত FAIL;
 	}
-	if (partial->pt_argc > 0)
+	যদি (partial->pt_argc > 0)
 	{
-	    int i;
+	    পূর্ণসংখ্যা i;
 
 	    partial_argc = partial->pt_argc;
-	    for (i = 0; i < partial_argc; ++i)
+	    জন্য (i = 0; i < partial_argc; ++i)
 		copy_tv(&partial->pt_argv[i], &argvars[i]);
 	}
     }
-    int is_builtin = builtin_function(name, -1);
+    পূর্ণসংখ্যা is_builtin = builtin_function(name, -1);
     r = get_func_arguments(arg, evalarg, FALSE,
 				argvars + partial_argc, &argcount, is_builtin);
     argcount += partial_argc;
 
-    if (r == OK)
+    যদি (r == OK)
     {
-	if (type != NULL)
+	যদি (type != ফাঁকা)
 	{
 	    // Check that the arguments are OK for the types of the funcref.
-	    r = check_argument_types(type, argvars, argcount, NULL, name);
+	    r = check_argument_types(type, argvars, argcount, ফাঁকা, name);
 	}
-	else if (is_builtin)
+	অন্যথা যদি (is_builtin)
 	{
-	    int idx = find_internal_func(name);
+	    পূর্ণসংখ্যা idx = find_internal_func(name);
 
-	    if (idx < 0)
+	    যদি (idx < 0)
 	    {
 		emsg_funcname(e_unknown_function_str, name);
 		r = FAIL;
 	    }
-	    else if (check_internal_func(idx, argcount) == -1)
+	    অন্যথা যদি (check_internal_func(idx, argcount) == -1)
 		r = FAIL;
 	}
-	else
+	অন্যথা
 	{
 	    ufunc_T *ufunc = find_func(name, FALSE);
 
 	    // we tolerate an unknown function here, it might be defined later
-	    if (ufunc != NULL)
+	    যদি (ufunc != ফাঁকা)
 	    {
 		funcerror_T error = check_user_func_argcount(ufunc, argcount);
-		if (error != FCERR_UNKNOWN)
+		যদি (error != FCERR_UNKNOWN)
 		{
 		    user_func_error(error, name, FALSE);
 		    r = FAIL;
@@ -6760,28 +6760,28 @@ ex_defer_inner(
 	}
     }
 
-    if (r == FAIL)
+    যদি (r == FAIL)
     {
-	while (--argcount >= 0)
+	যখন (--argcount >= 0)
 	    clear_tv(&argvars[argcount]);
-	return FAIL;
+	ফেরত FAIL;
     }
-    return add_defer(name, argcount, argvars);
+    ফেরত add_defer(name, argcount, argvars);
 }
 
 /*
  * Return TRUE if currently inside a function call.
  * Give an error message and return FALSE when not.
  */
-    int
-can_add_defer(void)
+    পূর্ণসংখ্যা
+can_add_defer(শূন্য)
 {
-    if (!in_def_function() && get_current_funccal() == NULL)
+    যদি (!in_def_function() && get_current_funccal() == ফাঁকা)
     {
 	semsg(_(e_str_not_inside_function), "defer");
-	return FALSE;
+	ফেরত FALSE;
     }
-    return TRUE;
+    ফেরত TRUE;
 }
 
 /*
@@ -6791,38 +6791,38 @@ can_add_defer(void)
  * not NULL.
  * Returns OK or FAIL.
  */
-    int
-add_defer(char_u *name, int argcount_arg, typval_T *argvars)
+    পূর্ণসংখ্যা
+add_defer(char_u *name, পূর্ণসংখ্যা argcount_arg, typval_T *argvars)
 {
     char_u	*saved_name = vim_strsave(name);
-    int		argcount = argcount_arg;
+    পূর্ণসংখ্যা		argcount = argcount_arg;
     defer_T	*dr;
-    int		ret = FAIL;
+    পূর্ণসংখ্যা		ret = FAIL;
 
-    if (saved_name == NULL)
-	goto theend;
-    if (in_def_function())
+    যদি (saved_name == ফাঁকা)
+	যাও theend;
+    যদি (in_def_function())
     {
-	if (add_defer_function(saved_name, argcount, argvars) == OK)
+	যদি (add_defer_function(saved_name, argcount, argvars) == OK)
 	{
 	    argcount = 0;
 	    ret = OK;
 	}
     }
-    else
+    অন্যথা
     {
-	if (current_funccal->fc_defer.ga_itemsize == 0)
-	    ga_init2(&current_funccal->fc_defer, sizeof(defer_T), 10);
-	if (ga_grow_id(&current_funccal->fc_defer, 1, aid_defer) == FAIL)
+	যদি (current_funccal->fc_defer.ga_itemsize == 0)
+	    ga_init2(&current_funccal->fc_defer, আকার(defer_T), 10);
+	যদি (ga_grow_id(&current_funccal->fc_defer, 1, aid_defer) == FAIL)
 	{
 	    vim_free(saved_name);
-	    goto theend;
+	    যাও theend;
 	}
-	dr = ((defer_T *)current_funccal->fc_defer.ga_data)
+	dr = ((defer_T *)current_funccal->fc_defer.ga_তথ্য)
 					  + current_funccal->fc_defer.ga_len++;
 	dr->dr_name = saved_name;
 	dr->dr_argcount = argcount;
-	while (argcount > 0)
+	যখন (argcount > 0)
 	{
 	    --argcount;
 	    dr->dr_argvars[argcount] = argvars[argcount];
@@ -6831,26 +6831,26 @@ add_defer(char_u *name, int argcount_arg, typval_T *argvars)
     }
 
 theend:
-    while (--argcount >= 0)
+    যখন (--argcount >= 0)
 	clear_tv(&argvars[argcount]);
-    return ret;
+    ফেরত ret;
 }
 
 /*
  * Invoked after a functions has finished: invoke ":defer" functions.
  */
-    static void
+    স্থির শূন্য
 handle_defer_one(funccall_T *funccal)
 {
-    int	    idx;
+    পূর্ণসংখ্যা	    idx;
 
-    for (idx = funccal->fc_defer.ga_len - 1; idx >= 0; --idx)
+    জন্য (idx = funccal->fc_defer.ga_len - 1; idx >= 0; --idx)
     {
-	defer_T	    *dr = ((defer_T *)funccal->fc_defer.ga_data) + idx;
+	defer_T	    *dr = ((defer_T *)funccal->fc_defer.ga_তথ্য) + idx;
 
-	if (dr->dr_name == NULL)
+	যদি (dr->dr_name == ফাঁকা)
 	    // already being called, can happen if function does ":qa"
-	    continue;
+	    চালু;
 
 	funcexe_T   funcexe;
 	CLEAR_FIELD(funcexe);
@@ -6860,7 +6860,7 @@ handle_defer_one(funccall_T *funccal)
 	rettv.v_type = VAR_UNKNOWN;	// clear_tv() uses this
 
 	char_u *name = dr->dr_name;
-	dr->dr_name = NULL;
+	dr->dr_name = ফাঁকা;
 
 	// If the deferred function is called after an exception, then only the
 	// first statement in the function will be executed (because of the
@@ -6876,22 +6876,22 @@ handle_defer_one(funccall_T *funccal)
 
 	clear_tv(&rettv);
 	vim_free(name);
-	for (int i = dr->dr_argcount - 1; i >= 0; --i)
+	জন্য (পূর্ণসংখ্যা i = dr->dr_argcount - 1; i >= 0; --i)
 	    clear_tv(&dr->dr_argvars[i]);
     }
     ga_clear(&funccal->fc_defer);
 }
 
-    static void
+    স্থির শূন্য
 invoke_funccall_defer(funccall_T *fc)
 {
-    if (fc->fc_ectx != NULL)
+    যদি (fc->fc_ectx != ফাঁকা)
     {
 	// :def function
 	unwind_def_callstack(fc->fc_ectx);
 	may_invoke_defer_funcs(fc->fc_ectx);
     }
-    else
+    অন্যথা
     {
 	// legacy function
 	handle_defer_one(fc);
@@ -6901,14 +6901,14 @@ invoke_funccall_defer(funccall_T *fc)
 /*
  * Called when exiting: call all defer functions.
  */
-    void
-invoke_all_defer(void)
+    শূন্য
+invoke_all_defer(শূন্য)
 {
-    for (funccall_T *fc = current_funccal; fc != NULL; fc = fc->fc_caller)
+    জন্য (funccall_T *fc = current_funccal; fc != ফাঁকা; fc = fc->fc_caller)
 	invoke_funccall_defer(fc);
 
-    for (funccal_entry_T *fce = funccal_stack; fce != NULL; fce = fce->next)
-	for (funccall_T *fc = fce->top_funccal; fc != NULL; fc = fc->fc_caller)
+    জন্য (funccal_entry_T *fce = funccal_স্তূপ; fce != ফাঁকা; fce = fce->পরবর্তী)
+	জন্য (funccall_T *fc = fce->শীর্ষ_funccal; fc != ফাঁকা; fc = fc->fc_caller)
 	    invoke_funccall_defer(fc);
 }
 
@@ -6916,25 +6916,25 @@ invoke_all_defer(void)
  * ":1,25call func(arg1, arg2)"	function call.
  * ":defer func(arg1, arg2)"    deferred function call.
  */
-    void
+    শূন্য
 ex_call(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
     char_u	*startarg;
     char_u	*name;
     char_u	*tofree;
-    int		len;
-    int		failed = FALSE;
+    পূর্ণসংখ্যা		len;
+    পূর্ণসংখ্যা		failed = FALSE;
     funcdict_T	fudi;
-    ufunc_T	*ufunc = NULL;
-    partial_T	*partial = NULL;
+    ufunc_T	*ufunc = ফাঁকা;
+    partial_T	*partial = ফাঁকা;
     evalarg_T	evalarg;
-    type_T	*type = NULL;
-    int		found_var = FALSE;
-    int		vim9script = in_vim9script();
+    type_T	*type = ফাঁকা;
+    পূর্ণসংখ্যা		found_var = FALSE;
+    পূর্ণসংখ্যা		vim9script = in_vim9script();
 
     fill_evalarg_from_eap(&evalarg, eap, eap->skip);
-    if (eap->skip)
+    যদি (eap->skip)
     {
 	typval_T	rettv;
 
@@ -6942,43 +6942,43 @@ ex_call(exarg_T *eap)
 	// instead to skip to any following command, e.g. for:
 	//   :if 0 | call dict.foo().bar() | endif
 	++emsg_skip;
-	if (eval0(eap->arg, &rettv, eap, &evalarg) != FAIL)
+	যদি (eval0(eap->arg, &rettv, eap, &evalarg) != FAIL)
 	    clear_tv(&rettv);
 	--emsg_skip;
 	clear_evalarg(&evalarg, eap);
-	return;
+	ফেরত;
     }
 
-    tofree = trans_function_name_ext(&arg, NULL, FALSE, TFN_INT | TFN_NO_DECL,
-			   &fudi, &partial, vim9script ? &type : NULL, &ufunc);
-    if (fudi.fd_newkey != NULL)
+    tofree = trans_function_name_ext(&arg, ফাঁকা, FALSE, TFN_INT | TFN_NO_DECL,
+			   &fudi, &partial, vim9script ? &type : ফাঁকা, &ufunc);
+    যদি (fudi.fd_newkey != ফাঁকা)
     {
 	// Still need to give an error message for missing key.
-	semsg(_(e_key_not_present_in_dictionary_str), fudi.fd_newkey);
+	semsg(_(e_চাবি_not_present_in_dictionary_str), fudi.fd_newkey);
 	vim_free(fudi.fd_newkey);
     }
-    if (tofree == NULL)
-	return;
+    যদি (tofree == ফাঁকা)
+	ফেরত;
 
     // Increase refcount on dictionary, it could get deleted when evaluating
     // the arguments.
-    if (fudi.fd_dict != NULL)
+    যদি (fudi.fd_dict != ফাঁকা)
 	++fudi.fd_dict->dv_refcount;
 
     // If it is the name of a variable of type VAR_FUNC or VAR_PARTIAL use its
     // contents.  For VAR_PARTIAL get its partial, unless we already have one
     // from trans_function_name().
-    len = (int)STRLEN(tofree);
-    name = deref_func_name(tofree, &len, partial != NULL ? NULL : &partial,
-				vim9script && type == NULL ? &type : NULL,
+    len = (পূর্ণসংখ্যা)STRLEN(tofree);
+    name = deref_func_name(tofree, &len, partial != ফাঁকা ? ফাঁকা : &partial,
+				vim9script && type == ফাঁকা ? &type : ফাঁকা,
 						     FALSE, FALSE, &found_var);
 
-    if (*arg == '<')
+    যদি (*arg == '<')
     {
 	// generic function call
 	name = append_generic_func_type_args(name, STRLEN(name), &arg);
-	if (name == NULL)
-	    goto end;
+	যদি (name == ফাঁকা)
+	    যাও end;
 	vim_free(tofree);
 	tofree = name;
     }
@@ -6986,23 +6986,23 @@ ex_call(exarg_T *eap)
     // Skip white space to allow ":call func ()".  Not good, but required for
     // backward compatibility.
     startarg = skipwhite(arg);
-    if (*startarg != '(')
+    যদি (*startarg != '(')
     {
 	semsg(_(e_missing_parenthesis_str), eap->arg);
-	goto end;
+	যাও end;
     }
-    if (vim9script && startarg > arg)
+    যদি (vim9script && startarg > arg)
     {
 	semsg(_(e_no_white_space_allowed_before_str_str), "(", eap->arg);
-	goto end;
+	যাও end;
     }
 
-    if (eap->cmdidx == CMD_defer)
+    যদি (eap->cmdidx == CMD_defer)
     {
 	arg = startarg;
 	failed = ex_defer_inner(name, &arg, type, partial, &evalarg) == FAIL;
     }
-    else
+    অন্যথা
     {
 	funcexe_T funcexe;
 
@@ -7020,19 +7020,19 @@ ex_call(exarg_T *eap)
 
     // When inside :try we need to check for following "| catch" or "| endtry".
     // Not when there was an error, but do check if an exception was thrown.
-    if ((!aborting() || did_throw) && (!failed || eap->cstack->cs_trylevel > 0))
+    যদি ((!aborting() || did_throw) && (!failed || eap->cstack->cs_trylevel > 0))
     {
 	// Check for trailing illegal characters and a following command.
 	arg = skipwhite(arg);
-	if (!ends_excmd2(eap->arg, arg))
+	যদি (!ends_excmd2(eap->arg, arg))
 	{
-	    if (!failed && !aborting())
+	    যদি (!failed && !aborting())
 	    {
 		emsg_severe = TRUE;
 		semsg(_(e_trailing_characters_str), arg);
 	    }
 	}
-	else
+	অন্যথা
 	    set_nextcmd(eap, arg);
     }
     // Must be after using "arg", it may point into memory cleared here.
@@ -7051,17 +7051,17 @@ end:
  * with the return rettv.  Returns TRUE when the return can be carried out,
  * FALSE when the return gets pending.
  */
-    int
+    পূর্ণসংখ্যা
 do_return(
     exarg_T	*eap,
-    int		reanimate,
-    int		is_cmd,
-    void	*rettv)
+    পূর্ণসংখ্যা		reanimate,
+    পূর্ণসংখ্যা		is_cmd,
+    শূন্য	*rettv)
 {
-    int		idx;
+    পূর্ণসংখ্যা		idx;
     cstack_T	*cstack = eap->cstack;
 
-    if (reanimate)
+    যদি (reanimate)
 	// Undo the return.
 	current_funccal->fc_returned = FALSE;
 
@@ -7072,68 +7072,68 @@ do_return(
      * Otherwise, return normally.
      */
     idx = cleanup_conditionals(eap->cstack, 0, TRUE);
-    if (idx >= 0)
+    যদি (idx >= 0)
     {
 	cstack->cs_pending[idx] = CSTP_RETURN;
 
-	if (!is_cmd && !reanimate)
+	যদি (!is_cmd && !reanimate)
 	    // A pending return again gets pending.  "rettv" points to an
 	    // allocated variable with the rettv of the original ":return"'s
 	    // argument if present or is NULL else.
 	    cstack->cs_rettv[idx] = rettv;
-	else
+	অন্যথা
 	{
 	    // When undoing a return in order to make it pending, get the stored
 	    // return rettv.
-	    if (reanimate)
+	    যদি (reanimate)
 		rettv = current_funccal->fc_rettv;
 
-	    if (rettv != NULL)
+	    যদি (rettv != ফাঁকা)
 	    {
 		// Store the value of the pending return.
-		if ((cstack->cs_rettv[idx] = alloc_tv()) != NULL)
+		যদি ((cstack->cs_rettv[idx] = alloc_tv()) != ফাঁকা)
 		    *(typval_T *)cstack->cs_rettv[idx] = *(typval_T *)rettv;
-		else
+		অন্যথা
 		    emsg(_(e_out_of_memory));
 	    }
-	    else
-		cstack->cs_rettv[idx] = NULL;
+	    অন্যথা
+		cstack->cs_rettv[idx] = ফাঁকা;
 
-	    if (reanimate)
+	    যদি (reanimate)
 	    {
 		// The pending return value could be overwritten by a ":return"
 		// without argument in a finally clause; reset the default
 		// return value.
-		current_funccal->fc_rettv->v_type = VAR_NUMBER;
-		current_funccal->fc_rettv->vval.v_number = 0;
+		current_funccal->fc_rettv->v_type = VAR_সংখ্যা;
+		current_funccal->fc_rettv->vval.v_সংখ্যা = 0;
 	    }
 	}
 	report_make_pending(CSTP_RETURN, rettv);
     }
-    else
+    অন্যথা
     {
 	current_funccal->fc_returned = TRUE;
 
 	// If the return is carried out now, store the return value.  For
 	// a return immediately after reanimation, the value is already
 	// there.
-	if (!reanimate && rettv != NULL)
+	যদি (!reanimate && rettv != ফাঁকা)
 	{
 	    clear_tv(current_funccal->fc_rettv);
 	    *current_funccal->fc_rettv = *(typval_T *)rettv;
-	    if (!is_cmd)
+	    যদি (!is_cmd)
 		vim_free(rettv);
 	}
     }
 
-    return idx < 0;
+    ফেরত idx < 0;
 }
 
 /*
  * Free the variable with a pending return value.
  */
-    void
-discard_pending_return(void *rettv)
+    শূন্য
+discard_pending_return(শূন্য *rettv)
 {
     free_tv((typval_T *)rettv);
 }
@@ -7143,31 +7143,31 @@ discard_pending_return(void *rettv)
  * is an allocated string.  Used by report_pending() for verbose messages.
  */
     char_u *
-get_return_cmd(void *rettv)
+get_return_cmd(শূন্য *rettv)
 {
-    char_u	*s = NULL;
-    char_u	*tofree = NULL;
+    char_u	*s = ফাঁকা;
+    char_u	*tofree = ফাঁকা;
     char_u	numbuf[NUMBUFLEN];
     size_t	slen = 0;
     size_t	IObufflen;
 
-    if (rettv != NULL)
+    যদি (rettv != ফাঁকা)
 	s = echo_string((typval_T *)rettv, &tofree, numbuf, 0);
-    if (s == NULL)
+    যদি (s == ফাঁকা)
 	s = (char_u *)"";
-    else
+    অন্যথা
 	slen = STRLEN(s);
 
     STRCPY(IObuff, ":return ");
     STRNCPY(IObuff + 8, s, IOSIZE - 8);
     IObufflen = 8 + slen;
-    if (IObufflen >= IOSIZE)
+    যদি (IObufflen >= IOSIZE)
     {
 	STRCPY(IObuff + IOSIZE - 4, "...");
 	IObufflen = IOSIZE - 1;
     }
     vim_free(tofree);
-    return vim_strnsave(IObuff, IObufflen);
+    ফেরত vim_strnsave(IObuff, IObufflen);
 }
 
 /*
@@ -7176,10 +7176,10 @@ get_return_cmd(void *rettv)
  * Returns allocated string, or NULL for end of function.
  */
     char_u *
-get_func_line(
-    int	    c UNUSED,
-    void    *cookie,
-    int	    indent UNUSED,
+get_func_সারি(
+    পূর্ণসংখ্যা	    c UNUSED,
+    শূন্য    *cookie,
+    পূর্ণসংখ্যা	    indent UNUSED,
     getline_opt_T options UNUSED)
 {
     funccall_T	*fcp = (funccall_T *)cookie;
@@ -7188,42 +7188,42 @@ get_func_line(
     garray_T	*gap;  // growarray with function lines
 
     // If breakpoints have been added/deleted need to check for it.
-    if (fcp->fc_dbg_tick != debug_tick)
+    যদি (fcp->fc_dbg_tick != debug_tick)
     {
 	fcp->fc_breakpoint = dbg_find_breakpoint(FALSE, fp->uf_name,
 							       SOURCING_LNUM);
 	fcp->fc_dbg_tick = debug_tick;
     }
 #ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
-	func_line_end(cookie);
+    যদি (do_profiling == PROF_YES)
+	func_সারি_end(cookie);
 #endif
 
-    gap = &fp->uf_lines;
-    if (((fp->uf_flags & FC_ABORT) && did_emsg && !aborted_in_try())
+    gap = &fp->uf_সারিগুলি;
+    যদি (((fp->uf_flags & FC_ABORT) && did_emsg && !aborted_in_try())
 	    || fcp->fc_returned)
-	retval = NULL;
-    else
+	retval = ফাঁকা;
+    অন্যথা
     {
 	// Skip NULL lines (continuation lines).
-	while (fcp->fc_linenr < gap->ga_len
-			&& ((char_u **)(gap->ga_data))[fcp->fc_linenr] == NULL)
+	যখন (fcp->fc_linenr < gap->ga_len
+			&& ((char_u **)(gap->ga_তথ্য))[fcp->fc_linenr] == ফাঁকা)
 	    ++fcp->fc_linenr;
-	if (fcp->fc_linenr >= gap->ga_len)
-	    retval = NULL;
-	else
+	যদি (fcp->fc_linenr >= gap->ga_len)
+	    retval = ফাঁকা;
+	অন্যথা
 	{
-	    retval = vim_strsave(((char_u **)(gap->ga_data))[fcp->fc_linenr++]);
+	    retval = vim_strsave(((char_u **)(gap->ga_তথ্য))[fcp->fc_linenr++]);
 	    SOURCING_LNUM = fcp->fc_linenr;
 #ifdef FEAT_PROFILE
-	    if (do_profiling == PROF_YES)
-		func_line_start(cookie, SOURCING_LNUM);
+	    যদি (do_profiling == PROF_YES)
+		func_সারি_start(cookie, SOURCING_LNUM);
 #endif
 	}
     }
 
     // Did we encounter a breakpoint?
-    if (fcp->fc_breakpoint != 0 && fcp->fc_breakpoint <= SOURCING_LNUM)
+    যদি (fcp->fc_breakpoint != 0 && fcp->fc_breakpoint <= SOURCING_LNUM)
     {
 	dbg_breakpoint(fp->uf_name, SOURCING_LNUM);
 	// Find next breakpoint.
@@ -7232,21 +7232,21 @@ get_func_line(
 	fcp->fc_dbg_tick = debug_tick;
     }
 
-    return retval;
+    ফেরত retval;
 }
 
 /*
  * Return TRUE if the currently active function should be ended, because a
  * return was encountered or an error occurred.  Used inside a ":while".
  */
-    int
-func_has_ended(void *cookie)
+    পূর্ণসংখ্যা
+func_has_ended(শূন্য *cookie)
 {
     funccall_T  *fcp = (funccall_T *)cookie;
 
     // Ignore the "abort" flag if the abortion behavior has been changed due to
     // an error inside a try conditional.
-    return (((fcp->fc_func->uf_flags & FC_ABORT)
+    ফেরত (((fcp->fc_func->uf_flags & FC_ABORT)
 					      && did_emsg && !aborted_in_try())
 	    || fcp->fc_returned);
 }
@@ -7254,11 +7254,11 @@ func_has_ended(void *cookie)
 /*
  * return TRUE if cookie indicates a function which "abort"s on errors.
  */
-    int
+    পূর্ণসংখ্যা
 func_has_abort(
-    void    *cookie)
+    শূন্য    *cookie)
 {
-    return ((funccall_T *)cookie)->fc_func->uf_flags & FC_ABORT;
+    ফেরত ((funccall_T *)cookie)->fc_func->uf_flags & FC_ABORT;
 }
 
 
@@ -7273,28 +7273,28 @@ func_has_abort(
 make_partial(dict_T *selfdict_in, typval_T *rettv)
 {
     char_u	*fname;
-    ufunc_T	*fp = NULL;
+    ufunc_T	*fp = ফাঁকা;
     char_u	fname_buf[FLEN_FIXED + 1];
     dict_T	*selfdict = selfdict_in;
 
-    if (rettv->v_type == VAR_PARTIAL  && rettv->vval.v_partial != NULL
-				     && rettv->vval.v_partial->pt_func != NULL)
+    যদি (rettv->v_type == VAR_PARTIAL  && rettv->vval.v_partial != ফাঁকা
+				     && rettv->vval.v_partial->pt_func != ফাঁকা)
 	fp = rettv->vval.v_partial->pt_func;
-    else
+    অন্যথা
     {
 	fname = rettv->v_type == VAR_FUNC ? rettv->vval.v_string
-					 : rettv->vval.v_partial == NULL ? NULL
+					 : rettv->vval.v_partial == ফাঁকা ? ফাঁকা
 					      : rettv->vval.v_partial->pt_name;
-	if (fname == NULL)
+	যদি (fname == ফাঁকা)
 	{
 	    // There is no point binding a dict to a NULL function, just create
 	    // a function reference.
 	    rettv->v_type = VAR_FUNC;
-	    rettv->vval.v_string = NULL;
+	    rettv->vval.v_string = ফাঁকা;
 	}
-	else
+	অন্যথা
 	{
-	    char_u	*tofree = NULL;
+	    char_u	*tofree = ফাঁকা;
 	    funcerror_T	error;
 
 	    // Translate "s:func" to the stored function name.
@@ -7304,50 +7304,50 @@ make_partial(dict_T *selfdict_in, typval_T *rettv)
 	}
     }
 
-    if (fp != NULL && (fp->uf_flags & FC_DICT))
+    যদি (fp != ফাঁকা && (fp->uf_flags & FC_DICT))
     {
 	partial_T	*pt = ALLOC_CLEAR_ONE(partial_T);
 
-	if (pt != NULL)
+	যদি (pt != ফাঁকা)
 	{
 	    pt->pt_refcount = 1;
 	    pt->pt_dict = selfdict;
 	    pt->pt_auto = TRUE;
-	    selfdict = NULL;
-	    if (rettv->v_type == VAR_FUNC)
+	    selfdict = ফাঁকা;
+	    যদি (rettv->v_type == VAR_FUNC)
 	    {
 		// Just a function: Take over the function name and use
 		// selfdict.
 		pt->pt_name = rettv->vval.v_string;
 	    }
-	    else
+	    অন্যথা
 	    {
 		partial_T	*ret_pt = rettv->vval.v_partial;
-		int		i;
+		পূর্ণসংখ্যা		i;
 
 		// Partial: copy the function name, use selfdict and copy
 		// args.  Can't take over name or args, the partial might
 		// be referenced elsewhere.
-		if (ret_pt->pt_name != NULL)
+		যদি (ret_pt->pt_name != ফাঁকা)
 		{
 		    pt->pt_name = vim_strsave(ret_pt->pt_name);
 		    func_ref(pt->pt_name);
 		}
-		else
+		অন্যথা
 		{
 		    pt->pt_func = ret_pt->pt_func;
 		    func_ptr_ref(pt->pt_func);
 		}
-		if (ret_pt->pt_argc > 0)
+		যদি (ret_pt->pt_argc > 0)
 		{
 		    pt->pt_argv = ALLOC_MULT(typval_T, ret_pt->pt_argc);
-		    if (pt->pt_argv == NULL)
+		    যদি (pt->pt_argv == ফাঁকা)
 			// out of memory: drop the arguments
 			pt->pt_argc = 0;
-		    else
+		    অন্যথা
 		    {
 			pt->pt_argc = ret_pt->pt_argc;
-			for (i = 0; i < pt->pt_argc; i++)
+			জন্য (i = 0; i < pt->pt_argc; i++)
 			    copy_tv(&ret_pt->pt_argv[i], &pt->pt_argv[i]);
 		    }
 		}
@@ -7357,64 +7357,64 @@ make_partial(dict_T *selfdict_in, typval_T *rettv)
 	    rettv->vval.v_partial = pt;
 	}
     }
-    return selfdict;
+    ফেরত selfdict;
 }
 
 /*
  * Return the name of the executed function.
  */
     char_u *
-func_name(void *cookie)
+func_name(শূন্য *cookie)
 {
-    return ((funccall_T *)cookie)->fc_func->uf_name;
+    ফেরত ((funccall_T *)cookie)->fc_func->uf_name;
 }
 
 /*
  * Return the address holding the next breakpoint line for a funccall cookie.
  */
     linenr_T *
-func_breakpoint(void *cookie)
+func_breakpoint(শূন্য *cookie)
 {
-    return &((funccall_T *)cookie)->fc_breakpoint;
+    ফেরত &((funccall_T *)cookie)->fc_breakpoint;
 }
 
 /*
  * Return the address holding the debug tick for a funccall cookie.
  */
-    int *
-func_dbg_tick(void *cookie)
+    পূর্ণসংখ্যা *
+func_dbg_tick(শূন্য *cookie)
 {
-    return &((funccall_T *)cookie)->fc_dbg_tick;
+    ফেরত &((funccall_T *)cookie)->fc_dbg_tick;
 }
 
 /*
  * Return the nesting level for a funccall cookie.
  */
-    int
-func_level(void *cookie)
+    পূর্ণসংখ্যা
+func_level(শূন্য *cookie)
 {
-    return ((funccall_T *)cookie)->fc_level;
+    ফেরত ((funccall_T *)cookie)->fc_level;
 }
 
 /*
  * Return TRUE when a function was ended by a ":return" command.
  */
-    int
-current_func_returned(void)
+    পূর্ণসংখ্যা
+current_func_returned(শূন্য)
 {
-    return current_funccal->fc_returned;
+    ফেরত current_funccal->fc_returned;
 }
 
-    int
-free_unref_funccal(int copyID, int testing)
+    পূর্ণসংখ্যা
+free_unref_funccal(পূর্ণসংখ্যা copyID, পূর্ণসংখ্যা testing)
 {
-    int		did_free = FALSE;
-    int		did_free_funccal = FALSE;
+    পূর্ণসংখ্যা		did_free = FALSE;
+    পূর্ণসংখ্যা		did_free_funccal = FALSE;
     funccall_T	*fc, **pfc;
 
-    for (pfc = &previous_funccal; *pfc != NULL; )
+    জন্য (pfc = &previous_funccal; *pfc != ফাঁকা; )
     {
-	if (can_free_funccal(*pfc, copyID))
+	যদি (can_free_funccal(*pfc, copyID))
 	{
 	    fc = *pfc;
 	    *pfc = fc->fc_caller;
@@ -7422,41 +7422,41 @@ free_unref_funccal(int copyID, int testing)
 	    did_free = TRUE;
 	    did_free_funccal = TRUE;
 	}
-	else
+	অন্যথা
 	    pfc = &(*pfc)->fc_caller;
     }
-    if (did_free_funccal)
+    যদি (did_free_funccal)
 	// When a funccal was freed some more items might be garbage
 	// collected, so run again.
-	(void)garbage_collect(testing);
+	(শূন্য)garbage_collect(testing);
 
-    return did_free;
+    ফেরত did_free;
 }
 
 /*
  * Get function call environment based on backtrace debug level
  */
-    static funccall_T *
-get_funccal(void)
+    স্থির funccall_T *
+get_funccal(শূন্য)
 {
-    int		i;
+    পূর্ণসংখ্যা		i;
     funccall_T	*funccal;
-    funccall_T	*temp_funccal;
+    funccall_T	*অস্থায়ী_funccal;
 
     funccal = current_funccal;
-    if (debug_backtrace_level > 0)
+    যদি (debug_backtrace_level > 0)
     {
-	for (i = 0; i < debug_backtrace_level; i++)
+	জন্য (i = 0; i < debug_backtrace_level; i++)
 	{
-	    temp_funccal = funccal->fc_caller;
-	    if (temp_funccal)
-		funccal = temp_funccal;
-	    else
+	    অস্থায়ী_funccal = funccal->fc_caller;
+	    যদি (অস্থায়ী_funccal)
+		funccal = অস্থায়ী_funccal;
+	    অন্যথা
 		// backtrace level overflow. reset to max
 		debug_backtrace_level = i;
 	}
     }
-    return funccal;
+    ফেরত funccal;
 }
 
 /*
@@ -7465,17 +7465,17 @@ get_funccal(void)
  * Returns NULL if there is no current funccal or when the selected funccal is
  * for a :def function, which does not have l: and a: dictionaries.
  */
-    static funccall_T *
-get_funccal_for_vars(void)
+    স্থির funccall_T *
+get_funccal_for_vars(শূন্য)
 {
-    funccall_T	*funccal = NULL;
+    funccall_T	*funccal = ফাঁকা;
 
-    if (current_funccal == NULL)
-	return NULL;
+    যদি (current_funccal == ফাঁকা)
+	ফেরত ফাঁকা;
     funccal = get_funccal();
-    if (funccal == NULL || funccal->fc_l_vars.dv_refcount == 0)
-	return NULL;
-    return funccal;
+    যদি (funccal == ফাঁকা || funccal->fc_l_vars.dv_refcount == 0)
+	ফেরত ফাঁকা;
+    ফেরত funccal;
 }
 
 /*
@@ -7483,11 +7483,11 @@ get_funccal_for_vars(void)
  * Return NULL if there is no current funccal.
  */
     hashtab_T *
-get_funccal_local_ht(void)
+get_funccal_local_ht(শূন্য)
 {
     funccall_T	*funccal = get_funccal_for_vars();
 
-    return funccal == NULL ? NULL : &funccal->fc_l_vars.dv_hashtab;
+    ফেরত funccal == ফাঁকা ? ফাঁকা : &funccal->fc_l_vars.dv_hashtab;
 }
 
 /*
@@ -7495,11 +7495,11 @@ get_funccal_local_ht(void)
  * Return NULL if there is no current funccal.
  */
     dictitem_T *
-get_funccal_local_var(void)
+get_funccal_local_var(শূন্য)
 {
     funccall_T	*funccal = get_funccal_for_vars();
 
-    return funccal == NULL ? NULL : &funccal->fc_l_vars_var;
+    ফেরত funccal == ফাঁকা ? ফাঁকা : &funccal->fc_l_vars_var;
 }
 
 /*
@@ -7507,11 +7507,11 @@ get_funccal_local_var(void)
  * Return NULL if there is no current funccal.
  */
     hashtab_T *
-get_funccal_args_ht(void)
+get_funccal_args_ht(শূন্য)
 {
     funccall_T	*funccal = get_funccal_for_vars();
 
-    return funccal == NULL ? NULL : &funccal->fc_l_avars.dv_hashtab;
+    ফেরত funccal == ফাঁকা ? ফাঁকা : &funccal->fc_l_avars.dv_hashtab;
 }
 
 /*
@@ -7519,20 +7519,20 @@ get_funccal_args_ht(void)
  * Return NULL if there is no current funccal.
  */
     dictitem_T *
-get_funccal_args_var(void)
+get_funccal_args_var(শূন্য)
 {
     funccall_T	*funccal = get_funccal_for_vars();
 
-    return funccal == NULL ? NULL : &funccal->fc_l_avars_var;
+    ফেরত funccal == ফাঁকা ? ফাঁকা : &funccal->fc_l_avars_var;
 }
 
 /*
  * List function variables, if there is a function.
  */
-    void
-list_func_vars(int *first)
+    শূন্য
+list_func_vars(পূর্ণসংখ্যা *first)
 {
-    if (current_funccal != NULL && current_funccal->fc_l_vars.dv_refcount > 0)
+    যদি (current_funccal != ফাঁকা && current_funccal->fc_l_vars.dv_refcount > 0)
 	list_hashtable_vars(&current_funccal->fc_l_vars.dv_hashtab,
 							   "l:", FALSE, first);
 }
@@ -7545,10 +7545,10 @@ list_func_vars(int *first)
     dict_T *
 get_current_funccal_dict(hashtab_T *ht)
 {
-    if (current_funccal != NULL
+    যদি (current_funccal != ফাঁকা
 	    && ht == &current_funccal->fc_l_vars.dv_hashtab)
-	return &current_funccal->fc_l_vars;
-    return NULL;
+	ফেরত &current_funccal->fc_l_vars;
+    ফেরত ফাঁকা;
 }
 
 /*
@@ -7559,195 +7559,195 @@ find_hi_in_scoped_ht(char_u *name, hashtab_T **pht)
 {
     funccall_T	*old_current_funccal = current_funccal;
     hashtab_T	*ht;
-    hashitem_T	*hi = NULL;
+    hashitem_T	*hi = ফাঁকা;
     char_u	*varname;
 
-    if (current_funccal == NULL || current_funccal->fc_func->uf_scoped == NULL)
-	return NULL;
+    যদি (current_funccal == ফাঁকা || current_funccal->fc_func->uf_scoped == ফাঁকা)
+	ফেরত ফাঁকা;
 
     // Search in parent scope, which can be referenced from a lambda.
     current_funccal = current_funccal->fc_func->uf_scoped;
-    while (current_funccal != NULL)
+    যখন (current_funccal != ফাঁকা)
     {
 	ht = find_var_ht(name, &varname);
-	if (ht != NULL && *varname != NUL)
+	যদি (ht != ফাঁকা && *varname != NUL)
 	{
 	    hi = hash_find(ht, varname);
-	    if (!HASHITEM_EMPTY(hi))
+	    যদি (!HASHITEM_EMPTY(hi))
 	    {
 		*pht = ht;
-		break;
+		বিরতি;
 	    }
 	}
-	if (current_funccal == current_funccal->fc_func->uf_scoped)
-	    break;
+	যদি (current_funccal == current_funccal->fc_func->uf_scoped)
+	    বিরতি;
 	current_funccal = current_funccal->fc_func->uf_scoped;
     }
     current_funccal = old_current_funccal;
 
-    return hi;
+    ফেরত hi;
 }
 
 /*
  * Search variable in parent scope.
  */
     dictitem_T *
-find_var_in_scoped_ht(char_u *name, int no_autoload)
+find_var_in_scoped_ht(char_u *name, পূর্ণসংখ্যা no_autoload)
 {
-    dictitem_T	*v = NULL;
+    dictitem_T	*v = ফাঁকা;
     funccall_T	*old_current_funccal = current_funccal;
     hashtab_T	*ht;
     char_u	*varname;
 
-    if (current_funccal == NULL || current_funccal->fc_func->uf_scoped == NULL)
-	return NULL;
+    যদি (current_funccal == ফাঁকা || current_funccal->fc_func->uf_scoped == ফাঁকা)
+	ফেরত ফাঁকা;
 
     // Search in parent scope which is possible to reference from lambda
     current_funccal = current_funccal->fc_func->uf_scoped;
-    while (current_funccal)
+    যখন (current_funccal)
     {
 	ht = find_var_ht(name, &varname);
-	if (ht != NULL && *varname != NUL)
+	যদি (ht != ফাঁকা && *varname != NUL)
 	{
 	    v = find_var_in_ht(ht, *name, varname, no_autoload);
-	    if (v != NULL)
-		break;
+	    যদি (v != ফাঁকা)
+		বিরতি;
 	}
-	if (current_funccal == current_funccal->fc_func->uf_scoped)
-	    break;
+	যদি (current_funccal == current_funccal->fc_func->uf_scoped)
+	    বিরতি;
 	current_funccal = current_funccal->fc_func->uf_scoped;
     }
     current_funccal = old_current_funccal;
 
-    return v;
+    ফেরত v;
 }
 
 /*
  * Set "copyID + 1" in previous_funccal and callers.
  */
-    int
-set_ref_in_previous_funccal(int copyID)
+    পূর্ণসংখ্যা
+set_ref_in_previous_funccal(পূর্ণসংখ্যা copyID)
 {
     funccall_T	*fc;
 
-    for (fc = previous_funccal; fc != NULL; fc = fc->fc_caller)
+    জন্য (fc = previous_funccal; fc != ফাঁকা; fc = fc->fc_caller)
     {
 	fc->fc_copyID = copyID + 1;
-	if (set_ref_in_ht(&fc->fc_l_vars.dv_hashtab, copyID + 1, NULL, NULL)
-		|| set_ref_in_ht(&fc->fc_l_avars.dv_hashtab, copyID + 1, NULL, NULL)
-		|| set_ref_in_list_items(&fc->fc_l_varlist, copyID + 1, NULL, NULL))
-	    return TRUE;
+	যদি (set_ref_in_ht(&fc->fc_l_vars.dv_hashtab, copyID + 1, ফাঁকা, ফাঁকা)
+		|| set_ref_in_ht(&fc->fc_l_avars.dv_hashtab, copyID + 1, ফাঁকা, ফাঁকা)
+		|| set_ref_in_list_বস্তুসমূহ(&fc->fc_l_varlist, copyID + 1, ফাঁকা, ফাঁকা))
+	    ফেরত TRUE;
     }
-    return FALSE;
+    ফেরত FALSE;
 }
 
-    static int
-set_ref_in_funccal(funccall_T *fc, int copyID)
+    স্থির পূর্ণসংখ্যা
+set_ref_in_funccal(funccall_T *fc, পূর্ণসংখ্যা copyID)
 {
-    if (fc->fc_copyID != copyID)
+    যদি (fc->fc_copyID != copyID)
     {
 	fc->fc_copyID = copyID;
-	if (set_ref_in_ht(&fc->fc_l_vars.dv_hashtab, copyID, NULL, NULL)
-		|| set_ref_in_ht(&fc->fc_l_avars.dv_hashtab, copyID, NULL, NULL)
-		|| set_ref_in_list_items(&fc->fc_l_varlist, copyID, NULL, NULL)
-		|| set_ref_in_func(NULL, fc->fc_func, copyID))
-	    return TRUE;
+	যদি (set_ref_in_ht(&fc->fc_l_vars.dv_hashtab, copyID, ফাঁকা, ফাঁকা)
+		|| set_ref_in_ht(&fc->fc_l_avars.dv_hashtab, copyID, ফাঁকা, ফাঁকা)
+		|| set_ref_in_list_বস্তুসমূহ(&fc->fc_l_varlist, copyID, ফাঁকা, ফাঁকা)
+		|| set_ref_in_func(ফাঁকা, fc->fc_func, copyID))
+	    ফেরত TRUE;
     }
-    return FALSE;
+    ফেরত FALSE;
 }
 
 /*
  * Set "copyID" in all local vars and arguments in the call stack.
  */
-    int
-set_ref_in_call_stack(int copyID)
+    পূর্ণসংখ্যা
+set_ref_in_call_স্তূপ(পূর্ণসংখ্যা copyID)
 {
     funccall_T		*fc;
     funccal_entry_T	*entry;
 
-    for (fc = current_funccal; fc != NULL; fc = fc->fc_caller)
-	if (set_ref_in_funccal(fc, copyID))
-	    return TRUE;
+    জন্য (fc = current_funccal; fc != ফাঁকা; fc = fc->fc_caller)
+	যদি (set_ref_in_funccal(fc, copyID))
+	    ফেরত TRUE;
 
     // Also go through the funccal_stack.
-    for (entry = funccal_stack; entry != NULL; entry = entry->next)
-	for (fc = entry->top_funccal; fc != NULL; fc = fc->fc_caller)
-	    if (set_ref_in_funccal(fc, copyID))
-		return TRUE;
-    return FALSE;
+    জন্য (entry = funccal_স্তূপ; entry != ফাঁকা; entry = entry->পরবর্তী)
+	জন্য (fc = entry->শীর্ষ_funccal; fc != ফাঁকা; fc = fc->fc_caller)
+	    যদি (set_ref_in_funccal(fc, copyID))
+		ফেরত TRUE;
+    ফেরত FALSE;
 }
 
 /*
  * Set "copyID" in all functions available by name.
  */
-    int
-set_ref_in_functions(int copyID)
+    পূর্ণসংখ্যা
+set_ref_in_functions(পূর্ণসংখ্যা copyID)
 {
-    int		todo;
-    hashitem_T	*hi = NULL;
+    পূর্ণসংখ্যা		todo;
+    hashitem_T	*hi = ফাঁকা;
     ufunc_T	*fp;
 
-    todo = (int)func_hashtab.ht_used;
-    for (hi = func_hashtab.ht_array; todo > 0 && !got_int; ++hi)
+    todo = (পূর্ণসংখ্যা)func_hashtab.ht_used;
+    জন্য (hi = func_hashtab.ht_array; todo > 0 && !got_int; ++hi)
     {
-	if (!HASHITEM_EMPTY(hi))
+	যদি (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
 	    fp = HI2UF(hi);
-	    if (!func_name_refcount(fp->uf_name)
-					  && set_ref_in_func(NULL, fp, copyID))
-		return TRUE;
+	    যদি (!func_name_refcount(fp->uf_name)
+					  && set_ref_in_func(ফাঁকা, fp, copyID))
+		ফেরত TRUE;
 	}
     }
-    return FALSE;
+    ফেরত FALSE;
 }
 
 /*
  * Set "copyID" in all function arguments.
  */
-    int
-set_ref_in_func_args(int copyID)
+    পূর্ণসংখ্যা
+set_ref_in_func_args(পূর্ণসংখ্যা copyID)
 {
-    int i;
+    পূর্ণসংখ্যা i;
 
-    for (i = 0; i < funcargs.ga_len; ++i)
-	if (set_ref_in_item(((typval_T **)funcargs.ga_data)[i],
-						copyID, NULL, NULL, NULL))
-	    return TRUE;
-    return FALSE;
+    জন্য (i = 0; i < funcargs.ga_len; ++i)
+	যদি (set_ref_in_item(((typval_T **)funcargs.ga_তথ্য)[i],
+						copyID, ফাঁকা, ফাঁকা, ফাঁকা))
+	    ফেরত TRUE;
+    ফেরত FALSE;
 }
 
 /*
  * Mark all lists and dicts referenced through function "name" with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_func(char_u *name, ufunc_T *fp_in, int copyID)
+    পূর্ণসংখ্যা
+set_ref_in_func(char_u *name, ufunc_T *fp_in, পূর্ণসংখ্যা copyID)
 {
     ufunc_T	*fp = fp_in;
     funccall_T	*fc;
     funcerror_T	error = FCERR_NONE;
     char_u	fname_buf[FLEN_FIXED + 1];
-    char_u	*tofree = NULL;
+    char_u	*tofree = ফাঁকা;
     char_u	*fname;
-    int		abort = FALSE;
+    পূর্ণসংখ্যা		abort = FALSE;
 
-    if (name == NULL && fp_in == NULL)
-	return FALSE;
+    যদি (name == ফাঁকা && fp_in == ফাঁকা)
+	ফেরত FALSE;
 
-    if (fp_in == NULL)
+    যদি (fp_in == ফাঁকা)
     {
 	fname = fname_trans_sid(name, fname_buf, &tofree, &error);
 	fp = find_func(fname, FALSE);
     }
-    if (fp != NULL)
+    যদি (fp != ফাঁকা)
     {
-	for (fc = fp->uf_scoped; fc != NULL; fc = fc->fc_func->uf_scoped)
+	জন্য (fc = fp->uf_scoped; fc != ফাঁকা; fc = fc->fc_func->uf_scoped)
 	    abort = abort || set_ref_in_funccal(fc, copyID);
     }
 
     vim_free(tofree);
-    return abort;
+    ফেরত abort;
 }
 
 #endif // FEAT_EVAL

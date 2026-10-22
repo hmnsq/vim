@@ -21,16 +21,16 @@
  * - gtk_window_new() takes no arguments
  */
 
-#include "vim.h"
+#অন্তর্ভাব "vim.h"
 
 #ifdef FEAT_GUI_GTK
 
-#include <gdk/gdkkeysyms.h>
-#include <gdk/gdk.h>
-#include <gtk/gtk.h>
-#include "gui_gtk4_f.h"
-#include "gui_gtk4_cb.h"
-#include "gui_gtk4_da.h"
+#অন্তর্ভাব <gdk/gdkkeysyms.h>
+#অন্তর্ভাব <gdk/gdk.h>
+#অন্তর্ভাব <gtk/gtk.h>
+#অন্তর্ভাব "gui_gtk4_f.h"
+#অন্তর্ভাব "gui_gtk4_cb.h"
+#অন্তর্ভাব "gui_gtk4_da.h"
 #ifdef FEAT_TOOLBAR
 # include "gui_gtk4_tb.h"
 #endif
@@ -42,249 +42,249 @@
  * Geometry string parser, replacing XParseGeometry to remove X11 dependency.
  * Format: [WIDTHxHEIGHT][{+-}XOFF{+-}YOFF]
  */
-#define NoValue		0x0000
-#define WidthValue	0x0004
-#define HeightValue	0x0008
+#define No_মান		0x0000
+#define Width_মান	0x0004
+#define Height_মান	0x0008
 
-    static int
-vim_parse_geometry(const char *str, unsigned int *width, unsigned int *height)
+    স্থির পূর্ণসংখ্যা
+vim_parse_geometry(ধ্রুবক অক্ষর *str, unsigned পূর্ণসংখ্যা *width, unsigned পূর্ণসংখ্যা *height)
 {
-    int mask = NoValue;
-    char *end;
+    পূর্ণসংখ্যা mask = No_মান;
+    অক্ষর *end;
     long val;
 
-    if (str == NULL || *str == NUL)
-	return mask;
+    যদি (str == ফাঁকা || *str == NUL)
+	ফেরত mask;
 
     // Parse width
-    if (*str != '+' && *str != '-')
+    যদি (*str != '+' && *str != '-')
     {
 	val = strtol(str, &end, 10);
-	if (end != str)
+	যদি (end != str)
 	{
-	    *width = (unsigned int)val;
-	    mask |= WidthValue;
+	    *width = (unsigned পূর্ণসংখ্যা)val;
+	    mask |= Width_মান;
 	    str = end;
 	}
     }
 
     // Parse 'x' or 'X' separator and height
-    if (*str == 'x' || *str == 'X')
+    যদি (*str == 'x' || *str == 'X')
     {
 	str++;
 	val = strtol(str, &end, 10);
-	if (end != str)
+	যদি (end != str)
 	{
-	    *height = (unsigned int)val;
-	    mask |= HeightValue;
+	    *height = (unsigned পূর্ণসংখ্যা)val;
+	    mask |= Height_মান;
 	    str = end;
 	}
     }
 
-    return mask;
+    ফেরত mask;
 }
 
-#if defined(FEAT_MOUSESHAPE)
+#যদি defined(FEAT_MOUSESHAPE)
 // Last set mouse pointer shape
-static int last_shape = 0;
+স্থির পূর্ণসংখ্যা last_shape = 0;
 #endif
 
 #define DEFAULT_FONT	"Monospace 10"
 
 // Cursor blinking state
-static enum {
+স্থির গণনা {
     BLINK_NONE,
     BLINK_OFF,
     BLINK_ON
 } blink_state = BLINK_NONE;
 
 // GTK4 main loop compatibility
-static int gtk4_main_loop_level = 0;
-static int gtk4_main_loop_quit = FALSE;
+স্থির পূর্ণসংখ্যা gtk4_main_loop_level = 0;
+স্থির পূর্ণসংখ্যা gtk4_main_loop_quit = FALSE;
 
 #ifdef USE_GRESOURCE
 # include "auto/gui_gtk_gresources.h"
 #endif
 
-typedef gboolean timeout_cb_type;
+প্রকারলেখ gboolean timeout_cb_type;
 
 /*
  * Table of special key mappings.
  */
-static struct special_key
+স্থির কাঠামো special_চাবি
 {
-    guint key_sym;
+    guint চাবি_sym;
     char_u code0;
     char_u code1;
 }
-const special_keys[] =
+ধ্রুবক special_চাবিগুলি[] =
 {
-    {GDK_KEY_Up,	'k', 'u'},
-    {GDK_KEY_Down,	'k', 'd'},
-    {GDK_KEY_Left,	'k', 'l'},
-    {GDK_KEY_Right,	'k', 'r'},
-    {GDK_KEY_F1,	'k', '1'},
-    {GDK_KEY_F2,	'k', '2'},
-    {GDK_KEY_F3,	'k', '3'},
-    {GDK_KEY_F4,	'k', '4'},
-    {GDK_KEY_F5,	'k', '5'},
-    {GDK_KEY_F6,	'k', '6'},
-    {GDK_KEY_F7,	'k', '7'},
-    {GDK_KEY_F8,	'k', '8'},
-    {GDK_KEY_F9,	'k', '9'},
-    {GDK_KEY_F10,	'k', ';'},
-    {GDK_KEY_F11,	'F', '1'},
-    {GDK_KEY_F12,	'F', '2'},
-    {GDK_KEY_Help,	'%', '1'},
-    {GDK_KEY_Undo,	'&', '8'},
-    {GDK_KEY_BackSpace,	'k', 'b'},
-    {GDK_KEY_Insert,	'k', 'I'},
-    {GDK_KEY_Delete,	'k', 'D'},
-    {GDK_KEY_Home,	'k', 'h'},
-    {GDK_KEY_End,	'@', '7'},
-    {GDK_KEY_Prior,	'k', 'P'},
-    {GDK_KEY_Next,	'k', 'N'},
-    {GDK_KEY_Print,	'%', '9'},
-    {GDK_KEY_KP_Left,	'k', 'l'},
-    {GDK_KEY_KP_Right,	'k', 'r'},
-    {GDK_KEY_KP_Up,	'k', 'u'},
-    {GDK_KEY_KP_Down,	'k', 'd'},
-    {GDK_KEY_KP_Insert,	KS_EXTRA, (char_u)KE_KINS},
-    {GDK_KEY_KP_Delete,	KS_EXTRA, (char_u)KE_KDEL},
-    {GDK_KEY_KP_Home,	'K', '1'},
-    {GDK_KEY_KP_End,	'K', '4'},
-    {GDK_KEY_KP_Prior,	'K', '3'},
-    {GDK_KEY_KP_Next,	'K', '5'},
-    {GDK_KEY_KP_Add,	'K', '6'},
-    {GDK_KEY_KP_Subtract, 'K', '7'},
-    {GDK_KEY_KP_Divide,	'K', '8'},
-    {GDK_KEY_KP_Multiply, 'K', '9'},
-    {GDK_KEY_KP_Enter,	'K', 'A'},
-    {GDK_KEY_KP_Decimal,	'K', 'B'},
-    {GDK_KEY_KP_0,	'K', 'C'},
-    {GDK_KEY_KP_1,	'K', 'D'},
-    {GDK_KEY_KP_2,	'K', 'E'},
-    {GDK_KEY_KP_3,	'K', 'F'},
-    {GDK_KEY_KP_4,	'K', 'G'},
-    {GDK_KEY_KP_5,	'K', 'H'},
-    {GDK_KEY_KP_6,	'K', 'I'},
-    {GDK_KEY_KP_7,	'K', 'J'},
-    {GDK_KEY_KP_8,	'K', 'K'},
-    {GDK_KEY_KP_9,	'K', 'L'},
+    {GDK_চাবি_Up,	'k', 'u'},
+    {GDK_চাবি_Down,	'k', 'd'},
+    {GDK_চাবি_বাম,	'k', 'l'},
+    {GDK_চাবি_ডান,	'k', 'r'},
+    {GDK_চাবি_F1,	'k', '1'},
+    {GDK_চাবি_F2,	'k', '2'},
+    {GDK_চাবি_F3,	'k', '3'},
+    {GDK_চাবি_F4,	'k', '4'},
+    {GDK_চাবি_F5,	'k', '5'},
+    {GDK_চাবি_F6,	'k', '6'},
+    {GDK_চাবি_F7,	'k', '7'},
+    {GDK_চাবি_F8,	'k', '8'},
+    {GDK_চাবি_F9,	'k', '9'},
+    {GDK_চাবি_F10,	'k', ';'},
+    {GDK_চাবি_F11,	'F', '1'},
+    {GDK_চাবি_F12,	'F', '2'},
+    {GDK_চাবি_Help,	'%', '1'},
+    {GDK_চাবি_Undo,	'&', '8'},
+    {GDK_চাবি_Back_Space,	'k', 'b'},
+    {GDK_চাবি_ঢোকাও,	'k', 'I'},
+    {GDK_চাবি_Delete,	'k', 'D'},
+    {GDK_চাবি_Home,	'k', 'h'},
+    {GDK_চাবি_End,	'@', '7'},
+    {GDK_চাবি_Prior,	'k', 'P'},
+    {GDK_চাবি_পরবর্তী,	'k', 'N'},
+    {GDK_চাবি_Print,	'%', '9'},
+    {GDK_চাবি_KP_বাম,	'k', 'l'},
+    {GDK_চাবি_KP_ডান,	'k', 'r'},
+    {GDK_চাবি_KP_Up,	'k', 'u'},
+    {GDK_চাবি_KP_Down,	'k', 'd'},
+    {GDK_চাবি_KP_ঢোকাও,	KS_EXTRA, (char_u)KE_KINS},
+    {GDK_চাবি_KP_Delete,	KS_EXTRA, (char_u)KE_KDEL},
+    {GDK_চাবি_KP_Home,	'K', '1'},
+    {GDK_চাবি_KP_End,	'K', '4'},
+    {GDK_চাবি_KP_Prior,	'K', '3'},
+    {GDK_চাবি_KP_পরবর্তী,	'K', '5'},
+    {GDK_চাবি_KP_Add,	'K', '6'},
+    {GDK_চাবি_KP_Subtract, 'K', '7'},
+    {GDK_চাবি_KP_Divide,	'K', '8'},
+    {GDK_চাবি_KP_Multiply, 'K', '9'},
+    {GDK_চাবি_KP_Enter,	'K', 'A'},
+    {GDK_চাবি_KP_Decimal,	'K', 'B'},
+    {GDK_চাবি_KP_0,	'K', 'C'},
+    {GDK_চাবি_KP_1,	'K', 'D'},
+    {GDK_চাবি_KP_2,	'K', 'E'},
+    {GDK_চাবি_KP_3,	'K', 'F'},
+    {GDK_চাবি_KP_4,	'K', 'G'},
+    {GDK_চাবি_KP_5,	'K', 'H'},
+    {GDK_চাবি_KP_6,	'K', 'I'},
+    {GDK_চাবি_KP_7,	'K', 'J'},
+    {GDK_চাবি_KP_8,	'K', 'K'},
+    {GDK_চাবি_KP_9,	'K', 'L'},
     {0, 0, 0}
 };
 
-    static int
-keyval_to_string(unsigned int keyval, char_u *string)
+    স্থির পূর্ণসংখ্যা
+keyval_to_string(unsigned পূর্ণসংখ্যা keyval, char_u *string)
 {
-    int		len;
+    পূর্ণসংখ্যা		len;
     guint32	uc;
 
     uc = gdk_keyval_to_unicode(keyval);
-    if (uc != 0)
+    যদি (uc != 0)
     {
-	len = utf_char2bytes((int)uc, string);
+	len = utf_char2bytes((পূর্ণসংখ্যা)uc, string);
     }
-    else
+    অন্যথা
     {
 	len = 1;
-	switch (keyval)
+	নির্বাচন (keyval)
 	{
-	    case GDK_KEY_Tab: case GDK_KEY_KP_Tab: case GDK_KEY_ISO_Left_Tab:
+	    ক্ষেত্র GDK_চাবি_Tab: ক্ষেত্র GDK_চাবি_KP_Tab: ক্ষেত্র GDK_চাবি_ISO_বাম_Tab:
 		string[0] = TAB;
-		break;
-	    case GDK_KEY_Linefeed:
+		বিরতি;
+	    ক্ষেত্র GDK_চাবি_Linefeed:
 		string[0] = NL;
-		break;
-	    case GDK_KEY_Return: case GDK_KEY_ISO_Enter: case GDK_KEY_3270_Enter:
+		বিরতি;
+	    ক্ষেত্র GDK_চাবি_Return: ক্ষেত্র GDK_চাবি_ISO_Enter: ক্ষেত্র GDK_চাবি_3270_Enter:
 		string[0] = CAR;
-		break;
-	    case GDK_KEY_Escape:
+		বিরতি;
+	    ক্ষেত্র GDK_চাবি_Escape:
 		string[0] = ESC;
-		break;
-	    default:
+		বিরতি;
+	    পূর্বনির্ধারিত:
 		len = 0;
-		break;
+		বিরতি;
 	}
     }
     string[len] = NUL;
-    return len;
+    ফেরত len;
 }
 
-    static int
+    স্থির পূর্ণসংখ্যা
 modifiers_gdk2vim(guint state)
 {
-    int modifiers = 0;
+    পূর্ণসংখ্যা modifiers = 0;
 
-    if (state & GDK_SHIFT_MASK)
+    যদি (state & GDK_SHIFT_MASK)
 	modifiers |= MOD_MASK_SHIFT;
-    if (state & GDK_CONTROL_MASK)
+    যদি (state & GDK_CONTROL_MASK)
 	modifiers |= MOD_MASK_CTRL;
-    if (state & GDK_ALT_MASK)
+    যদি (state & GDK_ALT_MASK)
 	modifiers |= MOD_MASK_ALT;
-    if (state & GDK_META_MASK)
+    যদি (state & GDK_META_MASK)
 	modifiers |= MOD_MASK_META;
-    if (state & GDK_SUPER_MASK)
+    যদি (state & GDK_SUPER_MASK)
 	modifiers |= MOD_MASK_CMD;
 
-    return modifiers;
+    ফেরত modifiers;
 }
 
-static GtkWidget *vbox;		// the main vertical box
+স্থির GtkWidget *vbox;		// the main vertical box
 
 // Forward declarations for event callbacks
-static gboolean key_press_event(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer data);
-static void key_release_event(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer data);
-static void button_press_event(GtkGestureClick *gesture, int n_press, double x, double y, gpointer data);
-static void button_release_event(GtkGestureClick *gesture, int n_press, double x, double y, gpointer data);
-static void motion_notify_event(GtkEventControllerMotion *controller, double x, double y, gpointer data);
-static void enter_notify_event(GtkEventControllerMotion *controller, double x, double y, gpointer data);
-static gboolean scroll_event(GtkEventControllerScroll *controller, double dx, double dy, gpointer data);
-static void focus_in_event(GtkEventControllerFocus *controller, gpointer data);
-static void focus_out_event(GtkEventControllerFocus *controller, gpointer data);
+স্থির gboolean চাবি_press_event(Gtk_Event_Controller_চাবি *controller, guint keyval, guint keycode, GdkModifierType state, gpointer তথ্য);
+স্থির শূন্য চাবি_release_event(Gtk_Event_Controller_চাবি *controller, guint keyval, guint keycode, GdkModifierType state, gpointer তথ্য);
+স্থির শূন্য button_press_event(GtkGestureClick *gesture, পূর্ণসংখ্যা n_press, দ্বিগুণ x, দ্বিগুণ y, gpointer তথ্য);
+স্থির শূন্য button_release_event(GtkGestureClick *gesture, পূর্ণসংখ্যা n_press, দ্বিগুণ x, দ্বিগুণ y, gpointer তথ্য);
+স্থির শূন্য motion_notify_event(GtkEventControllerMotion *controller, দ্বিগুণ x, দ্বিগুণ y, gpointer তথ্য);
+স্থির শূন্য enter_notify_event(GtkEventControllerMotion *controller, দ্বিগুণ x, দ্বিগুণ y, gpointer তথ্য);
+স্থির gboolean scroll_event(GtkEventControllerScroll *controller, দ্বিগুণ dx, দ্বিগুণ dy, gpointer তথ্য);
+স্থির শূন্য focus_in_event(GtkEventControllerFocus *controller, gpointer তথ্য);
+স্থির শূন্য focus_out_event(GtkEventControllerFocus *controller, gpointer তথ্য);
 #ifdef FEAT_DND
-static gboolean drop_cb(GtkDropTargetAsync *target, GdkDrop *drop, double x, double y, void *data);
+স্থির gboolean drop_cb(GtkDropTargetAsync *target, GdkDrop *drop, দ্বিগুণ x, দ্বিগুণ y, শূন্য *তথ্য);
 #endif
 #ifdef FEAT_GUI_TABLINE
-static void tabline_enter_cb(GtkEventController *controller, double x, double y, void *udata);
-static void on_select_tab(GtkNotebook *notebook, gpointer *page, gint idx, gpointer data);
-static void on_tab_reordered(GtkNotebook *notebook, gpointer *page, gint idx, gpointer data);
-static VimMenu *create_tabline_popup_menu(void);
-static void tabline_add_css(void);
-static void tabline_menu_press_event(GtkGestureClick *gesture, int n_press, double x, double y, GtkWidget *popover);
+স্থির শূন্য tabline_enter_cb(GtkEventController *controller, দ্বিগুণ x, দ্বিগুণ y, শূন্য *udata);
+স্থির শূন্য on_select_tab(GtkNotebook *notebook, gpointer *page, gint idx, gpointer তথ্য);
+স্থির শূন্য on_tab_reordered(GtkNotebook *notebook, gpointer *page, gint idx, gpointer তথ্য);
+স্থির VimMenu *create_tabline_popup_menu(শূন্য);
+স্থির শূন্য tabline_add_css(শূন্য);
+স্থির শূন্য tabline_menu_press_event(GtkGestureClick *gesture, পূর্ণসংখ্যা n_press, দ্বিগুণ x, দ্বিগুণ y, GtkWidget *popover);
 #endif
-static void mainwin_destroy_cb(GObject *object, gpointer data);
-static gboolean delete_event_cb(GtkWindow *window, gpointer data);
-static int query_pointer_pos(int *x, int *y, GdkModifierType *state);
-static void mainwin_fullscreened_cb(GObject *obj, GParamSpec *pspec, gpointer user_data);
-static void set_form_size(int width, int height);
-static void drawarea_realize_cb(GtkWidget *widget, gpointer data);
-static void drawarea_unrealize_cb(GtkWidget *widget, gpointer data);
-static void clipboard_changed_cb(GdkClipboard *clipboard, gpointer user_data);
+স্থির শূন্য mainwin_destroy_cb(GObject *object, gpointer তথ্য);
+স্থির gboolean delete_event_cb(GtkWindow *window, gpointer তথ্য);
+স্থির পূর্ণসংখ্যা query_pointer_pos(পূর্ণসংখ্যা *x, পূর্ণসংখ্যা *y, GdkModifierType *state);
+স্থির শূন্য mainwin_fullscreened_cb(GObject *obj, GParamSpec *pspec, gpointer user_তথ্য);
+স্থির শূন্য set_form_আকার(পূর্ণসংখ্যা width, পূর্ণসংখ্যা height);
+স্থির শূন্য drawarea_realize_cb(GtkWidget *widget, gpointer তথ্য);
+স্থির শূন্য drawarea_unrealize_cb(GtkWidget *widget, gpointer তথ্য);
+স্থির শূন্য clipboard_changed_cb(GdkClipboard *clipboard, gpointer user_তথ্য);
 #ifdef FEAT_MENU
-static void show_menubar_popover(void);
+স্থির শূন্য show_menubar_popover(শূন্য);
 #endif
 
-static const char *prgname = NULL;
+স্থির ধ্রুবক অক্ষর *prgname = ফাঁকা;
 
 /*
  * Check if "s" is the option "name" (which includes the leading dash(es)).
  * "value" is set to the value if the option uses 'opt=val' format.
  */
-    static gboolean
-arg_match(const char *s, const char *name, char **value)
+    স্থির gboolean
+arg_match(ধ্রুবক অক্ষর *s, ধ্রুবক অক্ষর *name, অক্ষর **মান)
 {
     size_t  len = strlen(name);
 
-    if (strncmp(s, name, len) != 0)
-	return FALSE;
-    if (s[len] == '=')
-	*value = (char *)s + len + 1;
-    else if (s[len] != NUL)
+    যদি (strncmp(s, name, len) != 0)
+	ফেরত FALSE;
+    যদি (s[len] == '=')
+	*মান = (অক্ষর *)s + len + 1;
+    অন্যথা যদি (s[len] != NUL)
 	// Something follows the option name that isn't "=": this is a
 	// different, longer option (e.g. "-fnord" while matching "-fn").
-	return FALSE;
-    return TRUE;
+	ফেরত FALSE;
+    ফেরত TRUE;
 }
 
 /*
@@ -292,76 +292,76 @@ arg_match(const char *s, const char *name, char **value)
  * deleted from argv, and *argc is decremented accordingly.  This is called
  * when vim is started, whether or not the GUI has been started.
  */
-    void
-gui_mch_prepare(int *argc, char **argv)
+    শূন্য
+gui_mch_prepare(পূর্ণসংখ্যা *argc, অক্ষর **argv)
 {
     // Don't call gtk_init() here.  It will be called in
     // gui_mch_init_check() after the fork.  Calling it before fork
     // breaks the display connection in the child process, causing gvim
     // to fail to start without --nofork.
 
-    int	i = 0;
+    পূর্ণসংখ্যা	i = 0;
 
-    while (i < *argc)
+    যখন (i < *argc)
     {
-	char	*s = argv[i];
-	char	*value = NULL;
-	int	has_inline_value = FALSE;
-	int	n_strip;
+	অক্ষর	*s = argv[i];
+	অক্ষর	*মান = ফাঁকা;
+	পূর্ণসংখ্যা	has_inline_মান = FALSE;
+	পূর্ণসংখ্যা	n_strip;
 
-	if (s[0] != '-' && s[0] != '+')
+	যদি (s[0] != '-' && s[0] != '+')
 	{
 	    ++i;
-	    continue;
+	    চালু;
 	}
 
-	if (strchr(s, '=') != NULL)
-	    has_inline_value = TRUE;
+	যদি (strchr(s, '=') != ফাঁকা)
+	    has_inline_মান = TRUE;
 
 	// If the value was not given inline (no "="), it would come from the
 	// next argv element.  Do not treat that next element as this option's
 	// value if it is "--" (end-of-options marker) or is another option.
-	if (!has_inline_value)
+	যদি (!has_inline_মান)
 	{
-	    if (i + 1 < *argc
+	    যদি (i + 1 < *argc
 		    && strcmp(argv[i + 1], "--") != 0
 		    && !((argv[i + 1][0] == '-' || argv[i + 1][0] == '+')
 			&& !vim_isdigit(argv[i + 1][1])))
-		value = argv[i + 1];
-	    else
-		value = NULL;
+		মান = argv[i + 1];
+	    অন্যথা
+		মান = ফাঁকা;
 	}
 
-	if (arg_match(s, "-fn", &value) || arg_match(s, "-font", &value))
-	    font_argument = value;
-	else if (arg_match(s, "-geom", &value)
-		|| arg_match(s, "-geometry", &value))
+	যদি (arg_match(s, "-fn", &মান) || arg_match(s, "-font", &মান))
+	    font_argument = মান;
+	অন্যথা যদি (arg_match(s, "-geom", &মান)
+		|| arg_match(s, "-geometry", &মান))
 	{
-	    if (value != NULL)
-		gui.geom = vim_strsave((char_u *)value);
+	    যদি (মান != ফাঁকা)
+		gui.geom = vim_strsave((char_u *)মান);
 	}
-	else if (arg_match(s, "-bg", &value)
-		|| arg_match(s, "-background", &value))
-	    background_argument = value;
-	else if (arg_match(s, "-fg", &value)
-		|| arg_match(s, "-foreground", &value))
-	    foreground_argument = value;
+	অন্যথা যদি (arg_match(s, "-bg", &মান)
+		|| arg_match(s, "-background", &মান))
+	    background_argument = মান;
+	অন্যথা যদি (arg_match(s, "-fg", &মান)
+		|| arg_match(s, "-foreground", &মান))
+	    foreground_argument = মান;
 #ifdef FEAT_NETBEANS_INTG
-	else if (strncmp(s, "-nb", 3) == 0)
+	অন্যথা যদি (strncmp(s, "-nb", 3) == 0)
 	{
 	    gui.dofork = false; // don't fork() when starting GUI
 	    netbeansArg = argv[i];
-	    has_inline_value = TRUE; // -nb uses non standard syntax, just
+	    has_inline_মান = TRUE; // -nb uses non standard syntax, just
 				     // remove the flag.
 	}
 #endif
-	else if (arg_match(s, "--prg-name", &value))
+	অন্যথা যদি (arg_match(s, "--prg-name", &মান))
 	    // GTK4 specific
-	    prgname = value;
-	else
+	    prgname = মান;
+	অন্যথা
 	{
 	    i++;
-	    continue;
+	    চালু;
 	}
 
 	// Remove the flag from the argument vector.
@@ -369,16 +369,16 @@ gui_mch_prepare(int *argc, char **argv)
 	// Move the argument's value as well, but only if it was consumed
 	// from a separate argv element (the "-opt=value" form lives inside
 	// the flag's own element and is stripped along with it already).
-	if (value != NULL && !has_inline_value)
+	যদি (মান != ফাঁকা && !has_inline_মান)
 	    n_strip = 2;
 
-	if (*argc - n_strip >= i)
+	যদি (*argc - n_strip >= i)
 	{
 	    *argc -= n_strip;
-	    if (*argc > i)
+	    যদি (*argc > i)
 		mch_memmove(&argv[i], &argv[i + n_strip],
-			(*argc - i) * sizeof(char *));
-	    argv[*argc] = NULL;
+			(*argc - i) * আকার(অক্ষর *));
+	    argv[*argc] = ফাঁকা;
 	}
     }
 }
@@ -386,59 +386,59 @@ gui_mch_prepare(int *argc, char **argv)
 /*
  * Free all GUI related resources.
  */
-    void
-gui_mch_free_all(void)
+    শূন্য
+gui_mch_free_all(শূন্য)
 {
 }
 
-    static guint
-timeout_add(int time, timeout_cb_type (*callback)(gpointer), int *flagp)
+    স্থির guint
+timeout_add(পূর্ণসংখ্যা time, timeout_cb_type (*callback)(gpointer), পূর্ণসংখ্যা *flagp)
 {
-    return g_timeout_add((guint)time, (GSourceFunc)callback, flagp);
+    ফেরত g_timeout_add((guint)time, (GSourceFunc)callback, flagp);
 }
 
-    static void
+    স্থির শূন্য
 timeout_remove(guint timer)
 {
     g_source_remove(timer);
 }
 
-static long_u blink_waittime = 700;
-static long_u blink_ontime = 400;
-static long_u blink_offtime = 250;
-static guint blink_timer = 0;
+স্থির long_u blink_waittime = 700;
+স্থির long_u blink_ontime = 400;
+স্থির long_u blink_offtime = 250;
+স্থির guint blink_timer = 0;
 
-    static timeout_cb_type
-blink_cb(gpointer data UNUSED)
+    স্থির timeout_cb_type
+blink_cb(gpointer তথ্য UNUSED)
 {
-    if (blink_state == BLINK_ON)
+    যদি (blink_state == BLINK_ON)
     {
 	gui_undraw_cursor();
 	blink_state = BLINK_OFF;
-	blink_timer = timeout_add(blink_offtime, blink_cb, NULL);
+	blink_timer = timeout_add(blink_offtime, blink_cb, ফাঁকা);
     }
-    else
+    অন্যথা
     {
 	gui_update_cursor(TRUE, FALSE);
 	blink_state = BLINK_ON;
-	blink_timer = timeout_add(blink_ontime, blink_cb, NULL);
+	blink_timer = timeout_add(blink_ontime, blink_cb, ফাঁকা);
     }
-    return FALSE;
+    ফেরত FALSE;
 }
 
-    int
-gui_mch_is_blinking(void)
+    পূর্ণসংখ্যা
+gui_mch_is_blinking(শূন্য)
 {
-    return blink_state != BLINK_NONE;
+    ফেরত blink_state != BLINK_NONE;
 }
 
-    int
-gui_mch_is_blink_off(void)
+    পূর্ণসংখ্যা
+gui_mch_is_blink_off(শূন্য)
 {
-    return blink_state == BLINK_OFF;
+    ফেরত blink_state == BLINK_OFF;
 }
 
-    void
+    শূন্য
 gui_mch_set_blinking(long waittime, long on, long off)
 {
     blink_waittime = waittime;
@@ -446,68 +446,68 @@ gui_mch_set_blinking(long waittime, long on, long off)
     blink_offtime = off;
 }
 
-    void
-gui_mch_stop_blink(int may_call_gui_update_cursor)
+    শূন্য
+gui_mch_stop_blink(পূর্ণসংখ্যা may_call_gui_update_cursor)
 {
-    if (blink_timer)
+    যদি (blink_timer)
     {
 	timeout_remove(blink_timer);
 	blink_timer = 0;
     }
-    if (blink_state == BLINK_OFF && may_call_gui_update_cursor)
+    যদি (blink_state == BLINK_OFF && may_call_gui_update_cursor)
 	gui_update_cursor(TRUE, FALSE);
     blink_state = BLINK_NONE;
 }
 
-    void
-gui_mch_start_blink(void)
+    শূন্য
+gui_mch_start_blink(শূন্য)
 {
-    if (blink_timer)
+    যদি (blink_timer)
     {
 	timeout_remove(blink_timer);
 	blink_timer = 0;
     }
-    if (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
+    যদি (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
     {
-	blink_timer = timeout_add(blink_waittime, blink_cb, NULL);
+	blink_timer = timeout_add(blink_waittime, blink_cb, ফাঁকা);
 	blink_state = BLINK_ON;
 	gui_update_cursor(TRUE, FALSE);
     }
 }
 
-    int
-gui_mch_early_init_check(int give_message UNUSED)
+    পূর্ণসংখ্যা
+gui_mch_early_init_check(পূর্ণসংখ্যা give_message UNUSED)
 {
-    return OK;
+    ফেরত OK;
 }
 
-    int
-gui_mch_init_check(void)
+    পূর্ণসংখ্যা
+gui_mch_init_check(শূন্য)
 {
     // This defaults to argv[0], but we want it to match the name of the
     // shipped gvim.desktop so that Vim's windows can be associated with this
     // file.  Also sets WM_CLASS on X11. If "--prg-name" is specified, then use
     // that.
-    g_set_prgname(prgname == NULL ? "gvim" : prgname);
+    g_set_prgname(prgname == ফাঁকা ? "gvim" : prgname);
 
     // Suppress noisy EGL warnings when GL is not available.  Only set
     // this when actually starting the GUI, so non-GUI invocations are
     // not affected.
-    if (g_getenv("EGL_LOG_LEVEL") == NULL)
+    যদি (g_getenv("EGL_LOG_LEVEL") == ফাঁকা)
 	setenv("EGL_LOG_LEVEL", "fatal", 0);
 
     // Call gtk_init() here after fork().  Calling it before fork() breaks
     // the display connection in the child process.
     gtk_init();
-    return OK;
+    ফেরত OK;
 }
 
 /*
  * Initialise the GUI.  Create all the windows, set up all the callbacks etc.
  * Returns OK for success, FAIL when the GUI can't be started.
  */
-    int
-gui_mch_init(void)
+    পূর্ণসংখ্যা
+gui_mch_init(শূন্য)
 {
     // Allocate GdkRGBA color structs.
     gui.fgcolor = g_new0(GdkRGBA, 1);
@@ -531,9 +531,9 @@ gui_mch_init(void)
     pango_context_set_base_dir(gui.text_context, PANGO_DIRECTION_LTR);
 
     g_signal_connect(G_OBJECT(gui.mainwin), "close-request",
-		     G_CALLBACK(delete_event_cb), NULL);
+		     G_CALLBACK(delete_event_cb), ফাঁকা);
     g_signal_connect(G_OBJECT(gui.mainwin), "notify::fullscreened",
-		     G_CALLBACK(mainwin_fullscreened_cb), NULL);
+		     G_CALLBACK(mainwin_fullscreened_cb), ফাঁকা);
 
     // A vertical box holds the menubar, toolbar and main text window.
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -566,15 +566,15 @@ gui_mch_init(void)
     gtk_box_append(GTK_BOX(vbox), gui.tabline);
 
     g_signal_connect(G_OBJECT(gui.tabline), "switch-page",
-		     G_CALLBACK(on_select_tab), NULL);
+		     G_CALLBACK(on_select_tab), ফাঁকা);
     g_signal_connect(G_OBJECT(gui.tabline), "page-reordered",
-		     G_CALLBACK(on_tab_reordered), NULL);
+		     G_CALLBACK(on_tab_reordered), ফাঁকা);
 
     {
 	GtkEventController *mcontroller = gtk_event_controller_motion_new();
 
 	g_signal_connect(mcontroller, "enter",
-		G_CALLBACK(tabline_enter_cb), NULL);
+		G_CALLBACK(tabline_enter_cb), ফাঁকা);
 
 	// Make sure that tabline_enter_cb() is always called before
 	// tabpage_enter_cb().
@@ -592,7 +592,7 @@ gui_mch_init(void)
 	menu = create_tabline_popup_menu();
 
 	gtk_widget_set_parent(GTK_WIDGET(menu), gui.tabline);
-	g_object_set_data(G_OBJECT(gui.tabline), "menu", menu);
+	g_object_set_তথ্য(G_OBJECT(gui.tabline), "menu", menu);
 
 	gtk_popover_set_has_arrow(GTK_POPOVER(menu), FALSE);
 	gtk_popover_set_position(GTK_POPOVER(menu), GTK_POS_BOTTOM);
@@ -625,18 +625,18 @@ gui_mch_init(void)
     vim_form_put(VIM_FORM(gui.formwin), gui.drawarea, 0, 0);
 
     g_signal_connect(G_OBJECT(gui.drawarea), "realize",
-		     G_CALLBACK(drawarea_realize_cb), NULL);
+		     G_CALLBACK(drawarea_realize_cb), ফাঁকা);
     g_signal_connect(G_OBJECT(gui.drawarea), "unrealize",
-		     G_CALLBACK(drawarea_unrealize_cb), NULL);
+		     G_CALLBACK(drawarea_unrealize_cb), ফাঁকা);
 
     // Set up event controllers.
     {
-	GtkEventController *key_ctrl = gtk_event_controller_key_new();
-	g_signal_connect(key_ctrl, "key-pressed",
-			 G_CALLBACK(key_press_event), NULL);
-	g_signal_connect(key_ctrl, "key-released",
-			 G_CALLBACK(key_release_event), NULL);
-	gtk_widget_add_controller(gui.drawarea, key_ctrl);
+	GtkEventController *চাবি_ctrl = gtk_event_controller_চাবি_new();
+	g_signal_connect(চাবি_ctrl, "key-pressed",
+			 G_CALLBACK(চাবি_press_event), ফাঁকা);
+	g_signal_connect(চাবি_ctrl, "key-released",
+			 G_CALLBACK(চাবি_release_event), ফাঁকা);
+	gtk_widget_add_controller(gui.drawarea, চাবি_ctrl);
 #ifdef FEAT_XIM
 	xim_init();
 #endif
@@ -646,18 +646,18 @@ gui_mch_init(void)
 	GtkGesture *click = gtk_gesture_click_new();
 	gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(click), 0);
 	g_signal_connect(click, "pressed",
-			 G_CALLBACK(button_press_event), NULL);
+			 G_CALLBACK(button_press_event), ফাঁকা);
 	g_signal_connect(click, "released",
-			 G_CALLBACK(button_release_event), NULL);
+			 G_CALLBACK(button_release_event), ফাঁকা);
 	gtk_widget_add_controller(gui.drawarea, GTK_EVENT_CONTROLLER(click));
     }
 
     {
 	GtkEventController *motion = gtk_event_controller_motion_new();
 	g_signal_connect(motion, "motion",
-			 G_CALLBACK(motion_notify_event), NULL);
+			 G_CALLBACK(motion_notify_event), ফাঁকা);
 	g_signal_connect(motion, "enter",
-			 G_CALLBACK(enter_notify_event), NULL);
+			 G_CALLBACK(enter_notify_event), ফাঁকা);
 	gtk_widget_add_controller(gui.drawarea, motion);
     }
 
@@ -666,16 +666,16 @@ gui_mch_init(void)
 		GTK_EVENT_CONTROLLER_SCROLL_BOTH_AXES
 		| GTK_EVENT_CONTROLLER_SCROLL_DISCRETE);
 	g_signal_connect(scroll, "scroll",
-			 G_CALLBACK(scroll_event), NULL);
+			 G_CALLBACK(scroll_event), ফাঁকা);
 	gtk_widget_add_controller(gui.drawarea, scroll);
     }
 
     {
 	GtkEventController *focus = gtk_event_controller_focus_new();
 	g_signal_connect(focus, "enter",
-			 G_CALLBACK(focus_in_event), NULL);
+			 G_CALLBACK(focus_in_event), ফাঁকা);
 	g_signal_connect(focus, "leave",
-			 G_CALLBACK(focus_out_event), NULL);
+			 G_CALLBACK(focus_out_event), ফাঁকা);
 	gtk_widget_add_controller(gui.drawarea, focus);
     }
 
@@ -683,12 +683,12 @@ gui_mch_init(void)
     // Set up drag-and-drop target for files and text. We use async variant so
     // we can handle html format.
     {
-	gui.drop_target = gtk_drop_target_async_new(NULL,
+	gui.drop_target = gtk_drop_target_async_new(ফাঁকা,
 		GDK_ACTION_COPY | GDK_ACTION_MOVE);
 
 	gui_gtk_set_dnd_targets();
 	g_signal_connect(gui.drop_target, "drop",
-			 G_CALLBACK(drop_cb), NULL);
+			 G_CALLBACK(drop_cb), ফাঁকা);
 	gtk_widget_add_controller(gui.drawarea,
 		GTK_EVENT_CONTROLLER(gui.drop_target));
     }
@@ -697,17 +697,17 @@ gui_mch_init(void)
     gui.border_offset = gui.border_width;
 
     // Create a blank (invisible) cursor for hiding the mouse pointer.
-    gui.blank_pointer = gdk_cursor_new_from_name("none", NULL);
+    gui.blank_pointer = gdk_cursor_new_from_name("none", ফাঁকা);
 
     {
 	GdkDisplay   *display = gtk_widget_get_display(gui.mainwin);
 	GdkClipboard *primary = gdk_display_get_primary_clipboard(display);
 	GdkClipboard *regular = gdk_display_get_clipboard(display);
 
-	if (primary != NULL)
+	যদি (primary != ফাঁকা)
 	    g_signal_connect(primary, "changed",
 		    G_CALLBACK(clipboard_changed_cb), &clip_star);
-	if (regular != NULL)
+	যদি (regular != ফাঁকা)
 	    g_signal_connect(regular, "changed",
 		    G_CALLBACK(clipboard_changed_cb), &clip_plus);
     }
@@ -715,52 +715,52 @@ gui_mch_init(void)
     gui.regular_provider = vim_content_provider_new(&clip_plus);
     gui.primary_provider = vim_content_provider_new(&clip_star);
 
-    return OK;
+    ফেরত OK;
 }
 
-    void
-gui_mch_new_colors(void)
+    শূন্য
+gui_mch_new_colors(শূন্য)
 {
-    if (gui.drawarea != NULL && gtk_widget_get_realized(gui.drawarea))
+    যদি (gui.drawarea != ফাঁকা && gtk_widget_get_realized(gui.drawarea))
 	gtk_widget_queue_draw(gui.drawarea);
 }
 
 /*
  * Open the GUI window which was created by a call to gui_mch_init().
  */
-    int
-gui_mch_open(void)
+    পূর্ণসংখ্যা
+gui_mch_open(শূন্য)
 {
     guicolor_T fg_pixel = INVALCOLOR;
     guicolor_T bg_pixel = INVALCOLOR;
     guint pixel_width;
     guint pixel_height;
 
-    if (gui.geom != NULL)
+    যদি (gui.geom != ফাঁকা)
     {
-	int		mask;
-	unsigned int	w, h;
+	পূর্ণসংখ্যা		mask;
+	unsigned পূর্ণসংখ্যা	w, h;
 
-	mask = vim_parse_geometry((char *)gui.geom, &w, &h);
+	mask = vim_parse_geometry((অক্ষর *)gui.geom, &w, &h);
 
-	if (mask & WidthValue)
+	যদি (mask & Width_মান)
 	    Columns = w;
-	if (mask & HeightValue)
+	যদি (mask & Height_মান)
 	{
-	    if (p_window > (long)h - 1 || !option_was_set((char_u *)"window"))
+	    যদি (p_window > (long)h - 1 || !option_was_set((char_u *)"window"))
 		p_window = h - 1;
 	    Rows = h;
 	}
-	limit_screen_size();
+	limit_screen_আকার();
 
 	VIM_CLEAR(gui.geom);
     }
-    else
+    অন্যথা
     {
 	// Use 80x24 as the default GUI size, unless geometry was specified.
-	if (Columns > 80)
+	যদি (Columns > 80)
 	    Columns = 80;
-	if (Rows > 24)
+	যদি (Rows > 24)
 	    Rows = 24;
     }
 
@@ -770,22 +770,22 @@ gui_mch_open(void)
     pixel_width  += get_menu_tool_width();
     pixel_height += get_menu_tool_height();
 
-    if (foreground_argument != NULL)
+    যদি (foreground_argument != ফাঁকা)
 	fg_pixel = gui_get_color((char_u *)foreground_argument);
-    if (fg_pixel == INVALCOLOR)
+    যদি (fg_pixel == INVALCOLOR)
 	fg_pixel = gui_get_color((char_u *)"Black");
 
-    if (background_argument != NULL)
+    যদি (background_argument != ফাঁকা)
 	bg_pixel = gui_get_color((char_u *)background_argument);
-    if (bg_pixel == INVALCOLOR)
+    যদি (bg_pixel == INVALCOLOR)
 	bg_pixel = gui_get_color((char_u *)"White");
 
-    if (found_reverse_arg)
+    যদি (found_reverse_arg)
     {
 	gui.def_norm_pixel = bg_pixel;
 	gui.def_back_pixel = fg_pixel;
     }
-    else
+    অন্যথা
     {
 	gui.def_norm_pixel = fg_pixel;
 	gui.def_back_pixel = bg_pixel;
@@ -796,11 +796,11 @@ gui_mch_open(void)
     highlight_gui_started();
 
     g_signal_connect(G_OBJECT(gui.mainwin), "destroy",
-		     G_CALLBACK(mainwin_destroy_cb), NULL);
+		     G_CALLBACK(mainwin_destroy_cb), ফাঁকা);
     // Resize is handled by GtkForm's size_allocate callback.
 
-    set_form_size((int)pixel_width - get_menu_tool_width(),
-	    (int)pixel_height - get_menu_tool_height());
+    set_form_আকার((পূর্ণসংখ্যা)pixel_width - get_menu_tool_width(),
+	    (পূর্ণসংখ্যা)pixel_height - get_menu_tool_height());
 
     gtk_window_present(GTK_WINDOW(gui.mainwin));
 
@@ -812,17 +812,17 @@ gui_mch_open(void)
     gtk_widget_grab_focus(gui.drawarea);
     gui_focus_change(TRUE);
 
-    return OK;
+    ফেরত OK;
 }
 
-    void
-gui_mch_exit(int rc UNUSED)
+    শূন্য
+gui_mch_exit(পূর্ণসংখ্যা rc UNUSED)
 {
-    if (gui.mainwin != NULL)
+    যদি (gui.mainwin != ফাঁকা)
     {
 #ifdef FEAT_GUI_TABLINE
 	// Must unparent popover menu for tabline or we will get warning
-	gtk_widget_unparent(g_object_get_data(G_OBJECT(gui.tabline), "menu"));
+	gtk_widget_unparent(g_object_get_তথ্য(G_OBJECT(gui.tabline), "menu"));
 #endif
 #ifdef FEAT_BEVAL_GUI
 	// Make sure to destroy popover used for balloon eval, or we will get a
@@ -836,8 +836,8 @@ gui_mch_exit(int rc UNUSED)
 
 	    FOR_ALL_MENUS(menu)
 	    {
-		if ((menu->name[0] == ']' || menu_is_popup(menu->name))
-			&& menu->submenu_id != NULL)
+		যদি ((menu->name[0] == ']' || menu_is_popup(menu->name))
+			&& menu->submenu_id != ফাঁকা)
 		    gtk_widget_unparent(menu->submenu_id);
 	    }
 	}
@@ -846,51 +846,51 @@ gui_mch_exit(int rc UNUSED)
     }
 }
 
-    int
-gui_mch_get_winpos(int *x, int *y)
+    পূর্ণসংখ্যা
+gui_mch_get_winpos(পূর্ণসংখ্যা *x, পূর্ণসংখ্যা *y)
 {
     // GTK4 does not provide a window position API.
     *x = 0;
     *y = 0;
-    return FAIL;
+    ফেরত FAIL;
 }
 
-    void
-gui_mch_set_winpos(int x UNUSED, int y UNUSED)
+    শূন্য
+gui_mch_set_winpos(পূর্ণসংখ্যা x UNUSED, পূর্ণসংখ্যা y UNUSED)
 {
     // GTK4/Wayland: window positioning not available
 }
 
-    int
-gui_mch_maximized(void)
+    পূর্ণসংখ্যা
+gui_mch_maximized(শূন্য)
 {
-    return gtk_window_is_maximized(GTK_WINDOW(gui.mainwin));
+    ফেরত gtk_window_is_maximized(GTK_WINDOW(gui.mainwin));
 }
 
-    void
-gui_mch_unmaximize(void)
+    শূন্য
+gui_mch_unmaximize(শূন্য)
 {
-    if (gui.mainwin != NULL)
+    যদি (gui.mainwin != ফাঁকা)
 	gtk_window_unmaximize(GTK_WINDOW(gui.mainwin));
 }
 
-    void
-gui_mch_set_fullscreen(int flag)
+    শূন্য
+gui_mch_set_fullscreen(পূর্ণসংখ্যা flag)
 {
-    if (gui.mainwin == NULL)
-	return;
-    if (flag)
+    যদি (gui.mainwin == ফাঁকা)
+	ফেরত;
+    যদি (flag)
 	gtk_window_fullscreen(GTK_WINDOW(gui.mainwin));
-    else
+    অন্যথা
 	gtk_window_unfullscreen(GTK_WINDOW(gui.mainwin));
 }
 
-    static void
+    স্থির শূন্য
 mainwin_fullscreened_cb(GObject *obj,
-	GParamSpec *pspec UNUSED, gpointer user_data UNUSED)
+	GParamSpec *pspec UNUSED, gpointer user_তথ্য UNUSED)
 {
     // Force a redraw of the drawing area when entering fullscreen mode.
-    if (gtk_window_is_fullscreen(GTK_WINDOW(obj)))
+    যদি (gtk_window_is_fullscreen(GTK_WINDOW(obj)))
 	gui_focus_change(TRUE);
 }
 
@@ -906,10 +906,10 @@ mainwin_fullscreened_cb(GObject *obj,
  * crash.  Use gui_resize_shell() to recalculate Rows/Columns from the current
  * window size instead.
  */
-    void
-gui_mch_newfont(void)
+    শূন্য
+gui_mch_newfont(শূন্য)
 {
-    int w, h;
+    পূর্ণসংখ্যা w, h;
 
     // Do not subtract width and height with menubar, toolbar, etc, because
     // those are not part of the shell.
@@ -918,11 +918,11 @@ gui_mch_newfont(void)
     gui_resize_shell(w, h);
 }
 
-    void
+    শূন্য
 gui_mch_settitle(char_u *title, char_u *icon UNUSED)
 {
-    if (title != NULL && gui.mainwin != NULL)
-	gtk_window_set_title(GTK_WINDOW(gui.mainwin), (const char *)title);
+    যদি (title != ফাঁকা && gui.mainwin != ফাঁকা)
+	gtk_window_set_title(GTK_WINDOW(gui.mainwin), (ধ্রুবক অক্ষর *)title);
 }
 
 /*
@@ -933,13 +933,13 @@ gui_mch_settitle(char_u *title, char_u *icon UNUSED)
  * it actually is (while the window size is up to date), causing a negative
  * "decor_height".
  */
-    void
-gui_gtk_init_decor_height(void)
+    শূন্য
+gui_gtk_init_decor_height(শূন্য)
 {
-    int h = gtk_widget_get_height(gui.mainwin);
+    পূর্ণসংখ্যা h = gtk_widget_get_height(gui.mainwin);
 
-    if (h == 0)
-	return;
+    যদি (h == 0)
+	ফেরত;
 
     h -= get_menu_tool_height();
     h -= gtk_widget_get_height(gui.formwin);
@@ -951,14 +951,14 @@ gui_gtk_init_decor_height(void)
  * Ask for the form widget, and thus the shell, to become "width" by "height"
  * pixels.
  */
-    static void
-set_form_size(int width, int height)
+    স্থির শূন্য
+set_form_আকার(পূর্ণসংখ্যা width, পূর্ণসংখ্যা height)
 {
     // Nothing to do when the form widget already has this size: no allocation
     // would follow and the size request below would never be dropped.
-    if (gtk_widget_get_width(gui.formwin) == width
+    যদি (gtk_widget_get_width(gui.formwin) == width
 	    && gtk_widget_get_height(gui.formwin) == height)
-	return;
+	ফেরত;
 
     // Remember the size the form widget is supposed to get. An allocation
     // that arrives before the compositor has answered this request still has
@@ -970,44 +970,44 @@ set_form_size(int width, int height)
     // GtkWindow default size also includes client side decorations, so must
     // include it also.  It also keeps the natural width of the toolbar from
     // deciding the width.
-    gtk_window_set_default_size(GTK_WINDOW(gui.mainwin),
+    gtk_window_set_default_আকার(GTK_WINDOW(gui.mainwin),
 	    width + get_menu_tool_width(),
 	    height + get_menu_tool_height() + gui.decor_height);
 
     // The window drops a request made while it is being presented, and
     // "gui.decor_height" is not known before that.  A size request on the form
     // widget is honoured then; it is dropped again once the size was given.
-    gtk_widget_set_size_request(gui.formwin, width, height);
+    gtk_widget_set_আকার_request(gui.formwin, width, height);
 }
 
-    void
-gui_mch_set_shellsize(int width, int height,
-	int min_width UNUSED, int min_height UNUSED,
-	int base_width UNUSED, int base_height UNUSED,
-	int direction UNUSED)
+    শূন্য
+gui_mch_set_shellsize(পূর্ণসংখ্যা width, পূর্ণসংখ্যা height,
+	পূর্ণসংখ্যা min_width UNUSED, পূর্ণসংখ্যা min_height UNUSED,
+	পূর্ণসংখ্যা base_width UNUSED, পূর্ণসংখ্যা base_height UNUSED,
+	পূর্ণসংখ্যা direction UNUSED)
 {
-    set_form_size(width, height);
+    set_form_আকার(width, height);
 
     gui_mch_update();
 }
 
-    void
-gui_mch_get_screen_dimensions(int *screen_w, int *screen_h)
+    শূন্য
+gui_mch_get_screen_dimensions(পূর্ণসংখ্যা *screen_w, পূর্ণসংখ্যা *screen_h)
 {
     GdkDisplay *display = gtk_widget_get_display(gui.mainwin);
     GdkSurface *surface = gtk_native_get_surface(GTK_NATIVE(gui.mainwin));
 
-    if (surface != NULL)
+    যদি (surface != ফাঁকা)
     {
 	GdkMonitor *monitor = gdk_display_get_monitor_at_surface(display,
 		surface);
-	if (monitor != NULL)
+	যদি (monitor != ফাঁকা)
 	{
 	    GdkRectangle geom;
 	    gdk_monitor_get_geometry(monitor, &geom);
 	    *screen_w = geom.width;
 	    *screen_h = geom.height;
-	    return;
+	    ফেরত;
 	}
     }
 
@@ -1016,44 +1016,44 @@ gui_mch_get_screen_dimensions(int *screen_w, int *screen_h)
 }
 
 #ifdef FEAT_MENU
-    void
-gui_mch_enable_menu(int showit)
+    শূন্য
+gui_mch_enable_menu(পূর্ণসংখ্যা showit)
 {
-    if (gui.menubar != NULL)
+    যদি (gui.menubar != ফাঁকা)
     {
 	gtk_widget_set_visible(gui.menubar, showit);
 	// Draw area might become blank after this for some reason, queue a
 	// redraw, same for toolbar as well.
-	if (gui.drawarea != NULL)
+	যদি (gui.drawarea != ফাঁকা)
 	    gtk_widget_queue_draw(gui.drawarea);
     }
 }
 #endif
 
 #ifdef FEAT_TOOLBAR
-    void
-gui_mch_show_toolbar(int showit)
+    শূন্য
+gui_mch_show_toolbar(পূর্ণসংখ্যা showit)
 {
-    if (gui.toolbar != NULL)
+    যদি (gui.toolbar != ফাঁকা)
     {
 	gtk_widget_set_visible(gui.toolbar, showit);
-	if (showit)
+	যদি (showit)
 	    vim_toolbar_set_style(VIM_TOOLBAR(gui.toolbar),
 		    toolbar_flags, tbis_flags);
-	if (gui.drawarea != NULL)
+	যদি (gui.drawarea != ফাঁকা)
 	    gtk_widget_queue_draw(gui.drawarea);
     }
 }
 #endif
 
-    void
-gui_mch_set_dark_theme(int dark)
+    শূন্য
+gui_mch_set_dark_theme(পূর্ণসংখ্যা dark)
 {
     // GTK4: use GtkSettings
     GtkSettings *settings = gtk_settings_get_default();
-    if (settings != NULL)
+    যদি (settings != ফাঁকা)
 	g_object_set(settings, "gtk-application-prefer-dark-theme",
-		(gboolean)dark, NULL);
+		(gboolean)dark, ফাঁকা);
 }
 
 /*
@@ -1062,12 +1062,12 @@ gui_mch_set_dark_theme(int dark)
  * ============================================================
  */
 
-    int
-gui_mch_adjust_charheight(void)
+    পূর্ণসংখ্যা
+gui_mch_adjust_charheight(শূন্য)
 {
     PangoFontMetrics *metrics;
-    int ascent;
-    int descent;
+    পূর্ণসংখ্যা ascent;
+    পূর্ণসংখ্যা descent;
 
     metrics = pango_context_get_metrics(gui.text_context, gui.norm_font,
 			    pango_context_get_language(gui.text_context));
@@ -1081,155 +1081,155 @@ gui_mch_adjust_charheight(void)
     gui.char_ascent = MAX(gui.char_ascent, 0);
     gui.char_height = MAX(gui.char_height, gui.char_ascent + 1);
 
-    return OK;
+    ফেরত OK;
 }
 
-typedef struct {
-    PangoFontDescription    *result;
+প্রকারলেখ কাঠামো {
+    PangoFontDescription    *ফলাফল;
     gboolean		    done;
-} FontDialogData;
+} Font_Dialog_তথ্য;
 
-    static void
-font_dialog_finish_cb(GObject *source, GAsyncResult *res, gpointer data)
+    স্থির শূন্য
+font_dialog_finish_cb(GObject *source, GAsync_ফলাফল *res, gpointer তথ্য)
 {
-    FontDialogData *fdd = (FontDialogData *)data;
-    fdd->result = gtk_font_dialog_choose_font_finish(
-		    GTK_FONT_DIALOG(source), res, NULL);
+    Font_Dialog_তথ্য *fdd = (Font_Dialog_তথ্য *)তথ্য;
+    fdd->ফলাফল = gtk_font_dialog_choose_font_finish(
+		    GTK_FONT_DIALOG(source), res, ফাঁকা);
     fdd->done = TRUE;
 }
 
-    static gboolean
-font_filter(gpointer item, gpointer data UNUSED)
+    স্থির gboolean
+font_filter(gpointer item, gpointer তথ্য UNUSED)
 {
-    if (PANGO_IS_FONT_FAMILY(item))
-	return pango_font_family_is_monospace(PANGO_FONT_FAMILY(item));
-    if (PANGO_IS_FONT_FACE(item))
+    যদি (PANGO_IS_FONT_FAMILY(item))
+	ফেরত pango_font_family_is_monospace(PANGO_FONT_FAMILY(item));
+    যদি (PANGO_IS_FONT_FACE(item))
     {
 	PangoFontFamily *family = pango_font_face_get_family(
 		PANGO_FONT_FACE(item));
-	if (family != NULL)
-	    return pango_font_family_is_monospace(family);
+	যদি (family != ফাঁকা)
+	    ফেরত pango_font_family_is_monospace(family);
     }
-    return TRUE;
+    ফেরত TRUE;
 }
 
     char_u *
 gui_mch_font_dialog(char_u *oldval)
 {
     GtkFontDialog	*dlg;
-    PangoFontDescription *initial = NULL;
-    char_u		*fontname = NULL;
-    FontDialogData	fdd;
+    PangoFontDescription *initial = ফাঁকা;
+    char_u		*fontname = ফাঁকা;
+    Font_Dialog_তথ্য	fdd;
 
     dlg = gtk_font_dialog_new();
     gtk_font_dialog_set_modal(dlg, TRUE);
     gtk_font_dialog_set_filter(dlg,
 	    GTK_FILTER(gtk_custom_filter_new(
-		    (GtkCustomFilterFunc)font_filter, NULL, NULL)));
+		    (GtkCustomFilterFunc)font_filter, ফাঁকা, ফাঁকা)));
 
-    if (oldval != NULL && oldval[0] != NUL)
+    যদি (oldval != ফাঁকা && oldval[0] != NUL)
     {
 	char_u *oldname;
 
-	if (output_conv.vc_type != CONV_NONE)
-	    oldname = string_convert(&output_conv, oldval, NULL);
-	else
+	যদি (output_conv.vc_type != CONV_NONE)
+	    oldname = string_convert(&output_conv, oldval, ফাঁকা);
+	অন্যথা
 	    oldname = oldval;
 
-	if (STRLEN(oldname) > 0 && !vim_isdigit(oldname[STRLEN(oldname) - 1]))
+	যদি (STRLEN(oldname) > 0 && !vim_isdigit(oldname[STRLEN(oldname) - 1]))
 	{
 	    char_u *p = vim_strnsave(oldname, STRLEN(oldname) + 3);
-	    if (p != NULL)
+	    যদি (p != ফাঁকা)
 	    {
 		STRCPY(p + STRLEN(p), " 10");
-		if (oldname != oldval)
+		যদি (oldname != oldval)
 		    vim_free(oldname);
 		oldname = p;
 	    }
 	}
 
-	initial = pango_font_description_from_string((const char *)oldname);
-	if (oldname != oldval)
+	initial = pango_font_description_from_string((ধ্রুবক অক্ষর *)oldname);
+	যদি (oldname != oldval)
 	    vim_free(oldname);
     }
-    else
+    অন্যথা
 	initial = pango_font_description_from_string(DEFAULT_FONT);
 
-    fdd.result = NULL;
+    fdd.ফলাফল = ফাঁকা;
     fdd.done = FALSE;
 
     gtk_font_dialog_choose_font(dlg, GTK_WINDOW(gui.mainwin),
-	    initial, NULL, font_dialog_finish_cb, &fdd);
+	    initial, ফাঁকা, font_dialog_finish_cb, &fdd);
 
-    while (!fdd.done)
-	g_main_context_iteration(NULL, TRUE);
+    যখন (!fdd.done)
+	g_main_context_iteration(ফাঁকা, TRUE);
 
-    if (fdd.result != NULL)
+    যদি (fdd.ফলাফল != ফাঁকা)
     {
-	char *name = pango_font_description_to_string(fdd.result);
-	if (name != NULL)
+	অক্ষর *name = pango_font_description_to_string(fdd.ফলাফল);
+	যদি (name != ফাঁকা)
 	{
 	    char_u *p;
 
 	    p = vim_strsave_escaped((char_u *)name, (char_u *)",");
 	    g_free(name);
-	    if (p != NULL && input_conv.vc_type != CONV_NONE)
+	    যদি (p != ফাঁকা && প্রবেশ_conv.vc_type != CONV_NONE)
 	    {
-		fontname = string_convert(&input_conv, p, NULL);
+		fontname = string_convert(&প্রবেশ_conv, p, ফাঁকা);
 		vim_free(p);
 	    }
-	    else
+	    অন্যথা
 		fontname = p;
 	}
-	pango_font_description_free(fdd.result);
+	pango_font_description_free(fdd.ফলাফল);
     }
 
-    if (initial != NULL)
+    যদি (initial != ফাঁকা)
 	pango_font_description_free(initial);
     g_object_unref(dlg);
 
-    return fontname;
+    ফেরত fontname;
 }
 
 /*
  * Build a table of glyphs for ASCII characters 32..126.
  * This avoids the overhead of itemize+shape for the common case.
  */
-    static void
-ascii_glyph_table_init(void)
+    স্থির শূন্য
+ascii_glyph_table_init(শূন্য)
 {
     char_u	    ascii_chars[2 * 128];
     PangoAttrList   *attr_list;
     GList	    *item_list;
-    int		    i;
+    পূর্ণসংখ্যা		    i;
 
-    if (gui.ascii_glyphs != NULL)
+    যদি (gui.ascii_glyphs != ফাঁকা)
 	pango_glyph_string_free(gui.ascii_glyphs);
-    if (gui.ascii_font != NULL)
+    যদি (gui.ascii_font != ফাঁকা)
 	g_object_unref(gui.ascii_font);
 
-    gui.ascii_glyphs = NULL;
-    gui.ascii_font   = NULL;
+    gui.ascii_glyphs = ফাঁকা;
+    gui.ascii_font   = ফাঁকা;
 
-    for (i = 0; i < 128; ++i)
+    জন্য (i = 0; i < 128; ++i)
     {
-	if (i >= 32 && i < 127)
+	যদি (i >= 32 && i < 127)
 	    ascii_chars[2 * i] = i;
-	else
+	অন্যথা
 	    ascii_chars[2 * i] = '?';
 	ascii_chars[2 * i + 1] = ' ';
     }
 
     attr_list = pango_attr_list_new();
-    item_list = pango_itemize(gui.text_context, (const char *)ascii_chars,
-			      0, sizeof(ascii_chars), attr_list, NULL);
+    item_list = pango_itemize(gui.text_context, (ধ্রুবক অক্ষর *)ascii_chars,
+			      0, আকার(ascii_chars), attr_list, ফাঁকা);
 
-    if (item_list != NULL && item_list->next == NULL)
+    যদি (item_list != ফাঁকা && item_list->পরবর্তী == ফাঁকা)
     {
 	PangoItem   *item;
-	int	    width;
+	পূর্ণসংখ্যা	    width;
 
-	item  = (PangoItem *)item_list->data;
+	item  = (PangoItem *)item_list->তথ্য;
 	width = gui.char_width * PANGO_SCALE;
 
 	gui.ascii_font = item->analysis.font;
@@ -1237,12 +1237,12 @@ ascii_glyph_table_init(void)
 
 	gui.ascii_glyphs = pango_glyph_string_new();
 
-	pango_shape((const char *)ascii_chars, sizeof(ascii_chars),
+	pango_shape((ধ্রুবক অক্ষর *)ascii_chars, আকার(ascii_chars),
 		    &item->analysis, gui.ascii_glyphs);
 
-	if (gui.ascii_glyphs->num_glyphs == (int)sizeof(ascii_chars))
+	যদি (gui.ascii_glyphs->অঙ্ক_glyphs == (পূর্ণসংখ্যা)আকার(ascii_chars))
 	{
-	    for (i = 0; i < gui.ascii_glyphs->num_glyphs; ++i)
+	    জন্য (i = 0; i < gui.ascii_glyphs->অঙ্ক_glyphs; ++i)
 	    {
 		PangoGlyphGeometry *geom;
 
@@ -1251,22 +1251,22 @@ ascii_glyph_table_init(void)
 		geom->width = width;
 	    }
 	}
-	else
+	অন্যথা
 	{
 	    pango_glyph_string_free(gui.ascii_glyphs);
-	    gui.ascii_glyphs = NULL;
+	    gui.ascii_glyphs = ফাঁকা;
 	    g_object_unref(gui.ascii_font);
-	    gui.ascii_font = NULL;
+	    gui.ascii_font = ফাঁকা;
 	}
     }
 
-    g_list_foreach(item_list, (GFunc)(void *)&pango_item_free, NULL);
+    g_list_foreach(item_list, (GFunc)(শূন্য *)&pango_item_free, ফাঁকা);
     g_list_free(item_list);
     pango_attr_list_unref(attr_list);
 }
 
-    static void
-get_styled_font_variants(void)
+    স্থির শূন্য
+get_styled_font_variants(শূন্য)
 {
     PangoFontDescription    *bold_font_desc;
     PangoFont		    *plain_font;
@@ -1275,14 +1275,14 @@ get_styled_font_variants(void)
     gui.font_can_bold = FALSE;
 
     plain_font = pango_context_load_font(gui.text_context, gui.norm_font);
-    if (plain_font == NULL)
-	return;
+    যদি (plain_font == ফাঁকা)
+	ফেরত;
 
     bold_font_desc = pango_font_description_copy_static(gui.norm_font);
     pango_font_description_set_weight(bold_font_desc, PANGO_WEIGHT_BOLD);
 
     bold_font = pango_context_load_font(gui.text_context, bold_font_desc);
-    if (bold_font != NULL)
+    যদি (bold_font != ফাঁকা)
     {
 	gui.font_can_bold = (bold_font != plain_font);
 	g_object_unref(bold_font);
@@ -1292,19 +1292,19 @@ get_styled_font_variants(void)
     g_object_unref(plain_font);
 }
 
-    int
-gui_mch_init_font(char_u *font_name, int fontset UNUSED)
+    পূর্ণসংখ্যা
+gui_mch_init_font(char_u *font_name, পূর্ণসংখ্যা fontset UNUSED)
 {
     PangoFontDescription    *font_desc;
     PangoLayout		    *layout;
-    int			    width;
+    পূর্ণসংখ্যা			    width;
 
-    if (font_name == NULL)
+    যদি (font_name == ফাঁকা)
 	font_name = (char_u *)DEFAULT_FONT;
 
     font_desc = gui_mch_get_font(font_name, FALSE);
-    if (font_desc == NULL)
-	return FAIL;
+    যদি (font_desc == ফাঁকা)
+	ফেরত FAIL;
 
     gui_mch_free_font(gui.norm_font);
     gui.norm_font = font_desc;
@@ -1313,11 +1313,11 @@ gui_mch_init_font(char_u *font_name, int fontset UNUSED)
 
     layout = pango_layout_new(gui.text_context);
     pango_layout_set_text(layout, "MW", 2);
-    pango_layout_get_size(layout, &width, NULL);
+    pango_layout_get_আকার(layout, &width, ফাঁকা);
     g_object_unref(layout);
 
     gui.char_width = (width / 2 + PANGO_SCALE / 2) / PANGO_SCALE;
-    if (gui.char_width <= 0)
+    যদি (gui.char_width <= 0)
 	gui.char_width = 8;
 
     gui_mch_adjust_charheight();
@@ -1331,71 +1331,71 @@ gui_mch_init_font(char_u *font_name, int fontset UNUSED)
     // update the position after we've initialized font. Make sure to not go out
     // of bounds of the screen.
     {
-	int im_row = gui.row < screen_Rows ? gui.row : screen_Rows - 1;
-	int im_col = gui.col < screen_Columns ? gui.col : screen_Columns - 1;
+	পূর্ণসংখ্যা im_row = gui.row < screen_Rows ? gui.row : screen_Rows - 1;
+	পূর্ণসংখ্যা im_col = gui.col < screen_Columns ? gui.col : screen_Columns - 1;
 	im_set_position(im_row, im_col);
     }
-    return OK;
+    ফেরত OK;
 }
 
     GuiFont
-gui_mch_get_font(char_u *name, int report_error)
+gui_mch_get_font(char_u *name, পূর্ণসংখ্যা report_error)
 {
     PangoFontDescription *font;
 
-    if (name == NULL)
-	return NULL;
+    যদি (name == ফাঁকা)
+	ফেরত ফাঁকা;
 
-    font = pango_font_description_from_string((const char *)name);
-    if (font == NULL)
+    font = pango_font_description_from_string((ধ্রুবক অক্ষর *)name);
+    যদি (font == ফাঁকা)
     {
-	if (report_error)
+	যদি (report_error)
 	    semsg(_(e_unknown_font_str), name);
-	return NULL;
+	ফেরত ফাঁকা;
     }
 
     // Ensure a size is set
-    if (pango_font_description_get_size(font) <= 0)
-	pango_font_description_set_size(font, 10 * PANGO_SCALE);
+    যদি (pango_font_description_get_আকার(font) <= 0)
+	pango_font_description_set_আকার(font, 10 * PANGO_SCALE);
 
-    return font;
+    ফেরত font;
 }
 
     char_u *
 gui_mch_get_fontname(GuiFont font, char_u *name UNUSED)
 {
-    if (font != NOFONT)
+    যদি (font != NOFONT)
     {
-	char *desc = pango_font_description_to_string(font);
+	অক্ষর *desc = pango_font_description_to_string(font);
 	char_u *ret = vim_strsave((char_u *)desc);
 	g_free(desc);
-	return ret;
+	ফেরত ret;
     }
-    return NULL;
+    ফেরত ফাঁকা;
 }
 
-    void
+    শূন্য
 gui_mch_free_font(GuiFont font)
 {
-    if (font != NOFONT)
+    যদি (font != NOFONT)
 	pango_font_description_free(font);
 }
 
-    void
+    শূন্য
 gui_mch_expand_font(
     optexpand_T	*args,
-    void	*param,
-    int		(*add_match)(char_u *val))
+    শূন্য	*param,
+    পূর্ণসংখ্যা		(*add_match)(char_u *val))
 {
-    PangoFontFamily	**font_families = NULL;
-    int			n_families = 0;
-    int			wide = *(int *)param;
+    PangoFontFamily	**font_families = ফাঁকা;
+    পূর্ণসংখ্যা			n_families = 0;
+    পূর্ণসংখ্যা			wide = *(পূর্ণসংখ্যা *)param;
 
-    if (args->oe_include_orig_val && *args->oe_opt_value == NUL && !wide)
+    যদি (args->oe_include_orig_val && *args->oe_opt_মান == NUL && !wide)
     {
 	// If guifont is empty, suggest the default so the user can modify it.
-	if (add_match((char_u *)DEFAULT_FONT) != OK)
-	    return;
+	যদি (add_match((char_u *)DEFAULT_FONT) != OK)
+	    ফেরত;
     }
 
     pango_context_list_families(
@@ -1403,32 +1403,32 @@ gui_mch_expand_font(
 	    &font_families,
 	    &n_families);
 
-    for (int i = 0; i < n_families; i++)
+    জন্য (পূর্ণসংখ্যা i = 0; i < n_families; i++)
     {
-	if (!wide && !pango_font_family_is_monospace(font_families[i]))
-	    continue;
+	যদি (!wide && !pango_font_family_is_monospace(font_families[i]))
+	    চালু;
 
-	const char *fam_name = pango_font_family_get_name(font_families[i]);
-	if (input_conv.vc_type != CONV_NONE)
+	ধ্রুবক অক্ষর *fam_name = pango_font_family_get_name(font_families[i]);
+	যদি (প্রবেশ_conv.vc_type != CONV_NONE)
 	{
-	    char_u *buf = string_convert(&input_conv,
-		    (char_u *)fam_name, NULL);
-	    if (buf != NULL)
+	    char_u *buf = string_convert(&প্রবেশ_conv,
+		    (char_u *)fam_name, ফাঁকা);
+	    যদি (buf != ফাঁকা)
 	    {
-		if (add_match(buf) != OK)
+		যদি (add_match(buf) != OK)
 		{
 		    vim_free(buf);
-		    break;
+		    বিরতি;
 		}
 		vim_free(buf);
 	    }
-	    else
-		break;
+	    অন্যথা
+		বিরতি;
 	}
-	else
+	অন্যথা
 	{
-	    if (add_match((char_u *)fam_name) != OK)
-		break;
+	    যদি (add_match((char_u *)fam_name) != OK)
+		বিরতি;
 	}
     }
 
@@ -1444,22 +1444,22 @@ gui_mch_expand_font(
     guicolor_T
 gui_mch_get_color(char_u *name)
 {
-    if (!gui.in_use)
-	return INVALCOLOR;
+    যদি (!gui.in_use)
+	ফেরত INVALCOLOR;
 
-    if (name != NULL)
-	return gui_get_color_cmn(name);
+    যদি (name != ফাঁকা)
+	ফেরত gui_get_color_cmn(name);
 
-    return INVALCOLOR;
+    ফেরত INVALCOLOR;
 }
 
     guicolor_T
-gui_mch_get_rgb_color(int r, int g, int b)
+gui_mch_get_rgb_color(পূর্ণসংখ্যা r, পূর্ণসংখ্যা g, পূর্ণসংখ্যা b)
 {
-    return gui_get_rgb_color_cmn(r, g, b);
+    ফেরত gui_get_rgb_color_cmn(r, g, b);
 }
 
-    static GdkRGBA
+    স্থির GdkRGBA
 color_to_rgba(guicolor_T color)
 {
     GdkRGBA rgba;
@@ -1467,22 +1467,22 @@ color_to_rgba(guicolor_T color)
     rgba.green = ((color & 0xff00) >> 8) / 255.0;
     rgba.blue  = (color & 0xff) / 255.0;
     rgba.alpha = 1.0;
-    return rgba;
+    ফেরত rgba;
 }
 
-    void
+    শূন্য
 gui_mch_set_fg_color(guicolor_T color)
 {
     *gui.fgcolor = color_to_rgba(color);
 }
 
-    void
+    শূন্য
 gui_mch_set_bg_color(guicolor_T color)
 {
     *gui.bgcolor = color_to_rgba(color);
 }
 
-    void
+    শূন্য
 gui_mch_set_sp_color(guicolor_T color)
 {
     *gui.spcolor = color_to_rgba(color);
@@ -1491,7 +1491,7 @@ gui_mch_set_sp_color(guicolor_T color)
     guicolor_T
 gui_mch_get_rgb(guicolor_T pixel)
 {
-    return pixel;
+    ফেরত pixel;
 }
 
 /*
@@ -1500,66 +1500,66 @@ gui_mch_get_rgb(guicolor_T pixel)
  * ============================================================
  */
 
-    void
-gui_gtk4_update_size(void)
+    শূন্য
+gui_gtk4_update_আকার(শূন্য)
 {
-    vim_draw_area_set_size(VIM_DRAW_AREA(gui.drawarea),
-	    gui.num_rows, gui.num_cols);
+    vim_draw_area_set_আকার(VIM_DRAW_AREA(gui.drawarea),
+	    gui.অঙ্ক_rows, gui.অঙ্ক_cols);
 }
 
 #ifdef FEAT_NETBEANS_INTG
-    void
+    শূন্য
 gui_gtk4_add_multisign(
 	cairo_surface_t *surf,
-	int		row,
-	int		col,
-	int		width,
-	int		height)
+	পূর্ণসংখ্যা		row,
+	পূর্ণসংখ্যা		col,
+	পূর্ণসংখ্যা		width,
+	পূর্ণসংখ্যা		height)
 {
     vim_draw_area_add_multisign(VIM_DRAW_AREA(gui.drawarea), surf, row, col,
 	    width, height);
 }
 #endif
 
-    void
-gui_mch_clear_block(int row1, int col1, int row2, int col2)
+    শূন্য
+gui_mch_clear_block(পূর্ণসংখ্যা row1, পূর্ণসংখ্যা col1, পূর্ণসংখ্যা row2, পূর্ণসংখ্যা col2)
 {
     vim_draw_area_clear_block(VIM_DRAW_AREA(gui.drawarea), row1,
 	    col1, row2, col2);
-    if (gui.drawarea != NULL)
+    যদি (gui.drawarea != ফাঁকা)
 	gtk_widget_queue_draw(gui.drawarea);
 }
 
-    void
-gui_mch_clear_all(void)
+    শূন্য
+gui_mch_clear_all(শূন্য)
 {
     vim_draw_area_clear(VIM_DRAW_AREA(gui.drawarea));
-    if (gui.drawarea != NULL)
+    যদি (gui.drawarea != ফাঁকা)
 	gtk_widget_queue_draw(gui.drawarea);
 }
 
-    void
-gui_mch_delete_lines(int row, int num_lines)
+    শূন্য
+gui_mch_delete_সারিগুলি(পূর্ণসংখ্যা row, পূর্ণসংখ্যা অঙ্ক_সারিগুলি)
 {
     vim_draw_area_move_block(VIM_DRAW_AREA(gui.drawarea),
-	    row, row + num_lines, gui.scroll_region_bot,
-	    gui.scroll_region_left, gui.scroll_region_right);
+	    row, row + অঙ্ক_সারিগুলি, gui.scroll_region_bot,
+	    gui.scroll_region_বাম, gui.scroll_region_ডান);
     gui_clear_block(
-	    gui.scroll_region_bot - num_lines + 1, gui.scroll_region_left,
-	    gui.scroll_region_bot, gui.scroll_region_right);
+	    gui.scroll_region_bot - অঙ্ক_সারিগুলি + 1, gui.scroll_region_বাম,
+	    gui.scroll_region_bot, gui.scroll_region_ডান);
 
     gtk_widget_queue_draw(gui.drawarea);
 }
 
-    void
-gui_mch_insert_lines(int row, int num_lines)
+    শূন্য
+gui_mch_ঢোকাও_সারিগুলি(পূর্ণসংখ্যা row, পূর্ণসংখ্যা অঙ্ক_সারিগুলি)
 {
     vim_draw_area_move_block(VIM_DRAW_AREA(gui.drawarea),
-	    row + num_lines, row, gui.scroll_region_bot - num_lines,
-	    gui.scroll_region_left, gui.scroll_region_right);
+	    row + অঙ্ক_সারিগুলি, row, gui.scroll_region_bot - অঙ্ক_সারিগুলি,
+	    gui.scroll_region_বাম, gui.scroll_region_ডান);
     gui_clear_block(
-	    row, gui.scroll_region_left,
-	    row + num_lines - 1, gui.scroll_region_right);
+	    row, gui.scroll_region_বাম,
+	    row + অঙ্ক_সারিগুলি - 1, gui.scroll_region_ডান);
 
     gtk_widget_queue_draw(gui.drawarea);
 }
@@ -1567,8 +1567,8 @@ gui_mch_insert_lines(int row, int num_lines)
 /*
  * See vim_draw_area_set_cursor() for more information
  */
-    void
-gui_gtk4_draw_cursor(guicolor_T bg, guicolor_T fg, int w, int h)
+    শূন্য
+gui_gtk4_draw_cursor(guicolor_T bg, guicolor_T fg, পূর্ণসংখ্যা w, পূর্ণসংখ্যা h)
 {
     gui_mch_set_bg_color(bg);
     gui_mch_set_fg_color(fg);
@@ -1576,18 +1576,18 @@ gui_gtk4_draw_cursor(guicolor_T bg, guicolor_T fg, int w, int h)
     gtk_widget_queue_draw(gui.drawarea);
 }
 
-    void
-gui_mch_flash(int msec)
+    শূন্য
+gui_mch_flash(পূর্ণসংখ্যা msec)
 {
     // Invert the screen, wait, then invert back
-    gui_mch_invert_rectangle(0, 0, (int)Rows - 1, (int)Columns - 1);
+    gui_mch_invert_rectangle(0, 0, (পূর্ণসংখ্যা)Rows - 1, (পূর্ণসংখ্যা)Columns - 1);
     gui_mch_flush();
     ui_delay((long)msec, TRUE);
-    gui_mch_invert_rectangle(0, 0, (int)Rows - 1, (int)Columns - 1);
+    gui_mch_invert_rectangle(0, 0, (পূর্ণসংখ্যা)Rows - 1, (পূর্ণসংখ্যা)Columns - 1);
 }
 
-    void
-gui_mch_invert_rectangle(int r, int c, int nr, int nc)
+    শূন্য
+gui_mch_invert_rectangle(পূর্ণসংখ্যা r, পূর্ণসংখ্যা c, পূর্ণসংখ্যা nr, পূর্ণসংখ্যা nc)
 {
     vim_draw_area_invert_block(VIM_DRAW_AREA(gui.drawarea), r, c, nr, nc);
     gtk_widget_queue_draw(gui.drawarea);
@@ -1599,183 +1599,183 @@ gui_mch_invert_rectangle(int r, int c, int nr, int nc)
  * ============================================================
  */
 
-    static gboolean
-key_press_event(GtkEventControllerKey *controller UNUSED,
-	guint key_sym, guint keycode UNUSED,
-	GdkModifierType state, gpointer data UNUSED)
+    স্থির gboolean
+চাবি_press_event(Gtk_Event_Controller_চাবি *controller UNUSED,
+	guint চাবি_sym, guint keycode UNUSED,
+	GdkModifierType state, gpointer তথ্য UNUSED)
 {
     char_u	string[32], string2[32];
-    int		len;
-    int		i;
-    int		modifiers;
-    int		key;
+    পূর্ণসংখ্যা		len;
+    পূর্ণসংখ্যা		i;
+    পূর্ণসংখ্যা		modifiers;
+    পূর্ণসংখ্যা		চাবি;
     char_u	*s, *d;
 
 #ifdef FEAT_XIM
     // Let the input method have a go at the key event.
     // If it consumed the event, we're done.
-    if (xic != NULL)
+    যদি (xic != ফাঁকা)
     {
 	GdkEvent *event = gtk_event_controller_get_current_event(
 		GTK_EVENT_CONTROLLER(controller));
-	if (event != NULL && gtk_im_context_filter_keypress(xic, event))
-	    return TRUE;
+	যদি (event != ফাঁকা && gtk_im_context_filter_keypress(xic, event))
+	    ফেরত TRUE;
     }
 #endif
 
 #ifdef FEAT_MENU
-    if (key_sym == GDK_KEY_F10 && gui.menubar != NULL)
+    যদি (চাবি_sym == GDK_চাবি_F10 && gui.menubar != ফাঁকা)
     {
-	static char_u k10[] = {K_SPECIAL, 'k', ';', 0};
+	স্থির char_u k10[] = {K_SPECIAL, 'k', ';', 0};
 
-	if (check_map(k10, State, FALSE, TRUE, FALSE, NULL, NULL) == NULL)
+	যদি (check_map(k10, State, FALSE, TRUE, FALSE, ফাঁকা, ফাঁকা) == ফাঁকা)
 	{
 	    show_menubar_popover();
-	    return TRUE;
+	    ফেরত TRUE;
 	}
     }
 #endif
 
-    len = keyval_to_string(key_sym, string2);
+    len = keyval_to_string(চাবি_sym, string2);
 
-    if (len > 1 && input_conv.vc_type != CONV_NONE)
-	len = convert_input(string2, len, sizeof(string2));
+    যদি (len > 1 && প্রবেশ_conv.vc_type != CONV_NONE)
+	len = convert_প্রবেশ(string2, len, আকার(string2));
 
     s = string2;
     d = string;
-    for (i = 0; i < len; ++i)
+    জন্য (i = 0; i < len; ++i)
     {
 	*d++ = s[i];
-	if (d[-1] == CSI && d + 2 < string + sizeof(string))
+	যদি (d[-1] == CSI && d + 2 < string + আকার(string))
 	{
 	    *d++ = KS_EXTRA;
-	    *d++ = (int)KE_CSI;
+	    *d++ = (পূর্ণসংখ্যা)KE_CSI;
 	}
     }
     len = d - string;
 
     // Shift-Tab results in Left_Tab
-    if (key_sym == GDK_KEY_ISO_Left_Tab)
+    যদি (চাবি_sym == GDK_চাবি_ISO_বাম_Tab)
     {
-	key_sym = GDK_KEY_Tab;
+	চাবি_sym = GDK_চাবি_Tab;
 	state |= GDK_SHIFT_MASK;
     }
 
 #ifdef FEAT_MENU
     // If there is a menu and 'wak' is "yes", or 'wak' is "menu" and the key
     // is a menu shortcut, we ignore everything with the ALT modifier.
-    if ((state & GDK_ALT_MASK)
+    যদি ((state & GDK_ALT_MASK)
 	    && gui.menu_is_active
 	    && (*p_wak == 'y'
 		|| (*p_wak == 'm'
 		    && len == 1
 		    && gui_is_menu_shortcut(string[0]))))
 	// Tell GTK we have not handled the key (so it can handle it).
-	return FALSE;
+	ফেরত FALSE;
 #endif
 
     // Check for special keys
-    if (len == 0 || len == 1)
+    যদি (len == 0 || len == 1)
     {
-	for (i = 0; special_keys[i].key_sym != 0; i++)
+	জন্য (i = 0; special_চাবিগুলি[i].চাবি_sym != 0; i++)
 	{
-	    if (special_keys[i].key_sym == key_sym)
+	    যদি (special_চাবিগুলি[i].চাবি_sym == চাবি_sym)
 	    {
 		string[0] = CSI;
-		string[1] = special_keys[i].code0;
-		string[2] = special_keys[i].code1;
+		string[1] = special_চাবিগুলি[i].code0;
+		string[2] = special_চাবিগুলি[i].code1;
 		len = -3;
-		break;
+		বিরতি;
 	    }
 	}
     }
 
-    if (len == 0)
-	return TRUE;
+    যদি (len == 0)
+	ফেরত TRUE;
 
-    if (len == -3)
-	key = TO_SPECIAL(string[1], string[2]);
-    else
+    যদি (len == -3)
+	চাবি = TO_SPECIAL(string[1], string[2]);
+    অন্যথা
     {
 	string[len] = NUL;
-	key = mb_ptr2char(string);
+	চাবি = mb_ptr2char(string);
     }
 
     modifiers = modifiers_gdk2vim(state);
 
-    key = simplify_key(key, &modifiers);
-    if (key == CSI)
-	key = K_CSI;
-    if (IS_SPECIAL(key))
+    চাবি = simplify_চাবি(চাবি, &modifiers);
+    যদি (চাবি == CSI)
+	চাবি = K_CSI;
+    যদি (IS_SPECIAL(চাবি))
     {
 	string[0] = CSI;
-	string[1] = K_SECOND(key);
-	string[2] = K_THIRD(key);
+	string[1] = K_SECOND(চাবি);
+	string[2] = K_THIRD(চাবি);
 	len = 3;
     }
-    else
+    অন্যথা
     {
-	key = may_adjust_key_for_ctrl(modifiers, key);
-	modifiers = may_remove_shift_modifier(modifiers, key);
-	len = mb_char2bytes(key, string);
+	চাবি = may_adjust_চাবি_for_ctrl(modifiers, চাবি);
+	modifiers = may_remove_shift_modifier(modifiers, চাবি);
+	len = mb_char2bytes(চাবি, string);
     }
 
-    if (modifiers != 0)
+    যদি (modifiers != 0)
     {
 	string2[0] = CSI;
 	string2[1] = KS_MODIFIER;
 	string2[2] = modifiers;
-	add_to_input_buf(string2, 3);
+	add_to_প্রবেশ_buf(string2, 3);
     }
 
     {
-	int int_ch = check_for_interrupt(key, modifiers);
-	if (int_ch != NUL)
+	পূর্ণসংখ্যা int_ch = check_for_interrupt(চাবি, modifiers);
+	যদি (int_ch != NUL)
 	{
-	    trash_input_buf();
+	    trash_প্রবেশ_buf();
 	    string[0] = int_ch;
 	    len = 1;
 	}
     }
 
-    add_to_input_buf(string, len);
+    add_to_প্রবেশ_buf(string, len);
 
-    if (p_mh)
+    যদি (p_mh)
 	gui_mch_mousehide(TRUE);
 
-    return TRUE;
+    ফেরত TRUE;
 }
 
-    static void
-key_release_event(GtkEventControllerKey *controller UNUSED,
+    স্থির শূন্য
+চাবি_release_event(Gtk_Event_Controller_চাবি *controller UNUSED,
 	guint keyval UNUSED, guint keycode UNUSED,
-	GdkModifierType state UNUSED, gpointer data UNUSED)
+	GdkModifierType state UNUSED, gpointer তথ্য UNUSED)
 {
 }
 
-static int mouse_timed_out = TRUE;
-static guint mouse_click_timer = 0;
+স্থির পূর্ণসংখ্যা mouse_timed_out = TRUE;
+স্থির guint mouse_click_timer = 0;
 
-    static timeout_cb_type
-mouse_click_timer_cb(gpointer data)
+    স্থির timeout_cb_type
+mouse_click_timer_cb(gpointer তথ্য)
 {
-    *(int *)data = TRUE;
-    return FALSE;
+    *(পূর্ণসংখ্যা *)তথ্য = TRUE;
+    ফেরত FALSE;
 }
 
-    static int
+    স্থির পূর্ণসংখ্যা
 modifiers_gdk2mouse(guint state)
 {
-    int modifiers = 0;
+    পূর্ণসংখ্যা modifiers = 0;
 
-    if (state & GDK_SHIFT_MASK)
+    যদি (state & GDK_SHIFT_MASK)
 	modifiers |= MOUSE_SHIFT;
-    if (state & GDK_CONTROL_MASK)
+    যদি (state & GDK_CONTROL_MASK)
 	modifiers |= MOUSE_CTRL;
-    if (state & GDK_ALT_MASK)
+    যদি (state & GDK_ALT_MASK)
 	modifiers |= MOUSE_ALT;
 
-    return modifiers;
+    ফেরত modifiers;
 }
 
 // GdkModifierType has no mask covering the mouse buttons only.
@@ -1784,18 +1784,18 @@ modifiers_gdk2mouse(guint state)
 
 // Track which mouse button is currently pressed for drag detection.
 // -1 means no button is pressed (MOUSE_LEFT is 0x00, so can't use 0).
-static int mouse_pressed_button = -1;
+স্থির পূর্ণসংখ্যা mouse_pressed_button = -1;
 
-static guint motion_repeat_timer = 0;
-static gboolean motion_repeat_offset = FALSE;
-static int mouse_press_x = -1, mouse_press_y = -1;
+স্থির guint motion_repeat_timer = 0;
+স্থির gboolean motion_repeat_offset = FALSE;
+স্থির পূর্ণসংখ্যা mouse_press_x = -1, mouse_press_y = -1;
 
-    static void
-button_press_event(GtkGestureClick *gesture, int n_press UNUSED,
-	double x, double y, gpointer data UNUSED)
+    স্থির শূন্য
+button_press_event(GtkGestureClick *gesture, পূর্ণসংখ্যা n_press UNUSED,
+	দ্বিগুণ x, দ্বিগুণ y, gpointer তথ্য UNUSED)
 {
-    int button;
-    int repeated_click = FALSE;
+    পূর্ণসংখ্যা button;
+    পূর্ণসংখ্যা repeated_click = FALSE;
     int_u vim_modifiers;
     guint btn;
     GdkModifierType state;
@@ -1806,7 +1806,7 @@ button_press_event(GtkGestureClick *gesture, int n_press UNUSED,
     state = gdk_event_get_modifier_state(event);
     btn = gdk_button_event_get_button(event);
 
-    if (!mouse_timed_out && mouse_click_timer)
+    যদি (!mouse_timed_out && mouse_click_timer)
     {
 	timeout_remove(mouse_click_timer);
 	mouse_click_timer = 0;
@@ -1817,29 +1817,29 @@ button_press_event(GtkGestureClick *gesture, int n_press UNUSED,
     mouse_click_timer = timeout_add(p_mouset, mouse_click_timer_cb,
 	    &mouse_timed_out);
 
-    switch (btn)
+    নির্বাচন (btn)
     {
-	case 1: button = MOUSE_LEFT; break;
-	case 2: button = MOUSE_MIDDLE; break;
-	case 3: button = MOUSE_RIGHT; break;
-	case 8: button = MOUSE_X1; break;
-	case 9: button = MOUSE_X2; break;
-	default: return;
+	ক্ষেত্র 1: button = MOUSE_বাম; বিরতি;
+	ক্ষেত্র 2: button = MOUSE_মধ্য; বিরতি;
+	ক্ষেত্র 3: button = MOUSE_ডান; বিরতি;
+	ক্ষেত্র 8: button = MOUSE_X1; বিরতি;
+	ক্ষেত্র 9: button = MOUSE_X2; বিরতি;
+	পূর্বনির্ধারিত: ফেরত;
     }
 
-    mouse_press_x = (int)x;
-    mouse_press_y = (int)y;
+    mouse_press_x = (পূর্ণসংখ্যা)x;
+    mouse_press_y = (পূর্ণসংখ্যা)y;
 
     mouse_pressed_button = button;
     vim_modifiers = modifiers_gdk2mouse(state);
-    gui_send_mouse_event(button, (int)x, (int)y, repeated_click, vim_modifiers);
+    gui_send_mouse_event(button, (পূর্ণসংখ্যা)x, (পূর্ণসংখ্যা)y, repeated_click, vim_modifiers);
 }
 
-    static void
-button_release_event(GtkGestureClick *gesture, int n_press UNUSED,
-	double x, double y, gpointer data UNUSED)
+    স্থির শূন্য
+button_release_event(GtkGestureClick *gesture, পূর্ণসংখ্যা n_press UNUSED,
+	দ্বিগুণ x, দ্বিগুণ y, gpointer তথ্য UNUSED)
 {
-    int vim_modifiers;
+    পূর্ণসংখ্যা vim_modifiers;
     GdkModifierType state;
     GdkEvent *event;
 
@@ -1849,46 +1849,46 @@ button_release_event(GtkGestureClick *gesture, int n_press UNUSED,
     vim_modifiers = modifiers_gdk2mouse(state);
 
     // If we are repeating motion events, then stop
-    if (motion_repeat_timer != 0)
+    যদি (motion_repeat_timer != 0)
     {
 	timeout_remove(motion_repeat_timer);
 	motion_repeat_timer = 0;
     }
 
     mouse_pressed_button = -1;
-    gui_send_mouse_event(MOUSE_RELEASE, (int)x, (int)y, FALSE, vim_modifiers);
+    gui_send_mouse_event(MOUSE_RELEASE, (পূর্ণসংখ্যা)x, (পূর্ণসংখ্যা)y, FALSE, vim_modifiers);
 }
 
-static double prev_mouse_x = -1.0;
-static double prev_mouse_y = -1.0;
+স্থির দ্বিগুণ পূর্ব_mouse_x = -1.0;
+স্থির দ্বিগুণ পূর্ব_mouse_y = -1.0;
 
-static GdkModifierType cur_state = 0;
+স্থির GdkModifierType cur_state = 0;
 
-    static timeout_cb_type
-mouse_repeat_timer_cb(gpointer data UNUSED)
+    স্থির timeout_cb_type
+mouse_repeat_timer_cb(gpointer তথ্য UNUSED)
 {
-    int x, y;
+    পূর্ণসংখ্যা x, y;
 
-    if (mouse_pressed_button == -1)
+    যদি (mouse_pressed_button == -1)
     {
 	motion_repeat_timer = 0;
-	return G_SOURCE_REMOVE;
+	ফেরত G_SOURCE_REMOVE;
     }
 
     // If there already is a mouse click in the input buffer, wait another
     // time (otherwise we would create a backlog of clicks)
-    if (vim_used_in_input_buf() > 10)
-	return G_SOURCE_CONTINUE;
+    যদি (vim_used_in_প্রবেশ_buf() > 10)
+	ফেরত G_SOURCE_CONTINUE;
 
-    x = (int)prev_mouse_x;
-    y = (int)prev_mouse_y;
+    x = (পূর্ণসংখ্যা)পূর্ব_mouse_x;
+    y = (পূর্ণসংখ্যা)পূর্ব_mouse_y;
 
     // Fake a motion event.
     //
     // Trick: Pretend the mouse moved to the next character on every other
     // event, otherwise drag events will be discarded, because they are still in
     // the same character.
-    if (motion_repeat_offset)
+    যদি (motion_repeat_offset)
 	x += gui.char_width;
     motion_repeat_offset = !motion_repeat_offset;
 
@@ -1896,12 +1896,12 @@ mouse_repeat_timer_cb(gpointer data UNUSED)
 	    modifiers_gdk2mouse(cur_state));
 
     // Always continue, when button is released, then this timer is removed.
-    return G_SOURCE_CONTINUE;
+    ফেরত G_SOURCE_CONTINUE;
 }
 
-    static void
+    স্থির শূন্য
 motion_notify_event(GtkEventControllerMotion *controller UNUSED,
-	double x, double y, gpointer data UNUSED)
+	দ্বিগুণ x, দ্বিগুণ y, gpointer তথ্য UNUSED)
 {
     GdkEvent *event = gtk_event_controller_get_current_event(
 	    GTK_EVENT_CONTROLLER(controller));
@@ -1909,10 +1909,10 @@ motion_notify_event(GtkEventControllerMotion *controller UNUSED,
     // The button release event may have gone to another widget, e.g. a modal
     // dialog. Forget about the pressed button when no button is down anymore,
     // otherwise moving the mouse would be taken for a drag.
-    if (mouse_pressed_button >= 0 && event != NULL
+    যদি (mouse_pressed_button >= 0 && event != ফাঁকা
 	    && !(gdk_event_get_modifier_state(event) & ANY_BUTTON_MASK))
     {
-	if (motion_repeat_timer != 0)
+	যদি (motion_repeat_timer != 0)
 	{
 	    timeout_remove(motion_repeat_timer);
 	    motion_repeat_timer = 0;
@@ -1920,15 +1920,15 @@ motion_notify_event(GtkEventControllerMotion *controller UNUSED,
 	mouse_pressed_button = -1;
     }
 
-    if (mouse_pressed_button >= 0)
+    যদি (mouse_pressed_button >= 0)
     {
 	GdkModifierType state;
-	int		w, h;
+	পূর্ণসংখ্যা		w, h;
 
-	if (event != NULL)
+	যদি (event != ফাঁকা)
 	{
 	    cur_state = state = gdk_event_get_modifier_state(event);
-	    gui_send_mouse_event(MOUSE_DRAG, (int)x, (int)y,
+	    gui_send_mouse_event(MOUSE_DRAG, (পূর্ণসংখ্যা)x, (পূর্ণসংখ্যা)y,
 		    FALSE, modifiers_gdk2mouse(state));
 	}
 
@@ -1940,263 +1940,263 @@ motion_notify_event(GtkEventControllerMotion *controller UNUSED,
 	w = gtk_widget_get_width(gui.drawarea);
 	h = gtk_widget_get_height(gui.drawarea);
 
-	if (motion_repeat_timer > 0)
+	যদি (motion_repeat_timer > 0)
 	    timeout_remove(motion_repeat_timer);
 
-	if (x < 0 || y < 0 || x >= w || y >= h)
+	যদি (x < 0 || y < 0 || x >= w || y >= h)
 	{
-	    int	dx, dy;
-	    int offshoot;
-	    int	delay;
+	    পূর্ণসংখ্যা	dx, dy;
+	    পূর্ণসংখ্যা offshoot;
+	    পূর্ণসংখ্যা	delay;
 
 	    dx = x < 0 ? -x + mouse_press_x : x - mouse_press_x;
 	    dy = y < 0 ? -y + mouse_press_y : y - mouse_press_y;
 
 	    offshoot = dx > dy ? dx : dy;
 
-	    if (offshoot > 127)
+	    যদি (offshoot > 127)
 		delay = 5;
-	    else
+	    অন্যথা
 		delay = (130 * (127 - offshoot)) / 127 + 5;
 
 	    motion_repeat_timer = timeout_add(delay,
-		    mouse_repeat_timer_cb, NULL);
+		    mouse_repeat_timer_cb, ফাঁকা);
 	}
-	else
+	অন্যথা
 	    motion_repeat_timer = 0;
     }
-    else
-	gui_mouse_moved((int)x, (int)y);
+    অন্যথা
+	gui_mouse_moved((পূর্ণসংখ্যা)x, (পূর্ণসংখ্যা)y);
 
     // Only unhide if mouse actually moved. GTK seems to send a motion event
     // when switching tabs, causing the cursor to unhide.
-    if (p_mh && ((prev_mouse_x == -1 || prev_mouse_y == -1)
-		|| (fabs(prev_mouse_x - x) > 0.05
-		    && fabs(prev_mouse_y - y) > 0.05)))
+    যদি (p_mh && ((পূর্ব_mouse_x == -1 || পূর্ব_mouse_y == -1)
+		|| (fabs(পূর্ব_mouse_x - x) > 0.05
+		    && fabs(পূর্ব_mouse_y - y) > 0.05)))
 	gui_mch_mousehide(FALSE);
 
-    prev_mouse_x = x;
-    prev_mouse_y = y;
+    পূর্ব_mouse_x = x;
+    পূর্ব_mouse_y = y;
 
     // Make sure keyboard input goes to the drawing area. Fixes issues with menu
     // still being focused.
     gtk_widget_grab_focus(gui.drawarea);
 }
 
-    static void
+    স্থির শূন্য
 enter_notify_event(GtkEventControllerMotion *controller UNUSED,
-	double x, double y, gpointer data UNUSED)
+	দ্বিগুণ x, দ্বিগুণ y, gpointer তথ্য UNUSED)
 {
-    prev_mouse_x = x;
-    prev_mouse_y = y;
+    পূর্ব_mouse_x = x;
+    পূর্ব_mouse_y = y;
 
     // Make sure keyboard input goes to the drawing area.
     gtk_widget_grab_focus(gui.drawarea);
 }
 
-    static gboolean
+    স্থির gboolean
 scroll_event(GtkEventControllerScroll *controller UNUSED,
-	double dx UNUSED, double dy, gpointer data UNUSED)
+	দ্বিগুণ dx UNUSED, দ্বিগুণ dy, gpointer তথ্য UNUSED)
 {
-    int button;
+    পূর্ণসংখ্যা button;
     int_u vim_modifiers;
-    int x, y;
+    পূর্ণসংখ্যা x, y;
     GdkModifierType state;
     GdkEvent *event;
 
     event = gtk_event_controller_get_current_event(
 	    GTK_EVENT_CONTROLLER(controller));
-    if (event == NULL)
-	return FALSE;
+    যদি (event == ফাঁকা)
+	ফেরত FALSE;
     state = gdk_event_get_modifier_state(event);
 
-    if (dy < 0)
+    যদি (dy < 0)
 	button = MOUSE_4;	// scroll up
-    else if (dy > 0)
+    অন্যথা যদি (dy > 0)
 	button = MOUSE_5;	// scroll down
-    else if (dx < 0)
+    অন্যথা যদি (dx < 0)
 	button = MOUSE_7;	// scroll left
-    else if (dx > 0)
+    অন্যথা যদি (dx > 0)
 	button = MOUSE_6;	// scroll right
-    else
-	return FALSE;
+    অন্যথা
+	ফেরত FALSE;
 
     vim_modifiers = modifiers_gdk2mouse(state);
 
     gui_mch_getmouse(&x, &y);
     gui_send_mouse_event(button, x, y, FALSE, vim_modifiers);
 
-    return TRUE;
+    ফেরত TRUE;
 }
 
-    static void
+    স্থির শূন্য
 focus_in_event(GtkEventControllerFocus *controller UNUSED,
-	gpointer data UNUSED)
+	gpointer তথ্য UNUSED)
 {
-    if (gtk_window_is_active(GTK_WINDOW(gui.mainwin)))
+    যদি (gtk_window_is_active(GTK_WINDOW(gui.mainwin)))
     {
 	gui_focus_change(TRUE);
-	if (blink_state == BLINK_NONE)
+	যদি (blink_state == BLINK_NONE)
 	    gui_mch_start_blink();
     }
 }
 
-    static void
+    স্থির শূন্য
 focus_out_event(GtkEventControllerFocus *controller UNUSED,
-	gpointer data UNUSED)
+	gpointer তথ্য UNUSED)
 {
-    if (!gtk_window_is_active(GTK_WINDOW(gui.mainwin)))
+    যদি (!gtk_window_is_active(GTK_WINDOW(gui.mainwin)))
     {
 	gui_focus_change(FALSE);
-	if (blink_state != BLINK_NONE)
+	যদি (blink_state != BLINK_NONE)
 	    gui_mch_stop_blink(TRUE);
     }
 }
 
-#if defined(FEAT_IMAGE)
-    static void
+#যদি defined(FEAT_IMAGE)
+    স্থির শূন্য
 scale_factor_cb(GdkSurface  *surface,
 	GParamSpec	    *pspec UNUSED,
-	void		    *udata UNUSED)
+	শূন্য		    *udata UNUSED)
 {
     gui.scale = gdk_surface_get_scale(surface);
     redraw_all_later(UPD_VALID);
 }
 #endif
 
-    static void
-drawarea_realize_cb(GtkWidget *widget UNUSED, gpointer data UNUSED)
+    স্থির শূন্য
+drawarea_realize_cb(GtkWidget *widget UNUSED, gpointer তথ্য UNUSED)
 {
-#if defined(FEAT_IMAGE)
+#যদি defined(FEAT_IMAGE)
     // Use GdkSurface, as that handles fractional scale values.
     GdkSurface *surface = gtk_native_get_surface(
 	    gtk_widget_get_native(gui.drawarea));
 
     gui.scale = gdk_surface_get_scale(surface);
     g_signal_connect(G_OBJECT(surface), "notify::scale",
-	    G_CALLBACK(scale_factor_cb), NULL);
+	    G_CALLBACK(scale_factor_cb), ফাঁকা);
     redraw_all_later(UPD_VALID);
 #endif
     gui_mch_new_colors();
 }
 
-    static void
-drawarea_unrealize_cb(GtkWidget *widget UNUSED, gpointer data UNUSED)
+    স্থির শূন্য
+drawarea_unrealize_cb(GtkWidget *widget UNUSED, gpointer তথ্য UNUSED)
 {
 #ifdef FEAT_XIM
     im_shutdown();
 #endif
 }
 
-typedef enum
+প্রকারলেখ গণনা
 {
-    READ_DATA_CLIP,	    // Clipboard data
-    READ_DATA_DROP,	    // URI or text DND data
-    READ_DATA_DROP_DATA	    // HTML DND data
-} ReadDataType;
+    READ_তথ্য_CLIP,	    // Clipboard data
+    READ_তথ্য_DROP,	    // URI or text DND data
+    READ_তথ্য_DROP_তথ্য	    // HTML DND data
+} Read_তথ্য_Type;
 
 #define READDATA_BUFSIZE 4096
 
 // Used for reading clipboard and DND data.
-typedef struct
+প্রকারলেখ কাঠামো
 {
-    ReadDataType    type;
+    Read_তথ্য_Type    type;
 
     GCancellable    *cancel;
     GByteArray	    *arr; // NULL when not needed
-    char	    *buf; // NULL when not needed
-} ReadData;
+    অক্ষর	    *buf; // NULL when not needed
+} Read_তথ্য;
 
 #ifdef FEAT_DND
-typedef struct
+প্রকারলেখ কাঠামো
 {
-    ReadData	rd;
+    Read_তথ্য	rd;
     GdkDrop	*drop;
-    int		x;
-    int		y;
-} DropReadData;
+    পূর্ণসংখ্যা		x;
+    পূর্ণসংখ্যা		y;
+} Drop_Read_তথ্য;
 #endif
 
-typedef struct
+প্রকারলেখ কাঠামো
 {
-    ReadData	rd;
+    Read_তথ্য	rd;
     Clipboard_T *cbd;
-    char	*mime_type;
-} ClipReadData;
+    অক্ষর	*mime_type;
+} Clip_Read_তথ্য;
 
-    static ReadData *
-read_data_new(ReadDataType type, size_t sz)
+    স্থির Read_তথ্য *
+read_তথ্য_new(Read_তথ্য_Type type, size_t sz)
 {
-    ReadData *rd = g_malloc0(sz);
+    Read_তথ্য *rd = g_malloc0(sz);
 
     rd->type = type;
     rd->cancel = g_cancellable_new();
 
-    if (type == READ_DATA_CLIP || type == READ_DATA_DROP_DATA)
+    যদি (type == READ_তথ্য_CLIP || type == READ_তথ্য_DROP_তথ্য)
     {
 	rd->arr = g_byte_array_new();
 	rd->buf = g_malloc(READDATA_BUFSIZE);
     }
 
-    return rd;
+    ফেরত rd;
 }
 
-    static void
-read_data_free(ReadData *rd)
+    স্থির শূন্য
+read_তথ্য_free(Read_তথ্য *rd)
 {
     g_cancellable_cancel(rd->cancel);
 
-    if (rd->type == READ_DATA_CLIP)
-	g_free(((ClipReadData *)rd)->mime_type);
-    else if (rd->type == READ_DATA_DROP || rd->type == READ_DATA_DROP_DATA)
-	g_object_unref(((DropReadData *)rd)->drop);
+    যদি (rd->type == READ_তথ্য_CLIP)
+	g_free(((Clip_Read_তথ্য *)rd)->mime_type);
+    অন্যথা যদি (rd->type == READ_তথ্য_DROP || rd->type == READ_তথ্য_DROP_তথ্য)
+	g_object_unref(((Drop_Read_তথ্য *)rd)->drop);
     g_object_unref(rd->cancel);
-    if (rd->arr != NULL)
+    যদি (rd->arr != ফাঁকা)
 	g_byte_array_free(rd->arr, TRUE);
     g_free(rd->buf);
     g_free(rd);
 }
 
 #ifdef FEAT_DND
-static void drop_read_text(GdkDrop *drop, char_u *text);
+স্থির শূন্য drop_read_text(GdkDrop *drop, char_u *text);
 #endif
 
 /*
  * General purpose callback for reading data from an input stream, either from
  * clipboard or DND.
  */
-    static void
-read_data_input_cb(
+    স্থির শূন্য
+read_তথ্য_প্রবেশ_cb(
 	GInputStream	*stream,
-	GAsyncResult	*result,
-	ReadData	*rd)
+	GAsync_ফলাফল	*ফলাফল,
+	Read_তথ্য	*rd)
 {
-    ssize_t r = g_input_stream_read_finish(stream, result, NULL);
+    ssize_t r = g_প্রবেশ_stream_read_finish(stream, ফলাফল, ফাঁকা);
 
-    if (r == -1)
+    যদি (r == -1)
     {
 	// Error occurred
-	DropReadData *drd = (DropReadData *)rd;
+	Drop_Read_তথ্য *drd = (Drop_Read_তথ্য *)rd;
 
-	if (rd->type == READ_DATA_DROP_DATA)
+	যদি (rd->type == READ_তথ্য_DROP_তথ্য)
 	    gdk_drop_finish(drd->drop, 0);
     }
-    else if (r == 0)
+    অন্যথা যদি (r == 0)
     {
 	// EOF, don't need to check for READ_DATA_DROP because that uses GType.
-	if (rd->type == READ_DATA_CLIP)
+	যদি (rd->type == READ_তথ্য_CLIP)
 	{
-	    ClipReadData    *crd = (ClipReadData *)rd;
+	    Clip_Read_তথ্য    *crd = (Clip_Read_তথ্য *)rd;
 	    long	    len;
 	    char_u	    *actual, *final;
-	    int		    motion_type = MAUTO;
-	    char_u	    *tofree = NULL;
+	    পূর্ণসংখ্যা		    motion_type = MAUTO;
+	    char_u	    *tofree = ফাঁকা;
 
 	    len = (long)rd->arr->len;
 	    actual = final = g_byte_array_free(rd->arr, FALSE);
-	    rd->arr = NULL;
+	    rd->arr = ফাঁকা;
 
-	    if (clip_convert_data(&final, &len, &motion_type,
+	    যদি (clip_convert_তথ্য(&final, &len, &motion_type,
 			STRCMP(crd->mime_type, VIM_MIMETYPE_NAME) == 0,
 			STRCMP(crd->mime_type, VIMENC_MIMETYPE_NAME) == 0,
 			&tofree) == OK)
@@ -2205,32 +2205,32 @@ read_data_input_cb(
 	    vim_free(tofree);
 	}
 #ifdef FEAT_DND
-	else if (rd->type == READ_DATA_DROP_DATA)
+	অন্যথা যদি (rd->type == READ_তথ্য_DROP_তথ্য)
 	{
-	    DropReadData    *drd = (DropReadData *)rd;
+	    Drop_Read_তথ্য    *drd = (Drop_Read_তথ্য *)rd;
 	    char_u	    *str;
 
 	    // Append NUL
-	    g_byte_array_append(rd->arr, (const uint8_t *)"", 1);
+	    g_byte_array_append(rd->arr, (ধ্রুবক uint8_t *)"", 1);
 	    str = g_byte_array_free(rd->arr, FALSE);
-	    rd->arr = NULL;
+	    rd->arr = ফাঁকা;
 	    drop_read_text(drd->drop, str);
 	    g_free(str);
 	    gdk_drop_finish(drd->drop, gdk_drop_get_actions(drd->drop));
 	}
 #endif
     }
-    else
+    অন্যথা
     {
 	// Continue reading
-	g_byte_array_append(rd->arr, (const uint8_t *)rd->buf, r);
-	g_input_stream_read_async(stream, rd->buf, READDATA_BUFSIZE,
-		G_PRIORITY_HIGH,
-		rd->cancel, (GAsyncReadyCallback)read_data_input_cb, rd);
-	return;
+	g_byte_array_append(rd->arr, (ধ্রুবক uint8_t *)rd->buf, r);
+	g_প্রবেশ_stream_read_async(stream, rd->buf, READDATA_BUFSIZE,
+		G_PRIORITY_উপরের,
+		rd->cancel, (GAsyncReadyCallback)read_তথ্য_প্রবেশ_cb, rd);
+	ফেরত;
     }
 
-    read_data_free(rd);
+    read_তথ্য_free(rd);
     g_object_unref(stream);
 }
 
@@ -2238,15 +2238,15 @@ read_data_input_cb(
 /*
  * Set up for receiving DND items.
  */
-    void
-gui_gtk_set_dnd_targets(void)
+    শূন্য
+gui_gtk_set_dnd_targets(শূন্য)
 {
     GdkContentFormatsBuilder	*builder = gdk_content_formats_builder_new();
     GdkContentFormats		*formats;
 
     gdk_content_formats_builder_add_gtype(builder, GDK_TYPE_FILE_LIST);
     gdk_content_formats_builder_add_gtype(builder, G_TYPE_STRING);
-    if (clip_html)
+    যদি (clip_html)
 	gdk_content_formats_builder_add_mime_type(builder, "text/html");
 
     formats = gdk_content_formats_builder_free_to_formats(builder);
@@ -2257,7 +2257,7 @@ gui_gtk_set_dnd_targets(void)
 /*
  * Handle textual DND data. Note that this does not finish the drop.
  */
-    static void
+    স্থির শূন্য
 drop_read_text(GdkDrop *drop UNUSED, char_u *text)
 {
     GdkModifierType state;
@@ -2270,64 +2270,64 @@ drop_read_text(GdkDrop *drop UNUSED, char_u *text)
 	(char_u)KE_DROP
     };
 
-    if (text == NULL || *text == NUL || !query_pointer_pos(NULL, NULL, &state))
-	return;
+    যদি (text == ফাঁকা || *text == NUL || !query_pointer_pos(ফাঁকা, ফাঁকা, &state))
+	ফেরত;
 
-    dnd_yank_drag_data((char_u *)text, (long)STRLEN(text));
+    dnd_yank_drag_তথ্য((char_u *)text, (long)STRLEN(text));
 
     dropkey[2] = modifiers_gdk2vim(state);
-    if (dropkey[2] != 0)
-	add_to_input_buf(dropkey, (int)sizeof(dropkey));
-    else
-	add_to_input_buf(dropkey + 3, (int)(sizeof(dropkey) - 3));
+    যদি (dropkey[2] != 0)
+	add_to_প্রবেশ_buf(dropkey, (পূর্ণসংখ্যা)আকার(dropkey));
+    অন্যথা
+	add_to_প্রবেশ_buf(dropkey + 3, (পূর্ণসংখ্যা)(আকার(dropkey) - 3));
 }
 
-    static void
-drop_read_value_cb(GdkDrop *drop, GAsyncResult *result, DropReadData *drd)
+    স্থির শূন্য
+drop_read_মান_cb(GdkDrop *drop, GAsync_ফলাফল *ফলাফল, Drop_Read_তথ্য *drd)
 {
-    const GValue    *value = gdk_drop_read_value_finish(drop, result, NULL);
+    ধ্রুবক GValue    *মান = gdk_drop_read_মান_finish(drop, ফলাফল, ফাঁকা);
     gboolean	    success = FALSE;
 
-    if (value == NULL)
-	goto exit;
+    যদি (মান == ফাঁকা)
+	যাও exit;
 
-    if (G_VALUE_HOLDS(value, GDK_TYPE_FILE_LIST))
+    যদি (G_মান_HOLDS(মান, GDK_TYPE_FILE_LIST))
     {
-	GSList	*files = g_value_get_boxed(value);
-	int	nfiles = g_slist_length(files);
+	GSList	*files = g_মান_get_boxed(মান);
+	পূর্ণসংখ্যা	nfiles = g_slist_দৈর্ঘ্য(files);
 	char_u	**fnames;
-	int	i;
+	পূর্ণসংখ্যা	i;
 
-	if (nfiles <= 0)
-	    goto exit;
+	যদি (nfiles <= 0)
+	    যাও exit;
 
 	fnames = ALLOC_MULT(char_u *, nfiles);
-	if (fnames == NULL)
-	    goto exit;
+	যদি (fnames == ফাঁকা)
+	    যাও exit;
 
 	i = 0;
-	for (GSList *l = files; l != NULL; l = l->next)
+	জন্য (GSList *l = files; l != ফাঁকা; l = l->পরবর্তী)
 	{
-	    GFile *file = l->data;
-	    char *path = g_file_get_path(file);
-	    if (path != NULL)
+	    GFile *file = l->তথ্য;
+	    অক্ষর *path = g_file_get_path(file);
+	    যদি (path != ফাঁকা)
 		fnames[i++] = vim_strsave((char_u *)path);
 	    g_free(path);
 	}
 	nfiles = i;
 
-	if (nfiles > 0)
+	যদি (nfiles > 0)
 	    gui_handle_drop(drd->x, drd->y, 0, fnames, nfiles);
-	else
+	অন্যথা
 	    vim_free(fnames);
 	success = TRUE;
     }
-    else if (G_VALUE_HOLDS(value, G_TYPE_STRING))
+    অন্যথা যদি (G_মান_HOLDS(মান, G_TYPE_STRING))
     {
-	const char *text = g_value_get_string(value);
+	ধ্রুবক অক্ষর *text = g_মান_get_string(মান);
 
-	if (text == NULL || *text == NUL)
-	    goto exit;
+	যদি (text == ফাঁকা || *text == NUL)
+	    যাও exit;
 
 	drop_read_text(drop, (char_u *)text);
 	success = TRUE;
@@ -2335,91 +2335,91 @@ drop_read_value_cb(GdkDrop *drop, GAsyncResult *result, DropReadData *drd)
 
 exit:
     gdk_drop_finish(drop, success ? gdk_drop_get_actions(drop) : 0);
-    read_data_free(&drd->rd);
+    read_তথ্য_free(&drd->rd);
 }
 
-    static void
-drop_read_cb(GdkDrop *drop, GAsyncResult *result, DropReadData *drd)
+    স্থির শূন্য
+drop_read_cb(GdkDrop *drop, GAsync_ফলাফল *ফলাফল, Drop_Read_তথ্য *drd)
 {
     GInputStream    *in_stream;
-    const char	    *m;
+    ধ্রুবক অক্ষর	    *m;
 
-    in_stream = gdk_drop_read_finish(drop, result, &m, NULL);
-    if (in_stream == NULL || STRCMP(m, "text/html") != 0)
+    in_stream = gdk_drop_read_finish(drop, ফলাফল, &m, ফাঁকা);
+    যদি (in_stream == ফাঁকা || STRCMP(m, "text/html") != 0)
     {
-	read_data_free(&drd->rd);
+	read_তথ্য_free(&drd->rd);
 	gdk_drop_finish(drop, 0);
-	return;
+	ফেরত;
     }
 
-    assert(STRCMP(m, "text/html") == 0);
+    প্রতিজ্ঞা(STRCMP(m, "text/html") == 0);
 
     // GTK docs says not to use blocking read calls, so do it async.
-    g_input_stream_read_async(in_stream, drd->rd.buf, READDATA_BUFSIZE,
-	    G_PRIORITY_HIGH,
-	    drd->rd.cancel, (GAsyncReadyCallback)read_data_input_cb, drd);
+    g_প্রবেশ_stream_read_async(in_stream, drd->rd.buf, READDATA_BUFSIZE,
+	    G_PRIORITY_উপরের,
+	    drd->rd.cancel, (GAsyncReadyCallback)read_তথ্য_প্রবেশ_cb, drd);
 }
 
 // GCancellable of current DND operation, else NULL.
-static GCancellable *dnd_cancel = NULL;
-static guint dnd_timeout_id = 0;
+স্থির GCancellable *dnd_cancel = ফাঁকা;
+স্থির guint dnd_timeout_id = 0;
 
-    static gboolean
-drop_timeout_cb(void *udata UNUSED)
+    স্থির gboolean
+drop_timeout_cb(শূন্য *udata UNUSED)
 {
     g_cancellable_cancel(dnd_cancel);
     g_clear_object(&dnd_cancel);
     dnd_timeout_id = 0;
 
-    return G_SOURCE_REMOVE;
+    ফেরত G_SOURCE_REMOVE;
 }
 
 /*
  * Drag-and-drop handler for files and text.
  */
-    static gboolean
+    স্থির gboolean
 drop_cb(
 	GtkDropTargetAsync  *target UNUSED,
 	GdkDrop		    *drop,
-	double		    x,
-	double		    y,
-	void		    *udata UNUSED)
+	দ্বিগুণ		    x,
+	দ্বিগুণ		    y,
+	শূন্য		    *udata UNUSED)
 {
     GdkContentFormats	*formats = gdk_drop_get_formats(drop);
-    DropReadData	*drd = NULL;
+    Drop_Read_তথ্য	*drd = ফাঁকা;
 
-    if (gdk_content_formats_contain_gtype(formats, GDK_TYPE_FILE_LIST))
+    যদি (gdk_content_formats_contain_gtype(formats, GDK_TYPE_FILE_LIST))
     {
-	drd = (DropReadData *)read_data_new(READ_DATA_DROP, sizeof(*drd));
-	gdk_drop_read_value_async(drop, GDK_TYPE_FILE_LIST, G_PRIORITY_HIGH,
-		drd->rd.cancel, (GAsyncReadyCallback)drop_read_value_cb, drd);
+	drd = (Drop_Read_তথ্য *)read_তথ্য_new(READ_তথ্য_DROP, আকার(*drd));
+	gdk_drop_read_মান_async(drop, GDK_TYPE_FILE_LIST, G_PRIORITY_উপরের,
+		drd->rd.cancel, (GAsyncReadyCallback)drop_read_মান_cb, drd);
     }
-    else if (clip_html
+    অন্যথা যদি (clip_html
 	    && gdk_content_formats_contain_mime_type(formats, "text/html"))
     {
-	static const char *m[] = {"text/html", NULL};
+	স্থির ধ্রুবক অক্ষর *m[] = {"text/html", ফাঁকা};
 
-	drd = (DropReadData *)read_data_new(READ_DATA_DROP_DATA, sizeof(*drd));
-	gdk_drop_read_async(drop, m, G_PRIORITY_HIGH,
+	drd = (Drop_Read_তথ্য *)read_তথ্য_new(READ_তথ্য_DROP_তথ্য, আকার(*drd));
+	gdk_drop_read_async(drop, m, G_PRIORITY_উপরের,
 		drd->rd.cancel, (GAsyncReadyCallback)drop_read_cb, drd);
     }
-    else if (gdk_content_formats_contain_gtype(formats, G_TYPE_STRING))
+    অন্যথা যদি (gdk_content_formats_contain_gtype(formats, G_TYPE_STRING))
     {
-	drd = (DropReadData *)read_data_new(READ_DATA_DROP, sizeof(*drd));
-	gdk_drop_read_value_async(drop, G_TYPE_STRING, G_PRIORITY_HIGH,
-		drd->rd.cancel, (GAsyncReadyCallback)drop_read_value_cb, drd);
+	drd = (Drop_Read_তথ্য *)read_তথ্য_new(READ_তথ্য_DROP, আকার(*drd));
+	gdk_drop_read_মান_async(drop, G_TYPE_STRING, G_PRIORITY_উপরের,
+		drd->rd.cancel, (GAsyncReadyCallback)drop_read_মান_cb, drd);
     }
 
-    if (dnd_cancel != NULL)
+    যদি (dnd_cancel != ফাঁকা)
 	g_cancellable_cancel(dnd_cancel);
     g_clear_object(&dnd_cancel);
     g_clear_handle_id(&dnd_timeout_id, timeout_remove);
 
-    if (drd != NULL)
+    যদি (drd != ফাঁকা)
     {
 	drd->drop = g_object_ref(drop);
-	drd->x = (int)x;
-	drd->y = (int)y;
+	drd->x = (পূর্ণসংখ্যা)x;
+	drd->y = (পূর্ণসংখ্যা)y;
 	dnd_cancel = g_object_ref(drd->rd.cancel);
 
 	// Trying to spin the event loop here causes this GTK assertion error:
@@ -2429,28 +2429,28 @@ drop_cb(
 	// the first place anyways.
 
 	// Add a 3 second timeout
-	dnd_timeout_id = timeout_add(3000, drop_timeout_cb, NULL);
+	dnd_timeout_id = timeout_add(3000, drop_timeout_cb, ফাঁকা);
 
-	return TRUE;
+	ফেরত TRUE;
     }
-    return FALSE;
+    ফেরত FALSE;
 }
 #endif
 
-    static void
-mainwin_destroy_cb(GObject *object UNUSED, gpointer data UNUSED)
+    স্থির শূন্য
+mainwin_destroy_cb(GObject *object UNUSED, gpointer তথ্য UNUSED)
 {
-    gui.mainwin = NULL;
-    gui.drawarea = NULL;
-    if (!exiting)
+    gui.mainwin = ফাঁকা;
+    gui.drawarea = ফাঁকা;
+    যদি (!exiting)
 	gui_shell_closed();
 }
 
-    static gboolean
-delete_event_cb(GtkWindow *window UNUSED, gpointer data UNUSED)
+    স্থির gboolean
+delete_event_cb(GtkWindow *window UNUSED, gpointer তথ্য UNUSED)
 {
     gui_shell_closed();
-    return TRUE;
+    ফেরত TRUE;
 }
 
 /*
@@ -2459,73 +2459,73 @@ delete_event_cb(GtkWindow *window UNUSED, gpointer data UNUSED)
  * ============================================================
  */
 
-    static timeout_cb_type
-input_timer_cb(gpointer data)
+    স্থির timeout_cb_type
+প্রবেশ_timer_cb(gpointer তথ্য)
 {
-    int *timed_out = (int *)data;
+    পূর্ণসংখ্যা *timed_out = (পূর্ণসংখ্যা *)তথ্য;
 
     *timed_out = TRUE;
-    return FALSE;	// don't call me again
+    ফেরত FALSE;	// don't call me again
 }
 
-    void
-gui_mch_update(void)
+    শূন্য
+gui_mch_update(শূন্য)
 {
-    int cnt = 0;
+    পূর্ণসংখ্যা cnt = 0;
 
-    while (g_main_context_pending(NULL) && !vim_is_input_buf_full()
+    যখন (g_main_context_pending(ফাঁকা) && !vim_is_প্রবেশ_buf_full()
 								&& ++cnt < 100)
-	g_main_context_iteration(NULL, TRUE);
+	g_main_context_iteration(ফাঁকা, TRUE);
 }
 
 #ifdef FEAT_JOB_CHANNEL
-    static timeout_cb_type
-channel_poll_cb(gpointer data UNUSED)
+    স্থির timeout_cb_type
+channel_poll_cb(gpointer তথ্য UNUSED)
 {
     // Using an event handler for a channel that may be disconnected does
     // not work, it hangs.  Instead poll for messages.
     channel_handle_events(TRUE);
     parse_queued_messages();
-    return TRUE; // Keep repeating
+    ফেরত TRUE; // Keep repeating
 }
 #endif
 
-    int
+    পূর্ণসংখ্যা
 gui_mch_wait_for_chars(long wtime)
 {
-    int		focus;
+    পূর্ণসংখ্যা		focus;
     guint	timer;
-    static int	timed_out;
-    int		retval = FAIL;
+    স্থির পূর্ণসংখ্যা	timed_out;
+    পূর্ণসংখ্যা		retval = FAIL;
 #ifdef FEAT_JOB_CHANNEL
     guint	channel_timer = 0;
 #endif
 
     timed_out = FALSE;
 
-    if (wtime >= 0)
+    যদি (wtime >= 0)
 	timer = timeout_add(wtime == 0 ? 1L : wtime,
-						   input_timer_cb, &timed_out);
-    else
+						   প্রবেশ_timer_cb, &timed_out);
+    অন্যথা
 	timer = 0;
 
 #ifdef FEAT_JOB_CHANNEL
     // If there is a channel with the keep_open flag we need to poll for input
     // on them.
-    if (channel_any_keep_open())
-	channel_timer = timeout_add(20, channel_poll_cb, NULL);
+    যদি (channel_any_keep_open())
+	channel_timer = timeout_add(20, channel_poll_cb, ফাঁকা);
 #endif
 
     focus = gui.in_focus;
 
-    do
+    করো
     {
 	// Stop or start blinking when focus changes
-	if (gui.in_focus != focus)
+	যদি (gui.in_focus != focus)
 	{
-	    if (gui.in_focus)
+	    যদি (gui.in_focus)
 		gui_mch_start_blink();
-	    else
+	    অন্যথা
 		gui_mch_stop_blink(TRUE);
 	    focus = gui.in_focus;
 	}
@@ -2536,189 +2536,189 @@ gui_mch_wait_for_chars(long wtime)
 # endif
 	parse_queued_messages();
 # ifdef FEAT_TIMERS
-	if (did_add_timer)
-	    goto theend;
+	যদি (did_add_timer)
+	    যাও theend;
 # endif
 #endif
 
-	if (gui.mainwin == NULL)
-	    goto theend;
+	যদি (gui.mainwin == ফাঁকা)
+	    যাও theend;
 
 	// gtk_main_quit() is a wake-up request; consume it so later
 	// waits resume.
-	if (gtk4_main_loop_quit)
+	যদি (gtk4_main_loop_quit)
 	{
 	    gtk4_main_loop_quit = FALSE;
-	    goto theend;
+	    যাও theend;
 	}
 
-	if (!input_available())
+	যদি (!প্রবেশ_available())
 	{
 	    ++gtk4_main_loop_level;
-	    g_main_context_iteration(NULL, TRUE);
+	    g_main_context_iteration(ফাঁকা, TRUE);
 	    --gtk4_main_loop_level;
 	}
 
-	if (input_available())
+	যদি (প্রবেশ_available())
 	{
 	    retval = OK;
-	    goto theend;
+	    যাও theend;
 	}
-    } while (wtime < 0 || !timed_out);
+    } যখন (wtime < 0 || !timed_out);
 
     gui_mch_update();
 
 theend:
-    if (timer != 0 && !timed_out)
+    যদি (timer != 0 && !timed_out)
 	timeout_remove(timer);
 #ifdef FEAT_JOB_CHANNEL
-    if (channel_timer != 0)
+    যদি (channel_timer != 0)
 	timeout_remove(channel_timer);
 #endif
 
-    return retval;
+    ফেরত retval;
 }
 
-    void
-gui_mch_flush(void)
+    শূন্য
+gui_mch_flush(শূন্য)
 {
     // Ensure the offscreen surface content gets painted to the widget.
-    if (gui.drawarea != NULL)
+    যদি (gui.drawarea != ফাঁকা)
 	gtk_widget_queue_draw(gui.drawarea);
-    if (gui.mainwin != NULL && gtk_widget_get_realized(gui.mainwin))
+    যদি (gui.mainwin != ফাঁকা && gtk_widget_get_realized(gui.mainwin))
 	gdk_display_flush(gtk_widget_get_display(gui.mainwin));
 }
 
-    void
-gui_mch_beep(void)
+    শূন্য
+gui_mch_beep(শূন্য)
 {
     GdkDisplay *display;
 
-    if (gui.mainwin != NULL && gtk_widget_get_realized(gui.mainwin))
+    যদি (gui.mainwin != ফাঁকা && gtk_widget_get_realized(gui.mainwin))
     {
 	display = gtk_widget_get_display(gui.mainwin);
-	if (display != NULL)
+	যদি (display != ফাঁকা)
 	    gdk_display_beep(display);
     }
 }
 
-    void *
-gui_mch_get_display(void)
+    শূন্য *
+gui_mch_get_display(শূন্য)
 {
-    if (gui.mainwin != NULL && gtk_widget_get_display(gui.mainwin))
-	return gtk_widget_get_display(gui.mainwin);
-    return NULL;
+    যদি (gui.mainwin != ফাঁকা && gtk_widget_get_display(gui.mainwin))
+	ফেরত gtk_widget_get_display(gui.mainwin);
+    ফেরত ফাঁকা;
 }
 
-    void
-gui_mch_iconify(void)
+    শূন্য
+gui_mch_iconify(শূন্য)
 {
     gtk_window_minimize(GTK_WINDOW(gui.mainwin));
 }
 
-    void
-gui_mch_set_foreground(void)
+    শূন্য
+gui_mch_set_foreground(শূন্য)
 {
     gtk_window_present(GTK_WINDOW(gui.mainwin));
 }
 
-    static int
-query_pointer_pos(int *x, int *y, GdkModifierType *state)
+    স্থির পূর্ণসংখ্যা
+query_pointer_pos(পূর্ণসংখ্যা *x, পূর্ণসংখ্যা *y, GdkModifierType *state)
 {
     GtkNative	    *native;
     GdkSurface	    *surface;
     GdkDisplay	    *display;
     GdkSeat	    *seat;
     GdkDevice	    *pointer;
-    double	     sx, sy, nx, ny;
+    দ্বিগুণ	     sx, sy, nx, ny;
     graphene_point_t src, dst;
 
-    if (gui.drawarea == NULL)
-	return FALSE;
+    যদি (gui.drawarea == ফাঁকা)
+	ফেরত FALSE;
     native = gtk_widget_get_native(gui.drawarea);
-    if (native == NULL)
-	return FALSE;
+    যদি (native == ফাঁকা)
+	ফেরত FALSE;
     surface = gtk_native_get_surface(native);
-    if (surface == NULL)
-	return FALSE;
+    যদি (surface == ফাঁকা)
+	ফেরত FALSE;
     display = gtk_widget_get_display(gui.drawarea);
-    if (display == NULL)
-	return FALSE;
+    যদি (display == ফাঁকা)
+	ফেরত FALSE;
     seat = gdk_display_get_default_seat(display);
-    if (seat == NULL)
-	return FALSE;
+    যদি (seat == ফাঁকা)
+	ফেরত FALSE;
     pointer = gdk_seat_get_pointer(seat);
-    if (pointer == NULL)
-	return FALSE;
+    যদি (pointer == ফাঁকা)
+	ফেরত FALSE;
 
-    if (!gdk_surface_get_device_position(surface, pointer, &sx, &sy, state))
-	return FALSE;
+    যদি (!gdk_surface_get_device_position(surface, pointer, &sx, &sy, state))
+	ফেরত FALSE;
 
-    if (x != NULL && y != NULL)
+    যদি (x != ফাঁকা && y != ফাঁকা)
     {
 	gtk_native_get_surface_transform(native, &nx, &ny);
-	src.x = (float)(sx - nx);
-	src.y = (float)(sy - ny);
-	if (!gtk_widget_compute_point(GTK_WIDGET(native), gui.drawarea,
+	src.x = (দশমিক)(sx - nx);
+	src.y = (দশমিক)(sy - ny);
+	যদি (!gtk_widget_compute_point(GTK_WIDGET(native), gui.drawarea,
 		    &src, &dst))
-	    return FALSE;
+	    ফেরত FALSE;
 
-	*x = (int)dst.x;
-	*y = (int)dst.y;
+	*x = (পূর্ণসংখ্যা)dst.x;
+	*y = (পূর্ণসংখ্যা)dst.y;
     }
-    return TRUE;
+    ফেরত TRUE;
 }
 
-    void
-gui_mch_getmouse(int *x, int *y)
+    শূন্য
+gui_mch_getmouse(পূর্ণসংখ্যা *x, পূর্ণসংখ্যা *y)
 {
-    if (!query_pointer_pos(x, y, NULL))
+    যদি (!query_pointer_pos(x, y, ফাঁকা))
     {
 	*x = 0;
 	*y = 0;
     }
 }
 
-    void
-gui_mch_setmouse(int x UNUSED, int y UNUSED)
+    শূন্য
+gui_mch_setmouse(পূর্ণসংখ্যা x UNUSED, পূর্ণসংখ্যা y UNUSED)
 {
     // GTK4/Wayland: cannot warp pointer
 }
 
-    void
-gui_mch_mousehide(int hide)
+    শূন্য
+gui_mch_mousehide(পূর্ণসংখ্যা hide)
 {
-    if (gui.pointer_hidden == hide)
-	return;
+    যদি (gui.pointer_hidden == hide)
+	ফেরত;
 
     gui.pointer_hidden = hide;
-    if (gui.blank_pointer != NULL)
+    যদি (gui.blank_pointer != ফাঁকা)
     {
-	if (hide)
+	যদি (hide)
 	    gtk_widget_set_cursor(gui.drawarea, gui.blank_pointer);
-	else
+	অন্যথা
 #ifdef FEAT_MOUSESHAPE
 	    mch_set_mouse_shape(last_shape);
-#else
-	    gtk_widget_set_cursor(gui.drawarea, NULL);
+#অন্যথা
+	    gtk_widget_set_cursor(gui.drawarea, ফাঁকা);
 #endif
     }
 }
 
-    int
+    পূর্ণসংখ্যা
 gui_mch_haskey(char_u *name)
 {
-    int i;
+    পূর্ণসংখ্যা i;
 
-    for (i = 0; special_keys[i].key_sym != 0; i++)
-	if (name[0] == special_keys[i].code0
-		&& name[1] == special_keys[i].code1)
-	    return OK;
-    return FAIL;
+    জন্য (i = 0; special_চাবিগুলি[i].চাবি_sym != 0; i++)
+	যদি (name[0] == special_চাবিগুলি[i].code0
+		&& name[1] == special_চাবিগুলি[i].code1)
+	    ফেরত OK;
+    ফেরত FAIL;
 }
 
-    void
-gui_mch_forked(void)
+    শূন্য
+gui_mch_forked(শূন্য)
 {
 }
 
@@ -2726,56 +2726,56 @@ gui_mch_forked(void)
  * Try getting the actual size of the scrollbar, and update gui.scrollbar_width
  * and gui.scrollbar_height.
  */
-    static void
-gui_gtk4_update_scrollbar_size(void)
+    স্থির শূন্য
+gui_gtk4_update_scrollbar_আকার(শূন্য)
 {
     win_T	*wp;
-    int		w = -1, h = -1;
+    পূর্ণসংখ্যা		w = -1, h = -1;
     GtkWidget	*sbar;
 
     FOR_ALL_WINDOWS(wp)
     {
-	sbar = wp->w_scrollbars[SBAR_LEFT].id;
+	sbar = wp->w_scrollbars[SBAR_বাম].id;
 
-	if (sbar == NULL || !gtk_widget_get_visible(sbar)
-		|| (!gui.which_scrollbars[SBAR_LEFT]
-		    && wp->w_scrollbars[SBAR_RIGHT].id != NULL))
-	    sbar = wp->w_scrollbars[SBAR_RIGHT].id;
+	যদি (sbar == ফাঁকা || !gtk_widget_get_visible(sbar)
+		|| (!gui.which_scrollbars[SBAR_বাম]
+		    && wp->w_scrollbars[SBAR_ডান].id != ফাঁকা))
+	    sbar = wp->w_scrollbars[SBAR_ডান].id;
 
-	if (sbar != NULL && gtk_widget_get_visible(sbar))
+	যদি (sbar != ফাঁকা && gtk_widget_get_visible(sbar))
 	{
 	    GtkRequisition  min, nat;
-	    int		    sw;
+	    পূর্ণসংখ্যা		    sw;
 
 	    // Use preferred size, since widget may not have its size allocated
 	    // yet.
-	    gtk_widget_get_preferred_size(sbar, &min, &nat);
+	    gtk_widget_get_preferred_আকার(sbar, &min, &nat);
 	    sw = MAX(min.width, nat.width);
-	    if (sw > 0)
+	    যদি (sw > 0)
 	    {
 		w = sw;
-		break;
+		বিরতি;
 	    }
 	}
 
     }
 
     sbar = gui.bottom_sbar.id;
-    if (sbar != NULL && gtk_widget_get_visible(sbar))
+    যদি (sbar != ফাঁকা && gtk_widget_get_visible(sbar))
     {
 	GtkRequisition min, nat;
-	int		    sh;
+	পূর্ণসংখ্যা		    sh;
 
-	gtk_widget_get_preferred_size(sbar, &min, &nat);
+	gtk_widget_get_preferred_আকার(sbar, &min, &nat);
 	sh = MAX(min.height, nat.height);
 
-	if (sh > 0)
+	যদি (sh > 0)
 	    h = sh;
     }
 
-    if (w != -1)
+    যদি (w != -1)
 	gui.scrollbar_width = w;
-    if (h != -1)
+    যদি (h != -1)
 	gui.scrollbar_height = h;
 }
 
@@ -2786,32 +2786,32 @@ gui_gtk4_update_scrollbar_size(void)
  * ============================================================
  */
 
-    void
-gui_mch_enable_scrollbar(scrollbar_T *sb, int flag)
+    শূন্য
+gui_mch_enable_scrollbar(scrollbar_T *sb, পূর্ণসংখ্যা flag)
 {
-    if (sb->id != NULL)
+    যদি (sb->id != ফাঁকা)
     {
 	gboolean was_visible = gtk_widget_get_visible(sb->id);
 
 	gtk_widget_set_visible(sb->id, flag);
 
-	if (!was_visible && flag)
-	    gui_gtk4_update_scrollbar_size();
+	যদি (!was_visible && flag)
+	    gui_gtk4_update_scrollbar_আকার();
     }
 }
 
-#if defined(FEAT_MENU)
+#যদি defined(FEAT_MENU)
 /*
  * ============================================================
  * Menu stubs
  * ============================================================
  */
 
-    void
-gui_mch_menu_grey(vimmenu_T *menu, int grey)
+    শূন্য
+gui_mch_menu_grey(vimmenu_T *menu, পূর্ণসংখ্যা grey)
 {
-    if (menu->id == NULL)
-	return;
+    যদি (menu->id == ফাঁকা)
+	ফেরত;
     gtk_widget_set_sensitive(menu->id, !grey);
     gui_mch_update();
 }
@@ -2819,17 +2819,17 @@ gui_mch_menu_grey(vimmenu_T *menu, int grey)
 /*
  * Make menu item hidden or not hidden.
  */
-    void
-gui_mch_menu_hidden(vimmenu_T *menu, int hidden)
+    শূন্য
+gui_mch_menu_hidden(vimmenu_T *menu, পূর্ণসংখ্যা hidden)
 {
-    if (menu->id == NULL)
-	return;
+    যদি (menu->id == ফাঁকা)
+	ফেরত;
     gtk_widget_set_visible(menu->id, !hidden);
     gui_mch_update();
 }
 
-    void
-gui_mch_draw_menubar(void)
+    শূন্য
+gui_mch_draw_menubar(শূন্য)
 {
     // Just make sure that the visual changes get effect immediately
     gui_mch_update();
@@ -2843,41 +2843,41 @@ gui_mch_draw_menubar(void)
  */
 
 #ifdef FEAT_GUI_TABLINE
-    void
-gui_mch_show_tabline(int showit)
+    শূন্য
+gui_mch_show_tabline(পূর্ণসংখ্যা showit)
 {
-    if (gui.tabline == NULL)
-	return;
+    যদি (gui.tabline == ফাঁকা)
+	ফেরত;
     gtk_widget_set_visible(gui.tabline, showit);
     gui_mch_update();
 }
 
-    int
-gui_mch_showing_tabline(void)
+    পূর্ণসংখ্যা
+gui_mch_showing_tabline(শূন্য)
 {
-    return gui.tabline != NULL && gtk_widget_get_visible(gui.tabline);
+    ফেরত gui.tabline != ফাঁকা && gtk_widget_get_visible(gui.tabline);
 }
 
-static int ignore_tabline_evt = FALSE;
+স্থির পূর্ণসংখ্যা ignore_tabline_evt = FALSE;
 // Page hovered over in tab line, zero indicates none
-static int tabpage_hover = 0;
+স্থির পূর্ণসংখ্যা tabpage_hover = 0;
 
-    static void
+    স্থির শূন্য
 tabpage_enter_cb(
 	GtkEventController  *controller UNUSED,
-	double		    x UNUSED,
-	double		    y UNUSED,
-	void		    *udata)
+	দ্বিগুণ		    x UNUSED,
+	দ্বিগুণ		    y UNUSED,
+	শূন্য		    *udata)
 {
     tabpage_hover = GPOINTER_TO_INT(udata);
 }
 
-    static void
+    স্থির শূন্য
 tabline_enter_cb(
 	GtkEventController  *controller UNUSED,
-	double		    x UNUSED,
-	double		    y UNUSED,
-	void		    *udata UNUSED)
+	দ্বিগুণ		    x UNUSED,
+	দ্বিগুণ		    y UNUSED,
+	শূন্য		    *udata UNUSED)
 {
     tabpage_hover = 0;
 }
@@ -2886,11 +2886,11 @@ tabline_enter_cb(
  * CSS for the tab pages line: flat rounded tabs, the current tab with a light
  * background.  Only applies to the notebook with the "vim-tabline" CSS class.
  */
-    static void
-tabline_add_css(void)
+    স্থির শূন্য
+tabline_add_css(শূন্য)
 {
     GtkCssProvider  *provider;
-    static const char *css =
+    স্থির ধ্রুবক অক্ষর *css =
 	"notebook.vim-tabline > header {"
 	"  background: none; border: none; padding: 6px 1px; }"
 	"notebook.vim-tabline > header > tabs { margin: 0; }"
@@ -2935,10 +2935,10 @@ tabline_add_css(void)
 	"  min-width: 24px; }";
 
     provider = gtk_css_provider_new();
-# if GTK_CHECK_VERSION(4, 12, 0)
+# যদি GTK_CHECK_VERSION(4, 12, 0)
     gtk_css_provider_load_from_string(provider, css);
-# else
-    gtk_css_provider_load_from_data(provider, css, -1);
+# অন্যথা
+    gtk_css_provider_load_from_তথ্য(provider, css, -1);
 # endif
     gtk_style_context_add_provider_for_display(
 	    gtk_widget_get_display(gui.tabline), GTK_STYLE_PROVIDER(provider),
@@ -2949,46 +2949,46 @@ tabline_add_css(void)
 /*
  * Handle clicking the close button of a tab.
  */
-    static void
-tab_close_clicked_cb(GtkButton *button UNUSED, gpointer data)
+    স্থির শূন্য
+tab_close_clicked_cb(GtkButton *button UNUSED, gpointer তথ্য)
 {
-    int idx = gtk_notebook_page_num(GTK_NOTEBOOK(gui.tabline),
-							   GTK_WIDGET(data));
+    পূর্ণসংখ্যা idx = gtk_notebook_page_অঙ্ক(GTK_NOTEBOOK(gui.tabline),
+							   GTK_WIDGET(তথ্য));
 
-    if (idx >= 0)
+    যদি (idx >= 0)
 	send_tabline_menu_event(idx + 1, TABLINE_MENU_CLOSE);
 }
 
-    void
-gui_mch_update_tabline(void)
+    শূন্য
+gui_mch_update_tabline(শূন্য)
 {
     GtkWidget	*page;
     GtkWidget	*event_box;
     GtkWidget	*label;
     tabpage_T	*tp;
-    int		nr = 0;
-    int		tab_num;
-    int		curtabidx = 0;
+    পূর্ণসংখ্যা		nr = 0;
+    পূর্ণসংখ্যা		tab_অঙ্ক;
+    পূর্ণসংখ্যা		curtabidx = 0;
     char_u	*labeltext;
 
-    if (gui.tabline == NULL)
-	return;
+    যদি (gui.tabline == ফাঁকা)
+	ফেরত;
 
     ignore_tabline_evt = TRUE;
 
-    for (tp = first_tabpage; tp != NULL; tp = tp->tp_next, ++nr)
+    জন্য (tp = first_tabpage; tp != ফাঁকা; tp = tp->tp_পরবর্তী, ++nr)
     {
 	GtkNotebookPage	    *page_widget;
 	GtkWidget	    *tab_widget;
 	GtkEventController  *mcontroller;
 
-	if (tp == curtab)
+	যদি (tp == curtab)
 	    curtabidx = nr;
 
-	tab_num = nr + 1;
+	tab_অঙ্ক = nr + 1;
 
 	page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(gui.tabline), nr);
-	if (page == NULL)
+	যদি (page == ফাঁকা)
 	{
 	    GtkWidget	*spacer;
 	    GtkWidget	*close_button;
@@ -3007,7 +3007,7 @@ gui_mch_update_tabline(void)
 	    gtk_label_set_ellipsize(GTK_LABEL(label), PANGO_ELLIPSIZE_END);
 	    gtk_box_append(GTK_BOX(event_box), label);
 	    gtk_widget_set_visible(label, TRUE);
-	    g_object_set_data(G_OBJECT(event_box), "label", label);
+	    g_object_set_তথ্য(G_OBJECT(event_box), "label", label);
 
 	    close_button = gtk_button_new_from_icon_name("window-close-symbolic");
 	    gtk_widget_add_css_class(close_button, "flat");
@@ -3019,12 +3019,12 @@ gui_mch_update_tabline(void)
 		    G_CALLBACK(tab_close_clicked_cb), page);
 	    gtk_box_append(GTK_BOX(event_box), close_button);
 
-	    gtk_notebook_insert_page(GTK_NOTEBOOK(gui.tabline),
+	    gtk_notebook_ঢোকাও_page(GTK_NOTEBOOK(gui.tabline),
 		    page, event_box, nr);
 	    gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(gui.tabline),
 		    page, TRUE);
 	    g_object_set(gtk_notebook_get_page(GTK_NOTEBOOK(gui.tabline), page),
-		    "tab-expand", TRUE, NULL);
+		    "tab-expand", TRUE, ফাঁকা);
 	}
 
 	// Attach motion event controller to detect which tab page is currently
@@ -3032,105 +3032,105 @@ gui_mch_update_tabline(void)
 	page_widget = gtk_notebook_get_page(GTK_NOTEBOOK(gui.tabline), page);
 	mcontroller = gtk_event_controller_motion_new();
 	g_signal_connect(mcontroller, "enter", G_CALLBACK(tabpage_enter_cb),
-		GINT_TO_POINTER(tab_num));
+		GINT_TO_POINTER(tab_অঙ্ক));
 	gtk_event_controller_set_propagation_phase(
 		mcontroller, GTK_PHASE_CAPTURE);
-	g_object_get(page_widget, "tab", &tab_widget, NULL);
+	g_object_get(page_widget, "tab", &tab_widget, ফাঁকা);
 	gtk_widget_add_controller(tab_widget, mcontroller);
 
 	event_box = gtk_notebook_get_tab_label(GTK_NOTEBOOK(gui.tabline), page);
-	label = g_object_get_data(G_OBJECT(event_box), "label");
+	label = g_object_get_তথ্য(G_OBJECT(event_box), "label");
 	get_tabline_label(tp, FALSE);
 	labeltext = CONVERT_TO_UTF8(NameBuff);
-	if (label != NULL && GTK_IS_LABEL(label))
-	    gtk_label_set_text(GTK_LABEL(label), (const char *)labeltext);
+	যদি (label != ফাঁকা && GTK_IS_LABEL(label))
+	    gtk_label_set_text(GTK_LABEL(label), (ধ্রুবক অক্ষর *)labeltext);
 	CONVERT_TO_UTF8_FREE(labeltext);
 
 	get_tabline_label(tp, TRUE);
 	labeltext = CONVERT_TO_UTF8(NameBuff);
-	gtk_widget_set_tooltip_text(event_box, (const gchar *)labeltext);
+	gtk_widget_set_tooltip_text(event_box, (ধ্রুবক gchar *)labeltext);
 	CONVERT_TO_UTF8_FREE(labeltext);
     }
 
-    while (gtk_notebook_get_nth_page(GTK_NOTEBOOK(gui.tabline), nr) != NULL)
+    যখন (gtk_notebook_get_nth_page(GTK_NOTEBOOK(gui.tabline), nr) != ফাঁকা)
 	gtk_notebook_remove_page(GTK_NOTEBOOK(gui.tabline), nr);
 
     // With a single tab the tab is not highlighted and has no close button.
-    if (nr == 1)
+    যদি (nr == 1)
 	gtk_widget_add_css_class(gui.tabline, "single-tab");
-    else
+    অন্যথা
 	gtk_widget_remove_css_class(gui.tabline, "single-tab");
 
-    if (gtk_notebook_get_current_page(GTK_NOTEBOOK(gui.tabline)) != curtabidx)
+    যদি (gtk_notebook_get_current_page(GTK_NOTEBOOK(gui.tabline)) != curtabidx)
 	gtk_notebook_set_current_page(GTK_NOTEBOOK(gui.tabline), curtabidx);
 
     ignore_tabline_evt = FALSE;
 }
 
-    void
-gui_mch_set_curtab(int nr)
+    শূন্য
+gui_mch_set_curtab(পূর্ণসংখ্যা nr)
 {
-    if (gui.tabline != NULL)
+    যদি (gui.tabline != ফাঁকা)
 	gtk_notebook_set_current_page(GTK_NOTEBOOK(gui.tabline), nr - 1);
 }
 
 /*
  * Handle selecting one of the tabs.
  */
-    static void
+    স্থির শূন্য
 on_select_tab(
 	GtkNotebook	*notebook UNUSED,
 	gpointer	*page UNUSED,
 	gint		idx,
-	gpointer	data UNUSED)
+	gpointer	তথ্য UNUSED)
 {
-    if (!ignore_tabline_evt)
+    যদি (!ignore_tabline_evt)
 	send_tabline_event(idx + 1);
 }
 
 /*
  * Handle reordering the tabs (using D&D).
  */
-    static void
+    স্থির শূন্য
 on_tab_reordered(
 	GtkNotebook	*notebook UNUSED,
 	gpointer	*page UNUSED,
 	gint		idx,
-	gpointer	data UNUSED)
+	gpointer	তথ্য UNUSED)
 {
-    if (ignore_tabline_evt)
-	return;
+    যদি (ignore_tabline_evt)
+	ফেরত;
 
-    if ((tabpage_index(curtab) - 1) < idx)
+    যদি ((tabpage_সূচক(curtab) - 1) < idx)
 	tabpage_move(idx + 1);
-    else
+    অন্যথা
 	tabpage_move(idx);
 }
 
 /*
  * Handle selecting an item in the tab line popup menu.
  */
-    static void
-tabline_menu_event_cb(VimMenuItem *item UNUSED, VimMenuItemEvent event, void *udata)
+    স্থির শূন্য
+tabline_menu_event_cb(VimMenuItem *item UNUSED, VimMenuItemEvent event, শূন্য *udata)
 {
-    if (event == VIM_MENU_ITEM_CLICKED)
+    যদি (event == VIM_MENU_ITEM_CLICKED)
 	send_tabline_menu_event(tabpage_hover, GPOINTER_TO_INT(udata));
 }
 
-    static void
-add_tabline_menu_item(VimMenu *menu, const char *name, int resp)
+    স্থির শূন্য
+add_tabline_menu_item(VimMenu *menu, ধ্রুবক অক্ষর *name, পূর্ণসংখ্যা resp)
 {
     VimMenuItem *item = VIM_MENU_ITEM(vim_menu_item_new(name,
 		tabline_menu_event_cb, GINT_TO_POINTER(resp)));
 
-    vim_menu_insert_item(menu, item, -1);
+    vim_menu_ঢোকাও_item(menu, item, -1);
 }
 
 /*
  * Create a menu for the tab line.
  */
-    static VimMenu *
-create_tabline_popup_menu(void)
+    স্থির VimMenu *
+create_tabline_popup_menu(শূন্য)
 {
     VimMenu *menu = VIM_MENU(vim_menu_new());
 
@@ -3138,21 +3138,21 @@ create_tabline_popup_menu(void)
     add_tabline_menu_item(menu, _("New Tab"), TABLINE_MENU_NEW);
     add_tabline_menu_item(menu, _("Open Tab..."), TABLINE_MENU_OPEN);
 
-    return menu;
+    ফেরত menu;
 }
 
-    static void
+    স্থির শূন্য
 tabline_menu_press_event(
 	GtkGestureClick *gesture,
-	int		n_press UNUSED,
-	double		x,
-	double		y,
+	পূর্ণসংখ্যা		n_press UNUSED,
+	দ্বিগুণ		x,
+	দ্বিগুণ		y,
 	GtkWidget	*popover)
 {
     guint but;
 
     but = gtk_gesture_single_get_current_button(GTK_GESTURE_SINGLE(gesture));
-    if (but == GDK_BUTTON_SECONDARY)
+    যদি (but == GDK_BUTTON_SECONDARY)
     {
 	// Right mouse button pressed, popup menu
 	GdkRectangle rect;
@@ -3164,16 +3164,16 @@ tabline_menu_press_event(
 	gtk_popover_set_pointing_to(GTK_POPOVER(popover), &rect);
 	gtk_popover_popup(GTK_POPOVER(popover));
     }
-    else if (but == GDK_BUTTON_PRIMARY)
+    অন্যথা যদি (but == GDK_BUTTON_PRIMARY)
     {
-	if (tabpage_hover == 0)
+	যদি (tabpage_hover == 0)
 	    // Click after all tabs moves to next tab page.  When "x" is
 	    // small guess it's the left button.
 	    send_tabline_event(x < 50 ? -1 : 0);
     }
-    else if (but == GDK_BUTTON_MIDDLE)
+    অন্যথা যদি (but == GDK_BUTTON_মধ্য)
     {
-	if (tabpage_hover != 0)
+	যদি (tabpage_hover != 0)
 	    // Middle mouse click on tabpage label closes that tab.
 	    send_tabline_menu_event(tabpage_hover, TABLINE_MENU_CLOSE);
     }
@@ -3186,18 +3186,18 @@ tabline_menu_press_event(
  * ============================================================
  */
 
-#if defined(FEAT_SIGN_ICONS)
+#যদি defined(FEAT_SIGN_ICONS)
 # define SIGN_WIDTH  (2 * gui.char_width)
 # define SIGN_HEIGHT (gui.char_height)
 
-    void
-gui_mch_drawsign(int row, int col, int typenr)
+    শূন্য
+gui_mch_drawsign(পূর্ণসংখ্যা row, পূর্ণসংখ্যা col, পূর্ণসংখ্যা typenr)
 {
     GdkTexture *sign;
 
     sign = (GdkTexture *)sign_get_image(typenr);
-    if (sign == NULL)
-	return;
+    যদি (sign == ফাঁকা)
+	ফেরত;
 
     vim_draw_area_add_sign(VIM_DRAW_AREA(gui.drawarea), sign,
 	    row, col, SIGN_WIDTH, SIGN_HEIGHT);
@@ -3205,29 +3205,29 @@ gui_mch_drawsign(int row, int col, int typenr)
     gtk_widget_queue_draw(gui.drawarea);
 }
 
-    void *
+    শূন্য *
 gui_mch_register_sign(char_u *signfile)
 {
-    if (signfile[0] != NUL && signfile[0] != '-' && gui.in_use)
+    যদি (signfile[0] != NUL && signfile[0] != '-' && gui.in_use)
     {
-	GError	    *error = NULL;
+	GError	    *error = ফাঁকা;
 	GdkTexture  *sign;
 
-	sign = gdk_texture_new_from_filename((const char *)signfile,
+	sign = gdk_texture_new_from_filename((ধ্রুবক অক্ষর *)signfile,
 							    &error);
-	if (sign != NULL)
-	    return sign;
+	যদি (sign != ফাঁকা)
+	    ফেরত sign;
 
 	semsg("E255: %s", error->message);
 	g_error_free(error);
     }
-    return NULL;
+    ফেরত ফাঁকা;
 }
 
-    void
-gui_mch_destroy_sign(void *sign)
+    শূন্য
+gui_mch_destroy_sign(শূন্য *sign)
 {
-    if (sign != NULL)
+    যদি (sign != ফাঁকা)
 	g_object_unref(sign);
 }
 #endif
@@ -3245,28 +3245,28 @@ gui_mch_destroy_sign(void *sign)
  * uses the fast cached glyph path.
  * Returns the number of display cells used.
  */
-    int
-gui_gtk_draw_string(int row, int col, char_u *s, int len, int flags)
+    পূর্ণসংখ্যা
+gui_gtk_draw_string(পূর্ণসংখ্যা row, পূর্ণসংখ্যা col, char_u *s, পূর্ণসংখ্যা len, পূর্ণসংখ্যা flags)
 {
-    int cells;
+    পূর্ণসংখ্যা cells;
 
     cells = vim_draw_area_draw_string(VIM_DRAW_AREA(gui.drawarea),
 	    row, col, s, len, flags);
 
-    if (gui.drawarea != NULL)
+    যদি (gui.drawarea != ফাঁকা)
 	gtk_widget_queue_draw(gui.drawarea);
 
-    return cells;
+    ফেরত cells;
 }
 
-    int
+    পূর্ণসংখ্যা
 gui_get_x11_windis(Window *win UNUSED, Display **dis UNUSED)
 {
     // GTK4: not applicable
-    return FAIL;
+    ফেরত FAIL;
 }
 
-#if defined(FEAT_MENU)
+#যদি defined(FEAT_MENU)
 /*
  * Translate Vim's mnemonic tagging to GTK+ style and convert to UTF-8
  * if necessary.  The caller must vim_free() the returned string.
@@ -3277,42 +3277,42 @@ gui_get_x11_windis(Window *win UNUSED, Display **dis UNUSED)
  *	&	_	stripped if use_mnemonic == FALSE
  *	<Tab>		end of menu label text
  */
-    static char_u *
-translate_mnemonic_tag(char_u *name, int use_mnemonic)
+    স্থির char_u *
+translate_mnemonic_tag(char_u *name, পূর্ণসংখ্যা use_mnemonic)
 {
     char_u  *buf;
     char_u  *psrc;
     char_u  *pdest;
-    int	    n_underscores = 0;
+    পূর্ণসংখ্যা	    n_underscores = 0;
 
     name = CONVERT_TO_UTF8(name);
-    if (name == NULL)
-	return NULL;
+    যদি (name == ফাঁকা)
+	ফেরত ফাঁকা;
 
-    for (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
-	if (*psrc == '_')
+    জন্য (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
+	যদি (*psrc == '_')
 	    ++n_underscores;
 
     buf = alloc(psrc - name + n_underscores + 1);
-    if (buf != NULL)
+    যদি (buf != ফাঁকা)
     {
 	pdest = buf;
-	for (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
+	জন্য (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
 	{
-	    if (*psrc == '_')
+	    যদি (*psrc == '_')
 	    {
 		*pdest++ = '_';
 		*pdest++ = '_';
 	    }
-	    else if (*psrc != '&')
+	    অন্যথা যদি (*psrc != '&')
 	    {
 		*pdest++ = *psrc;
 	    }
-	    else if (*(psrc + 1) == '&')
+	    অন্যথা যদি (*(psrc + 1) == '&')
 	    {
 		*pdest++ = *psrc++;
 	    }
-	    else if (use_mnemonic)
+	    অন্যথা যদি (use_mnemonic)
 	    {
 		*pdest++ = '_';
 	    }
@@ -3321,51 +3321,51 @@ translate_mnemonic_tag(char_u *name, int use_mnemonic)
     }
 
     CONVERT_TO_UTF8_FREE(name);
-    return buf;
+    ফেরত buf;
 }
 
 /*
  * Enable or disable accelerators for the toplevel menus.
  */
-    void
-gui_gtk_set_mnemonics(int enable)
+    শূন্য
+gui_gtk_set_mnemonics(পূর্ণসংখ্যা enable)
 {
     vimmenu_T	*menu;
     char_u	*name;
 
     FOR_ALL_MENUS(menu)
     {
-	if (menu->id == NULL)
-	    continue;
+	যদি (menu->id == ফাঁকা)
+	    চালু;
 
 	name = translate_mnemonic_tag(menu->name, enable);
 	// Don't think the check if necessary but still do it anyways
-	if (VIM_IS_MENU_BAR_ITEM(menu->id))
+	যদি (VIM_IS_MENU_BAR_ITEM(menu->id))
 	    vim_menu_bar_item_set_text(VIM_MENU_BAR_ITEM(menu->id),
-		    (const char *)name);
+		    (ধ্রুবক অক্ষর *)name);
 	vim_free(name);
     }
 }
 
-    static void
-popupmenu_closed_cb(GtkWidget *popover, void *udata UNUSED)
+    স্থির শূন্য
+popupmenu_closed_cb(GtkWidget *popover, শূন্য *udata UNUSED)
 {
     gtk_widget_unparent(popover);
-    if (gui.drawarea != NULL)
+    যদি (gui.drawarea != ফাঁকা)
 	gtk_widget_queue_draw(gui.drawarea);
 }
 
 /*
  * Open a popup for the given menu at point (x, y).
  */
-    static void
-gui_gtk_popup_at(vimmenu_T *menu, int x, int y)
+    স্থির শূন্য
+gui_gtk_popup_at(vimmenu_T *menu, পূর্ণসংখ্যা x, পূর্ণসংখ্যা y)
 {
     GtkWidget	    *popover;
     GdkRectangle    rect;
 
-    if (menu == NULL || menu->submenu_id == NULL)
-	return;
+    যদি (menu == ফাঁকা || menu->submenu_id == ফাঁকা)
+	ফেরত;
 
     popover = vim_menu_copy(VIM_MENU(menu->submenu_id));
     gtk_widget_set_parent(popover, gui.drawarea);
@@ -3380,23 +3380,23 @@ gui_gtk_popup_at(vimmenu_T *menu, int x, int y)
     gtk_popover_set_pointing_to(GTK_POPOVER(popover), &rect);
 
     g_signal_connect(GTK_POPOVER(popover), "closed",
-	    G_CALLBACK(popupmenu_closed_cb), NULL);
+	    G_CALLBACK(popupmenu_closed_cb), ফাঁকা);
     gtk_popover_popup(GTK_POPOVER(popover));
 }
 
-    void
-gui_make_popup(char_u *path_name, int mouse_pos)
+    শূন্য
+gui_make_popup(char_u *path_name, পূর্ণসংখ্যা mouse_pos)
 {
     vimmenu_T	*menu;
-    int		x, y;
+    পূর্ণসংখ্যা		x, y;
 
     menu = gui_find_menu(path_name);
-    if (menu == NULL || menu->submenu_id == NULL)
-	return;
+    যদি (menu == ফাঁকা || menu->submenu_id == ফাঁকা)
+	ফেরত;
 
-    if (mouse_pos)
+    যদি (mouse_pos)
 	gui_mch_getmouse(&x, &y);
-    else
+    অন্যথা
     {
 	x = FILL_X(curwin->w_wincol + curwin->w_wcol + 1) + 1;
 	y = FILL_Y(W_WINROW(curwin) + curwin->w_wrow + 1) + 1;
@@ -3407,14 +3407,14 @@ gui_make_popup(char_u *path_name, int mouse_pos)
 }
 #endif // FEAT_MENU
 
-    int
-get_menu_tool_width(void)
+    পূর্ণসংখ্যা
+get_menu_tool_width(শূন্য)
 {
-    return 0;
+    ফেরত 0;
 }
 
-    int
-get_menu_tool_height(void)
+    পূর্ণসংখ্যা
+get_menu_tool_height(শূন্য)
 {
     GtkWidget *widgets[] = {
 #ifdef FEAT_MENU
@@ -3428,20 +3428,20 @@ get_menu_tool_height(void)
 #endif
     };
 
-    int height = 0;
+    পূর্ণসংখ্যা height = 0;
 
-    for (int i = 0; i < (int)ARRAY_LENGTH(widgets); i++)
+    জন্য (পূর্ণসংখ্যা i = 0; i < (পূর্ণসংখ্যা)ARRAY_দৈর্ঘ্য(widgets); i++)
     {
 	GtkRequisition	min;
 	GtkRequisition	nat;
-	int		h;
+	পূর্ণসংখ্যা		h;
 
-	if (widgets[i] == NULL || !gtk_widget_get_visible(widgets[i]))
-	    continue;
+	যদি (widgets[i] == ফাঁকা || !gtk_widget_get_visible(widgets[i]))
+	    চালু;
 
 	h = gtk_widget_get_height(widgets[i]);
 
-	if (h == 0)
+	যদি (h == 0)
 	{
 	    // Allocation hasn't been updated yet (widget just became visible).
 	    // Query the preferred height so the caller gets a valid value
@@ -3449,26 +3449,26 @@ get_menu_tool_height(void)
 	    // natural height: GTK may allocate min_h even when natural_h is
 	    // smaller (e.g. GtkNotebook tab bar has min_h > natural_h due to
 	    // CSS).
-	    gtk_widget_get_preferred_size(widgets[i], &min, &nat);
+	    gtk_widget_get_preferred_আকার(widgets[i], &min, &nat);
 	    height += MAX(min.height, nat.height);
 	}
-	else
+	অন্যথা
 	    height += h;
     }
-    return height;
+    ফেরত height;
 }
 
 /*
  * Update selection targets for regular and primary selections.
  */
-    void
+    শূন্য
 gui_gtk_update_selection_formats(Clipboard_T *cbd)
 {
     // This will call the ref_formats() vfunc of the content provider, see
     // gui_gtk4_cb.c
-    if (cbd == &clip_plus)
+    যদি (cbd == &clip_plus)
 	gdk_content_provider_content_changed(gui.regular_provider);
-    else
+    অন্যথা
 	gdk_content_provider_content_changed(gui.primary_provider);
 }
 
@@ -3476,84 +3476,84 @@ gui_gtk_update_selection_formats(Clipboard_T *cbd)
  * Get the GdkClipboard and GdkContentProvider for the given Clipboard_T.
  * clip_star (*) uses PRIMARY, clip_plus (+) uses CLIPBOARD.
  */
-    static GdkClipboard *
+    স্থির GdkClipboard *
 gtk4_get_clipboard(Clipboard_T *cbd, GdkContentProvider **provider)
 {
     GdkDisplay *display;
 
-    if (gui.mainwin == NULL)
-	return NULL;
+    যদি (gui.mainwin == ফাঁকা)
+	ফেরত ফাঁকা;
 
     display = gtk_widget_get_display(gui.mainwin);
-    if (display == NULL)
-	return NULL;
+    যদি (display == ফাঁকা)
+	ফেরত ফাঁকা;
 
-    if (cbd == &clip_plus)
+    যদি (cbd == &clip_plus)
     {
-	if (provider != NULL)
+	যদি (provider != ফাঁকা)
 	    *provider = gui.regular_provider;
-	return gdk_display_get_clipboard(display);
+	ফেরত gdk_display_get_clipboard(display);
     }
-    else
+    অন্যথা
     {
-	if (provider != NULL)
+	যদি (provider != ফাঁকা)
 	    *provider = gui.primary_provider;
-	return gdk_display_get_primary_clipboard(display);
+	ফেরত gdk_display_get_primary_clipboard(display);
     }
 }
 
 /*
  * Callback for gdk_clipboard_read_async().
  */
-    static void
-clip_read_cb(GdkClipboard *cb, GAsyncResult *result, ClipReadData *crd)
+    স্থির শূন্য
+clip_read_cb(GdkClipboard *cb, GAsync_ফলাফল *ফলাফল, Clip_Read_তথ্য *crd)
 {
     GInputStream    *in_stream;
-    const char	    *mime_type;
+    ধ্রুবক অক্ষর	    *mime_type;
 
-    in_stream = gdk_clipboard_read_finish(cb, result, &mime_type, NULL);
-    if (in_stream == NULL)
+    in_stream = gdk_clipboard_read_finish(cb, ফলাফল, &mime_type, ফাঁকা);
+    যদি (in_stream == ফাঁকা)
     {
-	read_data_free(&crd->rd);
-	return;
+	read_তথ্য_free(&crd->rd);
+	ফেরত;
     }
 
     // Not sure if we need to copy the string, but do it anyways.
     crd->mime_type = g_strdup(mime_type);
-    g_input_stream_read_async(in_stream, crd->rd.buf, READDATA_BUFSIZE,
-	    G_PRIORITY_HIGH,
-	    crd->rd.cancel, (GAsyncReadyCallback)read_data_input_cb, crd);
+    g_প্রবেশ_stream_read_async(in_stream, crd->rd.buf, READDATA_BUFSIZE,
+	    G_PRIORITY_উপরের,
+	    crd->rd.cancel, (GAsyncReadyCallback)read_তথ্য_প্রবেশ_cb, crd);
 }
 
 /*
  * Request the selection from the clipboard.
  */
-    void
+    শূন্য
 clip_mch_request_selection(Clipboard_T *cbd)
 {
-    static const char *mimes_no_html[] = {
+    স্থির ধ্রুবক অক্ষর *mimes_no_html[] = {
 	VIMENC_MIMETYPE_NAME,
 	VIM_MIMETYPE_NAME,
 	"text/plain;charset=utf-8",
 	"text/plain",
-	NULL
+	ফাঁকা
     };
 
     GdkClipboard *clipboard;
-    ClipReadData *crd;
+    Clip_Read_তথ্য *crd;
     GCancellable *cancel;
 
-    clipboard = gtk4_get_clipboard(cbd, NULL);
-    if (clipboard == NULL)
-	return;
+    clipboard = gtk4_get_clipboard(cbd, ফাঁকা);
+    যদি (clipboard == ফাঁকা)
+	ফেরত;
 
-    crd = (ClipReadData *)read_data_new(READ_DATA_CLIP, sizeof(*crd));
+    crd = (Clip_Read_তথ্য *)read_তথ্য_new(READ_তথ্য_CLIP, আকার(*crd));
     crd->cbd = cbd;
     cancel = g_object_ref(crd->rd.cancel);
 
     gdk_clipboard_read_async(
 	    clipboard, clip_html ? supported_mimes : mimes_no_html,
-	    G_PRIORITY_HIGH, crd->rd.cancel,
+	    G_PRIORITY_উপরের, crd->rd.cancel,
 	    (GAsyncReadyCallback)clip_read_cb, crd);
 
     {
@@ -3562,97 +3562,97 @@ clip_mch_request_selection(Clipboard_T *cbd)
 	// Spin until the done receiving data, with a 3-second wall-clock
 	// timeout as a safety net. Use the GCancellable as a way to signal if
 	// done (and also use it to cancel if timed out as well).
-	start = time(NULL);
-	while (!g_cancellable_is_cancelled(cancel)
-		&& time(NULL) < start + 3)
-	    g_main_context_iteration(NULL, TRUE);
+	start = time(ফাঁকা);
+	যখন (!g_cancellable_is_cancelled(cancel)
+		&& time(ফাঁকা) < start + 3)
+	    g_main_context_iteration(ফাঁকা, TRUE);
 
 	g_cancellable_cancel(cancel);
 	g_object_unref(cancel);
     }
 }
 
-static int in_clipboard_set = FALSE;
+স্থির পূর্ণসংখ্যা in_clipboard_set = FALSE;
 
 /*
  * Send the current selection to the clipboard. Do nothing for because we
  * subclass GdkContentProvider which will provide the data only when needed.
  */
-    void
+    শূন্য
 clip_mch_set_selection(Clipboard_T *cbd UNUSED)
 {
 }
 
-    static void
-clipboard_changed_cb(GdkClipboard *clipboard, gpointer user_data)
+    স্থির শূন্য
+clipboard_changed_cb(GdkClipboard *clipboard, gpointer user_তথ্য)
 {
-    Clipboard_T *cbd = (Clipboard_T *)user_data;
+    Clipboard_T *cbd = (Clipboard_T *)user_তথ্য;
 
-    if (in_clipboard_set)
-	return;
-    if (gdk_clipboard_is_local(clipboard))
-	return;
+    যদি (in_clipboard_set)
+	ফেরত;
+    যদি (gdk_clipboard_is_local(clipboard))
+	ফেরত;
     clip_lose_selection(cbd);
 }
 
 /*
  * Own the selection.
  */
-    int
+    পূর্ণসংখ্যা
 clip_mch_own_selection(Clipboard_T *cbd)
 {
     GdkContentProvider	*cp;
     GdkClipboard	*cb = gtk4_get_clipboard(cbd, &cp);
-    int			ret;
+    পূর্ণসংখ্যা			ret;
 
-    if (cb == NULL)
-	return FAIL;
+    যদি (cb == ফাঁকা)
+	ফেরত FAIL;
 
     in_clipboard_set = TRUE;
     ret = gdk_clipboard_set_content(cb, cp);
     in_clipboard_set = FALSE;
 
-    return ret ? OK : FAIL;
+    ফেরত ret ? OK : FAIL;
 }
 
 /*
  * Disown the selection.  In GTK4, we clear the clipboard content to
  * release ownership.
  */
-    void
+    শূন্য
 clip_mch_lose_selection(Clipboard_T *cbd)
 {
     GdkClipboard *clipboard;
 
-    clipboard = gtk4_get_clipboard(cbd, NULL);
-    if (clipboard == NULL)
-	return;
+    clipboard = gtk4_get_clipboard(cbd, ফাঁকা);
+    যদি (clipboard == ফাঁকা)
+	ফেরত;
 
     // Only release ownership if we still own it. We don't want to clear the
     // current selection when we aren't actually the source.
-    if (gdk_clipboard_is_local(clipboard))
-	gdk_clipboard_set_content(clipboard, NULL);
+    যদি (gdk_clipboard_is_local(clipboard))
+	gdk_clipboard_set_content(clipboard, ফাঁকা);
 }
 
 // GTK4 does not have gtk_main_level/gtk_main_quit.
 // Provide compatibility stubs using a simple flag.
     guint
-gtk_main_level(void)
+gtk_main_level(শূন্য)
 {
-    return gtk4_main_loop_level;
+    ফেরত gtk4_main_loop_level;
 }
 
-    void
-gtk_main_quit(void)
+    শূন্য
+gtk_main_quit(শূন্য)
 {
     gtk4_main_loop_quit = TRUE;
 }
 
-#if defined(FEAT_MOUSESHAPE)
+#যদি defined(FEAT_MOUSESHAPE)
 
 // Table of CSS cursor names corresponding to Vim's mouse shape IDs.
 // Keep in sync with the mshape_names[] table in misc2.c.
-static const char *mshape_css_names[] =
+স্থির ধ্রুবক অক্ষর *mshape_css_names[] =
 {
     "default",			// arrow
     "none",			// blank
@@ -3673,32 +3673,32 @@ static const char *mshape_css_names[] =
     "default"			// last entry
 };
 
-    void
-mch_set_mouse_shape(int shape)
+    শূন্য
+mch_set_mouse_shape(পূর্ণসংখ্যা shape)
 {
     GdkCursor	*c;
-    const char	*css_name = "default";
+    ধ্রুবক অক্ষর	*css_name = "default";
 
-    if (gui.drawarea == NULL)
-	return;
+    যদি (gui.drawarea == ফাঁকা)
+	ফেরত;
 
-    if (shape == MSHAPE_HIDE || gui.pointer_hidden)
+    যদি (shape == MSHAPE_HIDE || gui.pointer_hidden)
 	gtk_widget_set_cursor(gui.drawarea, gui.blank_pointer);
-    else
+    অন্যথা
     {
-	if (shape >= MSHAPE_NUMBERED)
+	যদি (shape >= MSHAPE_NUMBERED)
 	    css_name = "default";
-	else if (shape < (int)ARRAY_LENGTH(mshape_css_names))
+	অন্যথা যদি (shape < (পূর্ণসংখ্যা)ARRAY_দৈর্ঘ্য(mshape_css_names))
 	    css_name = mshape_css_names[shape];
-	else
-	    return;
+	অন্যথা
+	    ফেরত;
 
 	// GTK4: gdk_cursor_new_from_name(name, fallback)
-	c = gdk_cursor_new_from_name(css_name, NULL);
+	c = gdk_cursor_new_from_name(css_name, ফাঁকা);
 	gtk_widget_set_cursor(gui.drawarea, c);
 	g_object_unref(G_OBJECT(c));
     }
-    if (shape != MSHAPE_HIDE)
+    যদি (shape != MSHAPE_HIDE)
 	last_shape = shape;
 }
 
@@ -3712,8 +3712,8 @@ mch_set_mouse_shape(int shape)
 
 
 
-static int last_text_area_w = 0;
-static int last_text_area_h = 0;
+স্থির পূর্ণসংখ্যা last_text_area_w = 0;
+স্থির পূর্ণসংখ্যা last_text_area_h = 0;
 
 /*
  * ============================================================
@@ -3728,7 +3728,7 @@ static int last_text_area_h = 0;
  * Icon name table for toolbar buttons.
  * Must match toolbar_names[] in menu.c.
  */
-static const char * const toolbar_icon_names[] =
+স্থির ধ্রুবক অক্ষর * ধ্রুবক toolbar_icon_names[] =
 {
     /* 00 */ "document-new",
     /* 01 */ "document-open",
@@ -3763,82 +3763,82 @@ static const char * const toolbar_icon_names[] =
     /* 30 */ "image-missing",
 };
 
-    static void
-toolbar_button_clicked_cb(GtkWidget *widget UNUSED, gpointer data)
+    স্থির শূন্য
+toolbar_button_clicked_cb(GtkWidget *widget UNUSED, gpointer তথ্য)
 {
-    gui_menu_cb((vimmenu_T *)data);
+    gui_menu_cb((vimmenu_T *)তথ্য);
 }
 
-    static GtkWidget *
+    স্থির GtkWidget *
 create_toolbar_icon(vimmenu_T *menu)
 {
     char_u	buf[MAXPATHL];
-    GtkWidget	*image = NULL;
+    GtkWidget	*image = ফাঁকা;
 
     // Try specified icon file first
-    if (menu->iconfile != NULL)
+    যদি (menu->iconfile != ফাঁকা)
     {
 	expand_env(menu->iconfile, buf, MAXPATHL);
-	if (vim_fexists(buf))
+	যদি (vim_fexists(buf))
 	{
 	    GdkTexture *texture = gdk_texture_new_from_filename(
-		    (const char *)buf, NULL);
+		    (ধ্রুবক অক্ষর *)buf, ফাঁকা);
 
-	    if (texture != NULL)
+	    যদি (texture != ফাঁকা)
 	    {
 		image = gtk_image_new_from_paintable(
 			GDK_PAINTABLE(texture));
-		gtk_widget_set_size_request(image, 24, 24);
+		gtk_widget_set_আকার_request(image, 24, 24);
 		g_object_unref(texture);
 	    }
 	}
     }
 
     // Use themed icon
-    if (image == NULL)
+    যদি (image == ফাঁকা)
     {
-	const char *icon_name = "image-missing";
-	int n = (int)ARRAY_LENGTH(toolbar_icon_names);
+	ধ্রুবক অক্ষর *icon_name = "image-missing";
+	পূর্ণসংখ্যা n = (পূর্ণসংখ্যা)ARRAY_দৈর্ঘ্য(toolbar_icon_names);
 
-	if (menu->iconidx >= 0 && menu->iconidx < n)
+	যদি (menu->iconidx >= 0 && menu->iconidx < n)
 	    icon_name = toolbar_icon_names[menu->iconidx];
 
 	image = gtk_image_new_from_icon_name(icon_name);
     }
 
-    return image;
+    ফেরত image;
 }
 # endif
 
-    static void
+    স্থির শূন্য
 menu_button_clicked_cb(
 	VimMenuItem	    *item UNUSED,
 	VimMenuItemEvent    event,
 	vimmenu_T	    *menu)
 {
-    if (event == VIM_MENU_ITEM_CLICKED)
+    যদি (event == VIM_MENU_ITEM_CLICKED)
 	gui_menu_cb(menu);
-    else if (event == VIM_MENU_ITEM_SELECTED)
+    অন্যথা যদি (event == VIM_MENU_ITEM_SELECTED)
     {
 	// Show tooltip instantly in cmdline message.
 	char_u		*tooltip;
-	static gboolean did_msg = FALSE;
+	স্থির gboolean did_বার্তা = FALSE;
 
-	if (State & MODE_CMDLINE)
-	    return;
+	যদি (State & MODE_CMDLINE)
+	    ফেরত;
 
-	tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
-	if (tooltip != NULL && utf_valid_string(tooltip, NULL))
+	tooltip = CONVERT_TO_UTF8(menu->strings[MENU_সূচক_TIP]);
+	যদি (tooltip != ফাঁকা && utf_valid_string(tooltip, ফাঁকা))
 	{
-	    msg((char *)tooltip);
-	    did_msg = TRUE;
+	    বার্তা((অক্ষর *)tooltip);
+	    did_বার্তা = TRUE;
 	    setcursor();
 	    out_flush_cursor(TRUE, FALSE);
 	}
-	else if (did_msg)
+	অন্যথা যদি (did_বার্তা)
 	{
-	    msg("");
-	    did_msg = FALSE;
+	    বার্তা("");
+	    did_বার্তা = FALSE;
 	    setcursor();
 	    out_flush_cursor(TRUE, FALSE);
 	}
@@ -3846,15 +3846,15 @@ menu_button_clicked_cb(
     }
 }
 
-    void
-gui_mch_add_menu(vimmenu_T *menu, int idx)
+    শূন্য
+gui_mch_add_menu(vimmenu_T *menu, পূর্ণসংখ্যা idx)
 {
     vimmenu_T	*parent;
     GtkWidget	*parent_widget;
     gboolean	use_mnemonic;
     char_u	*text;
 
-    if (menu->name[0] == ']' || menu_is_popup(menu->name))
+    যদি (menu->name[0] == ']' || menu_is_popup(menu->name))
     {
 	// Attach the popover to drawarea's parent rather than to drawarea
 	// itself. GtkDrawingArea is a leaf widget whose snapshot does not
@@ -3862,58 +3862,58 @@ gui_mch_add_menu(vimmenu_T *menu, int idx)
 	// leave the drawing area blank while the popover is open.
 	menu->submenu_id = g_object_ref_sink(vim_menu_new());
 	gtk_widget_set_parent(menu->submenu_id, gui.drawarea);
-	return;
+	ফেরত;
     }
 
     parent = menu->parent;
 
-    if ((parent != NULL && parent->submenu_id == NULL)
+    যদি ((parent != ফাঁকা && parent->submenu_id == ফাঁকা)
 	    || !menu_is_menubar(menu->name))
-	return;
+	ফেরত;
 
     menu->submenu_id = g_object_ref_sink(vim_menu_new());
 
-    use_mnemonic = parent != NULL || p_wak[0] != 'n';
+    use_mnemonic = parent != ফাঁকা || p_wak[0] != 'n';
     text = translate_mnemonic_tag(menu->name, use_mnemonic);
 
-    if (parent != NULL)
+    যদি (parent != ফাঁকা)
     {
 	parent_widget = parent->submenu_id;
 	menu->id = g_object_ref_sink(vim_menu_item_new(
-		    (const char *)text, NULL, NULL));
+		    (ধ্রুবক অক্ষর *)text, ফাঁকা, ফাঁকা));
 
 	vim_menu_item_set_submenu(VIM_MENU_ITEM(menu->id),
 		VIM_MENU(menu->submenu_id));
-	vim_menu_insert_item(VIM_MENU(parent_widget),
+	vim_menu_ঢোকাও_item(VIM_MENU(parent_widget),
 		VIM_MENU_ITEM(menu->id), idx);
     }
-    else
+    অন্যথা
     {
 	parent_widget = gui.menubar;
 	menu->id = g_object_ref_sink(vim_menu_bar_item_new(
-		    (const char *)text, VIM_MENU(menu->submenu_id)));
+		    (ধ্রুবক অক্ষর *)text, VIM_MENU(menu->submenu_id)));
 
-	vim_menu_bar_insert_item(VIM_MENU_BAR(parent_widget),
+	vim_menu_bar_ঢোকাও_item(VIM_MENU_BAR(parent_widget),
 		VIM_MENU_BAR_ITEM(menu->id), idx);
     }
 
     vim_free(text);
 }
 
-    void
-gui_mch_add_menu_item(vimmenu_T *menu, int idx)
+    শূন্য
+gui_mch_add_menu_item(vimmenu_T *menu, পূর্ণসংখ্যা idx)
 {
     vimmenu_T	*parent = menu->parent;
 
 # ifdef FEAT_TOOLBAR
-    if (parent != NULL && menu_is_toolbar(parent->name))
+    যদি (parent != ফাঁকা && menu_is_toolbar(parent->name))
     {
-	if (menu_is_separator(menu->name))
+	যদি (menu_is_separator(menu->name))
 	{
 	    menu->id =
-		vim_toolbar_insert_separator(VIM_TOOLBAR(gui.toolbar), idx);
+		vim_toolbar_ঢোকাও_separator(VIM_TOOLBAR(gui.toolbar), idx);
 	}
-	else
+	অন্যথা
 	{
 	    GtkWidget	*btn;
 	    GtkWidget	*icon;
@@ -3921,14 +3921,14 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	    char_u	*tooltip;
 
 	    text    = CONVERT_TO_UTF8(menu->dname);
-	    tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
-	    if (tooltip != NULL && !utf_valid_string(tooltip, NULL))
+	    tooltip = CONVERT_TO_UTF8(menu->strings[MENU_সূচক_TIP]);
+	    যদি (tooltip != ফাঁকা && !utf_valid_string(tooltip, ফাঁকা))
 		CONVERT_TO_UTF8_FREE(tooltip);
 
 	    icon = create_toolbar_icon(menu);
-	    btn = vim_toolbar_insert_button(VIM_TOOLBAR(gui.toolbar),
-		    icon, (const char *)text, idx);
-	    gtk_widget_set_tooltip_text(btn, (const gchar *)tooltip);
+	    btn = vim_toolbar_ঢোকাও_button(VIM_TOOLBAR(gui.toolbar),
+		    icon, (ধ্রুবক অক্ষর *)text, idx);
+	    gtk_widget_set_tooltip_text(btn, (ধ্রুবক gchar *)tooltip);
 
 	    g_signal_connect(btn, "clicked",
 		    G_CALLBACK(toolbar_button_clicked_cb), menu);
@@ -3937,40 +3937,40 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	    CONVERT_TO_UTF8_FREE(text);
 	    CONVERT_TO_UTF8_FREE(tooltip);
 	}
-	return;
+	ফেরত;
     }
 # endif
 
     // Menu items (non-toolbar)
-    if (parent == NULL || parent->submenu_id == NULL)
-	return;
+    যদি (parent == ফাঁকা || parent->submenu_id == ফাঁকা)
+	ফেরত;
 
-    if (menu_is_separator(menu->name))
+    যদি (menu_is_separator(menu->name))
     {
-	menu->id = g_object_ref_sink(vim_menu_insert_separator(
+	menu->id = g_object_ref_sink(vim_menu_ঢোকাও_separator(
 		VIM_MENU(parent->submenu_id), idx));
     }
-    else
+    অন্যথা
     {
 	char_u	    *text;
-	char_u	    *accel_text = NULL;
+	char_u	    *accel_text = ফাঁকা;
 	gboolean    use_mnemonic;
 
 	use_mnemonic = p_wak[0] != 'n';
 	text = translate_mnemonic_tag(menu->name, use_mnemonic);
 
-	if (menu->actext != NULL && menu->actext[0] != NUL)
+	যদি (menu->actext != ফাঁকা && menu->actext[0] != NUL)
 	    accel_text = CONVERT_TO_UTF8(menu->actext);
 
 	// Add our own reference to the widget
-	menu->id = g_object_ref_sink(vim_menu_item_new((const char *)text,
+	menu->id = g_object_ref_sink(vim_menu_item_new((ধ্রুবক অক্ষর *)text,
 		    (VimMenuItemFunc)menu_button_clicked_cb, menu));
 
-	if (accel_text != NULL)
+	যদি (accel_text != ফাঁকা)
 	    vim_menu_item_set_accel(VIM_MENU_ITEM(menu->id),
-		    (const char *)accel_text);
+		    (ধ্রুবক অক্ষর *)accel_text);
 
-	vim_menu_insert_item(VIM_MENU(parent->submenu_id),
+	vim_menu_ঢোকাও_item(VIM_MENU(parent->submenu_id),
 		VIM_MENU_ITEM(menu->id), idx);
 
 	vim_free(text);
@@ -3978,51 +3978,51 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
     }
 }
 
-    void
-gui_mch_toggle_tearoffs(int enable UNUSED)
+    শূন্য
+gui_mch_toggle_tearoffs(পূর্ণসংখ্যা enable UNUSED)
 {
     // GTK4: tearoff menus don't exist.
 }
 
-    void
+    শূন্য
 gui_mch_menu_set_tip(vimmenu_T *menu)
 {
     char_u *tooltip;
 
-    if (menu->id == NULL)
-	return;
+    যদি (menu->id == ফাঁকা)
+	ফেরত;
 
-    tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
-    if (tooltip != NULL && utf_valid_string(tooltip, NULL))
-	gtk_widget_set_tooltip_text(menu->id, (const char *)tooltip);
+    tooltip = CONVERT_TO_UTF8(menu->strings[MENU_সূচক_TIP]);
+    যদি (tooltip != ফাঁকা && utf_valid_string(tooltip, ফাঁকা))
+	gtk_widget_set_tooltip_text(menu->id, (ধ্রুবক অক্ষর *)tooltip);
     CONVERT_TO_UTF8_FREE(tooltip);
 }
 
-    void
+    শূন্য
 gui_mch_destroy_menu(vimmenu_T *menu)
 {
     // For toolbar buttons and separators, remove from the toolbar box.
-    if (menu->parent != NULL && menu_is_toolbar(menu->parent->name))
+    যদি (menu->parent != ফাঁকা && menu_is_toolbar(menu->parent->name))
     {
-	if (menu->id != NULL)
+	যদি (menu->id != ফাঁকা)
 	{
 	    vim_toolbar_remove(VIM_TOOLBAR(gui.toolbar), menu->id);
-	    menu->id = NULL;
+	    menu->id = ফাঁকা;
 	}
-	return;
+	ফেরত;
     }
 
     // For popup menus, unparent the menu as well
-    if (menu->name[0] == ']' || menu_is_popup(menu->name))
+    যদি (menu->name[0] == ']' || menu_is_popup(menu->name))
     {
-	if (menu->submenu_id != NULL)
+	যদি (menu->submenu_id != ফাঁকা)
 	    gtk_widget_unparent(menu->submenu_id);
     }
-    else if (menu->parent == NULL && menu->id != NULL)
+    অন্যথা যদি (menu->parent == ফাঁকা && menu->id != ফাঁকা)
 	// Remove from menubar, if not NULL.
 	vim_menu_bar_remove(VIM_MENU_BAR(gui.menubar), menu->id);
     // "menu->id" is NULL for window toolbar
-    else if (menu->id != NULL)
+    অন্যথা যদি (menu->id != ফাঁকা)
 	// Remove from parent menu
 	vim_menu_remove(VIM_MENU(menu->parent->submenu_id), menu->id);
 
@@ -4030,30 +4030,30 @@ gui_mch_destroy_menu(vimmenu_T *menu)
     g_clear_object(&menu->id);
 }
 
-    void
+    শূন্য
 gui_mch_show_popupmenu(vimmenu_T *menu)
 {
-    int x, y;
+    পূর্ণসংখ্যা x, y;
 
     gui_mch_getmouse(&x, &y);
     gui_gtk_popup_at(menu, x, y);
 }
 
-    static void
-show_menubar_popover(void)
+    স্থির শূন্য
+show_menubar_popover(শূন্য)
 {
     GtkWidget	    *menu;
     GdkRectangle    rect;
 
-    if (gui.menubar == NULL || gui.drawarea == NULL)
-	return;
+    যদি (gui.menubar == ফাঁকা || gui.drawarea == ফাঁকা)
+	ফেরত;
 
-    if (gtk_widget_is_visible(gui.menubar))
+    যদি (gtk_widget_is_visible(gui.menubar))
     {
 	// If menubar is visible, then just show first menu in menubar, like how
 	// GTK traditionally seems to do it?
-	vim_menu_bar_show(VIM_MENU_BAR(gui.menubar), NULL);
-	return;
+	vim_menu_bar_show(VIM_MENU_BAR(gui.menubar), ফাঁকা);
+	ফেরত;
     }
 
     // Copy and convert the menubar into a menu popover
@@ -4066,7 +4066,7 @@ show_menubar_popover(void)
     rect.width = 1;
     rect.height = 1;
     gtk_popover_set_pointing_to(GTK_POPOVER(menu), &rect);
-    g_signal_connect(menu, "closed", G_CALLBACK(popupmenu_closed_cb), NULL);
+    g_signal_connect(menu, "closed", G_CALLBACK(popupmenu_closed_cb), ফাঁকা);
     gtk_popover_popup(GTK_POPOVER(menu));
 }
 
@@ -4078,79 +4078,79 @@ show_menubar_popover(void)
  * ============================================================
  */
 
-    void
-gui_mch_set_scrollbar_thumb(scrollbar_T *sb, long val, long size, long max)
+    শূন্য
+gui_mch_set_scrollbar_thumb(scrollbar_T *sb, long val, long আকার_2, long max)
 {
     GtkAdjustment *adj;
 
-    if (sb->id == NULL)
-	return;
-    if (!GTK_IS_WIDGET(sb->id) || !GTK_IS_SCROLLBAR(sb->id))
-	return;
+    যদি (sb->id == ফাঁকা)
+	ফেরত;
+    যদি (!GTK_IS_WIDGET(sb->id) || !GTK_IS_SCROLLBAR(sb->id))
+	ফেরত;
 
     adj = gtk_scrollbar_get_adjustment(GTK_SCROLLBAR(sb->id));
     gtk_adjustment_set_lower(adj, 0.0);
     gtk_adjustment_set_upper(adj, (gdouble)max + 1);
-    gtk_adjustment_set_value(adj, (gdouble)val);
+    gtk_adjustment_set_মান(adj, (gdouble)val);
     gtk_adjustment_set_step_increment(adj, 1.0);
-    gtk_adjustment_set_page_increment(adj, (gdouble)(size > 2 ? size - 2 : 1));
-    gtk_adjustment_set_page_size(adj, (gdouble)size);
+    gtk_adjustment_set_page_increment(adj, (gdouble)(আকার_2 > 2 ? আকার_2 - 2 : 1));
+    gtk_adjustment_set_page_আকার(adj, (gdouble)আকার_2);
 }
 
-    void
-gui_mch_set_scrollbar_pos(scrollbar_T *sb, int x, int y, int w, int h)
+    শূন্য
+gui_mch_set_scrollbar_pos(scrollbar_T *sb, পূর্ণসংখ্যা x, পূর্ণসংখ্যা y, পূর্ণসংখ্যা w, পূর্ণসংখ্যা h)
 {
-    if (sb->id != NULL)
+    যদি (sb->id != ফাঁকা)
 	vim_form_move_resize(VIM_FORM(gui.formwin), sb->id, x, y, w, h);
 }
 
-    int
-gui_mch_get_scrollbar_xpadding(void)
+    পূর্ণসংখ্যা
+gui_mch_get_scrollbar_xpadding(শূন্য)
 {
-    int formwin_w = gtk_widget_get_width(gui.formwin);
-    int sbar_w = 0;
-    int xpad;
+    পূর্ণসংখ্যা formwin_w = gtk_widget_get_width(gui.formwin);
+    পূর্ণসংখ্যা sbar_w = 0;
+    পূর্ণসংখ্যা xpad;
 
-    if (gui.which_scrollbars[SBAR_LEFT])
+    যদি (gui.which_scrollbars[SBAR_বাম])
 	sbar_w += gui.scrollbar_width;
-    if (gui.which_scrollbars[SBAR_RIGHT])
+    যদি (gui.which_scrollbars[SBAR_ডান])
 	sbar_w += gui.scrollbar_width;
 
     xpad = formwin_w - last_text_area_w - sbar_w;
-    return (xpad < 0) ? 0 : xpad;
+    ফেরত (xpad < 0) ? 0 : xpad;
 }
 
-    int
-gui_mch_get_scrollbar_ypadding(void)
+    পূর্ণসংখ্যা
+gui_mch_get_scrollbar_ypadding(শূন্য)
 {
-    int formwin_h = gtk_widget_get_height(gui.formwin);
-    int ypad;
+    পূর্ণসংখ্যা formwin_h = gtk_widget_get_height(gui.formwin);
+    পূর্ণসংখ্যা ypad;
 
     ypad = formwin_h - last_text_area_h;
-    if (gui.which_scrollbars[SBAR_BOTTOM])
+    যদি (gui.which_scrollbars[SBAR_BOTTOM])
 	ypad -= gui.scrollbar_height;
 
-    return (ypad < 0) ? 0 : ypad;
+    ফেরত (ypad < 0) ? 0 : ypad;
 }
 
-    static void
-adjustment_value_changed(GtkAdjustment *adj, gpointer data UNUSED)
+    স্থির শূন্য
+adjustment_মান_changed(GtkAdjustment *adj, gpointer তথ্য UNUSED)
 {
-    scrollbar_T *sb = (scrollbar_T *)g_object_get_data(G_OBJECT(adj), "vim-sb");
-    long value = (long)gtk_adjustment_get_value(adj);
+    scrollbar_T *sb = (scrollbar_T *)g_object_get_তথ্য(G_OBJECT(adj), "vim-sb");
+    long মান = (long)gtk_adjustment_get_মান(adj);
 
-    if (sb != NULL)
-	gui_drag_scrollbar(sb, value, FALSE);
+    যদি (sb != ফাঁকা)
+	gui_drag_scrollbar(sb, মান, FALSE);
 }
 
-    void
-gui_mch_create_scrollbar(scrollbar_T *sb, int orient)
+    শূন্য
+gui_mch_create_scrollbar(scrollbar_T *sb, পূর্ণসংখ্যা orient)
 {
     GtkAdjustment *adj;
-    if (orient == SBAR_HORIZ)
-	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_HORIZONTAL, NULL);
-    else
-	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_VERTICAL, NULL);
+    যদি (orient == SBAR_HORIZ)
+	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_HORIZONTAL, ফাঁকা);
+    অন্যথা
+	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_VERTICAL, ফাঁকা);
 
     gtk_widget_add_css_class(sb->id, "vim-scrollbar");
     adj = gtk_scrollbar_get_adjustment(GTK_SCROLLBAR(sb->id));
@@ -4158,18 +4158,18 @@ gui_mch_create_scrollbar(scrollbar_T *sb, int orient)
     gtk_widget_set_visible(sb->id, FALSE);
     vim_form_put(VIM_FORM(gui.formwin), sb->id, 0, 0);
 
-    g_object_set_data(G_OBJECT(adj), "vim-sb", (gpointer)sb);
+    g_object_set_তথ্য(G_OBJECT(adj), "vim-sb", (gpointer)sb);
     g_signal_connect(G_OBJECT(adj), "value-changed",
-	    G_CALLBACK(adjustment_value_changed), NULL);
+	    G_CALLBACK(adjustment_মান_changed), ফাঁকা);
 }
 
-    void
+    শূন্য
 gui_mch_destroy_scrollbar(scrollbar_T *sb)
 {
-    if (sb->id != NULL)
+    যদি (sb->id != ফাঁকা)
     {
 	vim_form_remove(VIM_FORM(gui.formwin), sb->id);
-	sb->id = NULL;
+	sb->id = ফাঁকা;
     }
 }
 
@@ -4179,13 +4179,13 @@ gui_mch_destroy_scrollbar(scrollbar_T *sb)
  * ============================================================
  */
 
-    void
-gui_mch_set_text_area_pos(int x, int y, int w, int h)
+    শূন্য
+gui_mch_set_text_area_pos(পূর্ণসংখ্যা x, পূর্ণসংখ্যা y, পূর্ণসংখ্যা w, পূর্ণসংখ্যা h)
 {
     // "h" may be negative especially when draw area size is smaller than
     // "gui.char_height".
-    if (w <= 0 || h <= 0)
-	return;
+    যদি (w <= 0 || h <= 0)
+	ফেরত;
     last_text_area_w = w;
     last_text_area_h = h;
 
@@ -4196,30 +4196,30 @@ gui_mch_set_text_area_pos(int x, int y, int w, int h)
  * Calculate the number of pixels to bleed background color to. Should be called
  * after all UI elements are positioned and resized.
  */
-    void
-gui_gtk4_calculate_bleed(int width, int height)
+    শূন্য
+gui_gtk4_calculate_bleed(পূর্ণসংখ্যা width, পূর্ণসংখ্যা height)
 {
-    int old_right = gui.bleed_right;
-    int old_bot = gui.bleed_bot;
+    পূর্ণসংখ্যা old_ডান = gui.bleed_ডান;
+    পূর্ণসংখ্যা old_bot = gui.bleed_bot;
 
-    gui.bleed_right = width - last_text_area_w;
+    gui.bleed_ডান = width - last_text_area_w;
     gui.bleed_bot = height - last_text_area_h;
 
-    if (gui.which_scrollbars[SBAR_LEFT])
-	gui.bleed_right -= gui.scrollbar_width;
-    if (gui.which_scrollbars[SBAR_RIGHT])
-	gui.bleed_right -= gui.scrollbar_width;
-    if (gui.which_scrollbars[SBAR_BOTTOM])
+    যদি (gui.which_scrollbars[SBAR_বাম])
+	gui.bleed_ডান -= gui.scrollbar_width;
+    যদি (gui.which_scrollbars[SBAR_ডান])
+	gui.bleed_ডান -= gui.scrollbar_width;
+    যদি (gui.which_scrollbars[SBAR_BOTTOM])
 	gui.bleed_bot -= gui.scrollbar_height;
 
     // Not sure if this can happen, but be safe...
-    if (gui.bleed_right < 0)
-	gui.bleed_right = 0;
-    if (gui.bleed_bot < 0)
+    যদি (gui.bleed_ডান < 0)
+	gui.bleed_ডান = 0;
+    যদি (gui.bleed_bot < 0)
 	gui.bleed_bot = 0;
 
     // Make sure to update draw area if changed
-    if (old_right != gui.bleed_right || old_bot != gui.bleed_bot)
+    যদি (old_ডান != gui.bleed_ডান || old_bot != gui.bleed_bot)
 	gtk_widget_queue_draw(GTK_WIDGET(gui.drawarea));
 }
 
@@ -4232,40 +4232,40 @@ gui_gtk4_calculate_bleed(int width, int height)
 /*
  * Blocking helper: run a GtkFileDialog and wait for result.
  */
-typedef struct {
-    GFile	*result;
+প্রকারলেখ কাঠামো {
+    GFile	*ফলাফল;
     gboolean	done;
-} FileDialogData;
+} File_Dialog_তথ্য;
 
-    static void
-file_dialog_open_cb(GObject *source, GAsyncResult *res, gpointer data)
+    স্থির শূন্য
+file_dialog_open_cb(GObject *source, GAsync_ফলাফল *res, gpointer তথ্য)
 {
-    FileDialogData *fdd = (FileDialogData *)data;
-    fdd->result = gtk_file_dialog_open_finish(
-		    GTK_FILE_DIALOG(source), res, NULL);
+    File_Dialog_তথ্য *fdd = (File_Dialog_তথ্য *)তথ্য;
+    fdd->ফলাফল = gtk_file_dialog_open_finish(
+		    GTK_FILE_DIALOG(source), res, ফাঁকা);
     fdd->done = TRUE;
 }
 
-    static void
-file_dialog_save_cb(GObject *source, GAsyncResult *res, gpointer data)
+    স্থির শূন্য
+file_dialog_save_cb(GObject *source, GAsync_ফলাফল *res, gpointer তথ্য)
 {
-    FileDialogData *fdd = (FileDialogData *)data;
-    fdd->result = gtk_file_dialog_save_finish(
-		    GTK_FILE_DIALOG(source), res, NULL);
+    File_Dialog_তথ্য *fdd = (File_Dialog_তথ্য *)তথ্য;
+    fdd->ফলাফল = gtk_file_dialog_save_finish(
+		    GTK_FILE_DIALOG(source), res, ফাঁকা);
     fdd->done = TRUE;
 }
 
-    static void
-file_dialog_folder_cb(GObject *source, GAsyncResult *res, gpointer data)
+    স্থির শূন্য
+file_dialog_folder_cb(GObject *source, GAsync_ফলাফল *res, gpointer তথ্য)
 {
-    FileDialogData *fdd = (FileDialogData *)data;
-    fdd->result = gtk_file_dialog_select_folder_finish(
-		    GTK_FILE_DIALOG(source), res, NULL);
+    File_Dialog_তথ্য *fdd = (File_Dialog_তথ্য *)তথ্য;
+    fdd->ফলাফল = gtk_file_dialog_select_folder_finish(
+		    GTK_FILE_DIALOG(source), res, ফাঁকা);
     fdd->done = TRUE;
 }
 
     char_u *
-gui_mch_browse(int saving,
+gui_mch_browse(পূর্ণসংখ্যা saving,
 	char_u *title,
 	char_u *dflt,
 	char_u *ext UNUSED,
@@ -4273,16 +4273,16 @@ gui_mch_browse(int saving,
 	char_u *filter)
 {
     GtkFileDialog   *dlg;
-    FileDialogData  fdd;
+    File_Dialog_তথ্য  fdd;
     char_u	    dirbuf[MAXPATHL];
-    char_u	    *result = NULL;
+    char_u	    *ফলাফল = ফাঁকা;
     GListStore	    *filters;
 
     title = CONVERT_TO_UTF8(title);
 
-    if (initdir == NULL || *initdir == NUL)
+    যদি (initdir == ফাঁকা || *initdir == NUL)
 	mch_dirname(dirbuf, MAXPATHL);
-    else if (vim_FullName(initdir, dirbuf, MAXPATHL - 2, FALSE) == FAIL)
+    অন্যথা যদি (vim_FullName(initdir, dirbuf, MAXPATHL - 2, FALSE) == FAIL)
 	dirbuf[0] = NUL;
     add_pathsep(dirbuf);
 
@@ -4290,51 +4290,51 @@ gui_mch_browse(int saving,
 
     dlg = gtk_file_dialog_new();
     gtk_file_dialog_set_modal(dlg, TRUE);
-    if (title != NULL)
-	gtk_file_dialog_set_title(dlg, (const char *)title);
+    যদি (title != ফাঁকা)
+	gtk_file_dialog_set_title(dlg, (ধ্রুবক অক্ষর *)title);
 
     {
-	GFile *dir = g_file_new_for_path((const char *)dirbuf);
+	GFile *dir = g_file_new_for_path((ধ্রুবক অক্ষর *)dirbuf);
 	gtk_file_dialog_set_initial_folder(dlg, dir);
 	g_object_unref(dir);
     }
 
     // Add file filters
     filters = g_list_store_new(GTK_TYPE_FILE_FILTER);
-    if (filter != NULL && *filter != NUL)
+    যদি (filter != ফাঁকা && *filter != NUL)
     {
-	int		i = 0;
+	পূর্ণসংখ্যা		i = 0;
 	char_u		*patt;
 	char_u		*p = filter;
 	GtkFileFilter	*gfilter;
 
 	gfilter = gtk_file_filter_new();
 	patt = alloc(STRLEN(filter));
-	if (patt != NULL)
+	যদি (patt != ফাঁকা)
 	{
-	    while (p != NULL && *p != NUL)
+	    যখন (p != ফাঁকা && *p != NUL)
 	    {
-		if (*p == '\n' || *p == ';' || *p == '\t')
+		যদি (*p == '\n' || *p == ';' || *p == '\t')
 		{
 		    STRNCPY(patt, filter, i);
 		    patt[i] = '\0';
-		    if (*p == '\t')
+		    যদি (*p == '\t')
 			gtk_file_filter_set_name(gfilter, (gchar *)patt);
-		    else
+		    অন্যথা
 		    {
 			gtk_file_filter_add_pattern(gfilter, (gchar *)patt);
-			if (*p == '\n')
+			যদি (*p == '\n')
 			{
 			    g_list_store_append(filters, gfilter);
 			    g_object_unref(gfilter);
-			    if (*(p + 1) != NUL)
+			    যদি (*(p + 1) != NUL)
 				gfilter = gtk_file_filter_new();
 			}
 		    }
 		    filter = ++p;
 		    i = 0;
 		}
-		else
+		অন্যথা
 		{
 		    p++;
 		    i++;
@@ -4346,85 +4346,85 @@ gui_mch_browse(int saving,
     gtk_file_dialog_set_filters(dlg, G_LIST_MODEL(filters));
     g_object_unref(filters);
 
-    if (saving && dflt != NULL && *dflt != NUL)
-	gtk_file_dialog_set_initial_name(dlg, (const char *)dflt);
+    যদি (saving && dflt != ফাঁকা && *dflt != NUL)
+	gtk_file_dialog_set_initial_name(dlg, (ধ্রুবক অক্ষর *)dflt);
 
-    fdd.result = NULL;
+    fdd.ফলাফল = ফাঁকা;
     fdd.done = FALSE;
 
-    if (saving)
-	gtk_file_dialog_save(dlg, GTK_WINDOW(gui.mainwin), NULL,
+    যদি (saving)
+	gtk_file_dialog_save(dlg, GTK_WINDOW(gui.mainwin), ফাঁকা,
 		file_dialog_save_cb, &fdd);
-    else
-	gtk_file_dialog_open(dlg, GTK_WINDOW(gui.mainwin), NULL,
+    অন্যথা
+	gtk_file_dialog_open(dlg, GTK_WINDOW(gui.mainwin), ফাঁকা,
 		file_dialog_open_cb, &fdd);
 
-    while (!fdd.done)
-	g_main_context_iteration(NULL, TRUE);
+    যখন (!fdd.done)
+	g_main_context_iteration(ফাঁকা, TRUE);
 
-    if (fdd.result != NULL)
+    যদি (fdd.ফলাফল != ফাঁকা)
     {
-	char *path = g_file_get_path(fdd.result);
-	if (path != NULL)
+	অক্ষর *path = g_file_get_path(fdd.ফলাফল);
+	যদি (path != ফাঁকা)
 	{
-	    result = vim_strsave((char_u *)path);
+	    ফলাফল = vim_strsave((char_u *)path);
 	    g_free(path);
 	}
-	g_object_unref(fdd.result);
+	g_object_unref(fdd.ফলাফল);
     }
 
     g_object_unref(dlg);
     CONVERT_TO_UTF8_FREE(title);
 
-    return result;
+    ফেরত ফলাফল;
 }
 
     char_u *
 gui_mch_browsedir(char_u *title, char_u *initdir)
 {
     GtkFileDialog	*dlg;
-    FileDialogData	fdd;
-    char_u		*result = NULL;
+    File_Dialog_তথ্য	fdd;
+    char_u		*ফলাফল = ফাঁকা;
 
     title = CONVERT_TO_UTF8(title);
     gui_mch_mousehide(FALSE);
 
     dlg = gtk_file_dialog_new();
     gtk_file_dialog_set_modal(dlg, TRUE);
-    if (title != NULL)
-	gtk_file_dialog_set_title(dlg, (const char *)title);
+    যদি (title != ফাঁকা)
+	gtk_file_dialog_set_title(dlg, (ধ্রুবক অক্ষর *)title);
 
-    if (initdir != NULL && *initdir != NUL)
+    যদি (initdir != ফাঁকা && *initdir != NUL)
     {
-	GFile *dir = g_file_new_for_path((const char *)initdir);
+	GFile *dir = g_file_new_for_path((ধ্রুবক অক্ষর *)initdir);
 	gtk_file_dialog_set_initial_folder(dlg, dir);
 	g_object_unref(dir);
     }
 
-    fdd.result = NULL;
+    fdd.ফলাফল = ফাঁকা;
     fdd.done = FALSE;
 
-    gtk_file_dialog_select_folder(dlg, GTK_WINDOW(gui.mainwin), NULL,
+    gtk_file_dialog_select_folder(dlg, GTK_WINDOW(gui.mainwin), ফাঁকা,
 	    file_dialog_folder_cb, &fdd);
 
-    while (!fdd.done)
-	g_main_context_iteration(NULL, TRUE);
+    যখন (!fdd.done)
+	g_main_context_iteration(ফাঁকা, TRUE);
 
-    if (fdd.result != NULL)
+    যদি (fdd.ফলাফল != ফাঁকা)
     {
-	char *path = g_file_get_path(fdd.result);
-	if (path != NULL)
+	অক্ষর *path = g_file_get_path(fdd.ফলাফল);
+	যদি (path != ফাঁকা)
 	{
-	    result = vim_strsave((char_u *)path);
+	    ফলাফল = vim_strsave((char_u *)path);
 	    g_free(path);
 	}
-	g_object_unref(fdd.result);
+	g_object_unref(fdd.ফলাফল);
     }
 
     g_object_unref(dlg);
     CONVERT_TO_UTF8_FREE(title);
 
-    return result;
+    ফেরত ফলাফল;
 }
 
 /*
@@ -4439,150 +4439,150 @@ gui_mch_browsedir(char_u *title, char_u *initdir)
  * "button_string" is duplicated; caller must free the duplicated string via
  * *tofree.
  */
-    static char **
-split_button_string(char_u *button_string, int *n_buttons, char **tofree)
+    স্থির অক্ষর **
+split_button_string(char_u *button_string, পূর্ণসংখ্যা *n_buttons, অক্ষর **tofree)
 {
-    char	    **array;
+    অক্ষর	    **array;
     char_u	    *p;
-    unsigned int    count = 1;
+    unsigned পূর্ণসংখ্যা    গুনতি = 1;
 
-    button_string = (char_u *)g_strdup((const char *)button_string);
+    button_string = (char_u *)g_strdup((ধ্রুবক অক্ষর *)button_string);
 
-    for (p = button_string; *p != NUL; ++p)
-	if (*p == DLG_BUTTON_SEP)
-	    ++count;
+    জন্য (p = button_string; *p != NUL; ++p)
+	যদি (*p == DLG_BUTTON_SEP)
+	    ++গুনতি;
 
-    array = g_malloc_n(count, sizeof(char *));
-    count = 0;
+    array = g_malloc_n(গুনতি, আকার(অক্ষর *));
+    গুনতি = 0;
 
-    if (array != NULL)
+    যদি (array != ফাঁকা)
     {
-	array[count++] = (char *)button_string;
-	for (p = button_string; *p != NUL; )
+	array[গুনতি++] = (অক্ষর *)button_string;
+	জন্য (p = button_string; *p != NUL; )
 	{
-	    if (*p == DLG_BUTTON_SEP)
+	    যদি (*p == DLG_BUTTON_SEP)
 	    {
 		*p++ = NUL;
-		array[count++] = (char *)p;
+		array[গুনতি++] = (অক্ষর *)p;
 	    }
-	    else if (*p == DLG_HOTKEY_CHAR)
+	    অন্যথা যদি (*p == DLG_HOTKEY_CHAR)
 		*p++ = '_';
-	    else
+	    অন্যথা
 		MB_PTR_ADV(p);
 	}
     }
 
-    *tofree = (char *)button_string;
-    *n_buttons = count;
-    return array;
+    *tofree = (অক্ষর *)button_string;
+    *n_buttons = গুনতি;
+    ফেরত array;
 }
 
 /*
  * Convert VIM_GENERIC, VIM_ERROR, etc into an icon name. Returns NULL for
  * VIM_GENERIC.
  */
-    static const char *
-dialog_type_to_icon(int type)
+    স্থির ধ্রুবক অক্ষর *
+dialog_type_to_icon(পূর্ণসংখ্যা type)
 {
-    switch (type)
+    নির্বাচন (type)
     {
-	case VIM_ERROR:
-	    return "dialog-error-symbolic";
-	case VIM_WARNING:
-	    return "dialog-warning-symbolic";
-	case VIM_INFO:
-	    return "dialog-information-symbolic";
-	case VIM_QUESTION:
-	    return "dialog-question-symbolic";
-	default:
-	    break;
+	ক্ষেত্র VIM_ERROR:
+	    ফেরত "dialog-error-symbolic";
+	ক্ষেত্র VIM_WARNING:
+	    ফেরত "dialog-warning-symbolic";
+	ক্ষেত্র VIM_INFO:
+	    ফেরত "dialog-information-symbolic";
+	ক্ষেত্র VIM_QUESTION:
+	    ফেরত "dialog-question-symbolic";
+	পূর্বনির্ধারিত:
+	    বিরতি;
     }
-    return NULL;
+    ফেরত ফাঁকা;
 }
 
 // Data associated with each button in the dialog
-typedef struct
+প্রকারলেখ কাঠামো
 {
-    int		but_idx;
-    int		*response;
+    পূর্ণসংখ্যা		but_idx;
+    পূর্ণসংখ্যা		*response;
     gboolean	*done;
 } DialogButtonState;
 
-typedef struct
+প্রকারলেখ কাঠামো
 {
     GtkWidget	*win;
     gboolean	*done;
     gboolean	no_alt;
 } DialogState;
 
-    static void
+    স্থির শূন্য
 dialog_button_clicked_cb(GtkButton *button UNUSED, DialogButtonState *state)
 {
     *state->response = state->but_idx;
     *state->done = TRUE;
 }
 
-    static gboolean
-dialog_key_pressed_cb(
-	GtkEventControllerKey	*controller UNUSED,
+    স্থির gboolean
+dialog_চাবি_pressed_cb(
+	Gtk_Event_Controller_চাবি	*controller UNUSED,
 	guint			keyval,
 	guint			keycode UNUSED,
 	GdkModifierType		state,
 	DialogState		*dstate)
 {
-    if (keyval == GDK_KEY_Escape)
+    যদি (keyval == GDK_চাবি_Escape)
     {
 	*dstate->done = TRUE;
-	return TRUE;
+	ফেরত TRUE;
     }
 
-    if (dstate->no_alt && !(state & gtk_accelerator_get_default_mod_mask()))
-	return gtk_widget_mnemonic_activate(dstate->win, FALSE);
-    return FALSE;
+    যদি (dstate->no_alt && !(state & gtk_accelerator_get_default_mod_mask()))
+	ফেরত gtk_widget_mnemonic_activate(dstate->win, FALSE);
+    ফেরত FALSE;
 }
 
-    static gboolean
+    স্থির gboolean
 dialog_close_request_cb(GtkWindow *win UNUSED, gboolean *win_closed)
 {
     *win_closed = TRUE;
-    return FALSE;
+    ফেরত FALSE;
 }
 
-    int
+    পূর্ণসংখ্যা
 gui_mch_dialog(
-	int	type,
+	পূর্ণসংখ্যা	type,
 	char_u	*title,
 	char_u	*message,
 	char_u	*buttons,
-	int	def_but,
+	পূর্ণসংখ্যা	def_but,
 	char_u	*textfield,
-	int	ex_cmd UNUSED)
+	পূর্ণসংখ্যা	ex_cmd UNUSED)
 {
     GtkWindow		*win = GTK_WINDOW(gtk_window_new());
     GtkWidget		*vertbox;
     GtkWidget		*message_box;
-    const char		*icon_name;
+    ধ্রুবক অক্ষর		*icon_name;
     GtkWidget		*icon;
     GtkWidget		*label;
-    GtkWidget		*entry = NULL;
+    GtkWidget		*entry = ফাঁকা;
     char_u		*utf8_title;
     char_u		*utf8_message;
-    GtkEventController *key_controller;
-    DialogButtonState	*but_states = NULL;
-    char		*tofree = NULL;
-    int			response = -1;
+    GtkEventController *চাবি_controller;
+    DialogButtonState	*but_states = ফাঁকা;
+    অক্ষর		*tofree = ফাঁকা;
+    পূর্ণসংখ্যা			response = -1;
     gboolean		done = FALSE;
     gboolean		win_closed = FALSE;
     DialogState		state;
 
     utf8_title = CONVERT_TO_UTF8(title);
-    if (utf8_title != NULL)
-	gtk_window_set_title(win, (const char *)utf8_title);
+    যদি (utf8_title != ফাঁকা)
+	gtk_window_set_title(win, (ধ্রুবক অক্ষর *)utf8_title);
     CONVERT_TO_UTF8_FREE(utf8_title);
 
     gtk_window_set_transient_for(win, GTK_WINDOW(gui.mainwin));
     gtk_window_set_modal(win, TRUE);
-    gtk_window_set_default_size(win, 300, -1);
+    gtk_window_set_default_আকার(win, 300, -1);
     gtk_window_set_destroy_with_parent(win, TRUE);
     g_signal_connect(win, "close-request",
 	    G_CALLBACK(dialog_close_request_cb), &win_closed);
@@ -4590,7 +4590,7 @@ gui_mch_dialog(
     // Create main vertical layout container
     vertbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 16);
     gtk_window_set_child(win, vertbox);
-    gtk_widget_set_margin_top(vertbox, 24);
+    gtk_widget_set_margin_শীর্ষ(vertbox, 24);
     gtk_widget_set_margin_bottom(vertbox, 24);
     gtk_widget_set_margin_start(vertbox, 12);
     gtk_widget_set_margin_end(vertbox, 12);
@@ -4602,15 +4602,15 @@ gui_mch_dialog(
 
     // If type is not VIM_GENERIC, add an icon to make the dialog look nicer :)
     icon_name = dialog_type_to_icon(type);
-    if (icon_name != NULL)
+    যদি (icon_name != ফাঁকা)
     {
 	icon = gtk_image_new_from_icon_name(icon_name);
-	gtk_image_set_icon_size(GTK_IMAGE(icon), GTK_ICON_SIZE_LARGE);
+	gtk_image_set_icon_আকার(GTK_IMAGE(icon), GTK_ICON_আকার_LARGE);
 	gtk_box_append(GTK_BOX(message_box), icon);
     }
 
     utf8_message = CONVERT_TO_UTF8(message);
-    label = gtk_label_new((const char *)utf8_message);
+    label = gtk_label_new((ধ্রুবক অক্ষর *)utf8_message);
     CONVERT_TO_UTF8_FREE(utf8_message);
     gtk_label_set_wrap(GTK_LABEL(label), TRUE);
     gtk_label_set_max_width_chars(GTK_LABEL(label), 40);
@@ -4618,23 +4618,23 @@ gui_mch_dialog(
 
     // Close the dialog when the <Esc> key is pressed. Also allow using
     // mnemonics without <Alt> key (if there is no text field).
-    key_controller = gtk_event_controller_key_new();
-    g_signal_connect(key_controller, "key-pressed",
-	    G_CALLBACK(dialog_key_pressed_cb), &state);
-    gtk_widget_add_controller(GTK_WIDGET(win), key_controller);
+    চাবি_controller = gtk_event_controller_চাবি_new();
+    g_signal_connect(চাবি_controller, "key-pressed",
+	    G_CALLBACK(dialog_চাবি_pressed_cb), &state);
+    gtk_widget_add_controller(GTK_WIDGET(win), চাবি_controller);
     state.done = &done;
     state.win = GTK_WIDGET(win);
 
-    if (textfield != NULL)
+    যদি (textfield != ফাঁকা)
     {
 	// Add text entry so user can enter text
 	char_u *utf8_text = CONVERT_TO_UTF8(textfield);
 
 	entry = gtk_entry_new();
 
-	if (utf8_text != NULL)
-	    gtk_editable_set_text(GTK_EDITABLE(entry), (const char *)utf8_text);
-	else
+	যদি (utf8_text != ফাঁকা)
+	    gtk_editable_set_text(GTK_EDITABLE(entry), (ধ্রুবক অক্ষর *)utf8_text);
+	অন্যথা
 	    gtk_editable_set_text(GTK_EDITABLE(entry), "");
 	CONVERT_TO_UTF8_FREE(utf8_text);
 
@@ -4644,21 +4644,21 @@ gui_mch_dialog(
 	gtk_box_append(GTK_BOX(vertbox), entry);
 	state.no_alt = FALSE;
     }
-    else
+    অন্যথা
     {
 	GListModel  *controllers;
-	int	    len;
+	পূর্ণসংখ্যা	    len;
 
 	// Set all shortcut controllers in the window to not require a modifier
 	// for mnemonics.
 	controllers = gtk_widget_observe_controllers(GTK_WIDGET(win));
-	len  = g_list_model_get_n_items(controllers);
-	for (int i = 0; i < len; i++)
+	len  = g_list_model_get_n_বস্তুসমূহ(controllers);
+	জন্য (পূর্ণসংখ্যা i = 0; i < len; i++)
 	{
 	    GtkEventController *controller;
 
 	    controller = g_list_model_get_item(controllers, i);
-	    if (GTK_IS_SHORTCUT_CONTROLLER(controller))
+	    যদি (GTK_IS_SHORTCUT_CONTROLLER(controller))
 		gtk_shortcut_controller_set_mnemonics_modifiers(
 			GTK_SHORTCUT_CONTROLLER(controller), 0);
 	}
@@ -4668,16 +4668,16 @@ gui_mch_dialog(
 	state.no_alt = TRUE;
     }
 
-    if (buttons != NULL)
+    যদি (buttons != ফাঁকা)
     {
 	GtkWidget   *but_box;
-	char	    **buttons_arr; // Note that array is allocated, not strings
-	int	    n_buttons;
+	অক্ষর	    **buttons_arr; // Note that array is allocated, not strings
+	পূর্ণসংখ্যা	    n_buttons;
 
 	// Check 'v' flag in 'guioptions': vertical button placement.
-	if (vim_strchr(p_go, GO_VERTICAL) != NULL)
+	যদি (vim_strchr(p_go, GO_VERTICAL) != ফাঁকা)
 	    but_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 8);
-	else
+	অন্যথা
 	    but_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
 
 	gtk_widget_set_halign(but_box, GTK_ALIGN_CENTER);
@@ -4686,20 +4686,20 @@ gui_mch_dialog(
 
 	buttons_arr = split_button_string(buttons, &n_buttons, &tofree);
 
-	but_states = g_malloc_n(n_buttons, sizeof(DialogButtonState));
+	but_states = g_malloc_n(n_buttons, আকার(DialogButtonState));
 
-	for (int i = 0; i < n_buttons; i++)
+	জন্য (পূর্ণসংখ্যা i = 0; i < n_buttons; i++)
 	{
 	    char_u		*but_label;
 	    GtkWidget		*but;
 	    DialogButtonState	*but_state = but_states + i;
 
 	    but_label = CONVERT_TO_UTF8((char_u *)buttons_arr[i]);
-	    if (but_label == NULL)
-		continue;
+	    যদি (but_label == ফাঁকা)
+		চালু;
 
-	    but = gtk_button_new_with_mnemonic((char *)but_label);
-	    if (i == def_but - 1)
+	    but = gtk_button_new_with_mnemonic((অক্ষর *)but_label);
+	    যদি (i == def_but - 1)
 		gtk_window_set_default_widget(win, but);
 	    gtk_box_append(GTK_BOX(but_box), but);
 	    CONVERT_TO_UTF8_FREE(but_label);
@@ -4716,12 +4716,12 @@ gui_mch_dialog(
 
     gtk_window_present(win);
 
-    while (!done && !win_closed)
-	g_main_context_iteration(NULL, TRUE);
+    যখন (!done && !win_closed)
+	g_main_context_iteration(ফাঁকা, TRUE);
 
-    if (done)
+    যদি (done)
     {
-	if (textfield != NULL)
+	যদি (textfield != ফাঁকা)
 	{
 	    // Get the text the user entered
 	    char_u *text;
@@ -4738,7 +4738,7 @@ gui_mch_dialog(
     g_free(tofree);
 
     // Vim buttons are indexed starting from one.
-    return response == -1 ? 0 : response + 1;
+    ফেরত response == -1 ? 0 : response + 1;
 }
 
 /*
@@ -4753,7 +4753,7 @@ gui_mch_dialog(
  * ============================================================
  */
 
-typedef struct
+প্রকারলেখ কাঠামো
 {
     GtkWidget *dialog;
     GtkWidget *what;	    // Find what entry
@@ -4767,26 +4767,26 @@ typedef struct
     GtkWidget *all;	    // 'Replace All' action button
 } SharedFindReplace;
 
-static SharedFindReplace find_widgets = {0};
-static SharedFindReplace repl_widgets = {0};
+স্থির SharedFindReplace find_widgets = {0};
+স্থির SharedFindReplace repl_widgets = {0};
 
-    static void
-find_replace_cb(GtkWidget *widget UNUSED, gpointer data)
+    স্থির শূন্য
+find_replace_cb(GtkWidget *widget UNUSED, gpointer তথ্য)
 {
-    int			flags;
+    পূর্ণসংখ্যা			flags;
     char_u		*find_text;
     char_u		*repl_text;
     gboolean		direction_down;
     SharedFindReplace	*sfr;
 
-    flags = GPOINTER_TO_INT(data);
+    flags = GPOINTER_TO_INT(তথ্য);
 
-    if (flags == FRD_FINDNEXT)
+    যদি (flags == FRD_FINDNEXT)
     {
-	repl_text = NULL;
+	repl_text = ফাঁকা;
 	sfr = &find_widgets;
     }
-    else
+    অন্যথা
     {
 	repl_text = (char_u *)gtk_editable_get_text(
 		GTK_EDITABLE(repl_widgets.with));
@@ -4797,9 +4797,9 @@ find_replace_cb(GtkWidget *widget UNUSED, gpointer data)
     direction_down = gtk_check_button_get_active(
 	    GTK_CHECK_BUTTON(sfr->down));
 
-    if (gtk_check_button_get_active(GTK_CHECK_BUTTON(sfr->wword)))
+    যদি (gtk_check_button_get_active(GTK_CHECK_BUTTON(sfr->wword)))
 	flags |= FRD_WHOLE_WORD;
-    if (gtk_check_button_get_active(GTK_CHECK_BUTTON(sfr->mcase)))
+    যদি (gtk_check_button_get_active(GTK_CHECK_BUTTON(sfr->mcase)))
 	flags |= FRD_MATCH_CASE;
 
     repl_text = CONVERT_FROM_UTF8(repl_text);
@@ -4809,29 +4809,29 @@ find_replace_cb(GtkWidget *widget UNUSED, gpointer data)
     CONVERT_FROM_UTF8_FREE(find_text);
 }
 
-    static void
-dialog_destroyed_cb(GtkWidget *widget UNUSED, gpointer data)
+    স্থির শূন্য
+dialog_destroyed_cb(GtkWidget *widget UNUSED, gpointer তথ্য)
 {
-    *(GtkWidget **)data = NULL;
+    *(GtkWidget **)তথ্য = ফাঁকা;
 }
 
-    static void
+    স্থির শূন্য
 entry_changed_cb(GtkWidget *entry, GtkWidget *dialog)
 {
-    const gchar	*entry_text;
+    ধ্রুবক gchar	*entry_text;
     gboolean	nonempty;
 
     entry_text = gtk_editable_get_text(GTK_EDITABLE(entry));
 
-    if (!entry_text)
-	return; // Shouldn't happen
+    যদি (!entry_text)
+	ফেরত; // Shouldn't happen
 
     nonempty = (entry_text[0] != '\0');
 
-    if (dialog == find_widgets.dialog)
+    যদি (dialog == find_widgets.dialog)
 	gtk_widget_set_sensitive(find_widgets.find, nonempty);
 
-    if (dialog == repl_widgets.dialog)
+    যদি (dialog == repl_widgets.dialog)
     {
 	gtk_widget_set_sensitive(repl_widgets.find, nonempty);
 	gtk_widget_set_sensitive(repl_widgets.replace, nonempty);
@@ -4839,9 +4839,9 @@ entry_changed_cb(GtkWidget *entry, GtkWidget *dialog)
     }
 }
 
-    static gboolean
-find_key_pressed_cb(
-	GtkEventControllerKey	*controller UNUSED,
+    স্থির gboolean
+find_চাবি_pressed_cb(
+	Gtk_Event_Controller_চাবি	*controller UNUSED,
 	guint			keyval,
 	guint			keycode UNUSED,
 	GdkModifierType		state,
@@ -4849,55 +4849,55 @@ find_key_pressed_cb(
 {
     // If the user is holding one of the key modifiers we will just bail out,
     // thus preserving the possibility of normal focus traversal.
-    if (state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK))
-	return FALSE;
+    যদি (state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK))
+	ফেরত FALSE;
 
     // the Escape key synthesizes a cancellation action
-    if (keyval == GDK_KEY_Escape)
+    যদি (keyval == GDK_চাবি_Escape)
     {
 	// Destroy rather than hide the dialog: reusing a hidden toplevel loses
 	// window decorations on Wayland
 	gtk_window_destroy(GTK_WINDOW(frdp->dialog));
-	return TRUE;
+	ফেরত TRUE;
     }
 
-    return FALSE;
+    ফেরত FALSE;
 }
 
-    static void
-entry_activate_cb(GtkWidget *widget UNUSED, void *udata)
+    স্থির শূন্য
+entry_activate_cb(GtkWidget *widget UNUSED, শূন্য *udata)
 {
     gtk_widget_grab_focus(GTK_WIDGET(udata));
 }
 
-    static void
-find_replace_dialog_create(char_u *arg, int do_replace)
+    স্থির শূন্য
+find_replace_dialog_create(char_u *arg, পূর্ণসংখ্যা do_replace)
 {
     SharedFindReplace	*frdp;
     char_u		*entry_text;
-    int			wword = FALSE;
-    int			mcase = !p_ic;
+    পূর্ণসংখ্যা			wword = FALSE;
+    পূর্ণসংখ্যা			mcase = !p_ic;
     GtkWidget		*vertbox, *grid, *hbox, *tmp, *btn;
     gboolean		sensitive;
-    GtkEventController	*key_controller;
+    GtkEventController	*চাবি_controller;
 
     frdp = do_replace ? &repl_widgets : &find_widgets;
     entry_text = get_find_dialog_text(arg, &wword, &mcase);
 
-    if (entry_text != NULL && output_conv.vc_type != CONV_NONE)
+    যদি (entry_text != ফাঁকা && output_conv.vc_type != CONV_NONE)
     {
 	char_u *old = entry_text;
-	entry_text = string_convert(&output_conv, entry_text, NULL);
+	entry_text = string_convert(&output_conv, entry_text, ফাঁকা);
 	vim_free(old);
     }
 
     // If the dialog already exists, just raise it.
-    if (frdp->dialog != NULL)
+    যদি (frdp->dialog != ফাঁকা)
     {
-	if (entry_text != NULL)
+	যদি (entry_text != ফাঁকা)
 	{
 	    gtk_editable_set_text(GTK_EDITABLE(frdp->what),
-		    (char *)entry_text);
+		    (অক্ষর *)entry_text);
 	    gtk_check_button_set_active(GTK_CHECK_BUTTON(frdp->wword),
 		    (gboolean)wword);
 	    gtk_check_button_set_active(GTK_CHECK_BUTTON(frdp->mcase),
@@ -4909,12 +4909,12 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	// For :promptrepl dialog, give it to 'with' entry if 'what' has a
 	// non-empty entry; otherwise, to 'what' entry.
 	gtk_widget_grab_focus(frdp->what);
-	if (do_replace && g_utf8_strlen(
+	যদি (do_replace && g_utf8_strlen(
 		    gtk_editable_get_text(GTK_EDITABLE(frdp->what)), -1) > 0)
 	    gtk_widget_grab_focus(frdp->with);
 
 	vim_free(entry_text);
-	return;
+	ফেরত;
     }
 
     // Create a new dialog window.
@@ -4933,7 +4933,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     vertbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
     gtk_widget_set_margin_start(vertbox, 12);
     gtk_widget_set_margin_end(vertbox, 12);
-    gtk_widget_set_margin_top(vertbox, 12);
+    gtk_widget_set_margin_শীর্ষ(vertbox, 12);
     gtk_widget_set_margin_bottom(vertbox, 12);
     gtk_window_set_child(GTK_WINDOW(frdp->dialog), vertbox);
 
@@ -4950,12 +4950,12 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 
     frdp->what = gtk_entry_new();
     gtk_widget_set_hexpand(frdp->what, TRUE);
-    sensitive = (entry_text != NULL && entry_text[0] != NUL);
-    if (entry_text != NULL)
-	gtk_editable_set_text(GTK_EDITABLE(frdp->what), (char *)entry_text);
+    sensitive = (entry_text != ফাঁকা && entry_text[0] != NUL);
+    যদি (entry_text != ফাঁকা)
+	gtk_editable_set_text(GTK_EDITABLE(frdp->what), (অক্ষর *)entry_text);
     gtk_grid_attach(GTK_GRID(grid), frdp->what, 1, 0, 1, 1);
 
-    if (do_replace)
+    যদি (do_replace)
     {
 	// "Replace with:" label + entry
 	tmp = gtk_label_new(_("Replace with:"));
@@ -4973,7 +4973,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	g_signal_connect(G_OBJECT(frdp->what), "activate",
 		G_CALLBACK(entry_activate_cb), frdp->with);
     }
-    else
+    অন্যথা
 	// Make the entry activation do the search.
 	gtk_entry_set_activates_default(GTK_ENTRY(frdp->what), TRUE);
 
@@ -5016,10 +5016,10 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     gtk_widget_set_sensitive(btn, sensitive);
     frdp->find = btn;
 
-    key_controller = gtk_event_controller_key_new();
-    g_signal_connect(key_controller, "key-pressed",
-	    G_CALLBACK(find_key_pressed_cb), frdp);
-    gtk_widget_add_controller(GTK_WIDGET(frdp->dialog), key_controller);
+    চাবি_controller = gtk_event_controller_চাবি_new();
+    g_signal_connect(চাবি_controller, "key-pressed",
+	    G_CALLBACK(find_চাবি_pressed_cb), frdp);
+    gtk_widget_add_controller(GTK_WIDGET(frdp->dialog), চাবি_controller);
 
     g_signal_connect(G_OBJECT(frdp->what), "changed",
 	    G_CALLBACK(entry_changed_cb), frdp->dialog);
@@ -5030,7 +5030,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    GINT_TO_POINTER(do_replace ? FRD_R_FINDNEXT : FRD_FINDNEXT));
     gtk_box_append(GTK_BOX(hbox), btn);
 
-    if (do_replace)
+    যদি (do_replace)
     {
 	btn = gtk_button_new_with_label(_("Replace"));
 	gtk_widget_set_sensitive(btn, sensitive);
@@ -5054,23 +5054,23 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 
     gtk_window_present(GTK_WINDOW(frdp->dialog));
     gtk_widget_grab_focus(frdp->what);
-    if (do_replace && entry_text != NULL && entry_text[0] != NUL)
+    যদি (do_replace && entry_text != ফাঁকা && entry_text[0] != NUL)
 	gtk_widget_grab_focus(frdp->with);
 
     vim_free(entry_text);
 }
 
-    void
+    শূন্য
 gui_mch_find_dialog(exarg_T *eap)
 {
-    if (gui.in_use)
+    যদি (gui.in_use)
 	find_replace_dialog_create(eap->arg, FALSE);
 }
 
-    void
+    শূন্য
 gui_mch_replace_dialog(exarg_T *eap)
 {
-    if (gui.in_use)
+    যদি (gui.in_use)
 	find_replace_dialog_create(eap->arg, TRUE);
 }
 
@@ -5080,7 +5080,7 @@ gui_mch_replace_dialog(exarg_T *eap)
  * ============================================================
  */
 
-    void
+    শূন্য
 ex_helpfind(exarg_T *eap UNUSED)
 {
     do_cmdline_cmd((char_u *)"emenu ToolBar.FindHelp");
@@ -5093,19 +5093,19 @@ ex_helpfind(exarg_T *eap UNUSED)
  */
 
 #ifdef USE_GTK4_PRINT_DIALOG
-static GtkPrintDialog *print_dialog = NULL;
-static GtkPrintSettings *print_settings = NULL;
-static GtkPageSetup *page_setup = NULL;
-static GtkPrintSetup *print_setup = NULL;
-static GFile *print_file;
+স্থির GtkPrintDialog *print_dialog = ফাঁকা;
+স্থির GtkPrintSettings *print_settings = ফাঁকা;
+স্থির GtkPageSetup *page_setup = ফাঁকা;
+স্থির GtkPrintSetup *print_setup = ফাঁকা;
+স্থির GFile *print_file;
 
-    static void
-print_dialog_cb(GtkPrintDialog *dialog, GAsyncResult *result, gboolean *done)
+    স্থির শূন্য
+print_dialog_cb(GtkPrintDialog *dialog, GAsync_ফলাফল *ফলাফল, gboolean *done)
 {
-    GError *error = NULL;
-    print_setup = gtk_print_dialog_setup_finish(dialog, result, &error);
+    GError *error = ফাঁকা;
+    print_setup = gtk_print_dialog_setup_finish(dialog, ফলাফল, &error);
 
-    if (print_setup == NULL)
+    যদি (print_setup == ফাঁকা)
     {
 	semsg(_(e_print_error_str), error->message);
 	g_error_free(error);
@@ -5121,86 +5121,86 @@ print_dialog_cb(GtkPrintDialog *dialog, GAsyncResult *result, gboolean *done)
 gui_gtk4_print_dialog(
 	prt_settings_T	*psettings,
 	char_u		*jobname,
-	double		*page_width,
-	double		*page_height)
+	দ্বিগুণ		*page_width,
+	দ্বিগুণ		*page_height)
 {
     GtkPrintDialog  *dialog = gtk_print_dialog_new();
     gboolean	    done = FALSE;
-    char_u	    *temp;
+    char_u	    *অস্থায়ী;
 
-    gtk_print_dialog_set_title(dialog, (const char *)jobname);
+    gtk_print_dialog_set_title(dialog, (ধ্রুবক অক্ষর *)jobname);
     gtk_print_dialog_set_modal(dialog, TRUE);
 
-    print_dialog = NULL;
-    print_setup = NULL;
+    print_dialog = ফাঁকা;
+    print_setup = ফাঁকা;
 
-    if (print_settings == NULL)
+    যদি (print_settings == ফাঁকা)
     {
 	option_table_T *opt;
 
 	print_settings = gtk_print_settings_new();
 
 	opt = &printer_opts[OPT_PRINT_DUPLEX];
-	if (opt->present)
+	যদি (opt->present)
 	{
-	    if (STRNICMP(opt->string, "off", 3) == 0)
+	    যদি (STRNICMP(opt->string, "off", 3) == 0)
 		gtk_print_settings_set_duplex(print_settings,
 			GTK_PRINT_DUPLEX_SIMPLEX);
-	    else if (STRNICMP(opt->string, "short", 5) == 0)
+	    অন্যথা যদি (STRNICMP(opt->string, "short", 5) == 0)
 		gtk_print_settings_set_duplex(print_settings,
 			GTK_PRINT_DUPLEX_VERTICAL);
-	    else
+	    অন্যথা
 		gtk_print_settings_set_duplex(print_settings,
 			GTK_PRINT_DUPLEX_HORIZONTAL);
 	}
 
 	opt = &printer_opts[OPT_PRINT_PORTRAIT];
-	if (opt->present)
+	যদি (opt->present)
 	{
-	    if (*opt->string == 'y')
+	    যদি (*opt->string == 'y')
 		gtk_print_settings_set_orientation(print_settings,
 			GTK_PAGE_ORIENTATION_PORTRAIT);
-	    else
+	    অন্যথা
 		gtk_print_settings_set_orientation(print_settings,
 			GTK_PAGE_ORIENTATION_LANDSCAPE);
 	}
 
 	opt = &printer_opts[OPT_PRINT_PAPER];
-	if (opt->present)
+	যদি (opt->present)
 	{
-	    gtk_print_settings_set_paper_size(print_settings,
-		    gtk_paper_size_new((const char *)opt->string));
+	    gtk_print_settings_set_paper_আকার(print_settings,
+		    gtk_paper_আকার_new((ধ্রুবক অক্ষর *)opt->string));
 	}
 
 	opt = &printer_opts[OPT_PRINT_COLLATE];
-	if (opt->present)
+	যদি (opt->present)
 	{
-	    if (*opt->string == 'y')
+	    যদি (*opt->string == 'y')
 		gtk_print_settings_set_collate(print_settings, TRUE);
-	    else
+	    অন্যথা
 		gtk_print_settings_set_collate(print_settings, FALSE);
 	}
     }
 
-    if (page_setup == NULL)
+    যদি (page_setup == ফাঁকা)
 	page_setup = gtk_page_setup_new();
 
     gtk_print_dialog_set_print_settings(dialog, print_settings);
     gtk_print_dialog_set_page_setup(dialog, page_setup);
 
-    gtk_print_dialog_setup(dialog, GTK_WINDOW(gui.mainwin), NULL,
+    gtk_print_dialog_setup(dialog, GTK_WINDOW(gui.mainwin), ফাঁকা,
 	    (GAsyncReadyCallback)print_dialog_cb, &done);
 
-    while (!done)
-	g_main_context_iteration(NULL, TRUE);
+    যখন (!done)
+	g_main_context_iteration(ফাঁকা, TRUE);
 
-    if (print_setup == NULL)
+    যদি (print_setup == ফাঁকা)
     {
 	g_object_unref(dialog);
 	g_clear_pointer(&print_setup, gtk_print_setup_unref);
 
-	psettings->user_abort_msg = FALSE;
-	return NULL;
+	psettings->user_abort_বার্তা = FALSE;
+	ফেরত ফাঁকা;
     }
 
     g_clear_object(&print_settings);
@@ -5221,32 +5221,32 @@ gui_gtk4_print_dialog(
     *page_height = gtk_page_setup_get_paper_height(page_setup,
 	    GTK_UNIT_POINTS);
 
-    temp  = vim_tempname('p', FALSE);
-    if (temp == NULL)
+    অস্থায়ী  = vim_tempname('p', FALSE);
+    যদি (অস্থায়ী == ফাঁকা)
     {
-	emsg(_(e_cant_find_temp_file_for_writing));
+	emsg(_(e_cant_find_অস্থায়ী_file_for_writing));
 	g_clear_object(&dialog);
 	g_clear_pointer(&print_setup, gtk_print_setup_unref);
 
-	psettings->user_abort_msg = FALSE;
-	return NULL;
+	psettings->user_abort_বার্তা = FALSE;
+	ফেরত ফাঁকা;
     }
-    print_file = g_file_new_for_path((char *)temp);
+    print_file = g_file_new_for_path((অক্ষর *)অস্থায়ী);
 
     print_dialog = dialog;
 
-    return temp;
+    ফেরত অস্থায়ী;
 }
 
-    static void
+    স্থির শূন্য
 print_file_cb(
 	GtkPrintDialog	*dialog,
-	GAsyncResult	*result,
+	GAsync_ফলাফল	*ফলাফল,
 	GFile		*file)
 {
-    char *path = g_file_get_path(file);
+    অক্ষর *path = g_file_get_path(file);
 
-    (void)gtk_print_dialog_print_file_finish(dialog, result, NULL);
+    (শূন্য)gtk_print_dialog_print_file_finish(dialog, ফলাফল, ফাঁকা);
     g_object_unref(dialog);
 
     // Don't use g_file_delete() to be consistent
@@ -5255,16 +5255,16 @@ print_file_cb(
 }
 
 
-    void
-gui_gtk4_print_finish(void)
+    শূন্য
+gui_gtk4_print_finish(শূন্য)
 {
-    if (print_dialog != NULL)
+    যদি (print_dialog != ফাঁকা)
     {
 	gtk_print_dialog_print_file(
 		print_dialog, GTK_WINDOW(gui.mainwin),
-		print_setup, print_file, NULL,
+		print_setup, print_file, ফাঁকা,
 		(GAsyncReadyCallback)print_file_cb, print_file);
-	print_dialog = NULL;
+	print_dialog = ফাঁকা;
 	g_clear_pointer(&print_setup, gtk_print_setup_unref);
     }
 }
@@ -5272,157 +5272,157 @@ gui_gtk4_print_finish(void)
 
 #ifdef FEAT_IMAGE_GUI
 
-typedef struct
+প্রকারলেখ কাঠামো
 {
     GdkTexture *texture;
 } image_gdk_T;
 
-typedef struct
+প্রকারলেখ কাঠামো
 {
-    GskRenderNode   **nodes; // Note that elements may be NULL
-    int		    n_nodes;
+    Gsk_Render_গ্রন্থি   **nodes; // Note that elements may be NULL
+    পূর্ণসংখ্যা		    n_nodes;
 } image_placement_gdk_T;
 
-    int
+    পূর্ণসংখ্যা
 image_gui_init(image_T *img)
 {
     image_gdk_T	    *ctx = ALLOC_CLEAR_ONE(image_gdk_T);
     GdkMemoryFormat fmt;
     size_t	    stride;
     GBytes	    *bytes;
-    size_t	    size;
-    int		    w, h;
+    size_t	    আকার_2;
+    পূর্ণসংখ্যা		    w, h;
 
-    if (ctx == NULL)
-	return FAIL;
+    যদি (ctx == ফাঁকা)
+	ফেরত FAIL;
 
-    if (img->fmt == IMAGE_FORMAT_RGBA)
+    যদি (img->fmt == IMAGE_FORMAT_RGBA)
 	fmt = GDK_MEMORY_R8G8B8A8;
-    else
+    অন্যথা
 	fmt = GDK_MEMORY_R8G8B8;
 
     image_get_dimensions(img, &w, &h);
 
-    size = (size_t)w * h * img->fmt;
+    আকার_2 = (size_t)w * h * img->fmt;
     stride = w * img->fmt;
 
-    bytes = g_bytes_new(img->data, size);
+    bytes = g_bytes_new(img->তথ্য, আকার_2);
     ctx->texture = gdk_memory_texture_new(w, h, fmt, bytes, stride);
     g_bytes_unref(bytes);
 
-    img->backend_data = ctx;
-    return OK;
+    img->backend_তথ্য = ctx;
+    ফেরত OK;
 }
 
-    void
+    শূন্য
 image_gui_uninit(image_T *img)
 {
-    image_gdk_T *ctx = img->backend_data;
+    image_gdk_T *ctx = img->backend_তথ্য;
 
     g_object_unref(ctx->texture);
     vim_free(ctx);
 }
 
-    static void
+    স্থির শূন্য
 clear_nodes(image_placement_gdk_T *ctx)
 {
-    if (ctx->nodes == NULL || gui.drawarea == NULL)
-	return;
+    যদি (ctx->nodes == ফাঁকা || gui.drawarea == ফাঁকা)
+	ফেরত;
 
-    for (int i = 0; i < ctx->n_nodes; i++)
+    জন্য (পূর্ণসংখ্যা i = 0; i < ctx->n_nodes; i++)
     {
-	if (ctx->nodes[i] == NULL)
-	    continue;
+	যদি (ctx->nodes[i] == ফাঁকা)
+	    চালু;
 	vim_draw_area_remove_external(
 		VIM_DRAW_AREA(gui.drawarea), ctx->nodes[i]);
-	gsk_render_node_unref(ctx->nodes[i]);
+	gsk_render_গ্রন্থি_unref(ctx->nodes[i]);
     }
     g_clear_pointer(&ctx->nodes, g_free);
     ctx->n_nodes = 0;
 }
 
-    int
+    পূর্ণসংখ্যা
 image_placement_gui_init(image_placement_T *place)
 {
     image_placement_gdk_T *ctx = ALLOC_CLEAR_ONE(image_placement_gdk_T);
 
-    if (ctx == NULL)
-	return FAIL;
+    যদি (ctx == ফাঁকা)
+	ফেরত FAIL;
 
-    place->backend_data = ctx;
-    return OK;
+    place->backend_তথ্য = ctx;
+    ফেরত OK;
 }
 
-    void
+    শূন্য
 image_placement_gui_uninit(image_placement_T *place)
 {
-    image_placement_gdk_T *ctx = place->backend_data;
+    image_placement_gdk_T *ctx = place->backend_তথ্য;
 
     clear_nodes(ctx);
     vim_free(ctx);
 }
 
-    void
+    শূন্য
 image_placement_gui_draw(image_placement_T *place)
 {
     image_T		    *img = place->img;
-    image_placement_gdk_T   *ctx = place->backend_data;
-    image_gdk_T		    *ictx = img->backend_data;
+    image_placement_gdk_T   *ctx = place->backend_তথ্য;
+    image_gdk_T		    *ictx = img->backend_তথ্য;
     pixman_box32_t	    *rects;
-    int			    n_rects;
-    int			    iw, ih;
-    GskRenderNode	    *texture_node;
+    পূর্ণসংখ্যা			    n_rects;
+    পূর্ণসংখ্যা			    iw, ih;
+    Gsk_Render_গ্রন্থি	    *texture_গ্রন্থি;
 
     rects = pixman_region32_rectangles(&place->visible, &n_rects);
-    if (rects == NULL)
-	return;
+    যদি (rects == ফাঁকা)
+	ফেরত;
 
     clear_nodes(ctx);
-    if (n_rects == 0)
-	return;
+    যদি (n_rects == 0)
+	ফেরত;
 
     image_get_dimensions(img, &iw, &ih);
-    texture_node = gsk_texture_node_new(ictx->texture,
+    texture_গ্রন্থি = gsk_texture_গ্রন্থি_new(ictx->texture,
 	    &GRAPHENE_RECT_INIT(
 		FILL_X(place->col) - FILL_X(place->crop_box.x1),
 		FILL_Y(place->row) - FILL_Y(place->crop_box.y1)
 		+ FILL_Y(place->row_off),
 		PHY2LOG(iw), PHY2LOG(ih)));
 
-    if (texture_node == NULL)
+    যদি (texture_গ্রন্থি == ফাঁকা)
 	// Not sure if this can happen...
-	return;
+	ফেরত;
 
-    ctx->nodes = g_malloc_n(n_rects, sizeof(GskRenderNode *));
+    ctx->nodes = g_malloc_n(n_rects, আকার(Gsk_Render_গ্রন্থি *));
     ctx->n_nodes = n_rects;
 
-    for (int i = 0; i < n_rects; i++)
+    জন্য (পূর্ণসংখ্যা i = 0; i < n_rects; i++)
     {
 	pixman_box32_t	rect = rects[i];
-	int		row, col;
-	int		posx, posy;
-	int		x, y, w, h;
-	GskRenderNode	*node;
+	পূর্ণসংখ্যা		row, col;
+	পূর্ণসংখ্যা		posx, posy;
+	পূর্ণসংখ্যা		x, y, w, h;
+	Gsk_Render_গ্রন্থি	*গ্রন্থি;
 
 	image_placement_subrect(place, rect, &row, &col, &x, &y, &w, &h, false);
 	posx = FILL_X(col);
 	posy = FILL_Y(row);
 
-	node = gsk_clip_node_new(texture_node,
+	গ্রন্থি = gsk_clip_গ্রন্থি_new(texture_গ্রন্থি,
 		&GRAPHENE_RECT_INIT(posx, posy, w, h));
 
-	if (node != NULL)
-	    vim_draw_area_add_external(VIM_DRAW_AREA(gui.drawarea), node);
+	যদি (গ্রন্থি != ফাঁকা)
+	    vim_draw_area_add_external(VIM_DRAW_AREA(gui.drawarea), গ্রন্থি);
 
-	ctx->nodes[i] = node;
+	ctx->nodes[i] = গ্রন্থি;
     }
-    gsk_render_node_unref(texture_node);
+    gsk_render_গ্রন্থি_unref(texture_গ্রন্থি);
 }
 
-    void
+    শূন্য
 image_placement_gui_clear(image_placement_T *place)
 {
-    image_placement_gdk_T   *ctx = place->backend_data;
+    image_placement_gdk_T   *ctx = place->backend_তথ্য;
 
     clear_nodes(ctx);
 }

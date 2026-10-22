@@ -1,7 +1,7 @@
-import platform
+আমদানি platform
 
-if platform.system() == 'Darwin':
-    from ctypes import (
+যদি platform.system() == 'Darwin':
+    তঃ ctypes আমদানি (
         CDLL,
         POINTER,
         Structure,
@@ -12,9 +12,9 @@ if platform.system() == 'Darwin':
         c_void_p,
         sizeof
     )
-    from ctypes.util import find_library
+    তঃ ctypes.util আমদানি find_library
 
-    class ThreadTimeConstraintPolicy(Structure):
+    শ্রেণী ThreadTimeConstraintPolicy(Structure):
         _fields_ = [
             ("period", c_uint32),
             ("computation", c_uint32),
@@ -26,8 +26,8 @@ if platform.system() == 'Darwin':
 
     THREAD_TIME_CONSTRAINT_POLICY = c_uint(2)
 
-    THREAD_TIME_CONSTRAINT_POLICY_COUNT = c_uint(
-        int(sizeof(ThreadTimeConstraintPolicy) / sizeof(c_int)))
+    THREAD_TIME_CONSTRAINT_POLICY_গুনতি = c_uint(
+        পূর্ণসংখ্যা(sizeof(ThreadTimeConstraintPolicy) / sizeof(c_int)))
 
     _libc.pthread_self.restype = c_void_p
 
@@ -52,13 +52,13 @@ if platform.system() == 'Darwin':
     ]
 
     def _mach_thread_self():
-        return _libc.pthread_mach_thread_np(_libc.pthread_self())
+        ফেরত _libc.pthread_mach_thread_np(_libc.pthread_self())
 
-    def _get_time_constraint_policy(default=False):
+    def _get_time_constraint_policy(পূর্বনির্ধারিত=মিথ্যা):
         thread = _mach_thread_self()
         policy_info = ThreadTimeConstraintPolicy()
-        policy_infoCnt = THREAD_TIME_CONSTRAINT_POLICY_COUNT
-        get_default = c_uint(default)
+        policy_infoCnt = THREAD_TIME_CONSTRAINT_POLICY_গুনতি
+        get_default = c_uint(পূর্বনির্ধারিত)
 
         kret = _libc.thread_policy_get(
             thread,
@@ -66,25 +66,25 @@ if platform.system() == 'Darwin':
             byref(policy_info),
             byref(policy_infoCnt),
             byref(get_default))
-        if kret != 0:
-            return None
-        return policy_info
+        যদি kret != 0:
+            ফেরত None
+        ফেরত policy_info
 
     def _set_time_constraint_policy(policy_info):
         thread = _mach_thread_self()
-        policy_infoCnt = THREAD_TIME_CONSTRAINT_POLICY_COUNT
+        policy_infoCnt = THREAD_TIME_CONSTRAINT_POLICY_গুনতি
 
         kret = _libc.thread_policy_set(
             thread,
             THREAD_TIME_CONSTRAINT_POLICY,
             byref(policy_info),
             policy_infoCnt)
-        if kret != 0:
-            raise OSError(kret)
+        যদি kret != 0:
+            তোলো OSError(kret)
 
-    def set_high_priority():
-        policy_info = _get_time_constraint_policy(default=True)
-        if not policy_info:
-            return
-        policy_info.preemptible = c_uint(False)
+    def set_উপরের_priority():
+        policy_info = _get_time_constraint_policy(পূর্বনির্ধারিত=সত্য)
+        যদি নয় policy_info:
+            ফেরত
+        policy_info.preemptible = c_uint(মিথ্যা)
         _set_time_constraint_policy(policy_info)

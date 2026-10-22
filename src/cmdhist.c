@@ -11,69 +11,69 @@
  * cmdhist.c: Functions for the history of the command-line.
  */
 
-#include "vim.h"
+#অন্তর্ভাব "vim.h"
 
-static histentry_T *(history[HIST_COUNT]) = {NULL, NULL, NULL, NULL, NULL};
-static int	hisidx[HIST_COUNT] = {-1, -1, -1, -1, -1};  // lastused entry
-static int	hisnum[HIST_COUNT] = {0, 0, 0, 0, 0};
+স্থির histentry_T *(history[HIST_গুনতি]) = {ফাঁকা, ফাঁকা, ফাঁকা, ফাঁকা, ফাঁকা};
+স্থির পূর্ণসংখ্যা	hisidx[HIST_গুনতি] = {-1, -1, -1, -1, -1};  // lastused entry
+স্থির পূর্ণসংখ্যা	hisnum[HIST_গুনতি] = {0, 0, 0, 0, 0};
 		    // identifying (unique) number of newest history entry
-static int	hislen = 0;		// actual length of history tables
+স্থির পূর্ণসংখ্যা	hislen = 0;		// actual length of history tables
 
 /*
  * Return the length of the history tables
  */
-    int
-get_hislen(void)
+    পূর্ণসংখ্যা
+get_hislen(শূন্য)
 {
-    return hislen;
+    ফেরত hislen;
 }
 
 /*
  * Return a pointer to a specified history table
  */
     histentry_T *
-get_histentry(int hist_type)
+get_histentry(পূর্ণসংখ্যা hist_type)
 {
-    return history[hist_type];
+    ফেরত history[hist_type];
 }
 
-#if defined(FEAT_VIMINFO)
-    void
-set_histentry(int hist_type, histentry_T *entry)
+#যদি defined(FEAT_VIMINFO)
+    শূন্য
+set_histentry(পূর্ণসংখ্যা hist_type, histentry_T *entry)
 {
     history[hist_type] = entry;
 }
 #endif
 
-    int *
-get_hisidx(int hist_type)
+    পূর্ণসংখ্যা *
+get_hisidx(পূর্ণসংখ্যা hist_type)
 {
-    return &hisidx[hist_type];
+    ফেরত &hisidx[hist_type];
 }
 
-#if defined(FEAT_VIMINFO)
-    int *
-get_hisnum(int hist_type)
+#যদি defined(FEAT_VIMINFO)
+    পূর্ণসংখ্যা *
+get_hisnum(পূর্ণসংখ্যা hist_type)
 {
-    return &hisnum[hist_type];
+    ফেরত &hisnum[hist_type];
 }
 #endif
 
 /*
  * Translate a history character to the associated type number.
  */
-    int
-hist_char2type(int c)
+    পূর্ণসংখ্যা
+hist_char2type(পূর্ণসংখ্যা c)
 {
-    if (c == ':')
-	return HIST_CMD;
-    if (c == '=')
-	return HIST_EXPR;
-    if (c == '@')
-	return HIST_INPUT;
-    if (c == '>')
-	return HIST_DEBUG;
-    return HIST_SEARCH;	    // must be '?' or '/'
+    যদি (c == ':')
+	ফেরত HIST_CMD;
+    যদি (c == '=')
+	ফেরত HIST_রাশিমালা;
+    যদি (c == '@')
+	ফেরত HIST_প্রবেশ;
+    যদি (c == '>')
+	ফেরত HIST_DEBUG;
+    ফেরত HIST_অনুসন্ধান;	    // must be '?' or '/'
 }
 
 /*
@@ -82,14 +82,14 @@ hist_char2type(int c)
  * It is sufficient to give the significant prefix of a history name.
  */
 
-static char *(history_names[]) =
+স্থির অক্ষর *(history_names[]) =
 {
     "cmd",
     "search",
     "expr",
     "input",
     "debug",
-    NULL
+    ফাঁকা
 };
 
 /*
@@ -97,118 +97,118 @@ static char *(history_names[]) =
  * arguments of the ":history command.
  */
     char_u *
-get_history_arg(expand_T *xp UNUSED, int idx)
+get_history_arg(expand_T *xp UNUSED, পূর্ণসংখ্যা idx)
 {
-    char    *short_names = ":=@>?/";
-    int	    short_names_count = (int)STRLEN(short_names);
-    int	    history_name_count = ARRAY_LENGTH(history_names) - 1;
+    অক্ষর    *short_names = ":=@>?/";
+    পূর্ণসংখ্যা	    short_names_গুনতি = (পূর্ণসংখ্যা)STRLEN(short_names);
+    পূর্ণসংখ্যা	    history_name_গুনতি = ARRAY_দৈর্ঘ্য(history_names) - 1;
 
-    if (idx < short_names_count)
+    যদি (idx < short_names_গুনতি)
     {
 	xp->xp_buf[0] = (char_u)short_names[idx];
 	xp->xp_buf[1] = NUL;
-	return xp->xp_buf;
+	ফেরত xp->xp_buf;
     }
-    if (idx < short_names_count + history_name_count)
-	return (char_u *)history_names[idx - short_names_count];
-    if (idx == short_names_count + history_name_count)
-	return (char_u *)"all";
-    return NULL;
+    যদি (idx < short_names_গুনতি + history_name_গুনতি)
+	ফেরত (char_u *)history_names[idx - short_names_গুনতি];
+    যদি (idx == short_names_গুনতি + history_name_গুনতি)
+	ফেরত (char_u *)"all";
+    ফেরত ফাঁকা;
 }
 
 /*
  * init_history() - Initialize the command line history.
  * Also used to re-allocate the history when the size changes.
  */
-    void
-init_history(void)
+    শূন্য
+init_history(শূন্য)
 {
-    int		newlen;	    // new length of history table
-    histentry_T	*temp;
-    int		type;
+    পূর্ণসংখ্যা		newlen;	    // new length of history table
+    histentry_T	*অস্থায়ী;
+    পূর্ণসংখ্যা		type;
 
     // If size of history table changed, reallocate it
-    newlen = (int)p_hi;
-    if (newlen == hislen)		// history length didn't change
-	return;
+    newlen = (পূর্ণসংখ্যা)p_hi;
+    যদি (newlen == hislen)		// history length didn't change
+	ফেরত;
 
     // history length changed
-    for (type = 0; type < HIST_COUNT; ++type)   // adjust the tables
+    জন্য (type = 0; type < HIST_গুনতি; ++type)   // adjust the tables
     {
-	if (newlen > 0)
+	যদি (newlen > 0)
 	{
-	    temp = ALLOC_MULT(histentry_T, newlen);
-	    if (temp == NULL)   // out of memory!
+	    অস্থায়ী = ALLOC_MULT(histentry_T, newlen);
+	    যদি (অস্থায়ী == ফাঁকা)   // out of memory!
 	    {
-		if (type == 0)  // first one: just keep the old length
+		যদি (type == 0)  // first one: just keep the old length
 		{
 		    newlen = hislen;
-		    break;
+		    বিরতি;
 		}
 		// Already changed one table, now we can only have zero
 		// length for all tables.
 		newlen = 0;
 		type = -1;
-		continue;
+		চালু;
 	    }
 	}
-	else
-	    temp = NULL;
+	অন্যথা
+	    অস্থায়ী = ফাঁকা;
 
-	if (hisidx[type] < 0)		// there are no entries yet
+	যদি (hisidx[type] < 0)		// there are no entries yet
 	{
-	    int	i;
+	    পূর্ণসংখ্যা	i;
 
-	    for (i = 0; i < newlen; ++i)
-		clear_hist_entry(&temp[i]);
+	    জন্য (i = 0; i < newlen; ++i)
+		clear_hist_entry(&অস্থায়ী[i]);
 	}
-	else if (newlen > hislen)	// array becomes bigger
+	অন্যথা যদি (newlen > hislen)	// array becomes bigger
 	{
-	    int	i;
-	    int	j;
+	    পূর্ণসংখ্যা	i;
+	    পূর্ণসংখ্যা	j;
 
-	    for (i = 0; i <= hisidx[type]; ++i)
-		temp[i] = history[type][i];
+	    জন্য (i = 0; i <= hisidx[type]; ++i)
+		অস্থায়ী[i] = history[type][i];
 	    j = i;
-	    for ( ; i <= newlen - (hislen - hisidx[type]); ++i)
-		clear_hist_entry(&temp[i]);
-	    for ( ; j < hislen; ++i, ++j)
-		temp[i] = history[type][j];
+	    জন্য ( ; i <= newlen - (hislen - hisidx[type]); ++i)
+		clear_hist_entry(&অস্থায়ী[i]);
+	    জন্য ( ; j < hislen; ++i, ++j)
+		অস্থায়ী[i] = history[type][j];
 	}
-	else				// array becomes smaller or 0
+	অন্যথা				// array becomes smaller or 0
 	{
-	    int	i;
-	    int	j;
+	    পূর্ণসংখ্যা	i;
+	    পূর্ণসংখ্যা	j;
 
 	    j = hisidx[type];
-	    for (i = newlen - 1; ; --i)
+	    জন্য (i = newlen - 1; ; --i)
 	    {
-		if (i >= 0)		// copy newest entries
-		    temp[i] = history[type][j];
-		else			// remove older entries
+		যদি (i >= 0)		// copy newest entries
+		    অস্থায়ী[i] = history[type][j];
+		অন্যথা			// remove older entries
 		{
 		    vim_free(history[type][j].hisstr);
 		    history[type][j].hisstrlen = 0;
 		}
-		if (--j < 0)
+		যদি (--j < 0)
 		    j = hislen - 1;
-		if (j == hisidx[type])
-		    break;
+		যদি (j == hisidx[type])
+		    বিরতি;
 	    }
 	    hisidx[type] = newlen - 1;
 	}
 	vim_free(history[type]);
-	history[type] = temp;
+	history[type] = অস্থায়ী;
     }
     hislen = newlen;
 }
 
-    void
+    শূন্য
 clear_hist_entry(histentry_T *hisptr)
 {
     hisptr->hisnum = 0;
     hisptr->viminfo = FALSE;
-    hisptr->hisstr = NULL;
+    hisptr->hisstr = ফাঁকা;
     hisptr->hisstrlen = 0;
     hisptr->time_set = 0;
 }
@@ -217,51 +217,51 @@ clear_hist_entry(histentry_T *hisptr)
  * Check if command line 'str' is already in history.
  * If 'move_to_front' is TRUE, matching entry is moved to end of history.
  */
-    int
+    পূর্ণসংখ্যা
 in_history(
-    int	    type,
+    পূর্ণসংখ্যা	    type,
     char_u  *str,
-    int	    move_to_front,	// Move the entry to the front if it exists
-    int	    sep,
-    int	    writing)		// ignore entries read from viminfo
+    পূর্ণসংখ্যা	    move_to_front,	// Move the entry to the front if it exists
+    পূর্ণসংখ্যা	    sep,
+    পূর্ণসংখ্যা	    writing)		// ignore entries read from viminfo
 {
-    int	    i;
-    int	    last_i = -1;
+    পূর্ণসংখ্যা	    i;
+    পূর্ণসংখ্যা	    last_i = -1;
     char_u  *p;
     size_t  len;
 
-    if (hisidx[type] < 0)
-	return FALSE;
+    যদি (hisidx[type] < 0)
+	ফেরত FALSE;
     i = hisidx[type];
-    do
+    করো
     {
-	if (history[type][i].hisstr == NULL)
-	    return FALSE;
+	যদি (history[type][i].hisstr == ফাঁকা)
+	    ফেরত FALSE;
 
 	// For search history, check that the separator character matches as
 	// well.
 	p = history[type][i].hisstr;
-	if (STRCMP(str, p) == 0
+	যদি (STRCMP(str, p) == 0
 		&& !(writing && history[type][i].viminfo)
-		&& (type != HIST_SEARCH || sep == p[history[type][i].hisstrlen + 1]))
+		&& (type != HIST_অনুসন্ধান || sep == p[history[type][i].hisstrlen + 1]))
 	{
-	    if (!move_to_front)
-		return TRUE;
+	    যদি (!move_to_front)
+		ফেরত TRUE;
 	    last_i = i;
-	    break;
+	    বিরতি;
 	}
-	if (--i < 0)
+	যদি (--i < 0)
 	    i = hislen - 1;
-    } while (i != hisidx[type]);
+    } যখন (i != hisidx[type]);
 
-    if (last_i < 0)
-	return FALSE;
+    যদি (last_i < 0)
+	ফেরত FALSE;
 
     str = history[type][i].hisstr;
     len = history[type][i].hisstrlen;
-    while (i != hisidx[type])
+    যখন (i != hisidx[type])
     {
-	if (++i >= hislen)
+	যদি (++i >= hislen)
 	    i = 0;
 	history[type][last_i] = history[type][i];
 	last_i = i;
@@ -271,7 +271,7 @@ in_history(
     history[type][i].hisstr = str;
     history[type][i].hisstrlen = len;
     history[type][i].time_set = vim_time();
-    return TRUE;
+    ফেরত TRUE;
 }
 
 /*
@@ -279,80 +279,80 @@ in_history(
  * When "name" is empty, return "cmd" history.
  * Returns -1 for unknown history name.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 get_histtype(char_u *name)
 {
-    int		i;
-    int		len = (int)STRLEN(name);
+    পূর্ণসংখ্যা		i;
+    পূর্ণসংখ্যা		len = (পূর্ণসংখ্যা)STRLEN(name);
 
     // No argument: use current history.
-    if (len == 0)
-	return hist_char2type(get_cmdline_firstc());
+    যদি (len == 0)
+	ফেরত hist_char2type(get_cmdline_firstc());
 
-    for (i = 0; history_names[i] != NULL; ++i)
-	if (STRNICMP(name, history_names[i], len) == 0)
-	    return i;
+    জন্য (i = 0; history_names[i] != ফাঁকা; ++i)
+	যদি (STRNICMP(name, history_names[i], len) == 0)
+	    ফেরত i;
 
-    if (vim_strchr((char_u *)":=@>?/", name[0]) != NULL && name[1] == NUL)
-	return hist_char2type(name[0]);
+    যদি (vim_strchr((char_u *)":=@>?/", name[0]) != ফাঁকা && name[1] == NUL)
+	ফেরত hist_char2type(name[0]);
 
-    return -1;
+    ফেরত -1;
 }
 
-static int	last_maptick = -1;	// last seen maptick
+স্থির পূর্ণসংখ্যা	last_maptick = -1;	// last seen maptick
 
 /*
  * Add the given string to the given history.  If the string is already in the
  * history then it is moved to the front.  "histype" may be one of he HIST_
  * values.
  */
-    void
+    শূন্য
 add_to_history(
-    int		histype,
+    পূর্ণসংখ্যা		histype,
     char_u	*new_entry,
     size_t	new_entrylen,
-    int		in_map,		// consider maptick when inside a mapping
-    int		sep)		// separator character used (search hist)
+    পূর্ণসংখ্যা		in_map,		// consider maptick when inside a mapping
+    পূর্ণসংখ্যা		sep)		// separator character used (search hist)
 {
     histentry_T	*hisptr;
 
-    if (hislen == 0)		// no history
-	return;
+    যদি (hislen == 0)		// no history
+	ফেরত;
 
-    if ((cmdmod.cmod_flags & CMOD_KEEPPATTERNS) && histype == HIST_SEARCH)
-	return;
+    যদি ((cmdmod.cmod_flags & CMOD_KEEPPATTERNS) && histype == HIST_অনুসন্ধান)
+	ফেরত;
 
     // Searches inside the same mapping overwrite each other, so that only
     // the last line is kept.  Be careful not to remove a line that was moved
     // down, only lines that were added.
-    if (histype == HIST_SEARCH && in_map)
+    যদি (histype == HIST_অনুসন্ধান && in_map)
     {
-	if (maptick == last_maptick && hisidx[HIST_SEARCH] >= 0)
+	যদি (maptick == last_maptick && hisidx[HIST_অনুসন্ধান] >= 0)
 	{
 	    // Current line is from the same mapping, remove it
-	    hisptr = &history[HIST_SEARCH][hisidx[HIST_SEARCH]];
+	    hisptr = &history[HIST_অনুসন্ধান][hisidx[HIST_অনুসন্ধান]];
 	    vim_free(hisptr->hisstr);
 	    clear_hist_entry(hisptr);
 	    --hisnum[histype];
-	    if (--hisidx[HIST_SEARCH] < 0)
-		hisidx[HIST_SEARCH] = hislen - 1;
+	    যদি (--hisidx[HIST_অনুসন্ধান] < 0)
+		hisidx[HIST_অনুসন্ধান] = hislen - 1;
 	}
 	last_maptick = -1;
     }
 
-    if (in_history(histype, new_entry, TRUE, sep, FALSE))
-	return;
+    যদি (in_history(histype, new_entry, TRUE, sep, FALSE))
+	ফেরত;
 
-    if (++hisidx[histype] == hislen)
+    যদি (++hisidx[histype] == hislen)
 	hisidx[histype] = 0;
     hisptr = &history[histype][hisidx[histype]];
     vim_free(hisptr->hisstr);
 
     // Store the separator after the NUL of the string.
     hisptr->hisstr = vim_strnsave(new_entry, new_entrylen + 2);
-    if (hisptr->hisstr == NULL)
+    যদি (hisptr->hisstr == ফাঁকা)
 	hisptr->hisstrlen = 0;
-    else
+    অন্যথা
     {
 	hisptr->hisstr[new_entrylen + 1] = sep;
 	hisptr->hisstrlen = new_entrylen;
@@ -361,24 +361,24 @@ add_to_history(
     hisptr->hisnum = ++hisnum[histype];
     hisptr->viminfo = FALSE;
     hisptr->time_set = vim_time();
-    if (histype == HIST_SEARCH && in_map)
+    যদি (histype == HIST_অনুসন্ধান && in_map)
 	last_maptick = maptick;
 }
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 
 /*
  * Get identifier of newest history entry.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-get_history_idx(int histype)
+    স্থির পূর্ণসংখ্যা
+get_history_idx(পূর্ণসংখ্যা histype)
 {
-    if (hislen == 0 || histype < 0 || histype >= HIST_COUNT
+    যদি (hislen == 0 || histype < 0 || histype >= HIST_গুনতি
 		    || hisidx[histype] < 0)
-	return -1;
+	ফেরত -1;
 
-    return history[histype][hisidx[histype]].hisnum;
+    ফেরত history[histype][hisidx[histype]].hisnum;
 }
 
 /*
@@ -387,56 +387,56 @@ get_history_idx(int histype)
  *   num < 0: relative position in history wrt newest entry
  * "histype" may be one of the HIST_ values.
  */
-    static int
-calc_hist_idx(int histype, int num)
+    স্থির পূর্ণসংখ্যা
+calc_hist_idx(পূর্ণসংখ্যা histype, পূর্ণসংখ্যা অঙ্ক)
 {
-    int		i;
+    পূর্ণসংখ্যা		i;
     histentry_T	*hist;
-    int		wrapped = FALSE;
+    পূর্ণসংখ্যা		wrapped = FALSE;
 
-    if (hislen == 0 || histype < 0 || histype >= HIST_COUNT
-		    || (i = hisidx[histype]) < 0 || num == 0)
-	return -1;
+    যদি (hislen == 0 || histype < 0 || histype >= HIST_গুনতি
+		    || (i = hisidx[histype]) < 0 || অঙ্ক == 0)
+	ফেরত -1;
 
     hist = history[histype];
-    if (num > 0)
+    যদি (অঙ্ক > 0)
     {
-	while (hist[i].hisnum > num)
-	    if (--i < 0)
+	যখন (hist[i].hisnum > অঙ্ক)
+	    যদি (--i < 0)
 	    {
-		if (wrapped)
-		    break;
+		যদি (wrapped)
+		    বিরতি;
 		i += hislen;
 		wrapped = TRUE;
 	    }
-	if (i >= 0 && hist[i].hisnum == num && hist[i].hisstr != NULL)
-	    return i;
+	যদি (i >= 0 && hist[i].hisnum == অঙ্ক && hist[i].hisstr != ফাঁকা)
+	    ফেরত i;
     }
-    else if (-num <= hislen)
+    অন্যথা যদি (-অঙ্ক <= hislen)
     {
-	i += num + 1;
-	if (i < 0)
+	i += অঙ্ক + 1;
+	যদি (i < 0)
 	    i += hislen;
-	if (hist[i].hisstr != NULL)
-	    return i;
+	যদি (hist[i].hisstr != ফাঁকা)
+	    ফেরত i;
     }
-    return -1;
+    ফেরত -1;
 }
 
 /*
  * Clear all entries of a history.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-clr_history(int histype)
+    স্থির পূর্ণসংখ্যা
+clr_history(পূর্ণসংখ্যা histype)
 {
-    int		i;
+    পূর্ণসংখ্যা		i;
     histentry_T	*hisptr;
 
-    if (hislen != 0 && histype >= 0 && histype < HIST_COUNT)
+    যদি (hislen != 0 && histype >= 0 && histype < HIST_গুনতি)
     {
 	hisptr = history[histype];
-	for (i = hislen; i--;)
+	জন্য (i = hislen; i--;)
 	{
 	    vim_free(hisptr->hisstr);
 	    clear_hist_entry(hisptr);
@@ -444,161 +444,161 @@ clr_history(int histype)
 	}
 	hisidx[histype] = -1;	// mark history as cleared
 	hisnum[histype] = 0;	// reset identifier counter
-	return OK;
+	ফেরত OK;
     }
-    return FAIL;
+    ফেরত FAIL;
 }
 
 /*
  * Remove all entries matching {str} from a history.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-del_history_entry(int histype, char_u *str)
+    স্থির পূর্ণসংখ্যা
+del_history_entry(পূর্ণসংখ্যা histype, char_u *str)
 {
     regmatch_T	regmatch;
     histentry_T	*hisptr;
-    int		idx;
-    int		i;
-    int		last;
-    int		found = FALSE;
+    পূর্ণসংখ্যা		idx;
+    পূর্ণসংখ্যা		i;
+    পূর্ণসংখ্যা		last;
+    পূর্ণসংখ্যা		found = FALSE;
 
-    if (hislen == 0 || histype < 0 || histype >= HIST_COUNT || *str == NUL
+    যদি (hislen == 0 || histype < 0 || histype >= HIST_গুনতি || *str == NUL
 		|| hisidx[histype] < 0)
-	return FALSE;
+	ফেরত FALSE;
 
     idx = hisidx[histype];
     regmatch.regprog = vim_regcomp(str, RE_MAGIC + RE_STRING);
-    if (regmatch.regprog == NULL)
-	return FALSE;
+    যদি (regmatch.regprog == ফাঁকা)
+	ফেরত FALSE;
 
     regmatch.rm_ic = FALSE;	// always match case
 
     i = last = idx;
-    do
+    করো
     {
 	hisptr = &history[histype][i];
-	if (hisptr->hisstr == NULL)
-	    break;
-	if (vim_regexec(&regmatch, hisptr->hisstr, (colnr_T)0))
+	যদি (hisptr->hisstr == ফাঁকা)
+	    বিরতি;
+	যদি (vim_regexec(&regmatch, hisptr->hisstr, (colnr_T)0))
 	{
 	    found = TRUE;
 	    vim_free(hisptr->hisstr);
 	    clear_hist_entry(hisptr);
 	}
-	else
+	অন্যথা
 	{
-	    if (i != last)
+	    যদি (i != last)
 	    {
 		history[histype][last] = *hisptr;
 		clear_hist_entry(hisptr);
 	    }
-	    if (--last < 0)
+	    যদি (--last < 0)
 		last += hislen;
 	}
-	if (--i < 0)
+	যদি (--i < 0)
 	    i += hislen;
-    } while (i != idx);
+    } যখন (i != idx);
 
-    if (history[histype][idx].hisstr == NULL)
+    যদি (history[histype][idx].hisstr == ফাঁকা)
 	hisidx[histype] = -1;
 
     vim_regfree(regmatch.regprog);
-    return found;
+    ফেরত found;
 }
 
 /*
  * Remove an indexed entry from a history.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-del_history_idx(int histype, int idx)
+    স্থির পূর্ণসংখ্যা
+del_history_idx(পূর্ণসংখ্যা histype, পূর্ণসংখ্যা idx)
 {
-    int	    i, j;
+    পূর্ণসংখ্যা	    i, j;
 
     i = calc_hist_idx(histype, idx);
-    if (i < 0)
-	return FALSE;
+    যদি (i < 0)
+	ফেরত FALSE;
     idx = hisidx[histype];
     vim_free(history[histype][i].hisstr);
     history[histype][i].hisstrlen = 0;
 
     // When deleting the last added search string in a mapping, reset
     // last_maptick, so that the last added search string isn't deleted again.
-    if (histype == HIST_SEARCH && maptick == last_maptick && i == idx)
+    যদি (histype == HIST_অনুসন্ধান && maptick == last_maptick && i == idx)
 	last_maptick = -1;
 
-    while (i != idx)
+    যখন (i != idx)
     {
 	j = (i + 1) % hislen;
 	history[histype][i] = history[histype][j];
 	i = j;
     }
     clear_hist_entry(&history[histype][i]);
-    if (--i < 0)
+    যদি (--i < 0)
 	i += hislen;
     hisidx[histype] = i;
-    return TRUE;
+    ফেরত TRUE;
 }
 
 /*
  * "histadd()" function
  */
-    void
+    শূন্য
 f_histadd(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		histype;
+    পূর্ণসংখ্যা		histype;
     char_u	*str;
     char_u	buf[NUMBUFLEN];
 
-    rettv->vval.v_number = FALSE;
-    if (check_secure())
-	return;
+    rettv->vval.v_সংখ্যা = FALSE;
+    যদি (check_secure())
+	ফেরত;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	ফেরত;
 
     str = tv_get_string_chk(&argvars[0]);	// NULL on type error
-    histype = str != NULL ? get_histtype(str) : -1;
-    if (histype < 0)
-	return;
+    histype = str != ফাঁকা ? get_histtype(str) : -1;
+    যদি (histype < 0)
+	ফেরত;
 
     str = tv_get_string_buf(&argvars[1], buf);
-    if (*str == NUL)
-	return;
+    যদি (*str == NUL)
+	ফেরত;
 
     init_history();
     add_to_history(histype, str, STRLEN(str), FALSE, NUL);
-    rettv->vval.v_number = TRUE;
+    rettv->vval.v_সংখ্যা = TRUE;
 }
 
 /*
  * "histdel()" function
  */
-    void
+    শূন্য
 f_histdel(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    int		n;
+    পূর্ণসংখ্যা		n;
     char_u	*str;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_string_or_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_string_or_সংখ্যা_arg(argvars, 1) == FAIL))
+	ফেরত;
 
     str = tv_get_string_chk(&argvars[0]);	// NULL on type error
-    if (str == NULL)
+    যদি (str == ফাঁকা)
 	n = 0;
-    else if (argvars[1].v_type == VAR_UNKNOWN)
+    অন্যথা যদি (argvars[1].v_type == VAR_UNKNOWN)
 	// only one argument: clear entire history
 	n = clr_history(get_histtype(str));
-    else if (argvars[1].v_type == VAR_NUMBER)
+    অন্যথা যদি (argvars[1].v_type == VAR_সংখ্যা)
 	// index given: remove that entry
 	n = del_history_idx(get_histtype(str),
-					  (int)tv_get_number(&argvars[1]));
-    else
+					  (পূর্ণসংখ্যা)tv_get_সংখ্যা(&argvars[1]));
+    অন্যথা
     {
 	char_u	buf[NUMBUFLEN];
 
@@ -607,41 +607,41 @@ f_histdel(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 				      tv_get_string_buf(&argvars[1], buf));
     }
 
-    rettv->vval.v_number = n;
+    rettv->vval.v_সংখ্যা = n;
 }
 
 /*
  * "histget()" function
  */
-    void
+    শূন্য
 f_histget(typval_T *argvars UNUSED, typval_T *rettv)
 {
     char_u  *str;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_সংখ্যা_arg(argvars, 1) == FAIL))
+	ফেরত;
 
     str = tv_get_string_chk(&argvars[0]);	// NULL on type error
-    if (str == NULL)
-	rettv->vval.v_string = NULL;
-    else
+    যদি (str == ফাঁকা)
+	rettv->vval.v_string = ফাঁকা;
+    অন্যথা
     {
-	int type;
-	int idx;
+	পূর্ণসংখ্যা type;
+	পূর্ণসংখ্যা idx;
 
 	type = get_histtype(str);
-	if (argvars[1].v_type == VAR_UNKNOWN)
+	যদি (argvars[1].v_type == VAR_UNKNOWN)
 	    idx = get_history_idx(type);
-	else
-	    idx = (int)tv_get_number_chk(&argvars[1], NULL);
+	অন্যথা
+	    idx = (পূর্ণসংখ্যা)tv_get_সংখ্যা_chk(&argvars[1], ফাঁকা);
 						    // -1 on type error
 
 	idx = calc_hist_idx(type, idx);
-	if (idx < 0)
+	যদি (idx < 0)
 	    rettv->vval.v_string = vim_strnsave((char_u *)"", 0);
-	else
+	অন্যথা
 	    rettv->vval.v_string = vim_strnsave(history[type][idx].hisstr, history[type][idx].hisstrlen);
     }
     rettv->v_type = VAR_STRING;
@@ -650,55 +650,55 @@ f_histget(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "histnr()" function
  */
-    void
+    শূন্য
 f_histnr(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		i;
+    পূর্ণসংখ্যা		i;
     char_u	*histname;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ফেরত;
 
     histname = tv_get_string_chk(&argvars[0]);
-    i = histname == NULL ? HIST_CMD - 1 : get_histtype(histname);
-    if (i >= HIST_CMD && i < HIST_COUNT)
-	rettv->vval.v_number = get_history_idx(i);
-    else
-	rettv->vval.v_number = -1;
+    i = histname == ফাঁকা ? HIST_CMD - 1 : get_histtype(histname);
+    যদি (i >= HIST_CMD && i < HIST_গুনতি)
+	rettv->vval.v_সংখ্যা = get_history_idx(i);
+    অন্যথা
+	rettv->vval.v_সংখ্যা = -1;
 }
 #endif // FEAT_EVAL
 
-#if defined(FEAT_CRYPT)
+#যদি defined(FEAT_CRYPT)
 /*
  * Very specific function to remove the value in ":set key=val" from the
  * history.
  */
-    void
-remove_key_from_history(void)
+    শূন্য
+remove_চাবি_from_history(শূন্য)
 {
     char_u	*p_start;
     char_u	*p_end;
     char_u	*p;
-    int		i;
+    পূর্ণসংখ্যা		i;
 
     i = hisidx[HIST_CMD];
-    if (i < 0)
-	return;
+    যদি (i < 0)
+	ফেরত;
     p_start = history[HIST_CMD][i].hisstr;
-    if (p_start == NULL)
-	return;
+    যদি (p_start == ফাঁকা)
+	ফেরত;
 
     p_end = p_start + history[HIST_CMD][i].hisstrlen;
-    for (p = p_start; *p; ++p)
+    জন্য (p = p_start; *p; ++p)
     {
-	if (STRNCMP(p, "key", 3) == 0 && !SAFE_isalpha(p[3]))
+	যদি (STRNCMP(p, "key", 3) == 0 && !SAFE_isalpha(p[3]))
 	{
 	    p = vim_strchr(p + 3, '=');
-	    if (p == NULL)
-		break;
+	    যদি (p == ফাঁকা)
+		বিরতি;
 	    ++p;
-	    for (i = 0; p[i] && !VIM_ISWHITE(p[i]); ++i)
-		if (p[i] == '\\' && p[i + 1])
+	    জন্য (i = 0; p[i] && !VIM_ISWHITE(p[i]); ++i)
+		যদি (p[i] == '\\' && p[i + 1])
 		    ++i;
 
 	    mch_memmove(p, p + i, (p_end - (p + i)) + 1);	    // +1 for the NUL
@@ -714,99 +714,99 @@ remove_key_from_history(void)
 /*
  * :history command - print a history
  */
-    void
+    শূন্য
 ex_history(exarg_T *eap)
 {
     histentry_T	*hist;
-    int		histype1 = HIST_CMD;
-    int		histype2 = HIST_CMD;
-    int		hisidx1 = 1;
-    int		hisidx2 = -1;
-    int		idx;
-    int		i, j, k;
+    পূর্ণসংখ্যা		histype1 = HIST_CMD;
+    পূর্ণসংখ্যা		histype2 = HIST_CMD;
+    পূর্ণসংখ্যা		hisidx1 = 1;
+    পূর্ণসংখ্যা		hisidx2 = -1;
+    পূর্ণসংখ্যা		idx;
+    পূর্ণসংখ্যা		i, j, k;
     char_u	*end;
     char_u	*arg = eap->arg;
 
-    if (hislen == 0)
+    যদি (hislen == 0)
     {
-	msg(_("'history' option is zero"));
-	return;
+	বার্তা(_("'history' option is zero"));
+	ফেরত;
     }
 
-    if (!(VIM_ISDIGIT(*arg) || *arg == '-' || *arg == ','))
+    যদি (!(VIM_ISDIGIT(*arg) || *arg == '-' || *arg == ','))
     {
 	end = arg;
-	while (ASCII_ISALPHA(*end)
-		|| vim_strchr((char_u *)":=@>/?", *end) != NULL)
+	যখন (ASCII_ISALPHA(*end)
+		|| vim_strchr((char_u *)":=@>/?", *end) != ফাঁকা)
 	    end++;
 	i = *end;
 	*end = NUL;
 	histype1 = get_histtype(arg);
-	if (histype1 == -1)
+	যদি (histype1 == -1)
 	{
-	    if (STRNICMP(arg, "all", STRLEN(arg)) == 0)
+	    যদি (STRNICMP(arg, "all", STRLEN(arg)) == 0)
 	    {
 		histype1 = 0;
-		histype2 = HIST_COUNT-1;
+		histype2 = HIST_গুনতি-1;
 	    }
-	    else
+	    অন্যথা
 	    {
 		*end = i;
 		semsg(_(e_trailing_characters_str), arg);
-		return;
+		ফেরত;
 	    }
 	}
-	else
+	অন্যথা
 	    histype2 = histype1;
 	*end = i;
     }
-    else
+    অন্যথা
 	end = arg;
-    if (!get_list_range(&end, &hisidx1, &hisidx2) || *end != NUL)
+    যদি (!get_list_range(&end, &hisidx1, &hisidx2) || *end != NUL)
     {
-	if (*end != NUL)
+	যদি (*end != NUL)
 	    semsg(_(e_trailing_characters_str), end);
-	else
+	অন্যথা
 	    semsg(_(e_val_too_large), arg);
-	return;
+	ফেরত;
     }
 
-    for (; !got_int && histype1 <= histype2; ++histype1)
+    জন্য (; !got_int && histype1 <= histype2; ++histype1)
     {
-	vim_snprintf((char *)IObuff, IOSIZE, "\n      #  %s history", history_names[histype1]);
-	msg_puts_title((char *)IObuff);
+	vim_snprintf((অক্ষর *)IObuff, IOSIZE, "\n      #  %s history", history_names[histype1]);
+	বার্তা_puts_title((অক্ষর *)IObuff);
 	idx = hisidx[histype1];
 	hist = history[histype1];
 	j = hisidx1;
 	k = hisidx2;
-	if (j < 0)
+	যদি (j < 0)
 	    j = (-j > hislen) ? 0 : hist[(hislen + j + idx + 1) % hislen].hisnum;
-	if (k < 0)
+	যদি (k < 0)
 	    k = (-k > hislen) ? 0 : hist[(hislen + k + idx + 1) % hislen].hisnum;
-	if (idx >= 0 && j <= k)
-	    for (i = idx + 1; !got_int; ++i)
+	যদি (idx >= 0 && j <= k)
+	    জন্য (i = idx + 1; !got_int; ++i)
 	    {
-		if (i == hislen)
+		যদি (i == hislen)
 		    i = 0;
-		if (hist[i].hisstr != NULL
+		যদি (hist[i].hisstr != ফাঁকা
 			&& hist[i].hisnum >= j && hist[i].hisnum <= k
 			&& !message_filtered(hist[i].hisstr))
 		{
-		    int  len;
+		    পূর্ণসংখ্যা  len;
 
-		    msg_putchar('\n');
-		    len = vim_snprintf((char *)IObuff, IOSIZE,
+		    বার্তা_putchar('\n');
+		    len = vim_snprintf((অক্ষর *)IObuff, IOSIZE,
 				"%c%6d  ", i == idx ? '>' : ' ', hist[i].hisnum);
-		    if (vim_strsize(hist[i].hisstr) > (int)Columns - 10)
+		    যদি (vim_strsize(hist[i].hisstr) > (পূর্ণসংখ্যা)Columns - 10)
 			trunc_string(hist[i].hisstr, IObuff + len,
-			     (int)Columns - 10, IOSIZE - (int)len);
-		    else
+			     (পূর্ণসংখ্যা)Columns - 10, IOSIZE - (পূর্ণসংখ্যা)len);
+		    অন্যথা
 			STRCPY(IObuff + len, hist[i].hisstr);
-		    msg_outtrans(IObuff);
+		    বার্তা_outtrans(IObuff);
 		    out_flush();
 		}
-		if (i == idx)
-		    break;
+		যদি (i == idx)
+		    বিরতি;
 	    }
     }
 }

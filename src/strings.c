@@ -12,7 +12,7 @@
  */
 
 #define USING_FLOAT_STUFF
-#include "vim.h"
+#অন্তর্ভাব "vim.h"
 
 /*
  * Copy "string" into newly allocated memory.
@@ -25,9 +25,9 @@ vim_strsave(char_u *string)
 
     len = STRLEN(string) + 1;
     p = alloc(len);
-    if (p != NULL)
+    যদি (p != ফাঁকা)
 	mch_memmove(p, string, len);
-    return p;
+    ফেরত p;
 }
 
 /*
@@ -42,12 +42,12 @@ vim_strnsave(char_u *string, size_t len)
     char_u	*p;
 
     p = alloc(len + 1);
-    if (p == NULL)
-	return NULL;
+    যদি (p == ফাঁকা)
+	ফেরত ফাঁকা;
 
     STRNCPY(p, string, len);
     p[len] = NUL;
-    return p;
+    ফেরত p;
 }
 
 /*
@@ -57,7 +57,7 @@ vim_strnsave(char_u *string, size_t len)
     char_u *
 vim_strsave_escaped(char_u *string, char_u *esc_chars)
 {
-    return vim_strsave_escaped_ext(string, esc_chars, '\\', FALSE);
+    ফেরত vim_strsave_escaped_ext(string, esc_chars, '\\', FALSE);
 }
 
 /*
@@ -69,67 +69,67 @@ vim_strsave_escaped(char_u *string, char_u *esc_chars)
 vim_strsave_escaped_ext(
     char_u	*string,
     char_u	*esc_chars,
-    int		cc,
-    int		bsl)
+    পূর্ণসংখ্যা		cc,
+    পূর্ণসংখ্যা		bsl)
 {
     char_u	*p;
     char_u	*p2;
     char_u	*escaped_string;
-    unsigned	length;
-    int		l;
+    unsigned	দৈর্ঘ্য;
+    পূর্ণসংখ্যা		l;
 
     // First count the number of backslashes required.
     // Then allocate the memory and insert them.
-    length = 1;				// count the trailing NUL
-    for (p = string; *p; p++)
+    দৈর্ঘ্য = 1;				// count the trailing NUL
+    জন্য (p = string; *p; p++)
     {
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	যদি (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	{
-	    length += l;		// count a multibyte char
+	    দৈর্ঘ্য += l;		// count a multibyte char
 	    p += l - 1;
-	    continue;
+	    চালু;
 	}
-	if (vim_strchr(esc_chars, *p) != NULL || (bsl && rem_backslash(p)))
-	    ++length;			// count a backslash
-	++length;			// count an ordinary char
+	যদি (vim_strchr(esc_chars, *p) != ফাঁকা || (bsl && rem_backslash(p)))
+	    ++দৈর্ঘ্য;			// count a backslash
+	++দৈর্ঘ্য;			// count an ordinary char
     }
-    escaped_string = alloc(length);
-    if (escaped_string == NULL)
-	return NULL;
+    escaped_string = alloc(দৈর্ঘ্য);
+    যদি (escaped_string == ফাঁকা)
+	ফেরত ফাঁকা;
     p2 = escaped_string;
-    for (p = string; *p; p++)
+    জন্য (p = string; *p; p++)
     {
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	যদি (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	{
 	    mch_memmove(p2, p, (size_t)l);
 	    p2 += l;
 	    p += l - 1;		// skip multibyte char
-	    continue;
+	    চালু;
 	}
-	if (vim_strchr(esc_chars, *p) != NULL || (bsl && rem_backslash(p)))
+	যদি (vim_strchr(esc_chars, *p) != ফাঁকা || (bsl && rem_backslash(p)))
 	    *p2++ = cc;
 	*p2++ = *p;
     }
     *p2 = NUL;
-    return escaped_string;
+    ফেরত escaped_string;
 }
 
 /*
  * Return TRUE when 'shell' has "csh" in the tail.
  */
-    int
-csh_like_shell(void)
+    পূর্ণসংখ্যা
+csh_like_shell(শূন্য)
 {
-    return (strstr((char *)gettail(p_sh), "csh") != NULL);
+    ফেরত (strstr((অক্ষর *)gettail(p_sh), "csh") != ফাঁকা);
 }
 
 /*
  * Return TRUE when 'shell' has "fish" in the tail.
  */
-    static int
-fish_like_shell(void)
+    স্থির পূর্ণসংখ্যা
+fish_like_shell(শূন্য)
 {
-    return (strstr((char *)gettail(p_sh), "fish") != NULL);
+    ফেরত (strstr((অক্ষর *)gettail(p_sh), "fish") != ফাঁকা);
 }
 
 /*
@@ -145,19 +145,19 @@ fish_like_shell(void)
  * Returns the result in allocated memory, NULL if we have run out.
  */
     char_u *
-vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
+vim_strsave_shellescape(char_u *string, পূর্ণসংখ্যা do_special, পূর্ণসংখ্যা do_newline)
 {
-    unsigned	length;
+    unsigned	দৈর্ঘ্য;
     char_u	*p;
     char_u	*d;
     char_u	*escaped_string;
     size_t	l;
-    int		csh_like;
-    int		fish_like;
+    পূর্ণসংখ্যা		csh_like;
+    পূর্ণসংখ্যা		fish_like;
     char_u	*shname;
-    int		powershell;
+    পূর্ণসংখ্যা		powershell;
 #ifdef MSWIN
-    int		double_quotes;
+    পূর্ণসংখ্যা		double_quotes;
 #endif
 
     // Only csh and similar shells expand '!' within single quotes.  For sh and
@@ -172,85 +172,85 @@ vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
 
     // PowerShell uses its own version for quoting single quotes
     shname = gettail(p_sh);
-    powershell = strstr((char *)shname, "pwsh") != NULL;
+    powershell = strstr((অক্ষর *)shname, "pwsh") != ফাঁকা;
 #ifdef MSWIN
-    powershell = powershell || strstr((char *)shname, "powershell") != NULL;
+    powershell = powershell || strstr((অক্ষর *)shname, "powershell") != ফাঁকা;
     // PowerShell only accepts single quotes so override shellslash.
     double_quotes = !powershell && !p_ssl;
 #endif
 
     // First count the number of extra bytes required.
-    length = (unsigned)STRLEN(string) + 3;  // two quotes and a trailing NUL
-    for (p = string; *p != NUL; MB_PTR_ADV(p))
+    দৈর্ঘ্য = (unsigned)STRLEN(string) + 3;  // two quotes and a trailing NUL
+    জন্য (p = string; *p != NUL; MB_PTR_ADV(p))
     {
 #ifdef MSWIN
-	if (double_quotes)
+	যদি (double_quotes)
 	{
-	    if (*p == '"')
-		++length;		// " -> ""
+	    যদি (*p == '"')
+		++দৈর্ঘ্য;		// " -> ""
 	}
-	else
+	অন্যথা
 #endif
-	if (*p == '\'')
+	যদি (*p == '\'')
 	{
-	    if (powershell)
-		length += 2;		// ' => ''
-	    else
-		length += 3;		// ' => '\''
+	    যদি (powershell)
+		দৈর্ঘ্য += 2;		// ' => ''
+	    অন্যথা
+		দৈর্ঘ্য += 3;		// ' => '\''
 	}
-	if ((*p == '\n' && (csh_like || do_newline))
+	যদি ((*p == '\n' && (csh_like || do_newline))
 		|| (*p == '!' && (csh_like || do_special)))
 	{
-	    ++length;			// insert backslash
-	    if (csh_like && do_special)
-		++length;		// insert backslash
+	    ++দৈর্ঘ্য;			// insert backslash
+	    যদি (csh_like && do_special)
+		++দৈর্ঘ্য;		// insert backslash
 	}
-	if (do_special && find_cmdline_var(p, &l) >= 0)
+	যদি (do_special && find_cmdline_var(p, &l) >= 0)
 	{
-	    ++length;			// insert backslash
+	    ++দৈর্ঘ্য;			// insert backslash
 	    p += l - 1;
 	}
-	if (*p == '\\' && fish_like)
-	    ++length;			// insert backslash
+	যদি (*p == '\\' && fish_like)
+	    ++দৈর্ঘ্য;			// insert backslash
     }
 
     // Allocate memory for the result and fill it.
-    escaped_string = alloc(length);
-    if (escaped_string != NULL)
+    escaped_string = alloc(দৈর্ঘ্য);
+    যদি (escaped_string != ফাঁকা)
     {
 	d = escaped_string;
 
 	// add opening quote
 #ifdef MSWIN
-	if (double_quotes)
+	যদি (double_quotes)
 	    *d++ = '"';
-	else
+	অন্যথা
 #endif
 	    *d++ = '\'';
 
-	for (p = string; *p != NUL; )
+	জন্য (p = string; *p != NUL; )
 	{
 #ifdef MSWIN
-	    if (double_quotes)
+	    যদি (double_quotes)
 	    {
-		if (*p == '"')
+		যদি (*p == '"')
 		{
 		    *d++ = '"';
 		    *d++ = '"';
 		    ++p;
-		    continue;
+		    চালু;
 		}
 	    }
-	    else
+	    অন্যথা
 #endif
-	    if (*p == '\'')
+	    যদি (*p == '\'')
 	    {
-		if (powershell)
+		যদি (powershell)
 		{
 		    *d++ = '\'';
 		    *d++ = '\'';
 		}
-		else
+		অন্যথা
 		{
 		    *d++ = '\'';
 		    *d++ = '\\';
@@ -258,30 +258,30 @@ vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
 		    *d++ = '\'';
 		}
 		++p;
-		continue;
+		চালু;
 	    }
-	    if ((*p == '\n' && (csh_like || do_newline))
+	    যদি ((*p == '\n' && (csh_like || do_newline))
 		    || (*p == '!' && (csh_like || do_special)))
 	    {
 		*d++ = '\\';
-		if (csh_like && do_special)
+		যদি (csh_like && do_special)
 		    *d++ = '\\';
 		*d++ = *p++;
-		continue;
+		চালু;
 	    }
-	    if (do_special && find_cmdline_var(p, &l) >= 0)
+	    যদি (do_special && find_cmdline_var(p, &l) >= 0)
 	    {
 		*d++ = '\\';		// insert backslash
 		memcpy(d, p, l);	// copy the var
 		d += l;
 		p += l;
-		continue;
+		চালু;
 	    }
-	    if (*p == '\\' && fish_like)
+	    যদি (*p == '\\' && fish_like)
 	    {
 		*d++ = '\\';
 		*d++ = *p++;
-		continue;
+		চালু;
 	    }
 
 	    MB_COPY_CHAR(p, d);
@@ -289,15 +289,15 @@ vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
 
 	// add terminating quote and finish with a NUL
 #ifdef MSWIN
-	if (double_quotes)
+	যদি (double_quotes)
 	    *d++ = '"';
-	else
+	অন্যথা
 #endif
 	    *d++ = '\'';
 	*d = NUL;
     }
 
-    return escaped_string;
+    ফেরত escaped_string;
 }
 
 /*
@@ -311,7 +311,7 @@ vim_strsave_up(char_u *string)
 
     p1 = vim_strsave(string);
     vim_strup(p1);
-    return p1;
+    ফেরত p1;
 }
 
 /*
@@ -325,34 +325,34 @@ vim_strnsave_up(char_u *string, size_t len)
 
     p1 = vim_strnsave(string, len);
     vim_strup(p1);
-    return p1;
+    ফেরত p1;
 }
 
 /*
  * ASCII lower-to-upper case translation, language independent.
  */
-    void
+    শূন্য
 vim_strup(
     char_u	*p)
 {
     char_u  *p2;
-    int	    c;
+    পূর্ণসংখ্যা	    c;
 
-    if (p == NULL)
-	return;
+    যদি (p == ফাঁকা)
+	ফেরত;
 
     p2 = p;
-    while ((c = *p2) != NUL)
+    যখন ((c = *p2) != NUL)
 	*p2++ = (c < 'a' || c > 'z') ? c : (c - 0x20);
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_SPELL)
+#যদি defined(FEAT_EVAL) || defined(FEAT_SPELL)
 /*
  * Make string "s" all upper-case and return it in allocated memory.
  * Handles multi-byte characters as well as possible.
  * Returns NULL when out of memory.
  */
-    static char_u *
+    স্থির char_u *
 strup_save(char_u *orig)
 {
     char_u	*p;
@@ -360,20 +360,20 @@ strup_save(char_u *orig)
 
     res = p = vim_strsave(orig);
 
-    if (res != NULL)
-	while (*p != NUL)
+    যদি (res != ফাঁকা)
+	যখন (*p != NUL)
 	{
-	    int		l;
+	    পূর্ণসংখ্যা		l;
 
-	    if (enc_utf8)
+	    যদি (enc_utf8)
 	    {
-		int	c, uc;
-		int	newl;
+		পূর্ণসংখ্যা	c, uc;
+		পূর্ণসংখ্যা	newl;
 		char_u	*s;
 
 		c = utf_ptr2char(p);
 		l = utf_ptr2len(p);
-		if (c == 0)
+		যদি (c == 0)
 		{
 		    // overlong sequence, use only the first byte
 		    c = *p;
@@ -384,13 +384,13 @@ strup_save(char_u *orig)
 		// Reallocate string when byte count changes.  This is rare,
 		// thus it's OK to do another malloc()/free().
 		newl = utf_char2len(uc);
-		if (newl != l)
+		যদি (newl != l)
 		{
 		    s = alloc(STRLEN(res) + 1 + newl - l);
-		    if (s == NULL)
+		    যদি (s == ফাঁকা)
 		    {
 			vim_free(res);
-			return NULL;
+			ফেরত ফাঁকা;
 		    }
 		    mch_memmove(s, res, p - res);
 		    STRCPY(s + (p - res) + newl, p + l);
@@ -402,16 +402,16 @@ strup_save(char_u *orig)
 		utf_char2bytes(uc, p);
 		p += newl;
 	    }
-	    else if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	    অন্যথা যদি (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 		p += l;		// skip multi-byte character
-	    else
+	    অন্যথা
 	    {
 		*p = TOUPPER_LOC(*p); // note that toupper() can be a macro
 		p++;
 	    }
 	}
 
-    return res;
+    ফেরত res;
 }
 
 /*
@@ -427,20 +427,20 @@ strlow_save(char_u *orig)
 
     res = p = vim_strsave(orig);
 
-    if (res != NULL)
-	while (*p != NUL)
+    যদি (res != ফাঁকা)
+	যখন (*p != NUL)
 	{
-	    int		l;
+	    পূর্ণসংখ্যা		l;
 
-	    if (enc_utf8)
+	    যদি (enc_utf8)
 	    {
-		int	c, lc;
-		int	newl;
+		পূর্ণসংখ্যা	c, lc;
+		পূর্ণসংখ্যা	newl;
 		char_u	*s;
 
 		c = utf_ptr2char(p);
 		l = utf_ptr2len(p);
-		if (c == 0)
+		যদি (c == 0)
 		{
 		    // overlong sequence, use only the first byte
 		    c = *p;
@@ -451,13 +451,13 @@ strlow_save(char_u *orig)
 		// Reallocate string when byte count changes.  This is rare,
 		// thus it's OK to do another malloc()/free().
 		newl = utf_char2len(lc);
-		if (newl != l)
+		যদি (newl != l)
 		{
 		    s = alloc(STRLEN(res) + 1 + newl - l);
-		    if (s == NULL)
+		    যদি (s == ফাঁকা)
 		    {
 			vim_free(res);
-			return NULL;
+			ফেরত ফাঁকা;
 		    }
 		    mch_memmove(s, res, p - res);
 		    STRCPY(s + (p - res) + newl, p + l);
@@ -469,29 +469,29 @@ strlow_save(char_u *orig)
 		utf_char2bytes(lc, p);
 		p += newl;
 	    }
-	    else if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	    অন্যথা যদি (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 		p += l;		// skip multi-byte character
-	    else
+	    অন্যথা
 	    {
 		*p = TOLOWER_LOC(*p); // note that tolower() can be a macro
 		p++;
 	    }
 	}
 
-    return res;
+    ফেরত res;
 }
 #endif
 
 /*
  * delete spaces at the end of a string
  */
-    void
+    শূন্য
 del_trailing_spaces(char_u *ptr)
 {
     char_u	*q;
 
     q = ptr + STRLEN(ptr);
-    while (--q > ptr && VIM_ISWHITE(q[0]) && q[-1] != '\\' && q[-1] != Ctrl_V)
+    যখন (--q > ptr && VIM_ISWHITE(q[0]) && q[-1] != '\\' && q[-1] != Ctrl_V)
 	*q = NUL;
 }
 
@@ -499,7 +499,7 @@ del_trailing_spaces(char_u *ptr)
  * Like strncpy(), but always terminate the result with one NUL.
  * "to" must be "len + 1" long!
  */
-    void
+    শূন্য
 vim_strncpy(char_u *to, char_u *from, size_t len)
 {
     STRNCPY(to, from, len);
@@ -510,18 +510,18 @@ vim_strncpy(char_u *to, char_u *from, size_t len)
  * Like strcat(), but make sure the result fits in "tosize" bytes and is
  * always NUL terminated. "from" and "to" may overlap.
  */
-    void
+    শূন্য
 vim_strcat(char_u *to, char_u *from, size_t tosize)
 {
     size_t tolen = STRLEN(to);
     size_t fromlen = STRLEN(from);
 
-    if (tolen + fromlen + 1 > tosize)
+    যদি (tolen + fromlen + 1 > tosize)
     {
 	mch_memmove(to + tolen, from, tosize - tolen - 1);
 	to[tosize - 1] = NUL;
     }
-    else
+    অন্যথা
 	mch_memmove(to + tolen, from, fromlen + 1);
 }
 
@@ -529,63 +529,63 @@ vim_strcat(char_u *to, char_u *from, size_t tosize)
  * A version of strlen() that has a maximum length.
  */
     size_t
-vim_strlen_maxlen(char *s, size_t maxlen)
+vim_strlen_maxlen(অক্ষর *s, size_t maxlen)
 {
     size_t i;
-    for (i = 0; i < maxlen; ++i)
-	if (s[i] == NUL)
-	    break;
-    return i;
+    জন্য (i = 0; i < maxlen; ++i)
+	যদি (s[i] == NUL)
+	    বিরতি;
+    ফেরত i;
 }
 
-#if !defined(HAVE_STRCASECMP) && !defined(HAVE_STRICMP)
+#যদি !defined(HAVE_STRCASECMP) && !defined(HAVE_STRICMP)
 /*
  * Compare two strings, ignoring case, using current locale.
  * Doesn't work for multi-byte characters.
  * return 0 for match, < 0 for smaller, > 0 for bigger
  */
-    int
-vim_stricmp(char *s1, char *s2)
+    পূর্ণসংখ্যা
+vim_stricmp(অক্ষর *s1, অক্ষর *s2)
 {
-    int		i;
+    পূর্ণসংখ্যা		i;
 
-    for (;;)
+    জন্য (;;)
     {
-	i = (int)TOLOWER_LOC(*s1) - (int)TOLOWER_LOC(*s2);
-	if (i != 0)
-	    return i;			    // this character different
-	if (*s1 == NUL)
-	    break;			    // strings match until NUL
+	i = (পূর্ণসংখ্যা)TOLOWER_LOC(*s1) - (পূর্ণসংখ্যা)TOLOWER_LOC(*s2);
+	যদি (i != 0)
+	    ফেরত i;			    // this character different
+	যদি (*s1 == NUL)
+	    বিরতি;			    // strings match until NUL
 	++s1;
 	++s2;
     }
-    return 0;				    // strings match
+    ফেরত 0;				    // strings match
 }
 #endif
 
-#if !defined(HAVE_STRNCASECMP) && !defined(HAVE_STRNICMP)
+#যদি !defined(HAVE_STRNCASECMP) && !defined(HAVE_STRNICMP)
 /*
  * Compare two strings, for length "len", ignoring case, using current locale.
  * Doesn't work for multi-byte characters.
  * return 0 for match, < 0 for smaller, > 0 for bigger
  */
-    int
-vim_strnicmp(char *s1, char *s2, size_t len)
+    পূর্ণসংখ্যা
+vim_strnicmp(অক্ষর *s1, অক্ষর *s2, size_t len)
 {
-    int		i;
+    পূর্ণসংখ্যা		i;
 
-    while (len > 0)
+    যখন (len > 0)
     {
-	i = (int)TOLOWER_LOC(*s1) - (int)TOLOWER_LOC(*s2);
-	if (i != 0)
-	    return i;			    // this character different
-	if (*s1 == NUL)
-	    break;			    // strings match until NUL
+	i = (পূর্ণসংখ্যা)TOLOWER_LOC(*s1) - (পূর্ণসংখ্যা)TOLOWER_LOC(*s2);
+	যদি (i != 0)
+	    ফেরত i;			    // this character different
+	যদি (*s1 == NUL)
+	    বিরতি;			    // strings match until NUL
 	++s1;
 	++s2;
 	--len;
     }
-    return 0;				    // strings match
+    ফেরত 0;				    // strings match
 }
 #endif
 
@@ -594,23 +594,23 @@ vim_strnicmp(char *s1, char *s2, size_t len)
  * (mostly matters for turkish locale where i I might be different).
  * return 0 for match, < 0 for smaller, > 0 for bigger
  */
-    int
-vim_strnicmp_asc(char *s1, char *s2, size_t len)
+    পূর্ণসংখ্যা
+vim_strnicmp_asc(অক্ষর *s1, অক্ষর *s2, size_t len)
 {
-    int                i = 0;
+    পূর্ণসংখ্যা                i = 0;
 
-    while (len > 0)
+    যখন (len > 0)
     {
 	i = TOLOWER_ASC(*s1) - TOLOWER_ASC(*s2);
-	if (i != 0)
-	    break;			// this character is different
-	if (*s1 == NUL)
-	    break;			// strings match until NUL
+	যদি (i != 0)
+	    বিরতি;			// this character is different
+	যদি (*s1 == NUL)
+	    বিরতি;			// strings match until NUL
 	++s1;
 	++s2;
 	--len;
     }
-    return i;
+    ফেরত i;
 }
 
 /*
@@ -620,57 +620,57 @@ vim_strnicmp_asc(char *s1, char *s2, size_t len)
  * end of the string.
  */
     char_u *
-vim_strchr(char_u *string, int c)
+vim_strchr(char_u *string, পূর্ণসংখ্যা c)
 {
     char_u	*p;
-    int		b;
+    পূর্ণসংখ্যা		b;
 
     p = string;
-    if (enc_utf8 && c > 0 && c < 0x80)
-	return vim_strbyte(string, c);
-    if (enc_utf8 && c >= 0x80)
+    যদি (enc_utf8 && c > 0 && c < 0x80)
+	ফেরত vim_strbyte(string, c);
+    যদি (enc_utf8 && c >= 0x80)
     {
-	while (*p != NUL)
+	যখন (*p != NUL)
 	{
-	    int l = utfc_ptr2len(p);
+	    পূর্ণসংখ্যা l = utfc_ptr2len(p);
 
 	    // Avoid matching an illegal byte here.
-	    if (utf_ptr2char(p) == c && l > 1)
-		return p;
+	    যদি (utf_ptr2char(p) == c && l > 1)
+		ফেরত p;
 	    p += l;
 	}
-	return NULL;
+	ফেরত ফাঁকা;
     }
-    if (enc_dbcs != 0 && c > 255)
+    যদি (enc_dbcs != 0 && c > 255)
     {
-	int	n2 = c & 0xff;
+	পূর্ণসংখ্যা	n2 = c & 0xff;
 
 	c = ((unsigned)c >> 8) & 0xff;
-	while ((b = *p) != NUL)
+	যখন ((b = *p) != NUL)
 	{
-	    if (b == c && p[1] == n2)
-		return p;
+	    যদি (b == c && p[1] == n2)
+		ফেরত p;
 	    p += (*mb_ptr2len)(p);
 	}
-	return NULL;
+	ফেরত ফাঁকা;
     }
-    if (has_mbyte)
+    যদি (has_mbyte)
     {
-	while ((b = *p) != NUL)
+	যখন ((b = *p) != NUL)
 	{
-	    if (b == c)
-		return p;
+	    যদি (b == c)
+		ফেরত p;
 	    p += (*mb_ptr2len)(p);
 	}
-	return NULL;
+	ফেরত ফাঁকা;
     }
-    while ((b = *p) != NUL)
+    যখন ((b = *p) != NUL)
     {
-	if (b == c)
-	    return p;
+	যদি (b == c)
+	    ফেরত p;
 	++p;
     }
-    return NULL;
+    ফেরত ফাঁকা;
 }
 
 /*
@@ -679,13 +679,13 @@ vim_strchr(char_u *string, int c)
  * pointer to the NUL at the end of the string.
  */
     char_u  *
-vim_strbyte(char_u *string, int c)
+vim_strbyte(char_u *string, পূর্ণসংখ্যা c)
 {
     // strchr() converts c to char and also matches the terminating NUL.
     // Keep the byte range and NUL behavior of this function.
-    if (c <= 0 || c > 255)
-	return NULL;
-    return (char_u *)strchr((char *)string, c);
+    যদি (c <= 0 || c > 255)
+	ফেরত ফাঁকা;
+    ফেরত (char_u *)strchr((অক্ষর *)string, c);
 }
 
 /*
@@ -697,18 +697,18 @@ vim_strbyte(char_u *string, int c)
  * Does not handle multi-byte char for "c"!
  */
     char_u  *
-vim_strrchr(char_u *string, int c)
+vim_strrchr(char_u *string, পূর্ণসংখ্যা c)
 {
-    char_u	*retval = NULL;
+    char_u	*retval = ফাঁকা;
     char_u	*p = string;
 
-    while (*p)
+    যখন (*p)
     {
-	if (*p == c)
+	যদি (*p == c)
 	    retval = p;
 	MB_PTR_ADV(p);
     }
-    return retval;
+    ফেরত retval;
 }
 
 /*
@@ -723,13 +723,13 @@ vim_strrchr(char_u *string, int c)
     char_u *
 vim_strpbrk(char_u *s, char_u *charset)
 {
-    while (*s)
+    যখন (*s)
     {
-	if (vim_strchr(charset, *s) != NULL)
-	    return s;
+	যদি (vim_strchr(charset, *s) != ফাঁকা)
+	    ফেরত s;
 	MB_PTR_ADV(s);
     }
-    return NULL;
+    ফেরত ফাঁকা;
 }
 # endif
 #endif
@@ -737,37 +737,37 @@ vim_strpbrk(char_u *s, char_u *charset)
 /*
  * Sort an array of strings.
  */
-static int sort_compare(const void *s1, const void *s2);
+স্থির পূর্ণসংখ্যা sort_compare(ধ্রুবক শূন্য *s1, ধ্রুবক শূন্য *s2);
 
-    static int
-sort_compare(const void *s1, const void *s2)
+    স্থির পূর্ণসংখ্যা
+sort_compare(ধ্রুবক শূন্য *s1, ধ্রুবক শূন্য *s2)
 {
-    return STRCMP(*(char **)s1, *(char **)s2);
+    ফেরত STRCMP(*(অক্ষর **)s1, *(অক্ষর **)s2);
 }
 
-    void
+    শূন্য
 sort_strings(
     char_u	**files,
-    int		count)
+    পূর্ণসংখ্যা		গুনতি)
 {
-    qsort((void *)files, (size_t)count, sizeof(char_u *), sort_compare);
+    qsort((শূন্য *)files, (size_t)গুনতি, আকার(char_u *), sort_compare);
 }
 
-#if defined(FEAT_QUICKFIX) || defined(FEAT_SPELL)
+#যদি defined(FEAT_QUICKFIX) || defined(FEAT_SPELL)
 /*
  * Return TRUE if string "s" contains a non-ASCII character (128 or higher).
  * When "s" is NULL FALSE is returned.
  */
-    int
+    পূর্ণসংখ্যা
 has_non_ascii(char_u *s)
 {
     char_u	*p;
 
-    if (s != NULL)
-	for (p = s; *p != NUL; ++p)
-	    if (*p >= 128)
-		return TRUE;
-    return FALSE;
+    যদি (s != ফাঁকা)
+	জন্য (p = s; *p != NUL; ++p)
+	    যদি (*p >= 128)
+		ফেরত TRUE;
+    ফেরত FALSE;
 }
 #endif
 
@@ -779,21 +779,21 @@ has_non_ascii(char_u *s)
 concat_str(char_u *str1, char_u *str2)
 {
     char_u  *dest;
-    size_t  l = str1 == NULL ? 0 : STRLEN(str1);
+    size_t  l = str1 == ফাঁকা ? 0 : STRLEN(str1);
 
-    dest = alloc(l + (str2 == NULL ? 0 : STRLEN(str2)) + 1L);
-    if (dest == NULL)
-	return NULL;
-    if (str1 == NULL)
+    dest = alloc(l + (str2 == ফাঁকা ? 0 : STRLEN(str2)) + 1L);
+    যদি (dest == ফাঁকা)
+	ফেরত ফাঁকা;
+    যদি (str1 == ফাঁকা)
 	*dest = NUL;
-    else
+    অন্যথা
 	STRCPY(dest, str1);
-    if (str2 != NULL)
+    যদি (str2 != ফাঁকা)
 	STRCPY(dest + l, str2);
-    return dest;
+    ফেরত dest;
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_RIGHTLEFT)
+#যদি defined(FEAT_EVAL) || defined(FEAT_RIGHTLEFT)
 /*
  * Reverse text into allocated memory.
  * Returns the allocated string, NULL when out of memory.
@@ -803,69 +803,69 @@ reverse_text(char_u *s)
 {
     size_t len = STRLEN(s);
     char_u *rev = alloc(len + 1);
-    if (rev == NULL)
-	return NULL;
+    যদি (rev == ফাঁকা)
+	ফেরত ফাঁকা;
 
-    for (size_t s_i = 0, rev_i = len; s_i < len; ++s_i)
+    জন্য (size_t s_i = 0, rev_i = len; s_i < len; ++s_i)
     {
-	if (has_mbyte)
+	যদি (has_mbyte)
 	{
-	    int mb_len = (*mb_ptr2len)(s + s_i);
+	    পূর্ণসংখ্যা mb_len = (*mb_ptr2len)(s + s_i);
 	    rev_i -= mb_len;
 	    mch_memmove(rev + rev_i, s + s_i, mb_len);
 	    s_i += mb_len - 1;
 	}
-	else
+	অন্যথা
 	    rev[--rev_i] = s[s_i];
     }
     rev[len] = NUL;
-    return rev;
+    ফেরত rev;
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 /*
  * Return string "str" in ' quotes, doubling ' characters.
  * If "str" is NULL an empty string is assumed.
  * If "function" is TRUE make it function('string').
  */
     char_u *
-string_quote(char_u *str, int function)
+string_quote(char_u *str, পূর্ণসংখ্যা function)
 {
     unsigned	len;
     char_u	*p, *r, *s;
 
     len = (function ? 13 : 3);
-    if (str != NULL)
+    যদি (str != ফাঁকা)
     {
 	len += (unsigned)STRLEN(str);
-	for (p = str; *p != NUL; MB_PTR_ADV(p))
-	    if (*p == '\'')
+	জন্য (p = str; *p != NUL; MB_PTR_ADV(p))
+	    যদি (*p == '\'')
 		++len;
     }
     s = r = alloc(len);
-    if (r == NULL)
-	return NULL;
+    যদি (r == ফাঁকা)
+	ফেরত ফাঁকা;
 
-    if (function)
+    যদি (function)
     {
 	STRCPY(r, "function('");
 	r += 10;
     }
-    else
+    অন্যথা
 	*r++ = '\'';
-    if (str != NULL)
-	for (p = str; *p != NUL; )
+    যদি (str != ফাঁকা)
+	জন্য (p = str; *p != NUL; )
 	{
-	    if (*p == '\'')
+	    যদি (*p == '\'')
 		*r++ = '\'';
 	    MB_COPY_CHAR(p, r);
 	}
     *r++ = '\'';
-    if (function)
+    যদি (function)
 	*r++ = ')';
     *r++ = NUL;
-    return s;
+    ফেরত s;
 }
 
 /*
@@ -873,118 +873,118 @@ string_quote(char_u *str, int function)
  * ignored if "ic" is TRUE.
  */
     long
-string_count(char_u *haystack, char_u *needle, int ic)
+string_গুনতি(char_u *haystack, char_u *needle, পূর্ণসংখ্যা ic)
 {
     long	n = 0;
     char_u	*p = haystack;
-    char_u	*next;
+    char_u	*পরবর্তী;
 
-    if (p == NULL || needle == NULL || *needle == NUL)
-	return 0;
+    যদি (p == ফাঁকা || needle == ফাঁকা || *needle == NUL)
+	ফেরত 0;
 
     size_t  needlelen = STRLEN(needle);
-    if (ic)
+    যদি (ic)
     {
-	while (*p != NUL)
+	যখন (*p != NUL)
 	{
-	    if (MB_STRNICMP(p, needle, needlelen) == 0)
+	    যদি (MB_STRNICMP(p, needle, needlelen) == 0)
 	    {
 		++n;
 		p += needlelen;
 	    }
-	    else
+	    অন্যথা
 		MB_PTR_ADV(p);
 	}
     }
-    else
-	while ((next = (char_u *)strstr((char *)p, (char *)needle)) != NULL)
+    অন্যথা
+	যখন ((পরবর্তী = (char_u *)strstr((অক্ষর *)p, (অক্ষর *)needle)) != ফাঁকা)
 	{
 	    ++n;
-	    p = next + needlelen;
+	    p = পরবর্তী + needlelen;
 	}
 
-    return n;
+    ফেরত n;
 }
 
 /*
  * Make a typval_T of the first character of "input" and store it in "output".
  * Return -1 on failure or v_string's length on success.
  */
-    static int
-copy_first_char_to_tv(char_u *input, typval_T *output)
+    স্থির পূর্ণসংখ্যা
+copy_first_char_to_tv(char_u *প্রবেশ, typval_T *output)
 {
     char_u	buf[MB_MAXBYTES + 1];
-    int		len;
+    পূর্ণসংখ্যা		len;
 
-    if (input == NULL || output == NULL)
-	return -1;
+    যদি (প্রবেশ == ফাঁকা || output == ফাঁকা)
+	ফেরত -1;
 
-    len = has_mbyte ? mb_ptr2len(input) : 1;
-    STRNCPY(buf, input, len);
+    len = has_mbyte ? mb_ptr2len(প্রবেশ) : 1;
+    STRNCPY(buf, প্রবেশ, len);
     buf[len] = NUL;
     output->v_type = VAR_STRING;
     output->vval.v_string = vim_strnsave(buf, len);
 
-    return output->vval.v_string == NULL ? -1 : len;
+    ফেরত output->vval.v_string == ফাঁকা ? -1 : len;
 }
 
 /*
  * Implementation of map() and filter() for a String. Apply "expr" to every
  * character in string "str" and return the result in "rettv".
  */
-    void
+    শূন্য
 string_filter_map(
 	char_u		*str,
 	filtermap_T	filtermap,
-	typval_T	*expr,
+	typval_T	*রাশিমালা,
 	typval_T	*rettv)
 {
     char_u	*p;
     typval_T	tv;
     garray_T	ga;
-    int		len = 0;
-    int		idx = 0;
-    int		rem;
+    পূর্ণসংখ্যা		len = 0;
+    পূর্ণসংখ্যা		idx = 0;
+    পূর্ণসংখ্যা		rem;
     typval_T	newtv;
     funccall_T	*fc;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ফাঁকা;
 
     // set_vim_var_nr() doesn't set the type
-    set_vim_var_type(VV_KEY, VAR_NUMBER);
+    set_vim_var_type(VV_চাবি, VAR_সংখ্যা);
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, &newtv);
+    fc = eval_রাশিমালা_get_funccal(রাশিমালা, &newtv);
 
-    ga_init2(&ga, sizeof(char), 80);
-    for (p = str; *p != NUL; p += len)
+    ga_init2(&ga, আকার(অক্ষর), 80);
+    জন্য (p = str; *p != NUL; p += len)
     {
 	len = copy_first_char_to_tv(p, &tv);
-	if (len < 0)
-	    break;
+	যদি (len < 0)
+	    বিরতি;
 
-	set_vim_var_nr(VV_KEY, idx);
-	if (filter_map_one(&tv, expr, filtermap, fc, &newtv, &rem) == FAIL
+	set_vim_var_nr(VV_চাবি, idx);
+	যদি (filter_map_one(&tv, রাশিমালা, filtermap, fc, &newtv, &rem) == FAIL
 		|| did_emsg)
 	{
 	    clear_tv(&newtv);
 	    clear_tv(&tv);
-	    break;
+	    বিরতি;
 	}
-	if (filtermap == FILTERMAP_MAP || filtermap == FILTERMAP_MAPNEW)
+	যদি (filtermap == FILTERMAP_MAP || filtermap == FILTERMAP_MAPNEW)
 	{
-	    if (newtv.v_type != VAR_STRING)
+	    যদি (newtv.v_type != VAR_STRING)
 	    {
 		clear_tv(&newtv);
 		clear_tv(&tv);
 		emsg(_(e_string_required));
-		break;
+		বিরতি;
 	    }
-	    else
+	    অন্যথা
 		ga_concat(&ga, newtv.vval.v_string);
 	}
-	else if (filtermap == FILTERMAP_FOREACH || !rem)
+	অন্যথা যদি (filtermap == FILTERMAP_FOREACH || !rem)
 	    ga_concat(&ga, tv.vval.v_string);
 
 	clear_tv(&newtv);
@@ -993,8 +993,8 @@ string_filter_map(
 	++idx;
     }
     ga_append(&ga, NUL);
-    rettv->vval.v_string = ga.ga_data;
-    if (fc != NULL)
+    rettv->vval.v_string = ga.ga_তথ্য;
+    যদি (fc != ফাঁকা)
 	remove_funccal();
 }
 
@@ -1003,126 +1003,126 @@ string_filter_map(
  * starting with the optional initial value "argvars[2]" and return the result
  * in "rettv".
  */
-    void
+    শূন্য
 string_reduce(
 	typval_T	*argvars,
-	typval_T	*expr,
+	typval_T	*রাশিমালা,
 	typval_T	*rettv)
 {
     char_u	*p = tv_get_string(&argvars[0]);
-    int		len;
+    পূর্ণসংখ্যা		len;
     typval_T	argv[3];
-    int		r;
-    int		called_emsg_start = called_emsg;
+    পূর্ণসংখ্যা		r;
+    পূর্ণসংখ্যা		called_emsg_start = called_emsg;
     funccall_T	*fc;
 
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    যদি (argvars[2].v_type == VAR_UNKNOWN)
     {
-	if (*p == NUL)
+	যদি (*p == NUL)
 	{
-	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_value), "String");
-	    return;
+	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_মান), "String");
+	    ফেরত;
 	}
 	len = copy_first_char_to_tv(p, rettv);
-	if (len < 0)
-	    return;
+	যদি (len < 0)
+	    ফেরত;
 	p += len;
     }
-    else if (check_for_string_arg(argvars, 2) == FAIL)
-	return;
-    else
+    অন্যথা যদি (check_for_string_arg(argvars, 2) == FAIL)
+	ফেরত;
+    অন্যথা
 	copy_tv(&argvars[2], rettv);
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, rettv);
+    fc = eval_রাশিমালা_get_funccal(রাশিমালা, rettv);
 
-    for ( ; *p != NUL; p += len)
+    জন্য ( ; *p != NUL; p += len)
     {
 	argv[0] = *rettv;
 	rettv->v_type = VAR_UNKNOWN;
 
 	len = copy_first_char_to_tv(p, &argv[1]);
-	if (len < 0)
+	যদি (len < 0)
 	{
 	    *rettv = argv[0];
-	    break;
+	    বিরতি;
 	}
 
-	r = eval_expr_typval(expr, TRUE, argv, 2, fc, rettv);
+	r = eval_রাশিমালা_typval(রাশিমালা, TRUE, argv, 2, fc, rettv);
 
 	clear_tv(&argv[0]);
 	clear_tv(&argv[1]);
-	if (r == FAIL || called_emsg != called_emsg_start)
-	    break;
+	যদি (r == FAIL || called_emsg != called_emsg_start)
+	    বিরতি;
     }
 
-    if (fc != NULL)
+    যদি (fc != ফাঁকা)
 	remove_funccal();
 }
 
 /*
  * Implementation of "byteidx()" and "byteidxcomp()" functions
  */
-    static void
-byteidx_common(typval_T *argvars, typval_T *rettv, int comp)
+    স্থির শূন্য
+byteidx_common(typval_T *argvars, typval_T *rettv, পূর্ণসংখ্যা comp)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_সংখ্যা = -1;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+		|| check_for_সংখ্যা_arg(argvars, 1) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL))
-	return;
+	ফেরত;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
-    varnumber_T	idx = tv_get_number_chk(&argvars[1], NULL);
-    if (str == NULL || idx < 0)
-	return;
+    varnumber_T	idx = tv_get_সংখ্যা_chk(&argvars[1], ফাঁকা);
+    যদি (str == ফাঁকা || idx < 0)
+	ফেরত;
 
     varnumber_T	utf16idx = FALSE;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    যদি (argvars[2].v_type != VAR_UNKNOWN)
     {
-	int error = FALSE;
+	পূর্ণসংখ্যা error = FALSE;
 	utf16idx = tv_get_bool_chk(&argvars[2], &error);
-	if (error)
-	    return;
-	if (utf16idx < 0 || utf16idx > 1)
+	যদি (error)
+	    ফেরত;
+	যদি (utf16idx < 0 || utf16idx > 1)
 	{
-	    semsg(_(e_using_number_as_bool_nr), utf16idx);
-	    return;
+	    semsg(_(e_using_সংখ্যা_as_bool_nr), utf16idx);
+	    ফেরত;
 	}
     }
 
-    int (*ptr2len)(char_u *);
-    if (enc_utf8 && comp)
+    পূর্ণসংখ্যা (*ptr2len)(char_u *);
+    যদি (enc_utf8 && comp)
 	ptr2len = utf_ptr2len;
-    else
+    অন্যথা
 	ptr2len = mb_ptr2len;
 
     char_u *t = str;
-    for ( ; idx > 0; idx--)
+    জন্য ( ; idx > 0; idx--)
     {
-	if (*t == NUL)		// EOL reached
-	    return;
-	if (utf16idx)
+	যদি (*t == NUL)		// EOL reached
+	    ফেরত;
+	যদি (utf16idx)
 	{
-	    int clen = ptr2len(t);
-	    int c = (clen > 1) ? utf_ptr2char(t) : *t;
-	    if (c > 0xFFFF)
+	    পূর্ণসংখ্যা clen = ptr2len(t);
+	    পূর্ণসংখ্যা c = (clen > 1) ? utf_ptr2char(t) : *t;
+	    যদি (c > 0xFFFF)
 		idx--;
-	    if (idx > 0)
+	    যদি (idx > 0)
 		t += clen;
 	}
-	else if (idx > 0)
+	অন্যথা যদি (idx > 0)
 	    t += ptr2len(t);
     }
-    rettv->vval.v_number = (varnumber_T)(t - str);
+    rettv->vval.v_সংখ্যা = (varnumber_T)(t - str);
 }
 
 /*
  * "byteidx()" function
  */
-    void
+    শূন্য
 f_byteidx(typval_T *argvars, typval_T *rettv)
 {
     byteidx_common(argvars, rettv, FALSE);
@@ -1131,7 +1131,7 @@ f_byteidx(typval_T *argvars, typval_T *rettv)
 /*
  * "byteidxcomp()" function
  */
-    void
+    শূন্য
 f_byteidxcomp(typval_T *argvars, typval_T *rettv)
 {
     byteidx_common(argvars, rettv, TRUE);
@@ -1140,114 +1140,114 @@ f_byteidxcomp(typval_T *argvars, typval_T *rettv)
 /*
  * "charidx()" function
  */
-    void
+    শূন্য
 f_charidx(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_সংখ্যা = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+    যদি (check_for_string_arg(argvars, 0) == FAIL
+		|| check_for_সংখ্যা_arg(argvars, 1) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL))
-	return;
+	ফেরত;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
-    varnumber_T	idx = tv_get_number_chk(&argvars[1], NULL);
-    if (str == NULL || idx < 0)
-	return;
+    varnumber_T	idx = tv_get_সংখ্যা_chk(&argvars[1], ফাঁকা);
+    যদি (str == ফাঁকা || idx < 0)
+	ফেরত;
 
     varnumber_T	countcc = FALSE;
     varnumber_T	utf16idx = FALSE;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    যদি (argvars[2].v_type != VAR_UNKNOWN)
     {
 	countcc = tv_get_bool(&argvars[2]);
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	যদি (argvars[3].v_type != VAR_UNKNOWN)
 	    utf16idx = tv_get_bool(&argvars[3]);
     }
 
-    int (*ptr2len)(char_u *);
-    if (enc_utf8 && countcc)
+    পূর্ণসংখ্যা (*ptr2len)(char_u *);
+    যদি (enc_utf8 && countcc)
 	ptr2len = utf_ptr2len;
-    else
+    অন্যথা
 	ptr2len = mb_ptr2len;
 
     char_u	*p;
-    int		len;
-    for (p = str, len = 0; utf16idx ? idx >= 0 : p <= str + idx; len++)
+    পূর্ণসংখ্যা		len;
+    জন্য (p = str, len = 0; utf16idx ? idx >= 0 : p <= str + idx; len++)
     {
-	if (*p == NUL)
+	যদি (*p == NUL)
 	{
 	    // If the index is exactly the number of bytes or utf-16 code units
 	    // in the string then return the length of the string in
 	    // characters.
-	    if (utf16idx ? (idx == 0) : (p == (str + idx)))
-		rettv->vval.v_number = len;
-	    return;
+	    যদি (utf16idx ? (idx == 0) : (p == (str + idx)))
+		rettv->vval.v_সংখ্যা = len;
+	    ফেরত;
 	}
-	if (utf16idx)
+	যদি (utf16idx)
 	{
 	    idx--;
-	    int clen = ptr2len(p);
-	    int c = (clen > 1) ? utf_ptr2char(p) : *p;
-	    if (c > 0xFFFF)
+	    পূর্ণসংখ্যা clen = ptr2len(p);
+	    পূর্ণসংখ্যা c = (clen > 1) ? utf_ptr2char(p) : *p;
+	    যদি (c > 0xFFFF)
 		idx--;
 	}
 	p += ptr2len(p);
     }
 
-    rettv->vval.v_number = len > 0 ? len - 1 : 0;
+    rettv->vval.v_সংখ্যা = len > 0 ? len - 1 : 0;
 }
 
 /*
  * Convert the string "str", from encoding "from" to encoding "to".
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 convert_string(string_T *str, char_u *from, char_u *to, string_T *ret)
 {
     vimconv_T	vimconv;
 
     vimconv.vc_type = CONV_NONE;
-    if (convert_setup(&vimconv, from, to) == FAIL)
-	return FAIL;
+    যদি (convert_setup(&vimconv, from, to) == FAIL)
+	ফেরত FAIL;
     vimconv.vc_fail = TRUE;
-    if (vimconv.vc_type == CONV_NONE)
+    যদি (vimconv.vc_type == CONV_NONE)
     {
-	ret->string = vim_strnsave(str->string, str->length);
-	if (ret->string == NULL)
-	    ret->length = 0;
-	else
-	    ret->length = str->length;
+	ret->string = vim_strnsave(str->string, str->দৈর্ঘ্য);
+	যদি (ret->string == ফাঁকা)
+	    ret->দৈর্ঘ্য = 0;
+	অন্যথা
+	    ret->দৈর্ঘ্য = str->দৈর্ঘ্য;
     }
-    else
+    অন্যথা
     {
-	int len = (int)str->length;
+	পূর্ণসংখ্যা len = (পূর্ণসংখ্যা)str->দৈর্ঘ্য;
 	ret->string = string_convert(&vimconv, str->string, &len);
-	ret->length = len;
+	ret->দৈর্ঘ্য = len;
     }
-    convert_setup(&vimconv, NULL, NULL);
+    convert_setup(&vimconv, ফাঁকা, ফাঁকা);
 
-    return (ret->string == NULL) ? FAIL : OK;
+    ফেরত (ret->string == ফাঁকা) ? FAIL : OK;
 }
 
 /*
  * Add the bytes from "str" to "blob".
  */
-    static void
+    স্থির শূন্য
 blob_from_string(char_u *str, blob_T *blob)
 {
-    int	    len = (int)STRLEN(str);
+    পূর্ণসংখ্যা	    len = (পূর্ণসংখ্যা)STRLEN(str);
     char_u  *dest;
 
-    if (len == 0)
-	return;
-    if (ga_grow(&blob->bv_ga, len) == FAIL)
-	return;
-    dest = (char_u *)blob->bv_ga.ga_data + blob->bv_ga.ga_len;
+    যদি (len == 0)
+	ফেরত;
+    যদি (ga_grow(&blob->bv_ga, len) == FAIL)
+	ফেরত;
+    dest = (char_u *)blob->bv_ga.ga_তথ্য + blob->bv_ga.ga_len;
     mch_memmove(dest, str, (size_t)len);
     // Translate newlines in the string to NUL characters
-    for (int i = 0; i < len; ++i)
-	if (dest[i] == NL)
+    জন্য (পূর্ণসংখ্যা i = 0; i < len; ++i)
+	যদি (dest[i] == NL)
 	    dest[i] = NUL;
     blob->bv_ga.ga_len += len;
 }
@@ -1260,45 +1260,45 @@ blob_from_string(char_u *str, blob_T *blob)
  * allocated string is returned and "start_idx" is moved forward by one byte.
  * On return, "start_idx" points to next byte to process in blob.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 string_from_blob(blob_T *blob, long *start_idx, string_T *ret)
 {
     long	blen = blob_len(blob);
     long	start = *start_idx;
     char_u	*src;
     char_u	*nl;
-    long	line_len;
+    long	সারি_len;
 
-    if (start >= blen)
+    যদি (start >= blen)
     {
 	ret->string = vim_strsave((char_u *)"");
-	ret->length = 0;
+	ret->দৈর্ঘ্য = 0;
 	*start_idx = blen;
-	return (ret->string == NULL) ? FAIL : OK;
+	ফেরত (ret->string == ফাঁকা) ? FAIL : OK;
     }
 
-    src = (char_u *)blob->bv_ga.ga_data + start;
+    src = (char_u *)blob->bv_ga.ga_তথ্য + start;
     nl = (char_u *)memchr(src, NL, (size_t)(blen - start));
-    line_len = (nl == NULL) ? (blen - start) : (long)(nl - src);
+    সারি_len = (nl == ফাঁকা) ? (blen - start) : (long)(nl - src);
 
-    ret->string = alloc(line_len + 1);
-    if (ret->string == NULL)
+    ret->string = alloc(সারি_len + 1);
+    যদি (ret->string == ফাঁকা)
     {
-	ret->length = 0;
-	return FAIL;
+	ret->দৈর্ঘ্য = 0;
+	ফেরত FAIL;
     }
-    if (line_len > 0)
-	mch_memmove(ret->string, src, (size_t)line_len);
-    ret->string[line_len] = NUL;
-    ret->length = (size_t)line_len;
+    যদি (সারি_len > 0)
+	mch_memmove(ret->string, src, (size_t)সারি_len);
+    ret->string[সারি_len] = NUL;
+    ret->দৈর্ঘ্য = (size_t)সারি_len;
 
     // A NUL byte in the blob represents a NL in the resulting string.
-    for (long i = 0; i < line_len; i++)
-	if (ret->string[i] == NUL)
+    জন্য (long i = 0; i < সারি_len; i++)
+	যদি (ret->string[i] == NUL)
 	    ret->string[i] = NL;
 
-    *start_idx = start + line_len + (nl != NULL ? 1 : 0);
-    return OK;
+    *start_idx = start + সারি_len + (nl != ফাঁকা ? 1 : 0);
+    ফেরত OK;
 }
 
 /*
@@ -1306,22 +1306,22 @@ string_from_blob(blob_T *blob, long *start_idx, string_T *ret)
  * For example: "ucs2be" -> "ucs-2be", "utf16le" -> "utf-16le"
  * Returns allocated string or NULL on allocation failure.
  */
-    static char_u *
+    স্থির char_u *
 normalize_encoding_name(char_u *enc_skipped)
 {
     char_u *from_encoding_raw = alloc(STRLEN(enc_skipped) + 3);
-    if (from_encoding_raw == NULL)
-	return NULL;
+    যদি (from_encoding_raw == ফাঁকা)
+	ফেরত ফাঁকা;
 
     char_u *s = enc_skipped;
     char_u *pe = from_encoding_raw;
 
     // Convert to lowercase and replace '_' with '-'
-    while (*s != NUL)
+    যখন (*s != NUL)
     {
-	if (*s == '_')
+	যদি (*s == '_')
 	    *pe++ = '-';
-	else
+	অন্যথা
 	    *pe++ = TOLOWER_ASC(*s);
 	++s;
     }
@@ -1329,7 +1329,7 @@ normalize_encoding_name(char_u *enc_skipped)
 
     // Add hyphen before digit: "ucs2be" -> "ucs-2be", "utf16le" -> "utf-16le"
     char_u *p = from_encoding_raw;
-    if ((STRNCMP(p, "ucs", 3) == 0 && VIM_ISDIGIT(p[3]) && p[3] != NUL && p[4] != '-') ||
+    যদি ((STRNCMP(p, "ucs", 3) == 0 && VIM_ISDIGIT(p[3]) && p[3] != NUL && p[4] != '-') ||
 	(STRNCMP(p, "utf", 3) == 0 && VIM_ISDIGIT(p[3]) && p[3] != NUL && p[4] != '-'))
     {
 	// Insert hyphen after "ucs" or "utf": "ucs2" -> "ucs-2"
@@ -1337,117 +1337,117 @@ normalize_encoding_name(char_u *enc_skipped)
 	p[3] = '-';
     }
 
-    return from_encoding_raw;
+    ফেরত from_encoding_raw;
 }
 
 /*
  * "blob2str()" function
  * Converts a blob to a string, ensuring valid UTF-8 encoding.
  */
-    static void
+    স্থির শূন্য
 append_converted_string_to_list(
 	string_T *converted,
-	int validate_utf8,
+	পূর্ণসংখ্যা validate_utf8,
 	list_T *list,
 	char_u *from_encoding)
 {
-    if (converted->string != NULL)
+    যদি (converted->string != ফাঁকা)
     {
 	// After conversion, the output is a valid UTF-8 string (NUL-terminated)
 	// Split by newlines and add to list
 	char_u *p = converted->string;
-	char_u *end = converted->string + converted->length;
-	while (p < end)
+	char_u *end = converted->string + converted->দৈর্ঘ্য;
+	যখন (p < end)
 	{
-	    string_T	line;
-	    char_u	*line_start = p;
+	    string_T	সারি;
+	    char_u	*সারি_start = p;
 
-	    while (p < end && *p != NL)
+	    যখন (p < end && *p != NL)
 		p++;
 
 	    // Add this line to the result list
-	    line.length = (size_t)(p - line_start);
-	    line.string = vim_strnsave(line_start, line.length);
-	    if (line.string != NULL)
+	    সারি.দৈর্ঘ্য = (size_t)(p - সারি_start);
+	    সারি.string = vim_strnsave(সারি_start, সারি.দৈর্ঘ্য);
+	    যদি (সারি.string != ফাঁকা)
 	    {
-		if (validate_utf8 && !utf_valid_string(line.string, NULL))
+		যদি (validate_utf8 && !utf_valid_string(সারি.string, ফাঁকা))
 		{
-		    vim_free(line.string);
+		    vim_free(সারি.string);
 		    semsg(_(e_str_encoding_from_failed), p_enc);
 		    vim_free(converted->string);
-		    return; // Stop processing
+		    ফেরত; // Stop processing
 		}
-		if (list_append_string(list, line.string, (int)line.length) == FAIL)
+		যদি (list_append_string(list, সারি.string, (পূর্ণসংখ্যা)সারি.দৈর্ঘ্য) == FAIL)
 		{
-		    vim_free(line.string);
+		    vim_free(সারি.string);
 		    vim_free(converted->string);
-		    return; // Stop processing on append failure
+		    ফেরত; // Stop processing on append failure
 		}
-		vim_free(line.string);
+		vim_free(সারি.string);
 	    }
-	    else
+	    অন্যথা
 	    {
 		// Allocation failure: report error and stop processing
 		emsg(_(e_out_of_memory));
 		vim_free(converted->string);
-		return;
+		ফেরত;
 	    }
 
-	    if (*p == NL)
+	    যদি (*p == NL)
 		p++;
 	}
 	vim_free(converted->string);
     }
-    else
+    অন্যথা
     {
 	semsg(_(e_str_encoding_from_failed), from_encoding);
     }
 }
 
-    static int
-append_validated_line_to_list(string_T *line, int validate_utf8, list_T *list)
+    স্থির পূর্ণসংখ্যা
+append_validated_সারি_to_list(string_T *সারি, পূর্ণসংখ্যা validate_utf8, list_T *list)
 {
-    if (validate_utf8 && !utf_valid_string(line->string, NULL))
+    যদি (validate_utf8 && !utf_valid_string(সারি->string, ফাঁকা))
     {
 	semsg(_(e_str_encoding_from_failed), p_enc);
-	vim_free(line->string);
-	return FAIL;
+	vim_free(সারি->string);
+	ফেরত FAIL;
     }
 
-    int ret = list_append_string(list, line->string, (int)line->length);
-    vim_free(line->string);
-    return ret;
+    পূর্ণসংখ্যা ret = list_append_string(list, সারি->string, (পূর্ণসংখ্যা)সারি->দৈর্ঘ্য);
+    vim_free(সারি->string);
+    ফেরত ret;
 }
 
-    void
+    শূন্য
 f_blob2str(typval_T *argvars, typval_T *rettv)
 {
     blob_T	*blob;
-    int		blen;
+    পূর্ণসংখ্যা		blen;
     long	idx;
-    int		validate_utf8 = FALSE;
+    পূর্ণসংখ্যা		validate_utf8 = FALSE;
 
-    if (check_for_blob_arg(argvars, 0) == FAIL
+    যদি (check_for_blob_arg(argvars, 0) == FAIL
 	    || check_for_opt_dict_arg(argvars, 1) == FAIL)
-	return;
+	ফেরত;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    যদি (rettv_list_alloc(rettv) == FAIL)
+	ফেরত;
 
     blob = argvars->vval.v_blob;
-    if (blob == NULL)
-	return;
+    যদি (blob == ফাঁকা)
+	ফেরত;
     blen = blob_len(blob);
 
-    char_u	*from_encoding = NULL;
-    char_u	*from_encoding_raw = NULL;  // Encoding name with endianness preserved for iconv
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    char_u	*from_encoding = ফাঁকা;
+    char_u	*from_encoding_raw = ফাঁকা;  // Encoding name with endianness preserved for iconv
+    যদি (argvars[1].v_type != VAR_UNKNOWN)
     {
 	dict_T *d = argvars[1].vval.v_dict;
-	if (d != NULL)
+	যদি (d != ফাঁকা)
 	{
 	    char_u *enc = dict_get_string(d, "encoding", FALSE);
-	    if (enc != NULL)
+	    যদি (enc != ফাঁকা)
 	    {
 		char_u *enc_skipped = enc_skip(enc);
 		from_encoding = enc_canonize(enc_skipped);
@@ -1455,20 +1455,20 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
 		// For iconv, preserve the endianness suffix by creating a normalized
 		// version with hyphens: "ucs2be" -> "ucs-2be", "utf16le" -> "utf-16le"
 		from_encoding_raw = normalize_encoding_name(enc_skipped);
-		if (from_encoding_raw == NULL)
+		যদি (from_encoding_raw == ফাঁকা)
 		{
 		    emsg(_(e_out_of_memory));
 		    VIM_CLEAR(from_encoding);
-		    return;
+		    ফেরত;
 		}
 	    }
 	}
     }
 
-    if (STRCMP(p_enc, "utf-8") == 0 || STRCMP(p_enc, "utf8") == 0)
+    যদি (STRCMP(p_enc, "utf-8") == 0 || STRCMP(p_enc, "utf8") == 0)
 	validate_utf8 = TRUE;
 
-    if (from_encoding != NULL && STRCMP(from_encoding, "none") == 0)
+    যদি (from_encoding != ফাঁকা && STRCMP(from_encoding, "none") == 0)
     {
 	validate_utf8 = FALSE;
 	VIM_CLEAR(from_encoding);
@@ -1476,23 +1476,23 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
     }
 
     // Special handling for UTF-16/UCS-2/UTF-32/UCS-4 encodings: convert entire blob before splitting by newlines
-    int from_prop = 0;
-    if (from_encoding != NULL)
+    পূর্ণসংখ্যা from_prop = 0;
+    যদি (from_encoding != ফাঁকা)
 	from_prop = enc_canon_props(from_encoding);
-    if (from_encoding != NULL && (from_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2WORD)))
+    যদি (from_encoding != ফাঁকা && (from_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2WORD)))
     {
 	// Build a temporary buffer from the blob as a whole
 	// Don't use string_from_blob() because it treats NUL as line separator
 	garray_T blob_ga;
-	int nul_size = (from_prop & ENC_4BYTE) ? 4 : 2;
-	ga_init2(&blob_ga, 1, blen + nul_size);
-	if (ga_grow(&blob_ga, blen + nul_size) == OK)
+	পূর্ণসংখ্যা nul_আকার = (from_prop & ENC_4BYTE) ? 4 : 2;
+	ga_init2(&blob_ga, 1, blen + nul_আকার);
+	যদি (ga_grow(&blob_ga, blen + nul_আকার) == OK)
 	{
-	    if (blen > 0)
-		mch_memmove(blob_ga.ga_data, blob->bv_ga.ga_data, (size_t)blen);
+	    যদি (blen > 0)
+		mch_memmove(blob_ga.ga_তথ্য, blob->bv_ga.ga_তথ্য, (size_t)blen);
 	    // NUL terminator (2 bytes for UTF-16/UCS-2, 4 bytes for UTF-32/UCS-4)
-	    vim_memset((char_u *)blob_ga.ga_data + blen, 0, (size_t)nul_size);
-	    blob_ga.ga_len = blen + nul_size;
+	    vim_memset((char_u *)blob_ga.ga_তথ্য + blen, 0, (size_t)nul_আকার);
+	    blob_ga.ga_len = blen + nul_আকার;
 	}
 
 	// Convert the entire blob at once
@@ -1500,60 +1500,60 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
 	vimconv.vc_type = CONV_NONE;
 	// Use raw encoding name for iconv to preserve endianness (utf-16be vs utf-16)
 	// from_encoding_raw is guaranteed non-NULL whenever from_encoding != NULL
-	if (convert_setup_ext(&vimconv, from_encoding_raw, FALSE, p_enc, FALSE) == FAIL)
+	যদি (convert_setup_ext(&vimconv, from_encoding_raw, FALSE, p_enc, FALSE) == FAIL)
 	{
 	    ga_clear(&blob_ga);
 	    semsg(_(e_str_encoding_from_failed), from_encoding);
-	    goto done;
+	    যাও done;
 	}
 	vimconv.vc_fail = TRUE;
 
 	// Use string_convert_ext with explicit input length
 	string_T    converted;
 
-	int len = blen;
+	পূর্ণসংখ্যা len = blen;
 	converted.string =
-	    string_convert_ext(&vimconv, (char_u *)blob_ga.ga_data, &len, NULL);
-	converted.length = len;
-	convert_setup(&vimconv, NULL, NULL);
+	    string_convert_ext(&vimconv, (char_u *)blob_ga.ga_তথ্য, &len, ফাঁকা);
+	converted.দৈর্ঘ্য = len;
+	convert_setup(&vimconv, ফাঁকা, ফাঁকা);
 	ga_clear(&blob_ga);
 	append_converted_string_to_list(&converted, validate_utf8, rettv->vval.v_list, from_encoding);
     }
-    else
+    অন্যথা
     {
 	// Original logic for non-UTF-16 encodings
 	idx = 0;
-	while (idx < blen)
+	যখন (idx < blen)
 	{
 	    string_T	str;
 
-	    if (string_from_blob(blob, &idx, &str) != OK)
-		break;
+	    যদি (string_from_blob(blob, &idx, &str) != OK)
+		বিরতি;
 
-	    if (from_encoding != NULL)
+	    যদি (from_encoding != ফাঁকা)
 	    {
 		// from_encoding_raw is guaranteed non-NULL whenever from_encoding != NULL
-		int	    res;
+		পূর্ণসংখ্যা	    res;
 		string_T    converted;
 
 		res = convert_string(&str, from_encoding_raw, p_enc, &converted);
 		vim_free(str.string);
-		if (res != OK)
+		যদি (res != OK)
 		{
 		    semsg(_(e_str_encoding_from_failed), from_encoding);
-		    goto done;
+		    যাও done;
 		}
 		str.string = converted.string;
-		str.length = converted.length;
+		str.দৈর্ঘ্য = converted.দৈর্ঘ্য;
 	    }
 
-	    if (append_validated_line_to_list(&str, validate_utf8, rettv->vval.v_list) == FAIL)
-		goto done;
+	    যদি (append_validated_সারি_to_list(&str, validate_utf8, rettv->vval.v_list) == FAIL)
+		যাও done;
 	}
     }
 
     // If the blob ends with a newline, we need to add another empty string.
-    if (blen > 0 && blob_get(blob, blen - 1) == NL)
+    যদি (blen > 0 && blob_get(blob, blen - 1) == NL)
 	list_append_string(rettv->vval.v_list, (char_u *)"", 0);
 
 done:
@@ -1564,35 +1564,35 @@ done:
 /*
  * "str2blob()" function
  */
-    void
+    শূন্য
 f_str2blob(typval_T *argvars, typval_T *rettv)
 {
     blob_T	*blob;
     list_T	*list;
     listitem_T	*li;
 
-    if (check_for_list_arg(argvars, 0) == FAIL
+    যদি (check_for_list_arg(argvars, 0) == FAIL
 	    || check_for_opt_dict_arg(argvars, 1) == FAIL)
-	return;
+	ফেরত;
 
-    if (rettv_blob_alloc(rettv) == FAIL)
-	return;
+    যদি (rettv_blob_alloc(rettv) == FAIL)
+	ফেরত;
 
     blob = rettv->vval.v_blob;
 
     list = argvars[0].vval.v_list;
-    if (list == NULL)
-	return;
+    যদি (list == ফাঁকা)
+	ফেরত;
 
-    char_u	*to_encoding = NULL;
-    char_u	*to_encoding_raw = NULL;  // Encoding name with endianness preserved for iconv
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    char_u	*to_encoding = ফাঁকা;
+    char_u	*to_encoding_raw = ফাঁকা;  // Encoding name with endianness preserved for iconv
+    যদি (argvars[1].v_type != VAR_UNKNOWN)
     {
 	dict_T *d = argvars[1].vval.v_dict;
-	if (d != NULL)
+	যদি (d != ফাঁকা)
 	{
 	    char_u *enc = dict_get_string(d, "encoding", FALSE);
-	    if (enc != NULL)
+	    যদি (enc != ফাঁকা)
 	    {
 		char_u *enc_skipped = enc_skip(enc);
 		to_encoding = enc_canonize(enc_skipped);
@@ -1600,11 +1600,11 @@ f_str2blob(typval_T *argvars, typval_T *rettv)
 		// For iconv, preserve the endianness suffix by creating a
 		// normalized version with hyphens: "utf16le" -> "utf-16le"
 		to_encoding_raw = normalize_encoding_name(enc_skipped);
-		if (to_encoding_raw == NULL)
+		যদি (to_encoding_raw == ফাঁকা)
 		{
 		    emsg(_(e_out_of_memory));
 		    VIM_CLEAR(to_encoding);
-		    return;
+		    ফেরত;
 		}
 	    }
 	}
@@ -1615,253 +1615,253 @@ f_str2blob(typval_T *argvars, typval_T *rettv)
     // the wide-encoded newline separators and embedded NUL bytes are preserved
     // (mirrors blob2str()).  convert_string() cannot be used here because it
     // treats every Unicode encoding as utf-8, leaving the bytes unconverted.
-    int to_prop = 0;
-    if (to_encoding != NULL)
+    পূর্ণসংখ্যা to_prop = 0;
+    যদি (to_encoding != ফাঁকা)
 	to_prop = enc_canon_props(to_encoding);
-    if (to_encoding != NULL && (to_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2WORD)))
+    যদি (to_encoding != ফাঁকা && (to_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2WORD)))
     {
 	garray_T	str_ga;
 
 	ga_init2(&str_ga, 1, 256);
-	FOR_ALL_LIST_ITEMS(list, li)
+	FOR_ALL_LIST_বস্তুসমূহ(list, li)
 	{
 	    char_u *s;
 
-	    if (li->li_tv.v_type != VAR_STRING)
-		continue;
+	    যদি (li->li_tv.v_type != VAR_STRING)
+		চালু;
 
 	    s = li->li_tv.vval.v_string;
 
 	    // Each list string item is separated by a newline in the blob
-	    if (li != list->lv_first)
+	    যদি (li != list->lv_first)
 		ga_append(&str_ga, NL);
-	    if (s != NULL && *s != NUL)
+	    যদি (s != ফাঁকা && *s != NUL)
 	    {
-		int slen = (int)STRLEN(s);
+		পূর্ণসংখ্যা slen = (পূর্ণসংখ্যা)STRLEN(s);
 
-		if (ga_grow(&str_ga, slen) == FAIL)
+		যদি (ga_grow(&str_ga, slen) == FAIL)
 		{
 		    ga_clear(&str_ga);
-		    goto done;
+		    যাও done;
 		}
-		mch_memmove((char_u *)str_ga.ga_data + str_ga.ga_len, s,
+		mch_memmove((char_u *)str_ga.ga_তথ্য + str_ga.ga_len, s,
 								(size_t)slen);
 		str_ga.ga_len += slen;
 	    }
 	}
 
-	if (str_ga.ga_len > 0)
+	যদি (str_ga.ga_len > 0)
 	{
 	    vimconv_T	vimconv;
 
 	    vimconv.vc_type = CONV_NONE;
-	    if (convert_setup_ext(&vimconv, p_enc, FALSE, to_encoding_raw, FALSE)
+	    যদি (convert_setup_ext(&vimconv, p_enc, FALSE, to_encoding_raw, FALSE)
 								    == FAIL)
 	    {
 		ga_clear(&str_ga);
 		semsg(_(e_str_encoding_to_failed), to_encoding);
-		goto done;
+		যাও done;
 	    }
 	    vimconv.vc_fail = TRUE;
 
-	    int		len = str_ga.ga_len;
+	    পূর্ণসংখ্যা		len = str_ga.ga_len;
 	    char_u	*converted = string_convert_ext(&vimconv,
-				    (char_u *)str_ga.ga_data, &len, NULL);
-	    convert_setup(&vimconv, NULL, NULL);
+				    (char_u *)str_ga.ga_তথ্য, &len, ফাঁকা);
+	    convert_setup(&vimconv, ফাঁকা, ফাঁকা);
 	    ga_clear(&str_ga);
 
-	    if (converted == NULL)
+	    যদি (converted == ফাঁকা)
 	    {
 		semsg(_(e_str_encoding_to_failed), to_encoding);
-		goto done;
+		যাও done;
 	    }
-	    if (len > 0 && ga_grow(&blob->bv_ga, len) == OK)
+	    যদি (len > 0 && ga_grow(&blob->bv_ga, len) == OK)
 	    {
-		mch_memmove((char_u *)blob->bv_ga.ga_data + blob->bv_ga.ga_len,
+		mch_memmove((char_u *)blob->bv_ga.ga_তথ্য + blob->bv_ga.ga_len,
 						    converted, (size_t)len);
 		blob->bv_ga.ga_len += len;
 	    }
 	    vim_free(converted);
 	}
-	else
+	অন্যথা
 	    ga_clear(&str_ga);
     }
-    else
+    অন্যথা
     {
-	FOR_ALL_LIST_ITEMS(list, li)
+	FOR_ALL_LIST_বস্তুসমূহ(list, li)
 	{
-	    if (li->li_tv.v_type != VAR_STRING)
-		continue;
+	    যদি (li->li_tv.v_type != VAR_STRING)
+		চালু;
 
 	    string_T	str = {li->li_tv.vval.v_string, 0};
 
-	    if (str.string == NULL)
+	    যদি (str.string == ফাঁকা)
 		STR_LITERAL_SET(str, "");
-	    else
-		str.length = STRLEN(str.string);
+	    অন্যথা
+		str.দৈর্ঘ্য = STRLEN(str.string);
 
-	    if (to_encoding != NULL)
+	    যদি (to_encoding != ফাঁকা)
 	    {
-		int	    res;
+		পূর্ণসংখ্যা	    res;
 		string_T    converted;
 
 		res = convert_string(&str, p_enc, to_encoding, &converted);
-		if (res != OK)
+		যদি (res != OK)
 		{
 		    semsg(_(e_str_encoding_to_failed), to_encoding);
-		    goto done;
+		    যাও done;
 		}
 		str.string = converted.string;
-		str.length = converted.length;
+		str.দৈর্ঘ্য = converted.দৈর্ঘ্য;
 	    }
 
-	    if (li != list->lv_first)
+	    যদি (li != list->lv_first)
 		// Each list string item is separated by a newline in the blob
 		ga_append(&blob->bv_ga, NL);
 
 	    blob_from_string(str.string, blob);
 
-	    if (to_encoding != NULL)
+	    যদি (to_encoding != ফাঁকা)
 		vim_free(str.string);
 	}
     }
 
 done:
-    if (to_encoding != NULL)
+    যদি (to_encoding != ফাঁকা)
 	vim_free(to_encoding);
-    if (to_encoding_raw != NULL)
+    যদি (to_encoding_raw != ফাঁকা)
 	vim_free(to_encoding_raw);
 }
 
 /*
  * "str2list()" function
  */
-    void
+    শূন্য
 f_str2list(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		utf8 = FALSE;
+    পূর্ণসংখ্যা		utf8 = FALSE;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    যদি (rettv_list_alloc(rettv) == FAIL)
+	ফেরত;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	ফেরত;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	utf8 = (int)tv_get_bool_chk(&argvars[1], NULL);
+    যদি (argvars[1].v_type != VAR_UNKNOWN)
+	utf8 = (পূর্ণসংখ্যা)tv_get_bool_chk(&argvars[1], ফাঁকা);
 
     p = tv_get_string(&argvars[0]);
 
-    if (has_mbyte || utf8)
+    যদি (has_mbyte || utf8)
     {
-	int (*ptr2len)(char_u *);
-	int (*ptr2char)(char_u *);
+	পূর্ণসংখ্যা (*ptr2len)(char_u *);
+	পূর্ণসংখ্যা (*ptr2char)(char_u *);
 
-	if (utf8 || enc_utf8)
+	যদি (utf8 || enc_utf8)
 	{
 	    ptr2len = utf_ptr2len;
 	    ptr2char = utf_ptr2char;
 	}
-	else
+	অন্যথা
 	{
 	    ptr2len = mb_ptr2len;
 	    ptr2char = mb_ptr2char;
 	}
 
-	for ( ; *p != NUL; p += (*ptr2len)(p))
-	    list_append_number(rettv->vval.v_list, (*ptr2char)(p));
+	জন্য ( ; *p != NUL; p += (*ptr2len)(p))
+	    list_append_সংখ্যা(rettv->vval.v_list, (*ptr2char)(p));
     }
-    else
-	for ( ; *p != NUL; ++p)
-	    list_append_number(rettv->vval.v_list, *p);
+    অন্যথা
+	জন্য ( ; *p != NUL; ++p)
+	    list_append_সংখ্যা(rettv->vval.v_list, *p);
 }
 
 /*
  * "str2nr()" function
  */
-    void
+    শূন্য
 f_str2nr(typval_T *argvars, typval_T *rettv)
 {
-    int		base = 10;
+    পূর্ণসংখ্যা		base = 10;
     char_u	*p;
     varnumber_T	n;
-    int		what = 0;
-    int		isneg;
+    পূর্ণসংখ্যা		what = 0;
+    পূর্ণসংখ্যা		isneg;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+		|| check_for_opt_সংখ্যা_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 2) == FAIL)))
-	return;
+	ফেরত;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    যদি (argvars[1].v_type != VAR_UNKNOWN)
     {
-	base = (int)tv_get_number(&argvars[1]);
-	if (base != 2 && base != 8 && base != 10 && base != 16)
+	base = (পূর্ণসংখ্যা)tv_get_সংখ্যা(&argvars[1]);
+	যদি (base != 2 && base != 8 && base != 10 && base != 16)
 	{
 	    emsg(_(e_invalid_argument));
-	    return;
+	    ফেরত;
 	}
-	if (argvars[2].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[2]))
+	যদি (argvars[2].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[2]))
 	    what |= STR2NR_QUOTE;
     }
 
     p = skipwhite(tv_get_string_strict(&argvars[0]));
     isneg = (*p == '-');
-    if (*p == '+' || *p == '-')
+    যদি (*p == '+' || *p == '-')
 	p = skipwhite(p + 1);
-    switch (base)
+    নির্বাচন (base)
     {
-	case 2: what |= STR2NR_BIN + STR2NR_FORCE; break;
-	case 8: what |= STR2NR_OCT + STR2NR_OOCT + STR2NR_FORCE; break;
-	case 16: what |= STR2NR_HEX + STR2NR_FORCE; break;
+	ক্ষেত্র 2: what |= STR2NR_BIN + STR2NR_FORCE; বিরতি;
+	ক্ষেত্র 8: what |= STR2NR_OCT + STR2NR_OOCT + STR2NR_FORCE; বিরতি;
+	ক্ষেত্র 16: what |= STR2NR_HEX + STR2NR_FORCE; বিরতি;
     }
-    vim_str2nr(p, NULL, NULL, what, &n, NULL, 0, FALSE, NULL);
+    vim_str2nr(p, ফাঁকা, ফাঁকা, what, &n, ফাঁকা, 0, FALSE, ফাঁকা);
     // Text after the number is silently ignored.
-    if (isneg)
-	rettv->vval.v_number = -n;
-    else
-	rettv->vval.v_number = n;
+    যদি (isneg)
+	rettv->vval.v_সংখ্যা = -n;
+    অন্যথা
+	rettv->vval.v_সংখ্যা = n;
 
 }
 
 /*
  * "strgetchar()" function
  */
-    void
+    শূন্য
 f_strgetchar(typval_T *argvars, typval_T *rettv)
 {
     char_u	*str;
-    int		len;
-    int		error = FALSE;
-    int		charidx;
-    int		byteidx = 0;
+    পূর্ণসংখ্যা		len;
+    পূর্ণসংখ্যা		error = FALSE;
+    পূর্ণসংখ্যা		charidx;
+    পূর্ণসংখ্যা		byteidx = 0;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_সংখ্যা = -1;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_সংখ্যা_arg(argvars, 1) == FAIL))
+	ফেরত;
 
     str = tv_get_string_chk(&argvars[0]);
-    if (str == NULL)
-	return;
-    len = (int)STRLEN(str);
-    charidx = (int)tv_get_number_chk(&argvars[1], &error);
-    if (error)
-	return;
+    যদি (str == ফাঁকা)
+	ফেরত;
+    len = (পূর্ণসংখ্যা)STRLEN(str);
+    charidx = (পূর্ণসংখ্যা)tv_get_সংখ্যা_chk(&argvars[1], &error);
+    যদি (error)
+	ফেরত;
 
-    while (charidx >= 0 && byteidx < len)
+    যখন (charidx >= 0 && byteidx < len)
     {
-	if (charidx == 0)
+	যদি (charidx == 0)
 	{
-	    rettv->vval.v_number = mb_ptr2char(str + byteidx);
-	    break;
+	    rettv->vval.v_সংখ্যা = mb_ptr2char(str + byteidx);
+	    বিরতি;
 	}
 	--charidx;
 	byteidx += MB_CPTR2LEN(str + byteidx);
@@ -1871,7 +1871,7 @@ f_strgetchar(typval_T *argvars, typval_T *rettv)
 /*
  * "stridx()" function
  */
-    void
+    শূন্য
 f_stridx(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
@@ -1879,40 +1879,40 @@ f_stridx(typval_T *argvars, typval_T *rettv)
     char_u	*haystack;
     char_u	*save_haystack;
     char_u	*pos;
-    int		start_idx;
+    পূর্ণসংখ্যা		start_idx;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+		|| check_for_opt_সংখ্যা_arg(argvars, 2) == FAIL))
+	ফেরত;
 
     needle = tv_get_string_chk(&argvars[1]);
     save_haystack = haystack = tv_get_string_buf_chk(&argvars[0], buf);
-    rettv->vval.v_number = -1;
-    if (needle == NULL || haystack == NULL)
-	return;		// type error; errmsg already given
+    rettv->vval.v_সংখ্যা = -1;
+    যদি (needle == ফাঁকা || haystack == ফাঁকা)
+	ফেরত;		// type error; errmsg already given
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    যদি (argvars[2].v_type != VAR_UNKNOWN)
     {
-	int	    error = FALSE;
+	পূর্ণসংখ্যা	    error = FALSE;
 
-	start_idx = (int)tv_get_number_chk(&argvars[2], &error);
-	if (error || start_idx >= (int)STRLEN(haystack))
-	    return;
-	if (start_idx >= 0)
+	start_idx = (পূর্ণসংখ্যা)tv_get_সংখ্যা_chk(&argvars[2], &error);
+	যদি (error || start_idx >= (পূর্ণসংখ্যা)STRLEN(haystack))
+	    ফেরত;
+	যদি (start_idx >= 0)
 	    haystack += start_idx;
     }
 
-    pos	= (char_u *)strstr((char *)haystack, (char *)needle);
-    if (pos != NULL)
-	rettv->vval.v_number = (varnumber_T)(pos - save_haystack);
+    pos	= (char_u *)strstr((অক্ষর *)haystack, (অক্ষর *)needle);
+    যদি (pos != ফাঁকা)
+	rettv->vval.v_সংখ্যা = (varnumber_T)(pos - save_haystack);
 }
 
 /*
  * "string()" function
  */
-    void
+    শূন্য
 f_string(typval_T *argvars, typval_T *rettv)
 {
     char_u	*tofree;
@@ -1922,49 +1922,49 @@ f_string(typval_T *argvars, typval_T *rettv)
     rettv->vval.v_string = tv2string(&argvars[0], &tofree, numbuf,
 								get_copyID());
     // Make a copy if we have a value but it's not in allocated memory.
-    if (rettv->vval.v_string != NULL && tofree == NULL)
+    যদি (rettv->vval.v_string != ফাঁকা && tofree == ফাঁকা)
 	rettv->vval.v_string = vim_strsave(rettv->vval.v_string);
 }
 
 /*
  * "strlen()" function
  */
-    void
+    শূন্য
 f_strlen(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
-	    && check_for_string_or_number_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script()
+	    && check_for_string_or_সংখ্যা_arg(argvars, 0) == FAIL)
+	ফেরত;
 
-    rettv->vval.v_number = (varnumber_T)(STRLEN(
+    rettv->vval.v_সংখ্যা = (varnumber_T)(STRLEN(
 					      tv_get_string(&argvars[0])));
 }
 
-    static void
-strchar_common(typval_T *argvars, typval_T *rettv, int skipcc)
+    স্থির শূন্য
+strchar_common(typval_T *argvars, typval_T *rettv, পূর্ণসংখ্যা skipcc)
 {
     char_u		*s = tv_get_string(&argvars[0]);
     varnumber_T		len = 0;
-    int			(*func_mb_ptr2char_adv)(char_u **pp);
+    পূর্ণসংখ্যা			(*func_mb_ptr2char_adv)(char_u **pp);
 
     func_mb_ptr2char_adv = skipcc ? mb_ptr2char_adv : mb_cptr2char_adv;
-    while (*s != NUL)
+    যখন (*s != NUL)
     {
 	func_mb_ptr2char_adv(&s);
 	++len;
     }
-    rettv->vval.v_number = len;
+    rettv->vval.v_সংখ্যা = len;
 }
 
 /*
  * "strcharlen()" function
  */
-    void
+    শূন্য
 f_strcharlen(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
-	    && check_for_string_or_number_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script()
+	    && check_for_string_or_সংখ্যা_arg(argvars, 0) == FAIL)
+	ফেরত;
 
     strchar_common(argvars, rettv, TRUE);
 }
@@ -1972,26 +1972,26 @@ f_strcharlen(typval_T *argvars, typval_T *rettv)
 /*
  * "strchars()" function
  */
-    void
+    শূন্য
 f_strchars(typval_T *argvars, typval_T *rettv)
 {
     varnumber_T		skipcc = FALSE;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	ফেরত;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    যদি (argvars[1].v_type != VAR_UNKNOWN)
     {
-	int error = FALSE;
+	পূর্ণসংখ্যা error = FALSE;
 	skipcc = tv_get_bool_chk(&argvars[1], &error);
-	if (error)
-	    return;
-	if (skipcc < 0 || skipcc > 1)
+	যদি (error)
+	    ফেরত;
+	যদি (skipcc < 0 || skipcc > 1)
 	{
-	    semsg(_(e_using_number_as_bool_nr), skipcc);
-	    return;
+	    semsg(_(e_using_সংখ্যা_as_bool_nr), skipcc);
+	    ফেরত;
 	}
     }
 
@@ -2001,161 +2001,161 @@ f_strchars(typval_T *argvars, typval_T *rettv)
 /*
  * "strutf16len()" function
  */
-    void
+    শূন্য
 f_strutf16len(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_সংখ্যা = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
+    যদি (check_for_string_arg(argvars, 0) == FAIL
 	    || check_for_opt_bool_arg(argvars, 1) == FAIL)
-	return;
+	ফেরত;
 
     varnumber_T countcc = FALSE;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    যদি (argvars[1].v_type != VAR_UNKNOWN)
 	countcc = tv_get_bool(&argvars[1]);
 
     char_u		*s = tv_get_string(&argvars[0]);
     varnumber_T		len = 0;
-    int			(*func_mb_ptr2char_adv)(char_u **pp);
-    int			ch;
+    পূর্ণসংখ্যা			(*func_mb_ptr2char_adv)(char_u **pp);
+    পূর্ণসংখ্যা			ch;
 
     func_mb_ptr2char_adv = countcc ? mb_cptr2char_adv : mb_ptr2char_adv;
-    while (*s != NUL)
+    যখন (*s != NUL)
     {
 	ch = func_mb_ptr2char_adv(&s);
-	if (ch > 0xFFFF)
+	যদি (ch > 0xFFFF)
 	    ++len;
 	++len;
     }
-    rettv->vval.v_number = len;
+    rettv->vval.v_সংখ্যা = len;
 }
 
 /*
  * "strdisplaywidth()" function
  */
-    void
+    শূন্য
 f_strdisplaywidth(typval_T *argvars, typval_T *rettv)
 {
     char_u	*s;
-    int		col = 0;
+    পূর্ণসংখ্যা		col = 0;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_সংখ্যা = -1;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_সংখ্যা_arg(argvars, 1) == FAIL))
+	ফেরত;
 
     s = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	col = (int)tv_get_number(&argvars[1]);
+    যদি (argvars[1].v_type != VAR_UNKNOWN)
+	col = (পূর্ণসংখ্যা)tv_get_সংখ্যা(&argvars[1]);
 
-    rettv->vval.v_number = (varnumber_T)(linetabsize_col(col, s) - col);
+    rettv->vval.v_সংখ্যা = (varnumber_T)(linetabsize_col(col, s) - col);
 }
 
 /*
  * "strwidth()" function
  */
-    void
+    শূন্য
 f_strwidth(typval_T *argvars, typval_T *rettv)
 {
     char_u	*s;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ফেরত;
 
     s = tv_get_string_strict(&argvars[0]);
-    rettv->vval.v_number = (varnumber_T)(mb_string2cells(s, -1));
+    rettv->vval.v_সংখ্যা = (varnumber_T)(mb_string2cells(s, -1));
 }
 
 /*
  * "strcharpart()" function
  */
-    void
+    শূন্য
 f_strcharpart(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		nchar;
-    int		nbyte = 0;
-    int		charlen;
-    int		skipcc = FALSE;
-    int		len = 0;
-    int		slen;
-    int		error = FALSE;
+    পূর্ণসংখ্যা		nchar;
+    পূর্ণসংখ্যা		nbyte = 0;
+    পূর্ণসংখ্যা		charlen;
+    পূর্ণসংখ্যা		skipcc = FALSE;
+    পূর্ণসংখ্যা		len = 0;
+    পূর্ণসংখ্যা		slen;
+    পূর্ণসংখ্যা		error = FALSE;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL
+		|| check_for_সংখ্যা_arg(argvars, 1) == FAIL
+		|| check_for_opt_সংখ্যা_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL)))
-	return;
+	ফেরত;
 
     p = tv_get_string(&argvars[0]);
-    slen = (int)STRLEN(p);
+    slen = (পূর্ণসংখ্যা)STRLEN(p);
 
-    nchar = (int)tv_get_number_chk(&argvars[1], &error);
-    if (!error)
+    nchar = (পূর্ণসংখ্যা)tv_get_সংখ্যা_chk(&argvars[1], &error);
+    যদি (!error)
     {
-	if (argvars[2].v_type != VAR_UNKNOWN
+	যদি (argvars[2].v_type != VAR_UNKNOWN
 					   && argvars[3].v_type != VAR_UNKNOWN)
 	{
 	    skipcc = tv_get_bool_chk(&argvars[3], &error);
-	    if (error)
-		return;
-	    if (skipcc < 0 || skipcc > 1)
+	    যদি (error)
+		ফেরত;
+	    যদি (skipcc < 0 || skipcc > 1)
 	    {
-		semsg(_(e_using_number_as_bool_nr), skipcc);
-		return;
+		semsg(_(e_using_সংখ্যা_as_bool_nr), skipcc);
+		ফেরত;
 	    }
 	}
 
-	if (nchar > 0)
-	    while (nchar > 0 && nbyte < slen)
+	যদি (nchar > 0)
+	    যখন (nchar > 0 && nbyte < slen)
 	    {
-		if (skipcc)
+		যদি (skipcc)
 		    nbyte += mb_ptr2len(p + nbyte);
-		else
+		অন্যথা
 		    nbyte += MB_CPTR2LEN(p + nbyte);
 		--nchar;
 	    }
-	else
+	অন্যথা
 	    nbyte = nchar;
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	যদি (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    charlen = (int)tv_get_number(&argvars[2]);
-	    while (charlen > 0 && nbyte + len < slen)
+	    charlen = (পূর্ণসংখ্যা)tv_get_সংখ্যা(&argvars[2]);
+	    যখন (charlen > 0 && nbyte + len < slen)
 	    {
-		int off = nbyte + len;
+		পূর্ণসংখ্যা off = nbyte + len;
 
-		if (off < 0)
+		যদি (off < 0)
 		    len += 1;
-		else
+		অন্যথা
 		{
-		    if (skipcc)
+		    যদি (skipcc)
 			len += mb_ptr2len(p + off);
-		    else
+		    অন্যথা
 			len += MB_CPTR2LEN(p + off);
 		}
 		--charlen;
 	    }
 	}
-	else
+	অন্যথা
 	    len = slen - nbyte;    // default: all bytes that are available.
     }
 
     // Only return the overlap between the specified part and the actual
     // string.
-    if (nbyte < 0)
+    যদি (nbyte < 0)
     {
 	len += nbyte;
 	nbyte = 0;
     }
-    else if (nbyte > slen)
+    অন্যথা যদি (nbyte > slen)
 	nbyte = slen;
-    if (len < 0)
+    যদি (len < 0)
 	len = 0;
-    else if (nbyte + len > slen)
+    অন্যথা যদি (nbyte + len > slen)
 	len = slen - nbyte;
 
     rettv->v_type = VAR_STRING;
@@ -2165,54 +2165,54 @@ f_strcharpart(typval_T *argvars, typval_T *rettv)
 /*
  * "strpart()" function
  */
-    void
+    শূন্য
 f_strpart(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		n;
-    int		len;
-    int		slen;
-    int		error = FALSE;
+    পূর্ণসংখ্যা		n;
+    পূর্ণসংখ্যা		len;
+    পূর্ণসংখ্যা		slen;
+    পূর্ণসংখ্যা		error = FALSE;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL
+		|| check_for_সংখ্যা_arg(argvars, 1) == FAIL
+		|| check_for_opt_সংখ্যা_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL)))
-	return;
+	ফেরত;
 
     p = tv_get_string(&argvars[0]);
-    slen = (int)STRLEN(p);
+    slen = (পূর্ণসংখ্যা)STRLEN(p);
 
-    n = (int)tv_get_number_chk(&argvars[1], &error);
-    if (error)
+    n = (পূর্ণসংখ্যা)tv_get_সংখ্যা_chk(&argvars[1], &error);
+    যদি (error)
 	len = 0;
-    else if (argvars[2].v_type != VAR_UNKNOWN)
-	len = (int)tv_get_number(&argvars[2]);
-    else
+    অন্যথা যদি (argvars[2].v_type != VAR_UNKNOWN)
+	len = (পূর্ণসংখ্যা)tv_get_সংখ্যা(&argvars[2]);
+    অন্যথা
 	len = slen - n;	    // default len: all bytes that are available.
 
     // Only return the overlap between the specified part and the actual
     // string.
-    if (n < 0)
+    যদি (n < 0)
     {
 	len += n;
 	n = 0;
     }
-    else if (n > slen)
+    অন্যথা যদি (n > slen)
 	n = slen;
-    if (len < 0)
+    যদি (len < 0)
 	len = 0;
-    else if (n + len > slen)
+    অন্যথা যদি (n + len > slen)
 	len = slen - n;
 
-    if (argvars[2].v_type != VAR_UNKNOWN && argvars[3].v_type != VAR_UNKNOWN)
+    যদি (argvars[2].v_type != VAR_UNKNOWN && argvars[3].v_type != VAR_UNKNOWN)
     {
-	int off;
+	পূর্ণসংখ্যা off;
 
 	// length in characters
-	for (off = n; off < slen && len > 0; --len)
+	জন্য (off = n; off < slen && len > 0; --len)
 	    off += mb_ptr2len(p + off);
 	len = off - n;
     }
@@ -2224,70 +2224,70 @@ f_strpart(typval_T *argvars, typval_T *rettv)
 /*
  * "strridx()" function
  */
-    void
+    শূন্য
 f_strridx(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
     char_u	*needle;
     char_u	*haystack;
     char_u	*rest;
-    char_u	*lastmatch = NULL;
-    int		haystack_len, end_idx;
+    char_u	*lastmatch = ফাঁকা;
+    পূর্ণসংখ্যা		haystack_len, end_idx;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+		|| check_for_opt_সংখ্যা_arg(argvars, 2) == FAIL))
+	ফেরত;
 
     needle = tv_get_string_chk(&argvars[1]);
     haystack = tv_get_string_buf_chk(&argvars[0], buf);
 
-    rettv->vval.v_number = -1;
-    if (needle == NULL || haystack == NULL)
-	return;		// type error; errmsg already given
+    rettv->vval.v_সংখ্যা = -1;
+    যদি (needle == ফাঁকা || haystack == ফাঁকা)
+	ফেরত;		// type error; errmsg already given
 
-    haystack_len = (int)STRLEN(haystack);
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    haystack_len = (পূর্ণসংখ্যা)STRLEN(haystack);
+    যদি (argvars[2].v_type != VAR_UNKNOWN)
     {
 	// Third argument: upper limit for index
-	end_idx = (int)tv_get_number_chk(&argvars[2], NULL);
-	if (end_idx < 0)
-	    return;	// can never find a match
+	end_idx = (পূর্ণসংখ্যা)tv_get_সংখ্যা_chk(&argvars[2], ফাঁকা);
+	যদি (end_idx < 0)
+	    ফেরত;	// can never find a match
     }
-    else
+    অন্যথা
 	end_idx = haystack_len;
 
-    if (*needle == NUL)
+    যদি (*needle == NUL)
     {
 	// Empty string matches past the end.
 	lastmatch = haystack + end_idx;
     }
-    else
+    অন্যথা
     {
-	for (rest = haystack; *rest != '\0'; ++rest)
+	জন্য (rest = haystack; *rest != '\0'; ++rest)
 	{
-	    rest = (char_u *)strstr((char *)rest, (char *)needle);
-	    if (rest == NULL || rest > haystack + end_idx)
-		break;
+	    rest = (char_u *)strstr((অক্ষর *)rest, (অক্ষর *)needle);
+	    যদি (rest == ফাঁকা || rest > haystack + end_idx)
+		বিরতি;
 	    lastmatch = rest;
 	}
     }
 
-    if (lastmatch == NULL)
-	rettv->vval.v_number = -1;
-    else
-	rettv->vval.v_number = (varnumber_T)(lastmatch - haystack);
+    যদি (lastmatch == ফাঁকা)
+	rettv->vval.v_সংখ্যা = -1;
+    অন্যথা
+	rettv->vval.v_সংখ্যা = (varnumber_T)(lastmatch - haystack);
 }
 
 /*
  * "strtrans()" function
  */
-    void
+    শূন্য
 f_strtrans(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ফেরত;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = transstr(tv_get_string(&argvars[0]));
@@ -2300,73 +2300,73 @@ f_strtrans(typval_T *argvars, typval_T *rettv)
  * Converts a byte or character offset in a string to the corresponding UTF-16
  * code unit offset.
  */
-    void
+    শূন্য
 f_utf16idx(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_সংখ্যা = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
-	    || check_for_opt_number_arg(argvars, 1) == FAIL
+    যদি (check_for_string_arg(argvars, 0) == FAIL
+	    || check_for_opt_সংখ্যা_arg(argvars, 1) == FAIL
 	    || check_for_opt_bool_arg(argvars, 2) == FAIL
 	    || (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL))
-	    return;
+	    ফেরত;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
-    varnumber_T	idx = tv_get_number_chk(&argvars[1], NULL);
-    if (str == NULL || idx < 0)
-	return;
+    varnumber_T	idx = tv_get_সংখ্যা_chk(&argvars[1], ফাঁকা);
+    যদি (str == ফাঁকা || idx < 0)
+	ফেরত;
 
     varnumber_T	countcc = FALSE;
     varnumber_T	charidx = FALSE;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    যদি (argvars[2].v_type != VAR_UNKNOWN)
     {
 	countcc = tv_get_bool(&argvars[2]);
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	যদি (argvars[3].v_type != VAR_UNKNOWN)
 	    charidx = tv_get_bool(&argvars[3]);
     }
 
-    int (*ptr2len)(char_u *);
-    if (enc_utf8 && countcc)
+    পূর্ণসংখ্যা (*ptr2len)(char_u *);
+    যদি (enc_utf8 && countcc)
 	ptr2len = utf_ptr2len;
-    else
+    অন্যথা
 	ptr2len = mb_ptr2len;
 
     char_u	*p;
-    int		len;
-    int		utf16idx = 0;
-    for (p = str, len = 0; charidx ? idx >= 0 : p <= str + idx; len++)
+    পূর্ণসংখ্যা		len;
+    পূর্ণসংখ্যা		utf16idx = 0;
+    জন্য (p = str, len = 0; charidx ? idx >= 0 : p <= str + idx; len++)
     {
-	if (*p == NUL)
+	যদি (*p == NUL)
 	{
 	    // If the index is exactly the number of bytes or characters in the
 	    // string then return the length of the string in utf-16 code
 	    // units.
-	    if (charidx ? (idx == 0) : (p == (str + idx)))
-		rettv->vval.v_number = len;
-	    return;
+	    যদি (charidx ? (idx == 0) : (p == (str + idx)))
+		rettv->vval.v_সংখ্যা = len;
+	    ফেরত;
 	}
 	utf16idx = len;
-	int clen = ptr2len(p);
-	int c = (clen > 1) ? utf_ptr2char(p) : *p;
-	if (c > 0xFFFF)
+	পূর্ণসংখ্যা clen = ptr2len(p);
+	পূর্ণসংখ্যা c = (clen > 1) ? utf_ptr2char(p) : *p;
+	যদি (c > 0xFFFF)
 	    len++;
 	p += clen;
-	if (charidx)
+	যদি (charidx)
 	    idx--;
     }
 
-    rettv->vval.v_number = utf16idx;
+    rettv->vval.v_সংখ্যা = utf16idx;
 }
 
 /*
  * "tolower(string)" function
  */
-    void
+    শূন্য
 f_tolower(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ফেরত;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = strlow_save(tv_get_string(&argvars[0]));
@@ -2375,11 +2375,11 @@ f_tolower(typval_T *argvars, typval_T *rettv)
 /*
  * "toupper(string)" function
  */
-    void
+    শূন্য
 f_toupper(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ফেরত;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = strup_save(tv_get_string(&argvars[0]));
@@ -2388,29 +2388,29 @@ f_toupper(typval_T *argvars, typval_T *rettv)
 /*
  * "tr(string, fromstr, tostr)" function
  */
-    void
+    শূন্য
 f_tr(typval_T *argvars, typval_T *rettv)
 {
     char_u	*in_str;
     char_u	*fromstr;
     char_u	*tostr;
     char_u	*p;
-    int		inlen;
-    int		fromlen;
-    int		tolen;
-    int		idx;
+    পূর্ণসংখ্যা		inlen;
+    পূর্ণসংখ্যা		fromlen;
+    পূর্ণসংখ্যা		tolen;
+    পূর্ণসংখ্যা		idx;
     char_u	*cpstr;
-    int		cplen;
-    int		first = TRUE;
+    পূর্ণসংখ্যা		cplen;
+    পূর্ণসংখ্যা		first = TRUE;
     char_u	buf[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
     garray_T	ga;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 2) == FAIL))
-	return;
+	ফেরত;
 
     in_str = tv_get_string(&argvars[0]);
     fromstr = tv_get_string_buf_chk(&argvars[1], buf);
@@ -2418,195 +2418,195 @@ f_tr(typval_T *argvars, typval_T *rettv)
 
     // Default return value: empty string.
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
-    if (fromstr == NULL || tostr == NULL)
-	    return;		// type error; errmsg already given
-    ga_init2(&ga, sizeof(char), 80);
+    rettv->vval.v_string = ফাঁকা;
+    যদি (fromstr == ফাঁকা || tostr == ফাঁকা)
+	    ফেরত;		// type error; errmsg already given
+    ga_init2(&ga, আকার(অক্ষর), 80);
 
-    if (!has_mbyte)
+    যদি (!has_mbyte)
 	// not multi-byte: fromstr and tostr must be the same length
-	if (STRLEN(fromstr) != STRLEN(tostr))
+	যদি (STRLEN(fromstr) != STRLEN(tostr))
 	{
 error:
 	    semsg(_(e_invalid_argument_str), fromstr);
 	    ga_clear(&ga);
-	    return;
+	    ফেরত;
 	}
 
     // fromstr and tostr have to contain the same number of chars
-    while (*in_str != NUL)
+    যখন (*in_str != NUL)
     {
-	if (has_mbyte)
+	যদি (has_mbyte)
 	{
 	    inlen = (*mb_ptr2len)(in_str);
 	    cpstr = in_str;
 	    cplen = inlen;
 	    idx = 0;
-	    for (p = fromstr; *p != NUL; p += fromlen)
+	    জন্য (p = fromstr; *p != NUL; p += fromlen)
 	    {
 		fromlen = (*mb_ptr2len)(p);
-		if (fromlen == inlen && STRNCMP(in_str, p, inlen) == 0)
+		যদি (fromlen == inlen && STRNCMP(in_str, p, inlen) == 0)
 		{
-		    for (p = tostr; *p != NUL; p += tolen)
+		    জন্য (p = tostr; *p != NUL; p += tolen)
 		    {
 			tolen = (*mb_ptr2len)(p);
-			if (idx-- == 0)
+			যদি (idx-- == 0)
 			{
 			    cplen = tolen;
 			    cpstr = p;
-			    break;
+			    বিরতি;
 			}
 		    }
-		    if (*p == NUL)	// tostr is shorter than fromstr
-			goto error;
-		    break;
+		    যদি (*p == NUL)	// tostr is shorter than fromstr
+			যাও error;
+		    বিরতি;
 		}
 		++idx;
 	    }
 
-	    if (first && cpstr == in_str)
+	    যদি (first && cpstr == in_str)
 	    {
 		// Check that fromstr and tostr have the same number of
 		// (multi-byte) characters.  Done only once when a character
 		// of in_str doesn't appear in fromstr.
 		first = FALSE;
-		for (p = tostr; *p != NUL; p += tolen)
+		জন্য (p = tostr; *p != NUL; p += tolen)
 		{
 		    tolen = (*mb_ptr2len)(p);
 		    --idx;
 		}
-		if (idx != 0)
-		    goto error;
+		যদি (idx != 0)
+		    যাও error;
 	    }
 
-	    (void)ga_grow(&ga, cplen);
-	    mch_memmove((char *)ga.ga_data + ga.ga_len, cpstr, (size_t)cplen);
+	    (শূন্য)ga_grow(&ga, cplen);
+	    mch_memmove((অক্ষর *)ga.ga_তথ্য + ga.ga_len, cpstr, (size_t)cplen);
 	    ga.ga_len += cplen;
 
 	    in_str += inlen;
 	}
-	else
+	অন্যথা
 	{
 	    // When not using multi-byte chars we can do it faster.
 	    p = vim_strchr(fromstr, *in_str);
-	    if (p != NULL)
+	    যদি (p != ফাঁকা)
 		ga_append(&ga, tostr[p - fromstr]);
-	    else
+	    অন্যথা
 		ga_append(&ga, *in_str);
 	    ++in_str;
 	}
     }
 
     // add a terminating NUL
-    (void)ga_grow(&ga, 1);
+    (শূন্য)ga_grow(&ga, 1);
     ga_append(&ga, NUL);
 
-    rettv->vval.v_string = ga.ga_data;
+    rettv->vval.v_string = ga.ga_তথ্য;
 }
 
 /*
  * "trim({expr})" function
  */
-    void
+    শূন্য
 f_trim(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf1[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
-    char_u	*head;
-    char_u	*mask = NULL;
-    char_u	*tail;
-    char_u	*prev;
+    char_u	*শীর্ষ;
+    char_u	*mask = ফাঁকা;
+    char_u	*লেজ;
+    char_u	*পূর্ব;
     char_u	*p;
-    int		c1;
-    int		dir = 0;
+    পূর্ণসংখ্যা		c1;
+    পূর্ণসংখ্যা		dir = 0;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ফাঁকা;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_সংখ্যা_arg(argvars, 2) == FAIL)))
+	ফেরত;
 
-    head = tv_get_string_buf_chk(&argvars[0], buf1);
-    if (head == NULL)
-	return;
+    শীর্ষ = tv_get_string_buf_chk(&argvars[0], buf1);
+    যদি (শীর্ষ == ফাঁকা)
+	ফেরত;
 
-    if (check_for_opt_string_arg(argvars, 1) == FAIL)
-	return;
+    যদি (check_for_opt_string_arg(argvars, 1) == FAIL)
+	ফেরত;
 
-    if (argvars[1].v_type == VAR_STRING)
+    যদি (argvars[1].v_type == VAR_STRING)
     {
 	mask = tv_get_string_buf_chk(&argvars[1], buf2);
-	if (*mask == NUL)
-	    mask = NULL;
+	যদি (*mask == NUL)
+	    mask = ফাঁকা;
 
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	যদি (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    int	error = 0;
+	    পূর্ণসংখ্যা	error = 0;
 
 	    // leading or trailing characters to trim
-	    dir = (int)tv_get_number_chk(&argvars[2], &error);
-	    if (error)
-		return;
-	    if (dir < 0 || dir > 2)
+	    dir = (পূর্ণসংখ্যা)tv_get_সংখ্যা_chk(&argvars[2], &error);
+	    যদি (error)
+		ফেরত;
+	    যদি (dir < 0 || dir > 2)
 	    {
 		semsg(_(e_invalid_argument_str), tv_get_string(&argvars[2]));
-		return;
+		ফেরত;
 	    }
 	}
     }
 
-    if (dir == 0 || dir == 1)
+    যদি (dir == 0 || dir == 1)
     {
 	// Trim leading characters
-	while (*head != NUL)
+	যখন (*শীর্ষ != NUL)
 	{
-	    c1 = PTR2CHAR(head);
-	    if (mask == NULL)
+	    c1 = PTR2CHAR(শীর্ষ);
+	    যদি (mask == ফাঁকা)
 	    {
-		if (c1 > ' ' && c1 != 0xa0)
-		    break;
+		যদি (c1 > ' ' && c1 != 0xa0)
+		    বিরতি;
 	    }
-	    else
+	    অন্যথা
 	    {
-		for (p = mask; *p != NUL; MB_PTR_ADV(p))
-		    if (c1 == PTR2CHAR(p))
-			break;
-		if (*p == NUL)
-		    break;
+		জন্য (p = mask; *p != NUL; MB_PTR_ADV(p))
+		    যদি (c1 == PTR2CHAR(p))
+			বিরতি;
+		যদি (*p == NUL)
+		    বিরতি;
 	    }
-	    MB_PTR_ADV(head);
+	    MB_PTR_ADV(শীর্ষ);
 	}
     }
 
-    tail = head + STRLEN(head);
-    if (dir == 0 || dir == 2)
+    লেজ = শীর্ষ + STRLEN(শীর্ষ);
+    যদি (dir == 0 || dir == 2)
     {
 	// Trim trailing characters
-	for (; tail > head; tail = prev)
+	জন্য (; লেজ > শীর্ষ; লেজ = পূর্ব)
 	{
-	    prev = tail;
-	    MB_PTR_BACK(head, prev);
-	    c1 = PTR2CHAR(prev);
-	    if (mask == NULL)
+	    পূর্ব = লেজ;
+	    MB_PTR_BACK(শীর্ষ, পূর্ব);
+	    c1 = PTR2CHAR(পূর্ব);
+	    যদি (mask == ফাঁকা)
 	    {
-		if (c1 > ' ' && c1 != 0xa0)
-		    break;
+		যদি (c1 > ' ' && c1 != 0xa0)
+		    বিরতি;
 	    }
-	    else
+	    অন্যথা
 	    {
-		for (p = mask; *p != NUL; MB_PTR_ADV(p))
-		    if (c1 == PTR2CHAR(p))
-			break;
-		if (*p == NUL)
-		    break;
+		জন্য (p = mask; *p != NUL; MB_PTR_ADV(p))
+		    যদি (c1 == PTR2CHAR(p))
+			বিরতি;
+		যদি (*p == NUL)
+		    বিরতি;
 	    }
 	}
     }
-    rettv->vval.v_string = vim_strnsave(head, tail - head);
+    rettv->vval.v_string = vim_strnsave(শীর্ষ, লেজ - শীর্ষ);
 }
 
 /*
@@ -2625,69 +2625,69 @@ f_trim(typval_T *argvars, typval_T *rettv)
  *
  * Returns NULL if input is NULL or memory allocation fails.
  */
-    static char_u *
+    স্থির char_u *
 uri_decode(char_u *str)
 {
-    if (str == NULL)
-	return NULL;
+    যদি (str == ফাঁকা)
+	ফেরত ফাঁকা;
 
     size_t len = STRLEN(str);
 
     char_u *decoded = alloc(len + 1);
-    if (!decoded)
-	return NULL;
+    যদি (!decoded)
+	ফেরত ফাঁকা;
 
     char_u	*p = decoded;
     size_t	i = 0;
 
-    while (i < len)
+    যখন (i < len)
     {
-	if (str[i] == '%')
+	যদি (str[i] == '%')
 	{
-	    if (i + 2 >= len)
+	    যদি (i + 2 >= len)
 	    {
 		// Malformed encoding
 		*p++ = str[i++];
-		if (str[i] != NUL)
+		যদি (str[i] != NUL)
 		    *p++ = str[i++];
 	    }
-	    else
+	    অন্যথা
 	    {
-		int val = hexhex2nr(&str[i + 1]);
-		if (val != -1)
+		পূর্ণসংখ্যা val = hexhex2nr(&str[i + 1]);
+		যদি (val != -1)
 		{
 		    *p++ = (char_u)val;
 		    i += 3;
 		}
-		else
+		অন্যথা
 		{
 		    // invalid hex digits following "%"
-		    for (int j = 0; j < 3; j++)
+		    জন্য (পূর্ণসংখ্যা j = 0; j < 3; j++)
 			*p++ = str[i++];
 		}
 	    }
 
 	}
-	else
+	অন্যথা
 	    *p++ = str[i++];
     }
 
     *p = NUL;
 
-    return decoded;
+    ফেরত decoded;
 }
 
 /*
  * "uri_decode({str})" function
  */
-    void
+    শূন্য
 f_uridecode(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ফাঁকা;
 
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    যদি (check_for_string_arg(argvars, 0) == FAIL)
+	ফেরত;
 
     rettv->vval.v_string = uri_decode(tv_get_string(&argvars[0]));
 }
@@ -2706,76 +2706,76 @@ f_uridecode(typval_T *argvars, typval_T *rettv)
  *
  *   Returns NULL if input is NULL or memory allocation fails.
  */
-    static char_u *
+    স্থির char_u *
 uri_encode(char_u *str)
 {
-    if (str == NULL)
-	return NULL;
+    যদি (str == ফাঁকা)
+	ফেরত ফাঁকা;
 
     size_t len = STRLEN(str);
 
     // Worst case: every character needs encoding => 3x size + 1 for null
     // terminator
     char_u *encoded = alloc(len * 3 + 1);
-    if (encoded == NULL)
-	return NULL;
+    যদি (encoded == ফাঁকা)
+	ফেরত ফাঁকা;
 
     char_u *p = encoded;
 
-    for (size_t i = 0; i < len; ++i)
+    জন্য (size_t i = 0; i < len; ++i)
     {
 	char_u c = str[i];
-	if (ASCII_ISALNUM(c) || c == '-' || c == '_' || c == '.' || c == '~')
+	যদি (ASCII_ISALNUM(c) || c == '-' || c == '_' || c == '.' || c == '~')
 	    *p++ = c;
-	else
+	অন্যথা
 	{
-	    sprintf((char *)p, "%%%02X", c);
+	    sprintf((অক্ষর *)p, "%%%02X", c);
 	    p += 3;
 	}
     }
 
     *p = NUL;
 
-    return encoded;
+    ফেরত encoded;
 }
 
 /*
  * "uri_encode({str})" function
  */
-    void
+    শূন্য
 f_uriencode(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ফাঁকা;
 
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    যদি (check_for_string_arg(argvars, 0) == FAIL)
+	ফেরত;
 
     rettv->vval.v_string = uri_encode(tv_get_string(&argvars[0]));
 }
 
-static char *e_printf = N_(e_insufficient_arguments_for_printf);
+স্থির অক্ষর *e_printf = N_(e_insufficient_arguments_for_printf);
 
 /*
  * Get number argument from "idxp" entry in "tvs".  First entry is 1.
  */
-    static varnumber_T
-tv_nr(typval_T *tvs, int *idxp)
+    স্থির varnumber_T
+tv_nr(typval_T *tvs, পূর্ণসংখ্যা *idxp)
 {
-    int		idx = *idxp - 1;
+    পূর্ণসংখ্যা		idx = *idxp - 1;
     varnumber_T	n = 0;
-    int		err = FALSE;
+    পূর্ণসংখ্যা		err = FALSE;
 
-    if (tvs[idx].v_type == VAR_UNKNOWN)
+    যদি (tvs[idx].v_type == VAR_UNKNOWN)
 	emsg(_(e_printf));
-    else
+    অন্যথা
     {
 	++*idxp;
-	n = tv_get_number_chk(&tvs[idx], &err);
-	if (err)
+	n = tv_get_সংখ্যা_chk(&tvs[idx], &err);
+	যদি (err)
 	    n = 0;
     }
-    return n;
+    ফেরত n;
 }
 
 /*
@@ -2786,48 +2786,48 @@ tv_nr(typval_T *tvs, int *idxp)
  * a string with the same format as ":echo".  The caller must free "*tofree".
  * Returns NULL for an error.
  */
-    static char *
-tv_str(typval_T *tvs, int *idxp, char_u **tofree)
+    স্থির অক্ষর *
+tv_str(typval_T *tvs, পূর্ণসংখ্যা *idxp, char_u **tofree)
 {
-    int		    idx = *idxp - 1;
-    char	    *s = NULL;
-    static char_u   numbuf[NUMBUFLEN];
+    পূর্ণসংখ্যা		    idx = *idxp - 1;
+    অক্ষর	    *s = ফাঁকা;
+    স্থির char_u   numbuf[NUMBUFLEN];
 
-    if (tvs[idx].v_type == VAR_UNKNOWN)
+    যদি (tvs[idx].v_type == VAR_UNKNOWN)
 	emsg(_(e_printf));
-    else
+    অন্যথা
     {
 	++*idxp;
-	if (tofree != NULL)
-	    s = (char *)echo_string(&tvs[idx], tofree, numbuf, get_copyID());
-	else
-	    s = (char *)tv_get_string_chk(&tvs[idx]);
+	যদি (tofree != ফাঁকা)
+	    s = (অক্ষর *)echo_string(&tvs[idx], tofree, numbuf, get_copyID());
+	অন্যথা
+	    s = (অক্ষর *)tv_get_string_chk(&tvs[idx]);
     }
-    return s;
+    ফেরত s;
 }
 
 /*
  * Get float argument from "idxp" entry in "tvs".  First entry is 1.
  */
-    static double
-tv_float(typval_T *tvs, int *idxp)
+    স্থির দ্বিগুণ
+tv_float(typval_T *tvs, পূর্ণসংখ্যা *idxp)
 {
-    int		idx = *idxp - 1;
-    double	f = 0;
+    পূর্ণসংখ্যা		idx = *idxp - 1;
+    দ্বিগুণ	f = 0;
 
-    if (tvs[idx].v_type == VAR_UNKNOWN)
+    যদি (tvs[idx].v_type == VAR_UNKNOWN)
 	emsg(_(e_printf));
-    else
+    অন্যথা
     {
 	++*idxp;
-	if (tvs[idx].v_type == VAR_FLOAT)
+	যদি (tvs[idx].v_type == VAR_FLOAT)
 	    f = tvs[idx].vval.v_float;
-	else if (tvs[idx].v_type == VAR_NUMBER)
-	    f = (double)tvs[idx].vval.v_number;
-	else
+	অন্যথা যদি (tvs[idx].v_type == VAR_সংখ্যা)
+	    f = (দ্বিগুণ)tvs[idx].vval.v_সংখ্যা;
+	অন্যথা
 	    emsg(_(e_expected_float_argument_for_printf));
     }
-    return f;
+    ফেরত f;
 }
 
 #endif
@@ -2836,22 +2836,22 @@ tv_float(typval_T *tvs, int *idxp)
  * Return the representation of infinity for printf() function:
  * "-inf", "inf", "+inf", " inf", "-INF", "INF", "+INF" or " INF".
  */
-    static const char *
-infinity_str(int positive,
-	     char fmt_spec,
-	     int force_sign,
-	     int space_for_positive)
+    স্থির ধ্রুবক অক্ষর *
+infinity_str(পূর্ণসংখ্যা positive,
+	     অক্ষর fmt_spec,
+	     পূর্ণসংখ্যা force_sign,
+	     পূর্ণসংখ্যা space_for_positive)
 {
-    static const char *table[] =
+    স্থির ধ্রুবক অক্ষর *table[] =
     {
 	"-inf", "inf", "+inf", " inf",
 	"-INF", "INF", "+INF", " INF"
     };
-    int idx = positive * (1 + force_sign + force_sign * space_for_positive);
+    পূর্ণসংখ্যা idx = positive * (1 + force_sign + force_sign * space_for_positive);
 
-    if (ASCII_ISUPPER(fmt_spec))
+    যদি (ASCII_ISUPPER(fmt_spec))
 	idx += 4;
-    return table[idx];
+    ফেরত table[idx];
 }
 
 /*
@@ -2901,34 +2901,34 @@ infinity_str(int positive,
 #ifndef PROTO
 
 // Like vim_vsnprintf() but append to the string.
-    int
-vim_snprintf_add(char *str, size_t str_m, const char *fmt, ...)
+    পূর্ণসংখ্যা
+vim_snprintf_add(অক্ষর *str, size_t str_m, ধ্রুবক অক্ষর *fmt, ...)
 {
     va_list	ap;
-    int		str_l;
+    পূর্ণসংখ্যা		str_l;
     size_t	len = STRLEN(str);
     size_t	space;
 
-    if (str_m <= len)
+    যদি (str_m <= len)
 	space = 0;
-    else
+    অন্যথা
 	space = str_m - len;
     va_start(ap, fmt);
     str_l = vim_vsnprintf(str + len, space, fmt, ap);
     va_end(ap);
-    return str_l;
+    ফেরত str_l;
 }
 
-    int
-vim_snprintf(char *str, size_t str_m, const char *fmt, ...)
+    পূর্ণসংখ্যা
+vim_snprintf(অক্ষর *str, size_t str_m, ধ্রুবক অক্ষর *fmt, ...)
 {
     va_list	ap;
-    int		str_l;
+    পূর্ণসংখ্যা		str_l;
 
     va_start(ap, fmt);
     str_l = vim_vsnprintf(str, str_m, fmt, ap);
     va_end(ap);
-    return str_l;
+    ফেরত str_l;
 }
 
 /*
@@ -2941,37 +2941,37 @@ vim_snprintf(char *str, size_t str_m, const char *fmt, ...)
  * guarantees the returned length will never be greater than the destination length.
  */
     size_t
-vim_snprintf_safelen(char *str, size_t str_m, const char *fmt, ...)
+vim_snprintf_safelen(অক্ষর *str, size_t str_m, ধ্রুবক অক্ষর *fmt, ...)
 {
     va_list ap;
-    int	    str_l;
+    পূর্ণসংখ্যা	    str_l;
 
-    if (str_m == 0)
-	return 0;
+    যদি (str_m == 0)
+	ফেরত 0;
 
     va_start(ap, fmt);
-    str_l = vim_vsnprintf_typval(str, str_m, fmt, ap, NULL);
+    str_l = vim_vsnprintf_typval(str, str_m, fmt, ap, ফাঁকা);
     va_end(ap);
 
-    if (str_l < 0)
+    যদি (str_l < 0)
     {
 	*str = NUL;
-	return 0;
+	ফেরত 0;
     }
-    return ((size_t)str_l >= str_m) ? str_m - 1 : (size_t)str_l;
+    ফেরত ((size_t)str_l >= str_m) ? str_m - 1 : (size_t)str_l;
 }
 
-    int
+    পূর্ণসংখ্যা
 vim_vsnprintf(
-    char	*str,
+    অক্ষর	*str,
     size_t	str_m,
-    const char	*fmt,
+    ধ্রুবক অক্ষর	*fmt,
     va_list	ap)
 {
-    return vim_vsnprintf_typval(str, str_m, fmt, ap, NULL);
+    ফেরত vim_vsnprintf_typval(str, str_m, fmt, ap, ফাঁকা);
 }
 
-enum
+গণনা
 {
     TYPE_UNKNOWN = -1,
     TYPE_INT,
@@ -2989,330 +2989,330 @@ enum
 
 /* Types that can be used in a format string
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 format_typeof(
-    const char	*type)
+    ধ্রুবক অক্ষর	*type)
 {
     // allowed values: \0, h, l, L
-    char    length_modifier = '\0';
+    অক্ষর    দৈর্ঘ্য_modifier = '\0';
 
     // current conversion specifier character
-    char    fmt_spec = '\0';
+    অক্ষর    fmt_spec = '\0';
 
     // parse 'h', 'l' and 'll' length modifiers
-    if (*type == 'h' || *type == 'l')
+    যদি (*type == 'h' || *type == 'l')
     {
-	length_modifier = *type;
+	দৈর্ঘ্য_modifier = *type;
 	type++;
-	if (length_modifier == 'l' && *type == 'l')
+	যদি (দৈর্ঘ্য_modifier == 'l' && *type == 'l')
 	{
 	    // double l = __int64 / varnumber_T
-	    length_modifier = 'L';
+	    দৈর্ঘ্য_modifier = 'L';
 	    type++;
 	}
     }
     fmt_spec = *type;
 
     // common synonyms:
-    switch (fmt_spec)
+    নির্বাচন (fmt_spec)
     {
-	case 'i': fmt_spec = 'd'; break;
-	case '*': fmt_spec = 'd'; length_modifier = 'h'; break;
-	case 'D': fmt_spec = 'd'; length_modifier = 'l'; break;
-	case 'U': fmt_spec = 'u'; length_modifier = 'l'; break;
-	case 'O': fmt_spec = 'o'; length_modifier = 'l'; break;
-	default: break;
+	ক্ষেত্র 'i': fmt_spec = 'd'; বিরতি;
+	ক্ষেত্র '*': fmt_spec = 'd'; দৈর্ঘ্য_modifier = 'h'; বিরতি;
+	ক্ষেত্র 'D': fmt_spec = 'd'; দৈর্ঘ্য_modifier = 'l'; বিরতি;
+	ক্ষেত্র 'U': fmt_spec = 'u'; দৈর্ঘ্য_modifier = 'l'; বিরতি;
+	ক্ষেত্র 'O': fmt_spec = 'o'; দৈর্ঘ্য_modifier = 'l'; বিরতি;
+	পূর্বনির্ধারিত: বিরতি;
     }
 
     // get parameter value, do initial processing
-    switch (fmt_spec)
+    নির্বাচন (fmt_spec)
     {
 	// '%' and 'c' behave similar to 's' regarding flags and field
 	// widths
-    case '%':
-	return TYPE_PERCENT;
+    ক্ষেত্র '%':
+	ফেরত TYPE_PERCENT;
 
-    case 'c':
-	return TYPE_CHAR;
+    ক্ষেত্র 'c':
+	ফেরত TYPE_CHAR;
 
-    case 's':
-    case 'S':
-	return TYPE_STRING;
+    ক্ষেত্র 's':
+    ক্ষেত্র 'S':
+	ফেরত TYPE_STRING;
 
-    case 'd': case 'u':
-    case 'b': case 'B':
-    case 'o':
-    case 'x': case 'X':
-    case 'p':
+    ক্ষেত্র 'd': ক্ষেত্র 'u':
+    ক্ষেত্র 'b': ক্ষেত্র 'B':
+    ক্ষেত্র 'o':
+    ক্ষেত্র 'x': ক্ষেত্র 'X':
+    ক্ষেত্র 'p':
 	{
 	    // NOTE: the u, b, o, x, X and p conversion specifiers
 	    // imply the value is unsigned;  d implies a signed
-	    // value
+	    //মান
 
 	    // 0 if numeric argument is zero (or if pointer is
 	    // NULL for 'p'), +1 if greater than zero (or nonzero
 	    // for unsigned arguments), -1 if negative (unsigned
 	    // argument is never negative)
 
-	    if (fmt_spec == 'p')
-		return TYPE_POINTER;
-	    else if (fmt_spec == 'b' || fmt_spec == 'B')
-		return TYPE_UNSIGNEDLONGLONGINT;
-	    else if (fmt_spec == 'd')
+	    যদি (fmt_spec == 'p')
+		ফেরত TYPE_POINTER;
+	    অন্যথা যদি (fmt_spec == 'b' || fmt_spec == 'B')
+		ফেরত TYPE_UNSIGNEDLONGLONGINT;
+	    অন্যথা যদি (fmt_spec == 'd')
 	    {
 		// signed
-		switch (length_modifier)
+		নির্বাচন (দৈর্ঘ্য_modifier)
 		{
-		case '\0':
-		case 'h':
+		ক্ষেত্র '\0':
+		ক্ষেত্র 'h':
 		    // char and short arguments are passed as int.
-		    return TYPE_INT;
-		case 'l':
-		    return TYPE_LONGINT;
-		case 'L':
-		    return TYPE_LONGLONGINT;
+		    ফেরত TYPE_INT;
+		ক্ষেত্র 'l':
+		    ফেরত TYPE_LONGINT;
+		ক্ষেত্র 'L':
+		    ফেরত TYPE_LONGLONGINT;
 		}
 	    }
-	    else
+	    অন্যথা
 	    {
 		// unsigned
-		switch (length_modifier)
+		নির্বাচন (দৈর্ঘ্য_modifier)
 		{
-		    case '\0':
-		    case 'h':
-			return TYPE_UNSIGNEDINT;
-		    case 'l':
-			return TYPE_UNSIGNEDLONGINT;
-		    case 'L':
-			return TYPE_UNSIGNEDLONGLONGINT;
+		    ক্ষেত্র '\0':
+		    ক্ষেত্র 'h':
+			ফেরত TYPE_UNSIGNEDINT;
+		    ক্ষেত্র 'l':
+			ফেরত TYPE_UNSIGNEDLONGINT;
+		    ক্ষেত্র 'L':
+			ফেরত TYPE_UNSIGNEDLONGLONGINT;
 		}
 	    }
 	}
-	break;
+	বিরতি;
 
-    case 'f':
-    case 'F':
-    case 'e':
-    case 'E':
-    case 'g':
-    case 'G':
-	return TYPE_FLOAT;
+    ক্ষেত্র 'f':
+    ক্ষেত্র 'F':
+    ক্ষেত্র 'e':
+    ক্ষেত্র 'E':
+    ক্ষেত্র 'g':
+    ক্ষেত্র 'G':
+	ফেরত TYPE_FLOAT;
     }
 
-    return TYPE_UNKNOWN;
+    ফেরত TYPE_UNKNOWN;
 }
 
-    static char *
+    স্থির অক্ষর *
 format_typename(
-    const char  *type)
+    ধ্রুবক অক্ষর  *type)
 {
-    switch (format_typeof(type))
+    নির্বাচন (format_typeof(type))
     {
-	case TYPE_INT:
-	    return typename_int;
+	ক্ষেত্র TYPE_INT:
+	    ফেরত typename_int;
 
-	case TYPE_LONGINT:
-	    return typename_longint;
+	ক্ষেত্র TYPE_LONGINT:
+	    ফেরত typename_longint;
 
-	case TYPE_LONGLONGINT:
-	    return typename_longlongint;
+	ক্ষেত্র TYPE_LONGLONGINT:
+	    ফেরত typename_longlongint;
 
-	case TYPE_UNSIGNEDINT:
-	    return typename_unsignedint;
+	ক্ষেত্র TYPE_UNSIGNEDINT:
+	    ফেরত typename_unsignedint;
 
-	case TYPE_UNSIGNEDLONGINT:
-	    return typename_unsignedlongint;
+	ক্ষেত্র TYPE_UNSIGNEDLONGINT:
+	    ফেরত typename_unsignedlongint;
 
-	case TYPE_UNSIGNEDLONGLONGINT:
-	    return typename_unsignedlonglongint;
+	ক্ষেত্র TYPE_UNSIGNEDLONGLONGINT:
+	    ফেরত typename_unsignedlonglongint;
 
-	case TYPE_POINTER:
-	    return _(typename_pointer);
+	ক্ষেত্র TYPE_POINTER:
+	    ফেরত _(typename_pointer);
 
-	case TYPE_PERCENT:
-	    return _(typename_percent);
+	ক্ষেত্র TYPE_PERCENT:
+	    ফেরত _(typename_percent);
 
-	case TYPE_CHAR:
-	    return typename_char;
+	ক্ষেত্র TYPE_CHAR:
+	    ফেরত typename_char;
 
-	case TYPE_STRING:
-	    return _(typename_string);
+	ক্ষেত্র TYPE_STRING:
+	    ফেরত _(typename_string);
 
-	case TYPE_FLOAT:
-	    return typename_float;
+	ক্ষেত্র TYPE_FLOAT:
+	    ফেরত typename_float;
     }
 
-    return _(typename_unknown);
+    ফেরত _(typename_unknown);
 }
 
-    static int
+    স্থির পূর্ণসংখ্যা
 adjust_types(
-    const char ***ap_types,
-    int arg,
-    int *num_posarg,
-    const char *type)
+    ধ্রুবক অক্ষর ***ap_types,
+    পূর্ণসংখ্যা arg,
+    পূর্ণসংখ্যা *অঙ্ক_posarg,
+    ধ্রুবক অক্ষর *type)
 {
-    if (arg <= 0)
+    যদি (arg <= 0)
     {
 	semsg(_( e_invalid_format_specifier_str), type);
-	return FAIL;
+	ফেরত FAIL;
     }
 
-    if (*ap_types == NULL || *num_posarg < arg)
+    যদি (*ap_types == ফাঁকা || *অঙ্ক_posarg < arg)
     {
-	int	    idx;
-	const char  **new_types;
+	পূর্ণসংখ্যা	    idx;
+	ধ্রুবক অক্ষর  **new_types;
 
-	if (*ap_types == NULL)
-	    new_types = ALLOC_CLEAR_MULT(const char *, arg);
-	else
-	    new_types = vim_realloc((char **)*ap_types,
-						arg * sizeof(const char *));
+	যদি (*ap_types == ফাঁকা)
+	    new_types = ALLOC_CLEAR_MULT(ধ্রুবক অক্ষর *, arg);
+	অন্যথা
+	    new_types = vim_realloc((অক্ষর **)*ap_types,
+						arg * আকার(ধ্রুবক অক্ষর *));
 
-	if (new_types == NULL)
-	    return FAIL;
+	যদি (new_types == ফাঁকা)
+	    ফেরত FAIL;
 
-	for (idx = *num_posarg; idx < arg; ++idx)
-	    new_types[idx] = NULL;
+	জন্য (idx = *অঙ্ক_posarg; idx < arg; ++idx)
+	    new_types[idx] = ফাঁকা;
 
 	*ap_types = new_types;
-	*num_posarg = arg;
+	*অঙ্ক_posarg = arg;
     }
 
-    if ((*ap_types)[arg - 1] != NULL)
+    যদি ((*ap_types)[arg - 1] != ফাঁকা)
     {
-	if ((*ap_types)[arg - 1][0] == '*' || type[0] == '*')
+	যদি ((*ap_types)[arg - 1][0] == '*' || type[0] == '*')
 	{
-	    const char *pt = type;
-	    if (pt[0] == '*')
+	    ধ্রুবক অক্ষর *pt = type;
+	    যদি (pt[0] == '*')
 		pt = (*ap_types)[arg - 1];
 
-	    if (pt[0] != '*')
+	    যদি (pt[0] != '*')
 	    {
-		switch (pt[0])
+		নির্বাচন (pt[0])
 		{
-		    case 'd':
-		    case 'i': break;
-		    default:
-			semsg(_(e_positional_num_field_spec_reused_str_str), arg, format_typename((*ap_types)[arg - 1]), format_typename(type));
-			return FAIL;
+		    ক্ষেত্র 'd':
+		    ক্ষেত্র 'i': বিরতি;
+		    পূর্বনির্ধারিত:
+			semsg(_(e_positional_অঙ্ক_field_spec_reused_str_str), arg, format_typename((*ap_types)[arg - 1]), format_typename(type));
+			ফেরত FAIL;
 		}
 	    }
 	}
-	else
+	অন্যথা
 	{
-	    if (format_typeof(type) != format_typeof((*ap_types)[arg - 1]))
+	    যদি (format_typeof(type) != format_typeof((*ap_types)[arg - 1]))
 	    {
-		semsg(_( e_positional_arg_num_type_inconsistent_str_str), arg, format_typename(type), format_typename((*ap_types)[arg - 1]));
-		return FAIL;
+		semsg(_( e_positional_arg_অঙ্ক_type_inconsistent_str_str), arg, format_typename(type), format_typename((*ap_types)[arg - 1]));
+		ফেরত FAIL;
 	    }
 	}
     }
 
     (*ap_types)[arg - 1] = type;
 
-    return OK;
+    ফেরত OK;
 }
 
-    static void
-format_overflow_error(const char *pstart)
+    স্থির শূন্য
+format_overflow_error(ধ্রুবক অক্ষর *pstart)
 {
     size_t	arglen = 0;
-    char	*argcopy = NULL;
-    const char	*p = pstart;
+    অক্ষর	*argcopy = ফাঁকা;
+    ধ্রুবক অক্ষর	*p = pstart;
 
-    while (VIM_ISDIGIT((int)(*p)))
+    যখন (VIM_ISDIGIT((পূর্ণসংখ্যা)(*p)))
 	++p;
 
     arglen = p - pstart;
-    argcopy = ALLOC_CLEAR_MULT(char, arglen + 1);
-    if (argcopy != NULL)
+    argcopy = ALLOC_CLEAR_MULT(অক্ষর, arglen + 1);
+    যদি (argcopy != ফাঁকা)
     {
 	strncpy(argcopy, pstart, arglen);
 	semsg(_( e_val_too_large), argcopy);
-	free(argcopy);
+	মুক্ত(argcopy);
     }
-    else
+    অন্যথা
 	semsg(_(e_out_of_memory_allocating_nr_bytes), arglen);
 }
 
 # define MAX_ALLOWED_STRING_WIDTH 1048576    // 1 MiB
 
-    static int
+    স্থির পূর্ণসংখ্যা
 get_unsigned_int(
-    const char *pstart,
-    const char **p,
-    unsigned int *uj,
-    int overflow_err)
+    ধ্রুবক অক্ষর *pstart,
+    ধ্রুবক অক্ষর **p,
+    unsigned পূর্ণসংখ্যা *uj,
+    পূর্ণসংখ্যা overflow_err)
 {
     *uj = **p - '0';
     ++*p;
 
-    while (VIM_ISDIGIT((int)(**p)) && *uj < MAX_ALLOWED_STRING_WIDTH)
+    যখন (VIM_ISDIGIT((পূর্ণসংখ্যা)(**p)) && *uj < MAX_ALLOWED_STRING_WIDTH)
     {
-	*uj = 10 * *uj + (unsigned int)(**p - '0');
+	*uj = 10 * *uj + (unsigned পূর্ণসংখ্যা)(**p - '0');
 	++*p;
     }
 
-    if (*uj > MAX_ALLOWED_STRING_WIDTH)
+    যদি (*uj > MAX_ALLOWED_STRING_WIDTH)
     {
-	if (overflow_err)
+	যদি (overflow_err)
 	{
 	    format_overflow_error(pstart);
-	    return FAIL;
+	    ফেরত FAIL;
 	}
-	else
+	অন্যথা
 	    *uj = MAX_ALLOWED_STRING_WIDTH;
     }
 
-    return OK;
+    ফেরত OK;
 }
 
 
-    static int
+    স্থির পূর্ণসংখ্যা
 parse_fmt_types(
-    const char  ***ap_types,
-    int		*num_posarg,
-    const char  *fmt,
+    ধ্রুবক অক্ষর  ***ap_types,
+    পূর্ণসংখ্যা		*অঙ্ক_posarg,
+    ধ্রুবক অক্ষর  *fmt,
     typval_T	*tvs UNUSED
     )
 {
-    const char	*p = fmt;
-    const char	*arg = NULL;
+    ধ্রুবক অক্ষর	*p = fmt;
+    ধ্রুবক অক্ষর	*arg = ফাঁকা;
 
-    int		any_pos = 0;
-    int		any_arg = 0;
-    int		arg_idx;
+    পূর্ণসংখ্যা		any_pos = 0;
+    পূর্ণসংখ্যা		any_arg = 0;
+    পূর্ণসংখ্যা		arg_idx;
 
-# define CHECK_POS_ARG do { \
-    if (any_pos && any_arg) \
+# define CHECK_POS_ARG করো { \
+    যদি (any_pos && any_arg) \
     { \
 	semsg(_( e_cannot_mix_positional_and_non_positional_str), fmt); \
-	goto error; \
+	যাও error; \
     } \
-} while (0);
+} যখন (0);
 
-    if (p == NULL)
-	return OK;
+    যদি (p == ফাঁকা)
+	ফেরত OK;
 
-    while (*p != NUL)
+    যখন (*p != NUL)
     {
-	if (*p != '%')
+	যদি (*p != '%')
 	{
-	    const char    *q = strchr(p + 1, '%');
-	    size_t  n = (q == NULL) ? STRLEN(p) : (size_t)(q - p);
+	    ধ্রুবক অক্ষর    *q = strchr(p + 1, '%');
+	    size_t  n = (q == ফাঁকা) ? STRLEN(p) : (size_t)(q - p);
 
 	    p += n;
 	}
-	else
+	অন্যথা
 	{
 	    // allowed values: \0, h, l, L
-	    char	length_modifier = '\0';
+	    অক্ষর	দৈর্ঘ্য_modifier = '\0';
 
 	    // variable for positional arg
-	    int		pos_arg = -1;
-	    const char	*ptype = NULL;
-	    const char	*pstart = p+1;
+	    পূর্ণসংখ্যা		pos_arg = -1;
+	    ধ্রুবক অক্ষর	*ptype = ফাঁকা;
+	    ধ্রুবক অক্ষর	*pstart = p+1;
 
 	    p++;  // skip '%'
 
@@ -3320,23 +3320,23 @@ parse_fmt_types(
 	    // argument specifier
 	    ptype = p;
 
-	    while (VIM_ISDIGIT(*ptype))
+	    যখন (VIM_ISDIGIT(*ptype))
 		++ptype;
 
-	    if (*ptype == '$')
+	    যদি (*ptype == '$')
 	    {
-		if (*p == '0')
+		যদি (*p == '0')
 		{
 		    // 0 flag at the wrong place
 		    semsg(_( e_invalid_format_specifier_str), fmt);
-		    goto error;
+		    যাও error;
 		}
 
 		// Positional argument
-		unsigned int uj;
+		unsigned পূর্ণসংখ্যা uj;
 
-		if (get_unsigned_int(pstart, &p, &uj, tvs != NULL) == FAIL)
-		    goto error;
+		যদি (get_unsigned_int(pstart, &p, &uj, tvs != ফাঁকা) == FAIL)
+		    যাও error;
 
 		pos_arg = uj;
 
@@ -3347,19 +3347,19 @@ parse_fmt_types(
 	    }
 
 	    // parse flags
-	    while (*p == '0' || *p == '-' || *p == '+' || *p == ' '
+	    যখন (*p == '0' || *p == '-' || *p == '+' || *p == ' '
 						   || *p == '#' || *p == '\'')
 	    {
-		switch (*p)
+		নির্বাচন (*p)
 		{
-		    case '0': break;
-		    case '-': break;
-		    case '+': break;
-		    case ' ': // If both the ' ' and '+' flags appear, the ' '
+		    ক্ষেত্র '0': বিরতি;
+		    ক্ষেত্র '-': বিরতি;
+		    ক্ষেত্র '+': বিরতি;
+		    ক্ষেত্র ' ': // If both the ' ' and '+' flags appear, the ' '
 			      // flag should be ignored
-			      break;
-		    case '#': break;
-		    case '\'': break;
+			      বিরতি;
+		    ক্ষেত্র '#': বিরতি;
+		    ক্ষেত্র '\'': বিরতি;
 		}
 		p++;
 	    }
@@ -3367,114 +3367,114 @@ parse_fmt_types(
 	    // ignored.
 
 	    // parse field width
-	    if (*(arg = p) == '*')
+	    যদি (*(arg = p) == '*')
 	    {
 		p++;
 
-		if (VIM_ISDIGIT((int)(*p)))
+		যদি (VIM_ISDIGIT((পূর্ণসংখ্যা)(*p)))
 		{
 		    // Positional argument field width
-		    unsigned int uj;
+		    unsigned পূর্ণসংখ্যা uj;
 
-		    if (get_unsigned_int(arg + 1, &p, &uj, tvs != NULL) == FAIL)
-			goto error;
+		    যদি (get_unsigned_int(arg + 1, &p, &uj, tvs != ফাঁকা) == FAIL)
+			যাও error;
 
-		    if (*p != '$')
+		    যদি (*p != '$')
 		    {
 			semsg(_( e_invalid_format_specifier_str), fmt);
-			goto error;
+			যাও error;
 		    }
-		    else
+		    অন্যথা
 		    {
 			++p;
 			any_pos = 1;
 			CHECK_POS_ARG;
 
-			if (adjust_types(ap_types, uj, num_posarg, arg) == FAIL)
-			    goto error;
+			যদি (adjust_types(ap_types, uj, অঙ্ক_posarg, arg) == FAIL)
+			    যাও error;
 		    }
 		}
-		else
+		অন্যথা
 		{
 		    any_arg = 1;
 		    CHECK_POS_ARG;
 		}
 	    }
-	    else if (VIM_ISDIGIT((int)(*p)))
+	    অন্যথা যদি (VIM_ISDIGIT((পূর্ণসংখ্যা)(*p)))
 	    {
 		// size_t could be wider than unsigned int; make sure we treat
 		// argument like common implementations do
-		const char *digstart = p;
-		unsigned int uj;
+		ধ্রুবক অক্ষর *digstart = p;
+		unsigned পূর্ণসংখ্যা uj;
 
-		if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-		    goto error;
+		যদি (get_unsigned_int(digstart, &p, &uj, tvs != ফাঁকা) == FAIL)
+		    যাও error;
 
-		if (*p == '$')
+		যদি (*p == '$')
 		{
 		    semsg(_( e_invalid_format_specifier_str), fmt);
-		    goto error;
+		    যাও error;
 		}
 	    }
 
 	    // parse precision
-	    if (*p == '.')
+	    যদি (*p == '.')
 	    {
 		p++;
 
-		if (*(arg = p) == '*')
+		যদি (*(arg = p) == '*')
 		{
 		    p++;
 
-		    if (VIM_ISDIGIT((int)(*p)))
+		    যদি (VIM_ISDIGIT((পূর্ণসংখ্যা)(*p)))
 		    {
 			// Parse precision
-			unsigned int uj;
+			unsigned পূর্ণসংখ্যা uj;
 
-			if (get_unsigned_int(arg + 1, &p, &uj, tvs != NULL) == FAIL)
-			    goto error;
+			যদি (get_unsigned_int(arg + 1, &p, &uj, tvs != ফাঁকা) == FAIL)
+			    যাও error;
 
-			if (*p == '$')
+			যদি (*p == '$')
 			{
 			    any_pos = 1;
 			    CHECK_POS_ARG;
 
 			    ++p;
 
-			    if (adjust_types(ap_types, uj, num_posarg, arg) == FAIL)
-				goto error;
+			    যদি (adjust_types(ap_types, uj, অঙ্ক_posarg, arg) == FAIL)
+				যাও error;
 			}
-			else
+			অন্যথা
 			{
 			    semsg(_( e_invalid_format_specifier_str), fmt);
-			    goto error;
+			    যাও error;
 			}
 		    }
-		    else
+		    অন্যথা
 		    {
 			any_arg = 1;
 			CHECK_POS_ARG;
 		    }
 		}
-		else if (VIM_ISDIGIT((int)(*p)))
+		অন্যথা যদি (VIM_ISDIGIT((পূর্ণসংখ্যা)(*p)))
 		{
 		    // size_t could be wider than unsigned int; make sure we
 		    // treat argument like common implementations do
-		    const char *digstart = p;
-		    unsigned int uj;
+		    ধ্রুবক অক্ষর *digstart = p;
+		    unsigned পূর্ণসংখ্যা uj;
 
-		    if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-			goto error;
+		    যদি (get_unsigned_int(digstart, &p, &uj, tvs != ফাঁকা) == FAIL)
+			যাও error;
 
-		    if (*p == '$')
+		    যদি (*p == '$')
 		    {
 			semsg(_( e_invalid_format_specifier_str), fmt);
-			goto error;
+			যাও error;
 		    }
 		}
 	    }
 
-	    if (pos_arg != -1)
+	    যদি (pos_arg != -1)
 	    {
 		any_pos = 1;
 		CHECK_POS_ARG;
@@ -3483,11 +3483,11 @@ parse_fmt_types(
 	    }
 
 	    // parse 'h', 'l' and 'll' length modifiers
-	    if (*p == 'h' || *p == 'l')
+	    যদি (*p == 'h' || *p == 'l')
 	    {
-		length_modifier = *p;
+		দৈর্ঘ্য_modifier = *p;
 		p++;
-		if (length_modifier == 'l' && *p == 'l')
+		যদি (দৈর্ঘ্য_modifier == 'l' && *p == 'l')
 		{
 		    // double l = __int64 / varnumber_T
 		    // length_modifier = 'L';
@@ -3495,172 +3495,172 @@ parse_fmt_types(
 		}
 	    }
 
-	    switch (*p)
+	    নির্বাচন (*p)
 	    {
 		// Check for known format specifiers. % is special!
-		case 'i':
-		case '*':
-		case 'd':
-		case 'u':
-		case 'o':
-		case 'D':
-		case 'U':
-		case 'O':
-		case 'x':
-		case 'X':
-		case 'b':
-		case 'B':
-		case 'c':
-		case 's':
-		case 'S':
-		case 'p':
-		case 'f':
-		case 'F':
-		case 'e':
-		case 'E':
-		case 'g':
-		case 'G':
-		    if (pos_arg != -1)
+		ক্ষেত্র 'i':
+		ক্ষেত্র '*':
+		ক্ষেত্র 'd':
+		ক্ষেত্র 'u':
+		ক্ষেত্র 'o':
+		ক্ষেত্র 'D':
+		ক্ষেত্র 'U':
+		ক্ষেত্র 'O':
+		ক্ষেত্র 'x':
+		ক্ষেত্র 'X':
+		ক্ষেত্র 'b':
+		ক্ষেত্র 'B':
+		ক্ষেত্র 'c':
+		ক্ষেত্র 's':
+		ক্ষেত্র 'S':
+		ক্ষেত্র 'p':
+		ক্ষেত্র 'f':
+		ক্ষেত্র 'F':
+		ক্ষেত্র 'e':
+		ক্ষেত্র 'E':
+		ক্ষেত্র 'g':
+		ক্ষেত্র 'G':
+		    যদি (pos_arg != -1)
 		    {
-			if (adjust_types(ap_types, pos_arg, num_posarg, ptype) == FAIL)
-			    goto error;
+			যদি (adjust_types(ap_types, pos_arg, অঙ্ক_posarg, ptype) == FAIL)
+			    যাও error;
 		    }
-		    else
+		    অন্যথা
 		    {
 			any_arg = 1;
 			CHECK_POS_ARG;
 		    }
-		    break;
+		    বিরতি;
 
-		default:
-		    if (pos_arg != -1)
+		পূর্বনির্ধারিত:
+		    যদি (pos_arg != -1)
 		    {
 			semsg(_( e_cannot_mix_positional_and_non_positional_str), fmt);
-			goto error;
+			যাও error;
 		    }
 	    }
 
-	    if (*p != NUL)
+	    যদি (*p != NUL)
 		p++;     // step over the just processed conversion specifier
 	}
     }
 
-    for (arg_idx = 0; arg_idx < *num_posarg; ++arg_idx)
+    জন্য (arg_idx = 0; arg_idx < *অঙ্ক_posarg; ++arg_idx)
     {
-	if ((*ap_types)[arg_idx] == NULL)
+	যদি ((*ap_types)[arg_idx] == ফাঁকা)
 	{
 	    semsg(_(e_fmt_arg_nr_unused_str), arg_idx + 1, fmt);
-	    goto error;
+	    যাও error;
 	}
 
-# if defined(FEAT_EVAL)
-	if (tvs != NULL && tvs[arg_idx].v_type == VAR_UNKNOWN)
+# যদি defined(FEAT_EVAL)
+	যদি (tvs != ফাঁকা && tvs[arg_idx].v_type == VAR_UNKNOWN)
 	{
 	    semsg(_(e_positional_nr_out_of_bounds_str), arg_idx + 1, fmt);
-	    goto error;
+	    যাও error;
 	}
 # endif
     }
 
-    return OK;
+    ফেরত OK;
 
 error:
-    vim_free((char**)*ap_types);
-    *ap_types = NULL;
-    *num_posarg = 0;
-    return FAIL;
+    vim_free((অক্ষর**)*ap_types);
+    *ap_types = ফাঁকা;
+    *অঙ্ক_posarg = 0;
+    ফেরত FAIL;
 }
 
-    static void
+    স্থির শূন্য
 skip_to_arg(
-    const char	**ap_types,
+    ধ্রুবক অক্ষর	**ap_types,
     va_list	ap_start,
     va_list	*ap,
-    int		*arg_idx,
-    int		*arg_cur,
-    const char	*fmt)
+    পূর্ণসংখ্যা		*arg_idx,
+    পূর্ণসংখ্যা		*arg_cur,
+    ধ্রুবক অক্ষর	*fmt)
 {
-    int		arg_min = 0;
+    পূর্ণসংখ্যা		arg_min = 0;
 
-    if (*arg_cur + 1 == *arg_idx)
+    যদি (*arg_cur + 1 == *arg_idx)
     {
 	++*arg_cur;
 	++*arg_idx;
-	return;
+	ফেরত;
     }
 
-    if (*arg_cur >= *arg_idx)
+    যদি (*arg_cur >= *arg_idx)
     {
 	// Reset ap to ap_start and skip arg_idx - 1 types
 	va_end(*ap);
 	va_copy(*ap, ap_start);
     }
-    else
+    অন্যথা
     {
 	// Skip over any we should skip
 	arg_min = *arg_cur;
     }
 
-    for (*arg_cur = arg_min; *arg_cur < *arg_idx - 1; ++*arg_cur)
+    জন্য (*arg_cur = arg_min; *arg_cur < *arg_idx - 1; ++*arg_cur)
     {
-	const char *p;
+	ধ্রুবক অক্ষর *p;
 
-	if (ap_types == NULL || ap_types[*arg_cur] == NULL)
+	যদি (ap_types == ফাঁকা || ap_types[*arg_cur] == ফাঁকা)
 	{
 	    siemsg(e_aptypes_is_null_nr_str, *arg_cur, fmt);
-	    return;
+	    ফেরত;
 	}
 
 	p = ap_types[*arg_cur];
 
-	int fmt_type = format_typeof(p);
+	পূর্ণসংখ্যা fmt_type = format_typeof(p);
 
 	// get parameter value, do initial processing
-	switch (fmt_type)
+	নির্বাচন (fmt_type)
 	{
-	case TYPE_PERCENT:
-	case TYPE_UNKNOWN:
-	    break;
+	ক্ষেত্র TYPE_PERCENT:
+	ক্ষেত্র TYPE_UNKNOWN:
+	    বিরতি;
 
-	case TYPE_CHAR:
-	    va_arg(*ap, int);
-	    break;
+	ক্ষেত্র TYPE_CHAR:
+	    va_arg(*ap, পূর্ণসংখ্যা);
+	    বিরতি;
 
-	case TYPE_STRING:
-	    va_arg(*ap, char *);
-	    break;
+	ক্ষেত্র TYPE_STRING:
+	    va_arg(*ap, অক্ষর *);
+	    বিরতি;
 
-	case TYPE_POINTER:
-	    va_arg(*ap, void *);
-	    break;
+	ক্ষেত্র TYPE_POINTER:
+	    va_arg(*ap, শূন্য *);
+	    বিরতি;
 
-	case TYPE_INT:
-	    va_arg(*ap, int);
-	    break;
+	ক্ষেত্র TYPE_INT:
+	    va_arg(*ap, পূর্ণসংখ্যা);
+	    বিরতি;
 
-	case TYPE_LONGINT:
-	    va_arg(*ap, long int);
-	    break;
+	ক্ষেত্র TYPE_LONGINT:
+	    va_arg(*ap, long পূর্ণসংখ্যা);
+	    বিরতি;
 
-	case TYPE_LONGLONGINT:
+	ক্ষেত্র TYPE_LONGLONGINT:
 	    va_arg(*ap, varnumber_T);
-	    break;
+	    বিরতি;
 
-	case TYPE_UNSIGNEDINT:
-	    va_arg(*ap, unsigned int);
-	    break;
+	ক্ষেত্র TYPE_UNSIGNEDINT:
+	    va_arg(*ap, unsigned পূর্ণসংখ্যা);
+	    বিরতি;
 
-	case TYPE_UNSIGNEDLONGINT:
-	    va_arg(*ap, unsigned long int);
-	    break;
+	ক্ষেত্র TYPE_UNSIGNEDLONGINT:
+	    va_arg(*ap, unsigned long পূর্ণসংখ্যা);
+	    বিরতি;
 
-	case TYPE_UNSIGNEDLONGLONGINT:
+	ক্ষেত্র TYPE_UNSIGNEDLONGLONGINT:
 	    va_arg(*ap, uvarnumber_T);
-	    break;
+	    বিরতি;
 
-	case TYPE_FLOAT:
-	    va_arg(*ap, double);
-	    break;
+	ক্ষেত্র TYPE_FLOAT:
+	    va_arg(*ap, দ্বিগুণ);
+	    বিরতি;
 	}
     }
 
@@ -3670,41 +3670,41 @@ skip_to_arg(
     ++*arg_cur;
     ++*arg_idx;
 
-    return;
+    ফেরত;
 }
 
-    int
+    পূর্ণসংখ্যা
 vim_vsnprintf_typval(
-    char	*str,
+    অক্ষর	*str,
     size_t	str_m,
-    const char	*fmt,
+    ধ্রুবক অক্ষর	*fmt,
     va_list	ap_start,
     typval_T	*tvs)
 {
     size_t	str_l = 0;
-    const char	*p = fmt;
-    int		arg_cur = 0;
-    int		num_posarg = 0;
-    int		arg_idx = 1;
+    ধ্রুবক অক্ষর	*p = fmt;
+    পূর্ণসংখ্যা		arg_cur = 0;
+    পূর্ণসংখ্যা		অঙ্ক_posarg = 0;
+    পূর্ণসংখ্যা		arg_idx = 1;
     va_list	ap;
-    const char	**ap_types = NULL;
+    ধ্রুবক অক্ষর	**ap_types = ফাঁকা;
 
-    if (parse_fmt_types(&ap_types, &num_posarg, fmt, tvs) == FAIL)
-	return 0;
+    যদি (parse_fmt_types(&ap_types, &অঙ্ক_posarg, fmt, tvs) == FAIL)
+	ফেরত 0;
 
     va_copy(ap, ap_start);
 
-    if (p == NULL)
+    যদি (p == ফাঁকা)
 	p = "";
-    while (*p != NUL)
+    যখন (*p != NUL)
     {
-	if (*p != '%')
+	যদি (*p != '%')
 	{
-	    const char    *q = strchr(p + 1, '%');
-	    size_t  n = (q == NULL) ? STRLEN(p) : (size_t)(q - p);
+	    ধ্রুবক অক্ষর    *q = strchr(p + 1, '%');
+	    size_t  n = (q == ফাঁকা) ? STRLEN(p) : (size_t)(q - p);
 
 	    // Copy up to the next '%' or NUL without any changes.
-	    if (str_l < str_m)
+	    যদি (str_l < str_m)
 	    {
 		size_t avail = str_m - str_l;
 
@@ -3713,27 +3713,27 @@ vim_vsnprintf_typval(
 	    p += n;
 	    str_l += n;
 	}
-	else
+	অন্যথা
 	{
 	    size_t  min_field_width = 0, precision = 0;
-	    int	    zero_padding = 0, precision_specified = 0, justify_left = 0;
-	    int	    alternate_form = 0, force_sign = 0;
+	    পূর্ণসংখ্যা	    zero_padding = 0, precision_specified = 0, justify_বাম = 0;
+	    পূর্ণসংখ্যা	    alternate_form = 0, force_sign = 0;
 
 	    // If both the ' ' and '+' flags appear, the ' ' flag should be
 	    // ignored.
-	    int	    space_for_positive = 1;
+	    পূর্ণসংখ্যা	    space_for_positive = 1;
 
 	    // allowed values: \0, h, l, L
-	    char    length_modifier = '\0';
+	    অক্ষর    দৈর্ঘ্য_modifier = '\0';
 
 	    // temporary buffer for simple numeric->string conversion
 # define TMP_LEN 350	// On my system 1e308 is the biggest number possible.
 			// That sounds reasonable to use as the maximum
 			// printable.
-	    char    tmp[TMP_LEN];
+	    অক্ষর    tmp[TMP_LEN];
 
 	    // string address in case of string argument
-	    const char  *str_arg = NULL;
+	    ধ্রুবক অক্ষর  *str_arg = ফাঁকা;
 
 	    // natural field width of arg without padding and sign
 	    size_t  str_arg_l;
@@ -3741,24 +3741,24 @@ vim_vsnprintf_typval(
 	    // unsigned char argument value - only defined for c conversion.
 	    // N.B. standard explicitly states the char argument for the c
 	    // conversion is unsigned
-	    unsigned char uchar_arg;
+	    unsigned অক্ষর uchar_arg;
 
 	    // number of zeros to be inserted for numeric conversions as
 	    // required by the precision or minimal field width
-	    size_t  number_of_zeros_to_pad = 0;
+	    size_t  সংখ্যা_of_zeros_to_pad = 0;
 
 	    // index into tmp where zero padding is to be inserted
 	    size_t  zero_padding_insertion_ind = 0;
 
 	    // current conversion specifier character
-	    char    fmt_spec = '\0';
+	    অক্ষর    fmt_spec = '\0';
 
 	    // buffer for 's' and 'S' specs
-	    char_u  *tofree = NULL;
+	    char_u  *tofree = ফাঁকা;
 
 	    // variables for positional arg
-	    int	    pos_arg = -1;
-	    const char	*ptype;
+	    পূর্ণসংখ্যা	    pos_arg = -1;
+	    ধ্রুবক অক্ষর	*ptype;
 
 
 	    p++;  // skip '%'
@@ -3767,17 +3767,17 @@ vim_vsnprintf_typval(
 	    // argument specifier
 	    ptype = p;
 
-	    while (VIM_ISDIGIT(*ptype))
+	    যখন (VIM_ISDIGIT(*ptype))
 		++ptype;
 
-	    if (*ptype == '$')
+	    যদি (*ptype == '$')
 	    {
 		// Positional argument
-		const char *digstart = p;
-		unsigned int uj;
+		ধ্রুবক অক্ষর *digstart = p;
+		unsigned পূর্ণসংখ্যা uj;
 
-		if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-		    goto error;
+		যদি (get_unsigned_int(digstart, &p, &uj, tvs != ফাঁকা) == FAIL)
+		    যাও error;
 
 		pos_arg = uj;
 
@@ -3785,20 +3785,20 @@ vim_vsnprintf_typval(
 	    }
 
 	    // parse flags
-	    while (*p == '0' || *p == '-' || *p == '+' || *p == ' '
+	    যখন (*p == '0' || *p == '-' || *p == '+' || *p == ' '
 						   || *p == '#' || *p == '\'')
 	    {
-		switch (*p)
+		নির্বাচন (*p)
 		{
-		    case '0': zero_padding = 1; break;
-		    case '-': justify_left = 1; break;
-		    case '+': force_sign = 1; space_for_positive = 0; break;
-		    case ' ': force_sign = 1;
+		    ক্ষেত্র '0': zero_padding = 1; বিরতি;
+		    ক্ষেত্র '-': justify_বাম = 1; বিরতি;
+		    ক্ষেত্র '+': force_sign = 1; space_for_positive = 0; বিরতি;
+		    ক্ষেত্র ' ': force_sign = 1;
 			      // If both the ' ' and '+' flags appear, the ' '
 			      // flag should be ignored
-			      break;
-		    case '#': alternate_form = 1; break;
-		    case '\'': break;
+			      বিরতি;
+		    ক্ষেত্র '#': alternate_form = 1; বিরতি;
+		    ক্ষেত্র '\'': বিরতি;
 		}
 		p++;
 	    }
@@ -3806,20 +3806,20 @@ vim_vsnprintf_typval(
 	    // ignored.
 
 	    // parse field width
-	    if (*p == '*')
+	    যদি (*p == '*')
 	    {
-		int j;
-		const char *digstart = p + 1;
+		পূর্ণসংখ্যা j;
+		ধ্রুবক অক্ষর *digstart = p + 1;
 
 		p++;
 
-		if (VIM_ISDIGIT((int)(*p)))
+		যদি (VIM_ISDIGIT((পূর্ণসংখ্যা)(*p)))
 		{
 		    // Positional argument field width
-		    unsigned int uj;
+		    unsigned পূর্ণসংখ্যা uj;
 
-		    if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-			goto error;
+		    যদি (get_unsigned_int(digstart, &p, &uj, tvs != ফাঁকা) == FAIL)
+			যাও error;
 
 		    arg_idx = uj;
 
@@ -3827,77 +3827,77 @@ vim_vsnprintf_typval(
 		}
 
 		j =
-# if defined(FEAT_EVAL)
-		    tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# যদি defined(FEAT_EVAL)
+		    tvs != ফাঁকা ? tv_nr(tvs, &arg_idx) :
 # endif
 			(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 				     &arg_cur, fmt),
-			va_arg(ap, int));
+			va_arg(ap, পূর্ণসংখ্যা));
 
-		if (j > MAX_ALLOWED_STRING_WIDTH)
+		যদি (j > MAX_ALLOWED_STRING_WIDTH)
 		{
-		    if (tvs != NULL)
+		    যদি (tvs != ফাঁকা)
 		    {
 			format_overflow_error(digstart);
-			goto error;
+			যাও error;
 		    }
-		    else
+		    অন্যথা
 			j = MAX_ALLOWED_STRING_WIDTH;
 		}
 
-		if (j >= 0)
+		যদি (j >= 0)
 		    min_field_width = j;
-		else
+		অন্যথা
 		{
 		    min_field_width = -j;
-		    justify_left = 1;
+		    justify_বাম = 1;
 		}
 	    }
-	    else if (VIM_ISDIGIT((int)(*p)))
+	    অন্যথা যদি (VIM_ISDIGIT((পূর্ণসংখ্যা)(*p)))
 	    {
 		// size_t could be wider than unsigned int; make sure we treat
 		// argument like common implementations do
-		const char *digstart = p;
-		unsigned int uj;
+		ধ্রুবক অক্ষর *digstart = p;
+		unsigned পূর্ণসংখ্যা uj;
 
-		if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-		    goto error;
+		যদি (get_unsigned_int(digstart, &p, &uj, tvs != ফাঁকা) == FAIL)
+		    যাও error;
 
 		min_field_width = uj;
 	    }
 
 	    // parse precision
-	    if (*p == '.')
+	    যদি (*p == '.')
 	    {
 		p++;
 		precision_specified = 1;
 
-		if (VIM_ISDIGIT((int)(*p)))
+		যদি (VIM_ISDIGIT((পূর্ণসংখ্যা)(*p)))
 		{
 		    // size_t could be wider than unsigned int; make sure we
 		    // treat argument like common implementations do
-		    const char *digstart = p;
-		    unsigned int uj;
+		    ধ্রুবক অক্ষর *digstart = p;
+		    unsigned পূর্ণসংখ্যা uj;
 
-		    if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-			goto error;
+		    যদি (get_unsigned_int(digstart, &p, &uj, tvs != ফাঁকা) == FAIL)
+			যাও error;
 
 		    precision = uj;
 		}
-		else if (*p == '*')
+		অন্যথা যদি (*p == '*')
 		{
-		    int j;
-		    const char *digstart = p;
+		    পূর্ণসংখ্যা j;
+		    ধ্রুবক অক্ষর *digstart = p;
 
 		    p++;
 
-		    if (VIM_ISDIGIT((int)(*p)))
+		    যদি (VIM_ISDIGIT((পূর্ণসংখ্যা)(*p)))
 		    {
 			// positional argument
-			unsigned int uj;
+			unsigned পূর্ণসংখ্যা uj;
 
-			if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
-			    goto error;
+			যদি (get_unsigned_int(digstart, &p, &uj, tvs != ফাঁকা) == FAIL)
+			    যাও error;
 
 			arg_idx = uj;
 
@@ -3905,27 +3905,27 @@ vim_vsnprintf_typval(
 		    }
 
 		    j =
-# if defined(FEAT_EVAL)
-			tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# যদি defined(FEAT_EVAL)
+			tvs != ফাঁকা ? tv_nr(tvs, &arg_idx) :
 # endif
 			    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 					 &arg_cur, fmt),
-			    va_arg(ap, int));
+			    va_arg(ap, পূর্ণসংখ্যা));
 
-		    if (j > MAX_ALLOWED_STRING_WIDTH)
+		    যদি (j > MAX_ALLOWED_STRING_WIDTH)
 		    {
-			if (tvs != NULL)
+			যদি (tvs != ফাঁকা)
 			{
 			    format_overflow_error(digstart);
-			    goto error;
+			    যাও error;
 			}
-			else
+			অন্যথা
 			    j = MAX_ALLOWED_STRING_WIDTH;
 		    }
 
-		    if (j >= 0)
+		    যদি (j >= 0)
 			precision = j;
-		    else
+		    অন্যথা
 		    {
 			precision_specified = 0;
 			precision = 0;
@@ -3934,157 +3934,157 @@ vim_vsnprintf_typval(
 	    }
 
 	    // parse 'h', 'l' and 'll' length modifiers
-	    if (*p == 'h' || *p == 'l')
+	    যদি (*p == 'h' || *p == 'l')
 	    {
-		length_modifier = *p;
+		দৈর্ঘ্য_modifier = *p;
 		p++;
-		if (length_modifier == 'l' && *p == 'l')
+		যদি (দৈর্ঘ্য_modifier == 'l' && *p == 'l')
 		{
 		    // double l = __int64 / varnumber_T
-		    length_modifier = 'L';
+		    দৈর্ঘ্য_modifier = 'L';
 		    p++;
 		}
 	    }
 	    fmt_spec = *p;
 
 	    // common synonyms:
-	    switch (fmt_spec)
+	    নির্বাচন (fmt_spec)
 	    {
-		case 'i': fmt_spec = 'd'; break;
-		case 'D': fmt_spec = 'd'; length_modifier = 'l'; break;
-		case 'U': fmt_spec = 'u'; length_modifier = 'l'; break;
-		case 'O': fmt_spec = 'o'; length_modifier = 'l'; break;
-		default: break;
+		ক্ষেত্র 'i': fmt_spec = 'd'; বিরতি;
+		ক্ষেত্র 'D': fmt_spec = 'd'; দৈর্ঘ্য_modifier = 'l'; বিরতি;
+		ক্ষেত্র 'U': fmt_spec = 'u'; দৈর্ঘ্য_modifier = 'l'; বিরতি;
+		ক্ষেত্র 'O': fmt_spec = 'o'; দৈর্ঘ্য_modifier = 'l'; বিরতি;
+		পূর্বনির্ধারিত: বিরতি;
 	    }
 
-# if defined(FEAT_EVAL)
-	    switch (fmt_spec)
+# যদি defined(FEAT_EVAL)
+	    নির্বাচন (fmt_spec)
 	    {
-		case 'd': case 'u': case 'o': case 'x': case 'X':
-		    if (tvs != NULL && length_modifier == '\0')
-			length_modifier = 'L';
+		ক্ষেত্র 'd': ক্ষেত্র 'u': ক্ষেত্র 'o': ক্ষেত্র 'x': ক্ষেত্র 'X':
+		    যদি (tvs != ফাঁকা && দৈর্ঘ্য_modifier == '\0')
+			দৈর্ঘ্য_modifier = 'L';
 	    }
 # endif
 
-	    if (pos_arg != -1)
+	    যদি (pos_arg != -1)
 		arg_idx = pos_arg;
 
 	    // get parameter value, do initial processing
-	    switch (fmt_spec)
+	    নির্বাচন (fmt_spec)
 	    {
 		// '%' and 'c' behave similar to 's' regarding flags and field
 		// widths
-	    case '%':
-	    case 'c':
-	    case 's':
-	    case 'S':
+	    ক্ষেত্র '%':
+	    ক্ষেত্র 'c':
+	    ক্ষেত্র 's':
+	    ক্ষেত্র 'S':
 		str_arg_l = 1;
-		switch (fmt_spec)
+		নির্বাচন (fmt_spec)
 		{
-		case '%':
+		ক্ষেত্র '%':
 		    str_arg = p;
-		    break;
+		    বিরতি;
 
-		case 'c':
+		ক্ষেত্র 'c':
 		    {
-			int j;
+			পূর্ণসংখ্যা j;
 
 			j =
-# if defined(FEAT_EVAL)
-			    tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# যদি defined(FEAT_EVAL)
+			    tvs != ফাঁকা ? tv_nr(tvs, &arg_idx) :
 # endif
 				(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 					     &arg_cur, fmt),
-				va_arg(ap, int));
+				va_arg(ap, পূর্ণসংখ্যা));
 
 			// standard demands unsigned char
-			uchar_arg = (unsigned char)j;
-			str_arg = (char *)&uchar_arg;
-			break;
+			uchar_arg = (unsigned অক্ষর)j;
+			str_arg = (অক্ষর *)&uchar_arg;
+			বিরতি;
 		    }
 
-		case 's':
-		case 'S':
+		ক্ষেত্র 's':
+		ক্ষেত্র 'S':
 		    str_arg =
-# if defined(FEAT_EVAL)
-				tvs != NULL ? tv_str(tvs, &arg_idx, &tofree) :
+# যদি defined(FEAT_EVAL)
+				tvs != ফাঁকা ? tv_str(tvs, &arg_idx, &tofree) :
 # endif
 				    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 						 &arg_cur, fmt),
-				    va_arg(ap, char *));
+				    va_arg(ap, অক্ষর *));
 
-		    if (str_arg == NULL)
+		    যদি (str_arg == ফাঁকা)
 		    {
 			str_arg = "[NULL]";
 			str_arg_l = 6;
 		    }
 		    // make sure not to address string beyond the specified
 		    // precision !!!
-		    else if (!precision_specified)
+		    অন্যথা যদি (!precision_specified)
 			str_arg_l = strlen(str_arg);
 		    // truncate string if necessary as requested by precision
-		    else if (precision == 0)
+		    অন্যথা যদি (precision == 0)
 			str_arg_l = 0;
-		    else
+		    অন্যথা
 		    {
 			// memchr on HP does not like n > 2^31  !!!
-			const char *q = memchr(str_arg, '\0',
+			ধ্রুবক অক্ষর *q = memchr(str_arg, '\0',
 				  precision <= (size_t)0x7fffffffL ? precision
 						       : (size_t)0x7fffffffL);
 
-			str_arg_l = (q == NULL) ? precision
+			str_arg_l = (q == ফাঁকা) ? precision
 						      : (size_t)(q - str_arg);
 		    }
-		    if (fmt_spec == 'S')
+		    যদি (fmt_spec == 'S')
 		    {
 			char_u	*p1;
 			size_t	i;
-			int	cell;
+			পূর্ণসংখ্যা	cell;
 
-			for (i = 0, p1 = (char_u *)str_arg; *p1;
+			জন্য (i = 0, p1 = (char_u *)str_arg; *p1;
 							  p1 += mb_ptr2len(p1))
 			{
 			    cell = mb_ptr2cells(p1);
-			    if (precision_specified && i + cell > precision)
-				break;
+			    যদি (precision_specified && i + cell > precision)
+				বিরতি;
 			    i += cell;
 			}
 
 			str_arg_l = p1 - (char_u *)str_arg;
-			if (min_field_width != 0)
+			যদি (min_field_width != 0)
 			    min_field_width += str_arg_l - i;
 		    }
-		    break;
+		    বিরতি;
 
-		default:
-		    break;
+		পূর্বনির্ধারিত:
+		    বিরতি;
 		}
-		break;
+		বিরতি;
 
-	    case 'd': case 'u':
-	    case 'b': case 'B':
-	    case 'o':
-	    case 'x': case 'X':
-	    case 'p':
+	    ক্ষেত্র 'd': ক্ষেত্র 'u':
+	    ক্ষেত্র 'b': ক্ষেত্র 'B':
+	    ক্ষেত্র 'o':
+	    ক্ষেত্র 'x': ক্ষেত্র 'X':
+	    ক্ষেত্র 'p':
 		{
 		    // NOTE: the u, b, o, x, X and p conversion specifiers
 		    // imply the value is unsigned;  d implies a signed
-		    // value
+		    //মান
 
 		    // 0 if numeric argument is zero (or if pointer is
 		    // NULL for 'p'), +1 if greater than zero (or nonzero
 		    // for unsigned arguments), -1 if negative (unsigned
 		    // argument is never negative)
-		    int arg_sign = 0;
+		    পূর্ণসংখ্যা arg_sign = 0;
 
 		    // only set for length modifier h, or for no length
 		    // modifiers
-		    int int_arg = 0;
-		    unsigned int uint_arg = 0;
+		    পূর্ণসংখ্যা int_arg = 0;
+		    unsigned পূর্ণসংখ্যা uint_arg = 0;
 
 		    // only set for length modifier l
-		    long int long_arg = 0;
-		    unsigned long int ulong_arg = 0;
+		    long পূর্ণসংখ্যা long_arg = 0;
+		    unsigned long পূর্ণসংখ্যা ulong_arg = 0;
 
 		    // only set for length modifier ll
 		    varnumber_T llong_arg = 0;
@@ -4095,133 +4095,133 @@ vim_vsnprintf_typval(
 
 		    // pointer argument value -only defined for p
 		    // conversion
-		    void *ptr_arg = NULL;
+		    শূন্য *ptr_arg = ফাঁকা;
 
-		    if (fmt_spec == 'p')
+		    যদি (fmt_spec == 'p')
 		    {
-			length_modifier = '\0';
+			দৈর্ঘ্য_modifier = '\0';
 			ptr_arg =
-# if defined(FEAT_EVAL)
-				 tvs != NULL ? (void *)tv_str(tvs, &arg_idx,
-									NULL) :
+# যদি defined(FEAT_EVAL)
+				 tvs != ফাঁকা ? (শূন্য *)tv_str(tvs, &arg_idx,
+									ফাঁকা) :
 # endif
 					(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 						     &arg_cur, fmt),
-					va_arg(ap, void *));
+					va_arg(ap, শূন্য *));
 
-			if (ptr_arg != NULL)
+			যদি (ptr_arg != ফাঁকা)
 			    arg_sign = 1;
 		    }
-		    else if (fmt_spec == 'b' || fmt_spec == 'B')
+		    অন্যথা যদি (fmt_spec == 'b' || fmt_spec == 'B')
 		    {
 			bin_arg =
-# if defined(FEAT_EVAL)
-				    tvs != NULL ?
+# যদি defined(FEAT_EVAL)
+				    tvs != ফাঁকা ?
 					   (uvarnumber_T)tv_nr(tvs, &arg_idx) :
 # endif
 					(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 						     &arg_cur, fmt),
 					va_arg(ap, uvarnumber_T));
 
-			if (bin_arg != 0)
+			যদি (bin_arg != 0)
 			    arg_sign = 1;
 		    }
-		    else if (fmt_spec == 'd')
+		    অন্যথা যদি (fmt_spec == 'd')
 		    {
 			// signed
-			switch (length_modifier)
+			নির্বাচন (দৈর্ঘ্য_modifier)
 			{
-			case '\0':
-			case 'h':
+			ক্ষেত্র '\0':
+			ক্ষেত্র 'h':
 			    // char and short arguments are passed as int.
 			    int_arg =
-# if defined(FEAT_EVAL)
-					tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# যদি defined(FEAT_EVAL)
+					tvs != ফাঁকা ? tv_nr(tvs, &arg_idx) :
 # endif
 					    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							 &arg_cur, fmt),
-					    va_arg(ap, int));
+					    va_arg(ap, পূর্ণসংখ্যা));
 
-			    if (int_arg > 0)
+			    যদি (int_arg > 0)
 				arg_sign =  1;
-			    else if (int_arg < 0)
+			    অন্যথা যদি (int_arg < 0)
 				arg_sign = -1;
-			    break;
-			case 'l':
+			    বিরতি;
+			ক্ষেত্র 'l':
 			    long_arg =
-# if defined(FEAT_EVAL)
-					tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# যদি defined(FEAT_EVAL)
+					tvs != ফাঁকা ? tv_nr(tvs, &arg_idx) :
 # endif
 					    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							 &arg_cur, fmt),
-					    va_arg(ap, long int));
+					    va_arg(ap, long পূর্ণসংখ্যা));
 
-			    if (long_arg > 0)
+			    যদি (long_arg > 0)
 				arg_sign =  1;
-			    else if (long_arg < 0)
+			    অন্যথা যদি (long_arg < 0)
 				arg_sign = -1;
-			    break;
-			case 'L':
+			    বিরতি;
+			ক্ষেত্র 'L':
 			    llong_arg =
-# if defined(FEAT_EVAL)
-					tvs != NULL ? tv_nr(tvs, &arg_idx) :
+# যদি defined(FEAT_EVAL)
+					tvs != ফাঁকা ? tv_nr(tvs, &arg_idx) :
 # endif
 					    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							 &arg_cur, fmt),
 					    va_arg(ap, varnumber_T));
 
-			    if (llong_arg > 0)
+			    যদি (llong_arg > 0)
 				arg_sign =  1;
-			    else if (llong_arg < 0)
+			    অন্যথা যদি (llong_arg < 0)
 				arg_sign = -1;
-			    break;
+			    বিরতি;
 			}
 		    }
-		    else
+		    অন্যথা
 		    {
 			// unsigned
-			switch (length_modifier)
+			নির্বাচন (দৈর্ঘ্য_modifier)
 			{
-			    case '\0':
-			    case 'h':
+			    ক্ষেত্র '\0':
+			    ক্ষেত্র 'h':
 				uint_arg =
-# if defined(FEAT_EVAL)
-					    tvs != NULL ? (unsigned)
+# যদি defined(FEAT_EVAL)
+					    tvs != ফাঁকা ? (unsigned)
 							tv_nr(tvs, &arg_idx) :
 # endif
 						(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							     &arg_cur, fmt),
-						va_arg(ap, unsigned int));
+						va_arg(ap, unsigned পূর্ণসংখ্যা));
 
-				if (uint_arg != 0)
+				যদি (uint_arg != 0)
 				    arg_sign = 1;
-				break;
-			    case 'l':
+				বিরতি;
+			    ক্ষেত্র 'l':
 				ulong_arg =
-# if defined(FEAT_EVAL)
-					    tvs != NULL ? (unsigned long)
+# যদি defined(FEAT_EVAL)
+					    tvs != ফাঁকা ? (unsigned long)
 							tv_nr(tvs, &arg_idx) :
 # endif
 						(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							     &arg_cur, fmt),
-						va_arg(ap, unsigned long int));
+						va_arg(ap, unsigned long পূর্ণসংখ্যা));
 
-				if (ulong_arg != 0)
+				যদি (ulong_arg != 0)
 				    arg_sign = 1;
-				break;
-			    case 'L':
+				বিরতি;
+			    ক্ষেত্র 'L':
 				ullong_arg =
-# if defined(FEAT_EVAL)
-					    tvs != NULL ? (uvarnumber_T)
+# যদি defined(FEAT_EVAL)
+					    tvs != ফাঁকা ? (uvarnumber_T)
 							tv_nr(tvs, &arg_idx) :
 # endif
 						(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							     &arg_cur, fmt),
 						va_arg(ap, uvarnumber_T));
 
-				if (ullong_arg != 0)
+				যদি (ullong_arg != 0)
 				    arg_sign = 1;
-				break;
+				বিরতি;
 			}
 		    }
 
@@ -4233,18 +4233,18 @@ vim_vsnprintf_typval(
 		    //   specified, the '0' flag should be ignored. This is so
 		    //   with Solaris 2.6, Digital UNIX 4.0, HPUX 10, Linux,
 		    //   FreeBSD, NetBSD; but not with Perl.
-		    if (precision_specified)
+		    যদি (precision_specified)
 			zero_padding = 0;
-		    if (fmt_spec == 'd')
+		    যদি (fmt_spec == 'd')
 		    {
-			if (force_sign && arg_sign >= 0)
+			যদি (force_sign && arg_sign >= 0)
 			    tmp[str_arg_l++] = space_for_positive ? ' ' : '+';
 			// leave negative numbers for sprintf to handle, to
 			// avoid handling tricky cases like (short int)-32768
 		    }
-		    else if (alternate_form)
+		    অন্যথা যদি (alternate_form)
 		    {
-			if (arg_sign != 0
+			যদি (arg_sign != 0
 				     && (fmt_spec == 'b' || fmt_spec == 'B'
 				      || fmt_spec == 'x' || fmt_spec == 'X') )
 			{
@@ -4256,107 +4256,107 @@ vim_vsnprintf_typval(
 		    }
 
 		    zero_padding_insertion_ind = str_arg_l;
-		    if (!precision_specified)
+		    যদি (!precision_specified)
 			precision = 1;   // default precision is 1
-		    if (precision == 0 && arg_sign == 0)
+		    যদি (precision == 0 && arg_sign == 0)
 		    {
 			// When zero value is formatted with an explicit
 			// precision 0, the resulting formatted string is
 			// empty (d, i, u, b, B, o, x, X, p).
 		    }
-		    else
+		    অন্যথা
 		    {
-			char	f[6];
-			int	f_l = 0;
+			অক্ষর	f[6];
+			পূর্ণসংখ্যা	f_l = 0;
 
 			// construct a simple format string for sprintf
 			f[f_l++] = '%';
-			if (!length_modifier)
+			যদি (!দৈর্ঘ্য_modifier)
 			    ;
-			else if (length_modifier == 'L')
+			অন্যথা যদি (দৈর্ঘ্য_modifier == 'L')
 			{
 # ifdef MSWIN
 			    f[f_l++] = 'I';
 			    f[f_l++] = '6';
 			    f[f_l++] = '4';
-# else
+# অন্যথা
 			    f[f_l++] = 'l';
 			    f[f_l++] = 'l';
 # endif
 			}
-			else
-			    f[f_l++] = length_modifier;
+			অন্যথা
+			    f[f_l++] = দৈর্ঘ্য_modifier;
 			f[f_l++] = fmt_spec;
 			f[f_l++] = '\0';
 
-			if (fmt_spec == 'p')
+			যদি (fmt_spec == 'p')
 			    str_arg_l += sprintf(tmp + str_arg_l, f, ptr_arg);
-			else if (fmt_spec == 'b' || fmt_spec == 'B')
+			অন্যথা যদি (fmt_spec == 'b' || fmt_spec == 'B')
 			{
-			    char	    b[8 * sizeof(uvarnumber_T)];
+			    অক্ষর	    b[8 * আকার(uvarnumber_T)];
 			    size_t	    b_l = 0;
 			    uvarnumber_T    bn = bin_arg;
 
-			    do
+			    করো
 			    {
-				b[sizeof(b) - ++b_l] = '0' + (bn & 0x1);
+				b[আকার(b) - ++b_l] = '0' + (bn & 0x1);
 				bn >>= 1;
 			    }
-			    while (bn != 0);
+			    যখন (bn != 0);
 
-			    memcpy(tmp + str_arg_l, b + sizeof(b) - b_l, b_l);
+			    memcpy(tmp + str_arg_l, b + আকার(b) - b_l, b_l);
 			    str_arg_l += b_l;
 			}
-			else if (fmt_spec == 'd')
+			অন্যথা যদি (fmt_spec == 'd')
 			{
 			    // signed
-			    switch (length_modifier)
+			    নির্বাচন (দৈর্ঘ্য_modifier)
 			    {
-			    case '\0': str_arg_l += sprintf(
+			    ক্ষেত্র '\0': str_arg_l += sprintf(
 						 tmp + str_arg_l, f,
 						 int_arg);
-				       break;
-			    case 'h': str_arg_l += sprintf(
+				       বিরতি;
+			    ক্ষেত্র 'h': str_arg_l += sprintf(
 						 tmp + str_arg_l, f,
 						 (short)int_arg);
-				      break;
-			    case 'l': str_arg_l += sprintf(
+				      বিরতি;
+			    ক্ষেত্র 'l': str_arg_l += sprintf(
 						tmp + str_arg_l, f, long_arg);
-				      break;
-			    case 'L': str_arg_l += sprintf(
+				      বিরতি;
+			    ক্ষেত্র 'L': str_arg_l += sprintf(
 					       tmp + str_arg_l, f, llong_arg);
-				      break;
+				      বিরতি;
 			    }
 			}
-			else
+			অন্যথা
 			{
 			    // unsigned
-			    switch (length_modifier)
+			    নির্বাচন (দৈর্ঘ্য_modifier)
 			    {
-			    case '\0': str_arg_l += sprintf(
+			    ক্ষেত্র '\0': str_arg_l += sprintf(
 						tmp + str_arg_l, f,
 						uint_arg);
-				       break;
-			    case 'h': str_arg_l += sprintf(
+				       বিরতি;
+			    ক্ষেত্র 'h': str_arg_l += sprintf(
 						tmp + str_arg_l, f,
 						(unsigned short)uint_arg);
-				      break;
-			    case 'l': str_arg_l += sprintf(
+				      বিরতি;
+			    ক্ষেত্র 'l': str_arg_l += sprintf(
 					       tmp + str_arg_l, f, ulong_arg);
-				      break;
-			    case 'L': str_arg_l += sprintf(
+				      বিরতি;
+			    ক্ষেত্র 'L': str_arg_l += sprintf(
 					      tmp + str_arg_l, f, ullong_arg);
-				      break;
+				      বিরতি;
 			    }
 			}
 
 			// include the optional minus sign and possible
 			// "0x" in the region before the zero padding
 			// insertion point
-			if (zero_padding_insertion_ind < str_arg_l
+			যদি (zero_padding_insertion_ind < str_arg_l
 				&& tmp[zero_padding_insertion_ind] == '-')
 			    zero_padding_insertion_ind++;
-			if (zero_padding_insertion_ind + 1 < str_arg_l
+			যদি (zero_padding_insertion_ind + 1 < str_arg_l
 				&& tmp[zero_padding_insertion_ind]   == '0'
 				&& (tmp[zero_padding_insertion_ind + 1] == 'x'
 				 || tmp[zero_padding_insertion_ind + 1] == 'X'))
@@ -4364,10 +4364,10 @@ vim_vsnprintf_typval(
 		    }
 
 		    {
-			size_t num_of_digits = str_arg_l
+			size_t অঙ্ক_of_digits = str_arg_l
 						 - zero_padding_insertion_ind;
 
-			if (alternate_form && fmt_spec == 'o'
+			যদি (alternate_form && fmt_spec == 'o'
 				// unless zero is already the first
 				// character
 				&& !(zero_padding_insertion_ind < str_arg_l
@@ -4375,71 +4375,71 @@ vim_vsnprintf_typval(
 			{
 			    // assure leading zero for alternate-form
 			    // octal numbers
-			    if (!precision_specified
-					     || precision < num_of_digits + 1)
+			    যদি (!precision_specified
+					     || precision < অঙ্ক_of_digits + 1)
 			    {
 				// precision is increased to force the
 				// first character to be zero, except if a
 				// zero value is formatted with an
 				// explicit precision of zero
-				precision = num_of_digits + 1;
+				precision = অঙ্ক_of_digits + 1;
 			    }
 			}
 			// zero padding to specified precision?
-			if (num_of_digits < precision)
-			    number_of_zeros_to_pad = precision - num_of_digits;
+			যদি (অঙ্ক_of_digits < precision)
+			    সংখ্যা_of_zeros_to_pad = precision - অঙ্ক_of_digits;
 		    }
 		    // zero padding to specified minimal field width?
-		    if (!justify_left && zero_padding)
+		    যদি (!justify_বাম && zero_padding)
 		    {
-			int n = (int)(min_field_width - (str_arg_l
-						    + number_of_zeros_to_pad));
-			if (n > 0)
-			    number_of_zeros_to_pad += n;
+			পূর্ণসংখ্যা n = (পূর্ণসংখ্যা)(min_field_width - (str_arg_l
+						    + সংখ্যা_of_zeros_to_pad));
+			যদি (n > 0)
+			    সংখ্যা_of_zeros_to_pad += n;
 		    }
-		    break;
+		    বিরতি;
 		}
 
-	    case 'f':
-	    case 'F':
-	    case 'e':
-	    case 'E':
-	    case 'g':
-	    case 'G':
+	    ক্ষেত্র 'f':
+	    ক্ষেত্র 'F':
+	    ক্ষেত্র 'e':
+	    ক্ষেত্র 'E':
+	    ক্ষেত্র 'g':
+	    ক্ষেত্র 'G':
 		{
 		    // Floating point.
-		    double	f;
-		    double	abs_f;
-		    char	format[40];
-		    int		l;
-		    int		remove_trailing_zeroes = FALSE;
+		    দ্বিগুণ	f;
+		    দ্বিগুণ	abs_f;
+		    অক্ষর	format[40];
+		    পূর্ণসংখ্যা		l;
+		    পূর্ণসংখ্যা		remove_trailing_zeroes = FALSE;
 
 		    f =
-# if defined(FEAT_EVAL)
-			tvs != NULL ? tv_float(tvs, &arg_idx) :
+# যদি defined(FEAT_EVAL)
+			tvs != ফাঁকা ? tv_float(tvs, &arg_idx) :
 # endif
 			    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 					 &arg_cur, fmt),
-			    va_arg(ap, double));
+			    va_arg(ap, দ্বিগুণ));
 
 		    abs_f = f < 0 ? -f : f;
 
-		    if (fmt_spec == 'g' || fmt_spec == 'G')
+		    যদি (fmt_spec == 'g' || fmt_spec == 'G')
 		    {
 			// Would be nice to use %g directly, but it prints
 			// "1.0" as "1", we don't want that.
-			if ((abs_f >= 0.001 && abs_f < 10000000.0)
+			যদি ((abs_f >= 0.001 && abs_f < 10000000.0)
 							      || abs_f == 0.0)
 			    fmt_spec = ASCII_ISUPPER(fmt_spec) ? 'F' : 'f';
-			else
+			অন্যথা
 			    fmt_spec = fmt_spec == 'g' ? 'e' : 'E';
 			remove_trailing_zeroes = TRUE;
 		    }
 
-		    if ((fmt_spec == 'f' || fmt_spec == 'F') &&
+		    যদি ((fmt_spec == 'f' || fmt_spec == 'F') &&
 # ifdef VAX
 			    abs_f > 1.0e38
-# else
+# অন্যথা
 			    abs_f > 1.0e307
 # endif
 			    )
@@ -4450,9 +4450,9 @@ vim_vsnprintf_typval(
 			str_arg_l = STRLEN(tmp);
 			zero_padding = 0;
 		    }
-		    else
+		    অন্যথা
 		    {
-			if (isnan(f))
+			যদি (isnan(f))
 			{
 			    // Not a number: nan or NAN
 			    STRCPY(tmp, ASCII_ISUPPER(fmt_spec) ? "NAN"
@@ -4460,32 +4460,32 @@ vim_vsnprintf_typval(
 			    str_arg_l = 3;
 			    zero_padding = 0;
 			}
-			else if (isinf(f))
+			অন্যথা যদি (isinf(f))
 			{
 			    STRCPY(tmp, infinity_str(f > 0.0, fmt_spec,
 					      force_sign, space_for_positive));
 			    str_arg_l = STRLEN(tmp);
 			    zero_padding = 0;
 			}
-			else
+			অন্যথা
 			{
 			    // Regular float number
 			    format[0] = '%';
 			    l = 1;
-			    if (force_sign)
+			    যদি (force_sign)
 				format[l++] = space_for_positive ? ' ' : '+';
-			    if (precision_specified)
+			    যদি (precision_specified)
 			    {
 				size_t max_prec = TMP_LEN - 10;
 
 				// Make sure we don't get more digits than we
 				// have room for.
-				if ((fmt_spec == 'f' || fmt_spec == 'F')
+				যদি ((fmt_spec == 'f' || fmt_spec == 'F')
 								&& abs_f > 1.0)
 				    max_prec -= (size_t)log10(abs_f);
-				if (precision > max_prec)
+				যদি (precision > max_prec)
 				    precision = max_prec;
-				l += sprintf(format + l, ".%d", (int)precision);
+				l += sprintf(format + l, ".%d", (পূর্ণসংখ্যা)precision);
 			    }
 			    format[l] = fmt_spec == 'F' ? 'f' : fmt_spec;
 			    format[l + 1] = NUL;
@@ -4493,30 +4493,30 @@ vim_vsnprintf_typval(
 			    str_arg_l = sprintf(tmp, format, f);
 			}
 
-			if (remove_trailing_zeroes)
+			যদি (remove_trailing_zeroes)
 			{
-			    int i;
-			    char *tp;
+			    পূর্ণসংখ্যা i;
+			    অক্ষর *tp;
 
 			    // Using %g or %G: remove superfluous zeroes.
-			    if (fmt_spec == 'f' || fmt_spec == 'F')
+			    যদি (fmt_spec == 'f' || fmt_spec == 'F')
 				tp = tmp + str_arg_l - 1;
-			    else
+			    অন্যথা
 			    {
-				tp = (char *)vim_strchr((char_u *)tmp,
+				tp = (অক্ষর *)vim_strchr((char_u *)tmp,
 						 fmt_spec == 'e' ? 'e' : 'E');
-				if (tp != NULL)
+				যদি (tp != ফাঁকা)
 				{
 				    // Remove superfluous '+' and leading
 				    // zeroes from the exponent.
-				    if (tp[1] == '+')
+				    যদি (tp[1] == '+')
 				    {
 					// Change "1.0e+07" to "1.0e07"
 					STRMOVE(tp + 1, tp + 2);
 					--str_arg_l;
 				    }
 				    i = (tp[1] == '-') ? 2 : 1;
-				    while (tp[i] == '0')
+				    যখন (tp[i] == '0')
 				    {
 					// Change "1.0e07" to "1.0e7"
 					STRMOVE(tp + i, tp + i + 1);
@@ -4526,10 +4526,10 @@ vim_vsnprintf_typval(
 				}
 			    }
 
-			    if (tp != NULL && !precision_specified)
+			    যদি (tp != ফাঁকা && !precision_specified)
 				// Remove trailing zeroes, but keep the one
 				// just after a dot.
-				while (tp > tmp + 2 && *tp == '0'
+				যখন (tp > tmp + 2 && *tp == '0'
 							     && tp[-1] != '.')
 				{
 				    STRMOVE(tp, tp + 1);
@@ -4537,16 +4537,16 @@ vim_vsnprintf_typval(
 				    --str_arg_l;
 				}
 			}
-			else
+			অন্যথা
 			{
-			    char *tp;
+			    অক্ষর *tp;
 
 			    // Be consistent: some printf("%e") use 1.0e+12
 			    // and some 1.0e+012.  Remove one zero in the last
 			    // case.
-			    tp = (char *)vim_strchr((char_u *)tmp,
+			    tp = (অক্ষর *)vim_strchr((char_u *)tmp,
 						 fmt_spec == 'e' ? 'e' : 'E');
-			    if (tp != NULL && (tp[1] == '+' || tp[1] == '-')
+			    যদি (tp != ফাঁকা && (tp[1] == '+' || tp[1] == '-')
 					  && tp[2] == '0'
 					  && vim_isdigit(tp[3])
 					  && vim_isdigit(tp[4]))
@@ -4556,49 +4556,49 @@ vim_vsnprintf_typval(
 			    }
 			}
 		    }
-		    if (zero_padding && min_field_width > str_arg_l
+		    যদি (zero_padding && min_field_width > str_arg_l
 					      && (tmp[0] == '-' || force_sign))
 		    {
 			// padding 0's should be inserted after the sign
-			number_of_zeros_to_pad = min_field_width - str_arg_l;
+			সংখ্যা_of_zeros_to_pad = min_field_width - str_arg_l;
 			zero_padding_insertion_ind = 1;
 		    }
 		    str_arg = tmp;
-		    break;
+		    বিরতি;
 		}
 
-	    default:
+	    পূর্বনির্ধারিত:
 		// unrecognized conversion specifier, keep format string
 		// as-is
 		zero_padding = 0;  // turn zero padding off for non-numeric
 				   // conversion
-		justify_left = 1;
+		justify_বাম = 1;
 		min_field_width = 0;		    // reset flags
 
 		// discard the unrecognized conversion, just keep *
 		// the unrecognized conversion character
 		str_arg = p;
 		str_arg_l = 0;
-		if (*p != NUL)
+		যদি (*p != NUL)
 		    str_arg_l++;  // include invalid conversion specifier
 				  // unchanged if not at end-of-string
-		break;
+		বিরতি;
 	    }
 
-	    if (*p != NUL)
+	    যদি (*p != NUL)
 		p++;     // step over the just processed conversion specifier
 
 	    // insert padding to the left as requested by min_field_width;
 	    // this does not include the zero padding in case of numerical
 	    // conversions
-	    if (!justify_left)
+	    যদি (!justify_বাম)
 	    {
 		// left padding with blank or zero
-		int pn = (int)(min_field_width - (str_arg_l + number_of_zeros_to_pad));
+		পূর্ণসংখ্যা pn = (পূর্ণসংখ্যা)(min_field_width - (str_arg_l + সংখ্যা_of_zeros_to_pad));
 
-		if (pn > 0)
+		যদি (pn > 0)
 		{
-		    if (str_l < str_m)
+		    যদি (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4612,21 +4612,21 @@ vim_vsnprintf_typval(
 
 	    // zero padding as requested by the precision or by the minimal
 	    // field width for numeric conversions required?
-	    if (number_of_zeros_to_pad == 0)
+	    যদি (সংখ্যা_of_zeros_to_pad == 0)
 	    {
 		// will not copy first part of numeric right now, *
 		// force it to be copied later in its entirety
 		zero_padding_insertion_ind = 0;
 	    }
-	    else
+	    অন্যথা
 	    {
 		// insert first part of numerics (sign or '0x') before zero
 		// padding
-		int zn = (int)zero_padding_insertion_ind;
+		পূর্ণসংখ্যা zn = (পূর্ণসংখ্যা)zero_padding_insertion_ind;
 
-		if (zn > 0)
+		যদি (zn > 0)
 		{
-		    if (str_l < str_m)
+		    যদি (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4639,10 +4639,10 @@ vim_vsnprintf_typval(
 
 		// insert zero padding as requested by the precision or min
 		// field width
-		zn = (int)number_of_zeros_to_pad;
-		if (zn > 0)
+		zn = (পূর্ণসংখ্যা)সংখ্যা_of_zeros_to_pad;
+		যদি (zn > 0)
 		{
-		    if (str_l < str_m)
+		    যদি (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4657,11 +4657,11 @@ vim_vsnprintf_typval(
 	    // insert formatted string
 	    // (or as-is conversion specifier for unknown conversions)
 	    {
-		int sn = (int)(str_arg_l - zero_padding_insertion_ind);
+		পূর্ণসংখ্যা sn = (পূর্ণসংখ্যা)(str_arg_l - zero_padding_insertion_ind);
 
-		if (sn > 0)
+		যদি (sn > 0)
 		{
-		    if (str_l < str_m)
+		    যদি (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4674,15 +4674,15 @@ vim_vsnprintf_typval(
 	    }
 
 	    // insert right padding
-	    if (justify_left)
+	    যদি (justify_বাম)
 	    {
 		// right blank padding to the field width
-		int pn = (int)(min_field_width
-				      - (str_arg_l + number_of_zeros_to_pad));
+		পূর্ণসংখ্যা pn = (পূর্ণসংখ্যা)(min_field_width
+				      - (str_arg_l + সংখ্যা_of_zeros_to_pad));
 
-		if (pn > 0)
+		যদি (pn > 0)
 		{
-		    if (str_l < str_m)
+		    যদি (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4697,7 +4697,7 @@ vim_vsnprintf_typval(
 	}
     }
 
-    if (str_m > 0)
+    যদি (str_m > 0)
     {
 	// make sure the string is nul-terminated even at the expense of
 	// overwriting the last character (shouldn't happen, but just in case)
@@ -4705,17 +4705,17 @@ vim_vsnprintf_typval(
 	str[str_l <= str_m - 1 ? str_l : str_m - 1] = '\0';
     }
 
-    if (tvs != NULL && tvs[num_posarg != 0 ? num_posarg : arg_idx - 1].v_type != VAR_UNKNOWN)
+    যদি (tvs != ফাঁকা && tvs[অঙ্ক_posarg != 0 ? অঙ্ক_posarg : arg_idx - 1].v_type != VAR_UNKNOWN)
 	emsg(_(e_too_many_arguments_to_printf));
 
 error:
-    vim_free((char*)ap_types);
+    vim_free((অক্ষর*)ap_types);
     va_end(ap);
 
     // Return the number of characters formatted (excluding trailing nul
     // character), that is, the number of characters that would have been
     // written to the buffer if it were large enough.
-    return (int)str_l;
+    ফেরত (পূর্ণসংখ্যা)str_l;
 }
 
 #endif // PROTO

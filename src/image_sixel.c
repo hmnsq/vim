@@ -26,9 +26,9 @@
  *   3. sixel_encode_view()     view -> sixel DCS byte sequence
  */
 
-#include "vim.h"
+#অন্তর্ভাব "vim.h"
 
-#if defined(FEAT_IMAGE_SIXEL)
+#যদি defined(FEAT_IMAGE_SIXEL)
 
 // Palette size cap (sixel allows up to 256 color registers; index 0 is
 // reserved as a transparent key, so usable colors are 1..MAX_COLORS).
@@ -38,27 +38,27 @@
  * Working buffer for one band (6 pixel rows). Allocated as
  * width * (palette_size+1) bytes; bit p (0..5) marks pixel at row offset p.
  */
-typedef struct
+প্রকারলেখ কাঠামো
 {
     char_u  *bits;	// bitmask buffer, width * paletteSize bytes
     size_t   bits_len;	// allocated bytes in "bits"
-    int	    *seen;	// per-color "used in this band" flags
-    int	    *used;	// colors used in this band
-    int	    *xmin;	// leftmost x used by color in this band
-    int	    *xmax;	// rightmost x used by color in this band
-    int	     color_len;	// allocated length for per-color arrays
-    int	     seen_gen;	// generation counter to avoid memset
+    পূর্ণসংখ্যা	    *seen;	// per-color "used in this band" flags
+    পূর্ণসংখ্যা	    *used;	// colors used in this band
+    পূর্ণসংখ্যা	    *xmin;	// leftmost x used by color in this band
+    পূর্ণসংখ্যা	    *xmax;	// rightmost x used by color in this band
+    পূর্ণসংখ্যা	     color_len;	// allocated length for per-color arrays
+    পূর্ণসংখ্যা	     seen_gen;	// generation counter to avoid memset
 } sixel_band_T;
 
-typedef struct
+প্রকারলেখ কাঠামো
 {
-    unsigned int    *keys;	// hash keys for dynamic palette lookup
+    unsigned পূর্ণসংখ্যা    *চাবিগুলি;	// hash keys for dynamic palette lookup
     char_u	    *vals;	// hash values for dynamic palette lookup
-    int		     hash_cap;	// allocated slots in keys/vals
+    পূর্ণসংখ্যা		     hash_cap;	// allocated slots in keys/vals
     char_u	    *idx;	// width * height paletted image
     size_t	     idx_len;	// allocated bytes in idx
     char_u	    *pal;	// dynamic palette storage (RGB triples)
-    int		     pal_len;	// allocated bytes in pal
+    পূর্ণসংখ্যা		     pal_len;	// allocated bytes in pal
     sixel_band_T     band;	// reusable band scratch
 } sixel_state_T;
 
@@ -66,65 +66,65 @@ typedef struct
  * A fully quantized (8bpp) image: one palette index per pixel, tightly
  * packed (stride == width), plus the palette that goes with it.
  */
-typedef struct
+প্রকারলেখ কাঠামো
 {
     char_u  *idx; // Is width*height bytes, indices 1..npal (0 = transparent)
-    int      width;
-    int      height;
+    পূর্ণসংখ্যা      width;
+    পূর্ণসংখ্যা      height;
     char_u  *pal; // Is npal*3 bytes, RGB triples
-    int      npal;
+    পূর্ণসংখ্যা      npal;
 } sixel_image8_T;
 
 /*
  * A view into a sixel_image8_T: an offset + stride,
  */
-typedef struct
+প্রকারলেখ কাঠামো
 {
     char_u  *idx; // Points at (x0,y0) inside the parent buffer
-    int      stride; // Row length of the *parent* image, not this view
-    int      width;
-    int      height;
+    পূর্ণসংখ্যা      stride; // Row length of the *parent* image, not this view
+    পূর্ণসংখ্যা      width;
+    পূর্ণসংখ্যা      height;
     char_u  *pal;
-    int      npal;
+    পূর্ণসংখ্যা      npal;
 } sixel_view_T;
 
-typedef struct
+প্রকারলেখ কাঠামো
 {
     // These are offsets relative to the top left of the image.
-    int	    row_off;
-    int	    col_off;
+    পূর্ণসংখ্যা	    row_off;
+    পূর্ণসংখ্যা	    col_off;
     char_u  *seq[2]; // Header + body
 } sixel_chunk_T;
 
-typedef struct
+প্রকারলেখ কাঠামো
 {
     sixel_image8_T image8;
 } image_sixel_T;
 
-typedef struct
+প্রকারলেখ কাঠামো
 {
     pixman_region32_t	visible_region; // Region used for the previous redraw
     bool		visible_init;
     sixel_chunk_T	*chunks;    // Cached sixel sequence (stored as multiple
 				    // chunks).
-    int			n_chunks;
+    পূর্ণসংখ্যা			n_chunks;
 } image_placement_sixel_T;
 
-static char_u		sixel_fixed_palette[240 * 3];
-static char_u		sixel_rgb_cube_idx[256];
-static bool		sixel_fixed_tables_ready = false;
-static sixel_state_T	sixel_state;
-static bool		sent_decsdm = false;
+স্থির char_u		sixel_fixed_palette[240 * 3];
+স্থির char_u		sixel_rgb_cube_idx[256];
+স্থির bool		sixel_fixed_tables_ready = false;
+স্থির sixel_state_T	sixel_state;
+স্থির bool		sent_decsdm = false;
 
 /*
  * Release all module-level allocations cached by the sixel encoder.
  */
-    void
-sixel_uninit(void)
+    শূন্য
+sixel_uninit(শূন্য)
 {
     sixel_band_T *band = &sixel_state.band;
 
-    VIM_CLEAR(sixel_state.keys);
+    VIM_CLEAR(sixel_state.চাবিগুলি);
     VIM_CLEAR(sixel_state.vals);
     VIM_CLEAR(sixel_state.idx);
     VIM_CLEAR(sixel_state.pal);
@@ -145,152 +145,152 @@ sixel_uninit(void)
 /*
  * Initialize the shared fixed sixel palette and RGB->cube lookup table.
  */
-    static void
-sixel_init_fixed_tables(void)
+    স্থির শূন্য
+sixel_init_fixed_tables(শূন্য)
 {
-    int	    r, g, b, gr, n;
+    পূর্ণসংখ্যা	    r, g, b, gr, n;
 
-    if (sixel_fixed_tables_ready)
-	return;
+    যদি (sixel_fixed_tables_ready)
+	ফেরত;
 
     n = 0;
-    for (r = 0; r < 6; r++)
-	for (g = 0; g < 6; g++)
-	    for (b = 0; b < 6; b++)
+    জন্য (r = 0; r < 6; r++)
+	জন্য (g = 0; g < 6; g++)
+	    জন্য (b = 0; b < 6; b++)
 	    {
 		sixel_fixed_palette[n * 3]     = (char_u)(r * 51);
 		sixel_fixed_palette[n * 3 + 1] = (char_u)(g * 51);
 		sixel_fixed_palette[n * 3 + 2] = (char_u)(b * 51);
 		n++;
 	    }
-    for (gr = 0; gr < 24; gr++)
+    জন্য (gr = 0; gr < 24; gr++)
     {
-	int v = 8 + gr * 10;
+	পূর্ণসংখ্যা v = 8 + gr * 10;
 
 	sixel_fixed_palette[n * 3]     = (char_u)v;
 	sixel_fixed_palette[n * 3 + 1] = (char_u)v;
 	sixel_fixed_palette[n * 3 + 2] = (char_u)v;
 	n++;
     }
-    for (n = 0; n < 256; n++)
+    জন্য (n = 0; n < 256; n++)
     {
-	int idx = n / 43;
+	পূর্ণসংখ্যা idx = n / 43;
 
 	sixel_rgb_cube_idx[n] = (char_u)(idx > 5 ? 5 : idx);
     }
     sixel_fixed_tables_ready = true;
 }
 
-    static int
-sixel_ensure_hash_capacity(int max_colors, int *cap_out)
+    স্থির পূর্ণসংখ্যা
+sixel_ensure_hash_capacity(পূর্ণসংখ্যা max_colors, পূর্ণসংখ্যা *cap_out)
 {
-    int cap = 1024;
+    পূর্ণসংখ্যা cap = 1024;
 
-    while (cap < max_colors * 4)
+    যখন (cap < max_colors * 4)
 	cap <<= 1;
-    if (cap > sixel_state.hash_cap)
+    যদি (cap > sixel_state.hash_cap)
     {
-	unsigned int	*keys;
+	unsigned পূর্ণসংখ্যা	*চাবিগুলি;
 	char_u		*vals;
 
-	keys = ALLOC_MULT(unsigned int, cap);
+	চাবিগুলি = ALLOC_MULT(unsigned পূর্ণসংখ্যা, cap);
 	vals = ALLOC_MULT(char_u, cap);
-	if (keys == NULL || vals == NULL)
+	যদি (চাবিগুলি == ফাঁকা || vals == ফাঁকা)
 	{
-	    vim_free(keys);
+	    vim_free(চাবিগুলি);
 	    vim_free(vals);
-	    return FAIL;
+	    ফেরত FAIL;
 	}
-	if (sixel_state.hash_cap > 0)
+	যদি (sixel_state.hash_cap > 0)
 	{
-	    mch_memmove(keys, sixel_state.keys,
-		    (size_t)sixel_state.hash_cap * sizeof(*keys));
+	    mch_memmove(চাবিগুলি, sixel_state.চাবিগুলি,
+		    (size_t)sixel_state.hash_cap * আকার(*চাবিগুলি));
 	    mch_memmove(vals, sixel_state.vals,
-		    (size_t)sixel_state.hash_cap * sizeof(*vals));
+		    (size_t)sixel_state.hash_cap * আকার(*vals));
 	}
-	vim_free(sixel_state.keys);
+	vim_free(sixel_state.চাবিগুলি);
 	vim_free(sixel_state.vals);
-	sixel_state.keys = keys;
+	sixel_state.চাবিগুলি = চাবিগুলি;
 	sixel_state.vals = vals;
 	sixel_state.hash_cap = cap;
     }
-    vim_memset(sixel_state.keys, 0, (size_t)cap * sizeof(*sixel_state.keys));
+    vim_memset(sixel_state.চাবিগুলি, 0, (size_t)cap * আকার(*sixel_state.চাবিগুলি));
     *cap_out = cap;
-    return OK;
+    ফেরত OK;
 }
 
-    static int
+    স্থির পূর্ণসংখ্যা
 sixel_ensure_idx_capacity(size_t pixels)
 {
-    if (pixels > sixel_state.idx_len)
+    যদি (pixels > sixel_state.idx_len)
     {
 	char_u *idx = vim_realloc(sixel_state.idx, pixels);
 
-	if (idx == NULL)
-	    return FAIL;
+	যদি (idx == ফাঁকা)
+	    ফেরত FAIL;
 	sixel_state.idx = idx;
 	sixel_state.idx_len = pixels;
     }
-    return OK;
+    ফেরত OK;
 }
 
-    static int
-sixel_ensure_pal_capacity(int max_colors)
+    স্থির পূর্ণসংখ্যা
+sixel_ensure_pal_capacity(পূর্ণসংখ্যা max_colors)
 {
-    int need = max_colors * 3;
+    পূর্ণসংখ্যা need = max_colors * 3;
 
-    if (need > sixel_state.pal_len)
+    যদি (need > sixel_state.pal_len)
     {
 	char_u *pal = vim_realloc(sixel_state.pal, (size_t)need);
 
-	if (pal == NULL)
-	    return FAIL;
+	যদি (pal == ফাঁকা)
+	    ফেরত FAIL;
 	sixel_state.pal = pal;
 	sixel_state.pal_len = need;
     }
-    return OK;
+    ফেরত OK;
 }
 
-    static int
-sixel_ensure_band_capacity(int width, int npal)
+    স্থির পূর্ণসংখ্যা
+sixel_ensure_band_capacity(পূর্ণসংখ্যা width, পূর্ণসংখ্যা npal)
 {
     size_t	    bits_need = (size_t)width * (npal + 1);
     sixel_band_T    *band = &sixel_state.band;
 
-    if (bits_need > band->bits_len)
+    যদি (bits_need > band->bits_len)
     {
 	char_u *bits = vim_realloc(band->bits, bits_need);
 
-	if (bits == NULL)
-	    return FAIL;
+	যদি (bits == ফাঁকা)
+	    ফেরত FAIL;
 	band->bits = bits;
 	band->bits_len = bits_need;
     }
-    if (npal + 1 > band->color_len)
+    যদি (npal + 1 > band->color_len)
     {
-	int *seen = ALLOC_MULT(int, npal + 1);
-	int *used = ALLOC_MULT(int, npal + 1);
-	int *xmin = ALLOC_MULT(int, npal + 1);
-	int *xmax = ALLOC_MULT(int, npal + 1);
+	পূর্ণসংখ্যা *seen = ALLOC_MULT(পূর্ণসংখ্যা, npal + 1);
+	পূর্ণসংখ্যা *used = ALLOC_MULT(পূর্ণসংখ্যা, npal + 1);
+	পূর্ণসংখ্যা *xmin = ALLOC_MULT(পূর্ণসংখ্যা, npal + 1);
+	পূর্ণসংখ্যা *xmax = ALLOC_MULT(পূর্ণসংখ্যা, npal + 1);
 
-	if (seen == NULL || used == NULL || xmin == NULL || xmax == NULL)
+	যদি (seen == ফাঁকা || used == ফাঁকা || xmin == ফাঁকা || xmax == ফাঁকা)
 	{
 	    vim_free(seen);
 	    vim_free(used);
 	    vim_free(xmin);
 	    vim_free(xmax);
-	    return FAIL;
+	    ফেরত FAIL;
 	}
-	if (band->color_len > 0)
+	যদি (band->color_len > 0)
 	{
 	    mch_memmove(seen, band->seen,
-		    (size_t)band->color_len * sizeof(*seen));
+		    (size_t)band->color_len * আকার(*seen));
 	    mch_memmove(used, band->used,
-		    (size_t)band->color_len * sizeof(*used));
+		    (size_t)band->color_len * আকার(*used));
 	    mch_memmove(xmin, band->xmin,
-		    (size_t)band->color_len * sizeof(*xmin));
+		    (size_t)band->color_len * আকার(*xmin));
 	    mch_memmove(xmax, band->xmax,
-		    (size_t)band->color_len * sizeof(*xmax));
+		    (size_t)band->color_len * আকার(*xmax));
 	}
 
 	// seen[] is checked against the band's generation counter; if the
@@ -299,12 +299,12 @@ sixel_ensure_band_capacity(int width, int npal)
 	// (and the matching slots in used/xmin/xmax for good measure) so the
 	// "first time this colour is touched" branch is always taken.
 	{
-	    size_t tail = (size_t)(npal + 1 - band->color_len);
+	    size_t লেজ = (size_t)(npal + 1 - band->color_len);
 
-	    vim_memset(seen + band->color_len, 0, tail * sizeof(*seen));
-	    vim_memset(used + band->color_len, 0, tail * sizeof(*used));
-	    vim_memset(xmin + band->color_len, 0, tail * sizeof(*xmin));
-	    vim_memset(xmax + band->color_len, 0, tail * sizeof(*xmax));
+	    vim_memset(seen + band->color_len, 0, লেজ * আকার(*seen));
+	    vim_memset(used + band->color_len, 0, লেজ * আকার(*used));
+	    vim_memset(xmin + band->color_len, 0, লেজ * আকার(*xmin));
+	    vim_memset(xmax + band->color_len, 0, লেজ * আকার(*xmax));
 	}
 	vim_free(band->seen);
 	vim_free(band->used);
@@ -316,7 +316,7 @@ sixel_ensure_band_capacity(int width, int npal)
 	band->xmax = xmax;
 	band->color_len = npal + 1;
     }
-    return OK;
+    ফেরত OK;
 }
 
 /*
@@ -338,76 +338,76 @@ sixel_ensure_band_capacity(int width, int npal)
  * Returns OK on success, FAIL when colors exceed max_colors (caller may fall
  * back to a fixed palette) or on OOM.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 rgb_to_paletted_fast(
 	char_u	*pixels,
-	int	 width,
-	int	 height,
+	পূর্ণসংখ্যা	 width,
+	পূর্ণসংখ্যা	 height,
 	bool	 has_alpha,
-	int	 max_colors,
+	পূর্ণসংখ্যা	 max_colors,
 	char_u **pal_out,
-	int	*npal_out,
+	পূর্ণসংখ্যা	*npal_out,
 	char_u **idx_out)
 {
-    int		     cap;
-    int		     mask;
-    int		     used = 0;
-    unsigned int    *keys;
+    পূর্ণসংখ্যা		     cap;
+    পূর্ণসংখ্যা		     mask;
+    পূর্ণসংখ্যা		     used = 0;
+    unsigned পূর্ণসংখ্যা    *চাবিগুলি;
     char_u	    *vals;
     char_u	    *idx;
     char_u	    *pal;
-    int		     i, n;
-    int		     bpp = has_alpha ? 4 : 3;
+    পূর্ণসংখ্যা		     i, n;
+    পূর্ণসংখ্যা		     bpp = has_alpha ? 4 : 3;
 
-    if (sixel_ensure_hash_capacity(max_colors, &cap) == FAIL
+    যদি (sixel_ensure_hash_capacity(max_colors, &cap) == FAIL
 	    || sixel_ensure_idx_capacity((size_t)width * height) == FAIL
 	    || sixel_ensure_pal_capacity(max_colors) == FAIL)
-	return FAIL;
-    keys = sixel_state.keys;
+	ফেরত FAIL;
+    চাবিগুলি = sixel_state.চাবিগুলি;
     vals = sixel_state.vals;
     idx = sixel_state.idx;
     pal = sixel_state.pal;
     mask = cap - 1;
 
     n = width * height;
-    for (i = 0; i < n; i++)
+    জন্য (i = 0; i < n; i++)
     {
 	char_u		*p = pixels + (size_t)i * bpp;
-	unsigned int	 key;
-	unsigned int	 h;
-	int		 slot;
+	unsigned পূর্ণসংখ্যা	 চাবি;
+	unsigned পূর্ণসংখ্যা	 h;
+	পূর্ণসংখ্যা		 slot;
 
-	if (has_alpha && p[3] < 128)
+	যদি (has_alpha && p[3] < 128)
 	{
 	    idx[i] = 0;	    // transparent -- terminal leaves cell as-is
-	    continue;
+	    চালু;
 	}
-	key = ((unsigned int)p[0] << 16)
-	    | ((unsigned int)p[1] << 8)
-	    | (unsigned int)p[2];
-	h = key * 2654435761u;
-	slot = (int)(h & mask);
+	চাবি = ((unsigned পূর্ণসংখ্যা)p[0] << 16)
+	    | ((unsigned পূর্ণসংখ্যা)p[1] << 8)
+	    | (unsigned পূর্ণসংখ্যা)p[2];
+	h = চাবি * 2654435761u;
+	slot = (পূর্ণসংখ্যা)(h & mask);
 
-	for (;;)
+	জন্য (;;)
 	{
-	    if (keys[slot] == 0)
+	    যদি (চাবিগুলি[slot] == 0)
 	    {
 		// new color
-		if (used >= max_colors)
-		    goto too_many;
-		keys[slot] = key + 1;
+		যদি (used >= max_colors)
+		    যাও too_many;
+		চাবিগুলি[slot] = চাবি + 1;
 		vals[slot] = (char_u)(used + 1);    // 1-based palette index
 		pal[used * 3]	  = p[0];
 		pal[used * 3 + 1] = p[1];
 		pal[used * 3 + 2] = p[2];
 		used++;
 		idx[i] = vals[slot];
-		break;
+		বিরতি;
 	    }
-	    if (keys[slot] == key + 1)
+	    যদি (চাবিগুলি[slot] == চাবি + 1)
 	    {
 		idx[i] = vals[slot];
-		break;
+		বিরতি;
 	    }
 	    slot = (slot + 1) & mask;
 	}
@@ -415,10 +415,10 @@ rgb_to_paletted_fast(
     *pal_out = pal;
     *npal_out = used;
     *idx_out = idx;
-    return OK;
+    ফেরত OK;
 
 too_many:
-    return FAIL;
+    ফেরত FAIL;
 }
 
 /*
@@ -431,36 +431,36 @@ too_many:
  * leaving the cell's underlying terminal contents visible (transparency); see
  * rgb_to_paletted_fast() for why the cut is at half coverage.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 rgb_to_paletted_fixed(
 	char_u	*pixels,
-	int	width,
-	int	height,
+	পূর্ণসংখ্যা	width,
+	পূর্ণসংখ্যা	height,
 	bool	has_alpha,
 	char_u	**pal_out,
-	int	*npal_out,
+	পূর্ণসংখ্যা	*npal_out,
 	char_u	**idx_out)
 {
     char_u  *idx;
-    int	     n;
-    int	     bpp = has_alpha ? 4 : 3;
+    পূর্ণসংখ্যা	     n;
+    পূর্ণসংখ্যা	     bpp = has_alpha ? 4 : 3;
 
-    if (sixel_ensure_idx_capacity((size_t)width * height) == FAIL)
-	return FAIL;
+    যদি (sixel_ensure_idx_capacity((size_t)width * height) == FAIL)
+	ফেরত FAIL;
     idx = sixel_state.idx;
 
     sixel_init_fixed_tables();
 
     // map every pixel to the nearest cube cell
-    for (n = 0; n < width * height; n++)
+    জন্য (n = 0; n < width * height; n++)
     {
 	char_u	*p = pixels + (size_t)n * bpp;
-	int	 ri, gi, bi;
+	পূর্ণসংখ্যা	 ri, gi, bi;
 
-	if (has_alpha && p[3] < 128)
+	যদি (has_alpha && p[3] < 128)
 	{
 	    idx[n] = 0;
-	    continue;
+	    চালু;
 	}
 	ri = sixel_rgb_cube_idx[p[0]];
 	gi = sixel_rgb_cube_idx[p[1]];
@@ -471,10 +471,10 @@ rgb_to_paletted_fixed(
     *pal_out = sixel_fixed_palette;
     *npal_out = 240;
     *idx_out = idx;
-    return OK;
+    ফেরত OK;
 }
 
-    static void
+    স্থির শূন্য
 sixel_image8_clear(sixel_image8_T *simg)
 {
     vim_free(simg->idx);
@@ -485,21 +485,21 @@ sixel_image8_clear(sixel_image8_T *simg)
  * Quantize an RGB(A) image to an 8bpp paletted image. Returns OK on success,
  * FAIL on invalid input or OOM.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 sixel_image_quantize(image_T *img, sixel_image8_T *out)
 {
-    char_u  *pal = NULL;
-    char_u  *idx = NULL;
-    int	     npal = 0;
+    char_u  *pal = ফাঁকা;
+    char_u  *idx = ফাঁকা;
+    পূর্ণসংখ্যা	     npal = 0;
 
-    if (rgb_to_paletted_fast(img->data, img->width, img->height,
+    যদি (rgb_to_paletted_fast(img->তথ্য, img->width, img->height,
 		img->fmt == IMAGE_FORMAT_RGBA,
 		SIXEL_MAX_COLORS, &pal, &npal, &idx) == FAIL)
     {
-	if (rgb_to_paletted_fixed(img->data, img->width, img->height,
+	যদি (rgb_to_paletted_fixed(img->তথ্য, img->width, img->height,
 		    img->fmt == IMAGE_FORMAT_RGBA,
 		    &pal, &npal, &idx) == FAIL)
-	    return FAIL;
+	    ফেরত FAIL;
     }
 
     out->idx = vim_memsave(idx, (size_t)img->width * img->height);
@@ -508,12 +508,12 @@ sixel_image_quantize(image_T *img, sixel_image8_T *out)
     out->pal = vim_memsave(pal, (size_t)npal * 3);
     out->npal = npal;
 
-    if (out->pal == NULL || out->idx == NULL)
+    যদি (out->pal == ফাঁকা || out->idx == ফাঁকা)
     {
 	sixel_image8_clear(out);
-	return FAIL;
+	ফেরত FAIL;
     }
-    return OK;
+    ফেরত OK;
 }
 
 /*
@@ -525,78 +525,78 @@ sixel_image_quantize(image_T *img, sixel_image8_T *out)
  * height==0), which sixel_encode_view() rejects. Returns OK on success and FAIL
  * on failure.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 sixel_image8_crop(
 	sixel_image8_T	*src,
-	int		 x,
-	int		 y,
-	int		 w,
-	int		 h,
+	পূর্ণসংখ্যা		 x,
+	পূর্ণসংখ্যা		 y,
+	পূর্ণসংখ্যা		 w,
+	পূর্ণসংখ্যা		 h,
 	sixel_view_T	*out)
 {
-    int x0, y0, x1, y1;   // clamped rectangle, half-open [x0,x1) x [y0,y1)
+    পূর্ণসংখ্যা x0, y0, x1, y1;   // clamped rectangle, half-open [x0,x1) x [y0,y1)
 
-    if (src == NULL || out == NULL)
-	return FAIL;
+    যদি (src == ফাঁকা || out == ফাঁকা)
+	ফেরত FAIL;
 
     x0 = x < 0 ? 0 : x;
     y0 = y < 0 ? 0 : y;
     x1 = x + w;
     y1 = y + h;
-    if (x1 > src->width)
+    যদি (x1 > src->width)
 	x1 = src->width;
-    if (y1 > src->height)
+    যদি (y1 > src->height)
 	y1 = src->height;
-    if (x1 < x0)
+    যদি (x1 < x0)
 	x1 = x0;
-    if (y1 < y0)
+    যদি (y1 < y0)
 	y1 = y0;
 
-    if (x1 <= x0 || y1 <= y0)
-	return FAIL;
+    যদি (x1 <= x0 || y1 <= y0)
+	ফেরত FAIL;
 
     out->stride = src->width;
     out->idx    = (x1 > x0 && y1 > y0)
 	? src->idx + (size_t)y0 * src->width + x0
-	: NULL;
+	: ফাঁকা;
     out->width  = x1 - x0;
     out->height = y1 - y0;
     out->pal    = src->pal;
     out->npal   = src->npal;
 
-    return OK;
+    ফেরত OK;
 }
 
 /*
  * Emit a run of `cnt` identical sixel data bytes (ch in 0..63) into gap.
  * Uses RLE form `!N{c}` when it shortens the output.
  */
-    static int
-emit_run(garray_T *gap, char_u ch, int cnt)
+    স্থির পূর্ণসংখ্যা
+emit_run(garray_T *gap, char_u ch, পূর্ণসংখ্যা cnt)
 {
     char_u  c = (char_u)(63 + ch);
 
-    while (cnt > 255)
+    যখন (cnt > 255)
     {
-	if (ga_concat_bytes(gap, "!255", 4) == FAIL
+	যদি (ga_concat_bytes(gap, "!255", 4) == FAIL
 		|| ga_append(gap, c) == FAIL)
-	    return FAIL;
+	    ফেরত FAIL;
 	cnt -= 255;
     }
-    if (cnt <= 0)
-	return OK;
-    if (cnt <= 3)
+    যদি (cnt <= 0)
+	ফেরত OK;
+    যদি (cnt <= 3)
     {
-	while (cnt-- > 0)
-	    if (ga_append(gap, c) == FAIL)
-		return FAIL;
-	return OK;
+	যখন (cnt-- > 0)
+	    যদি (ga_append(gap, c) == FAIL)
+		ফেরত FAIL;
+	ফেরত OK;
     }
-    if (ga_append(gap, '!') == FAIL
+    যদি (ga_append(gap, '!') == FAIL
 	    || ga_concat_int(gap, cnt) == FAIL
 	    || ga_append(gap, c) == FAIL)
-	return FAIL;
-    return OK;
+	ফেরত FAIL;
+    ফেরত OK;
 }
 
 /*
@@ -608,7 +608,7 @@ emit_run(garray_T *gap, char_u ch, int cnt)
  * Note that check if each string is NULL! Probably can't happen but be safe.
  * Returns FAIL on failure.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 sixel_encode_view(sixel_view_T *view, char_u *seq[2])
 {
     garray_T	    hdr;    // DCS introducer, raster attrs, used-color defs
@@ -616,9 +616,9 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
     sixel_band_T    *band_state = &sixel_state.band;
     char_u	    *idx;
     char_u	    *pal;
-    int		    npal;
-    int		    width, height;
-    int		    band, p, x, n;
+    পূর্ণসংখ্যা		    npal;
+    পূর্ণসংখ্যা		    width, height;
+    পূর্ণসংখ্যা		    band, p, x, n;
     bool	    defined[256];   // register already defined in header
 
     idx = view->idx;
@@ -627,9 +627,9 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
     width = view->width;
     height = view->height;
 
-    ga_init2(&hdr, sizeof(char_u), 256);
-    ga_init2(&body, sizeof(char_u), 4096);
-    vim_memset(defined, 0, sizeof(defined));
+    ga_init2(&hdr, আকার(char_u), 256);
+    ga_init2(&body, আকার(char_u), 4096);
+    vim_memset(defined, 0, আকার(defined));
 
     // DECSIXEL Introducer + Raster Attributes "1;1;W;H.
     // P2=1 means pixel positions left unspecified by any colour register
@@ -638,81 +638,81 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
     // alpha < 128 pixels are emitted as palette index 0 (which we never
     // write to the bitmask), so the terminal leaves the popup's underlying
     // cell colour visible there -- no flatten, no colour-match drift.
-    if (ga_concat_bytes(&hdr, "\033P0;1;8q\"1;1;", 13) == FAIL
+    যদি (ga_concat_bytes(&hdr, "\033P0;1;8q\"1;1;", 13) == FAIL
 	    || ga_concat_int(&hdr, width) == FAIL
 	    || ga_append(&hdr, ';') == FAIL
 	    || ga_concat_int(&hdr, height) == FAIL)
-	goto fail;
+	যাও fail;
 
     // bitmask buffer: (crop) width bytes per palette index, +1 for the
     // unused index 0.  Sized off the view's width, not the parent image's
     // width, so encoding a small crop out of a large quantized image only
     // needs scratch space proportional to the crop.
-    if (sixel_ensure_band_capacity(width, npal) == FAIL)
-	goto fail;
+    যদি (sixel_ensure_band_capacity(width, npal) == FAIL)
+	যাও fail;
 
-    for (band = 0; band < (height + 5) / 6; band++)
+    জন্য (band = 0; band < (height + 5) / 6; band++)
     {
-	int gen;
-	int last_was_cr = 0;
-	int used_count = 0;
+	পূর্ণসংখ্যা gen;
+	পূর্ণসংখ্যা last_was_cr = 0;
+	পূর্ণসংখ্যা used_গুনতি = 0;
 
-	if (++band_state->seen_gen <= 0)
+	যদি (++band_state->seen_gen <= 0)
 	{
-	    vim_memset(band_state->seen, 0, (npal + 1) * sizeof(int));
+	    vim_memset(band_state->seen, 0, (npal + 1) * আকার(পূর্ণসংখ্যা));
 	    band_state->seen_gen = 1;
 	}
 	gen = band_state->seen_gen;
 
-	if (band > 0 && ga_append(&body, '-') == FAIL)
-	    goto fail;
+	যদি (band > 0 && ga_append(&body, '-') == FAIL)
+	    যাও fail;
 
 	// Fill the bitmask for this band.
-	for (p = 0; p < 6; p++)
+	জন্য (p = 0; p < 6; p++)
 	{
-	    int y = band * 6 + p;
+	    পূর্ণসংখ্যা y = band * 6 + p;
 	    char_u  rowmask = (char_u)(1 << p);
 	    char_u  *row;
 
-	    if (y >= height)
-		continue;
+	    যদি (y >= height)
+		চালু;
 	    // Use the *parent* stride to find the row -- "idx" already
 	    // points at the crop's top-left corner, so only the row-to-row
 	    // step needs to know about the parent's real width.
 	    row = idx + (size_t)y * view->stride;
-	    for (x = 0; x < width; x++)
+	    জন্য (x = 0; x < width; x++)
 	    {
 		char_u  pix = row[x];
 
-		if (pix == 0)
-		    continue;
-		if (band_state->seen[pix] != gen)
+		যদি (pix == 0)
+		    চালু;
+		যদি (band_state->seen[pix] != gen)
 		{
 		    band_state->seen[pix] = gen;
-		    band_state->used[used_count++] = pix;
+		    band_state->used[used_গুনতি++] = pix;
 		    band_state->xmin[pix] = x;
 		    band_state->xmax[pix] = x;
 		    vim_memset(band_state->bits + (size_t)pix * width, 0, width);
 		}
-		else
+		অন্যথা
 		{
-		    if (x < band_state->xmin[pix])
+		    যদি (x < band_state->xmin[pix])
 			band_state->xmin[pix] = x;
-		    if (x > band_state->xmax[pix])
+		    যদি (x > band_state->xmax[pix])
 			band_state->xmax[pix] = x;
 		}
 		band_state->bits[(size_t)pix * width + x] |= rowmask;
 	    }
 	}
 
-	for (n = 0; n < used_count; n++)
+	জন্য (n = 0; n < used_গুনতি; n++)
 	{
-	    int	     pix = band_state->used[n];
+	    পূর্ণসংখ্যা	     pix = band_state->used[n];
 	    char_u  *row;
 	    char_u   ch0;
-	    int	     cnt;
-	    int	     start = band_state->xmin[pix];
-	    int	     end = band_state->xmax[pix];
+	    পূর্ণসংখ্যা	     cnt;
+	    পূর্ণসংখ্যা	     start = band_state->xmin[pix];
+	    পূর্ণসংখ্যা	     end = band_state->xmax[pix];
 
 	    // First time this colour is used in the subrect: add its
 	    // definition "#N;2;R;G;B" (RGB scaled to 0..100) to the header.
@@ -722,14 +722,14 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
 	    // darker.  This matters when the popup blends RGBA alpha onto the
 	    // terminal background: truncation made the flattened bg visibly
 	    // darker than the surrounding terminal cells.
-	    if (!defined[pix])
+	    যদি (!defined[pix])
 	    {
-		int r = (pal[(pix - 1) * 3]     * 100 + 127) / 255;
-		int g = (pal[(pix - 1) * 3 + 1] * 100 + 127) / 255;
-		int b = (pal[(pix - 1) * 3 + 2] * 100 + 127) / 255;
+		পূর্ণসংখ্যা r = (pal[(pix - 1) * 3]     * 100 + 127) / 255;
+		পূর্ণসংখ্যা g = (pal[(pix - 1) * 3 + 1] * 100 + 127) / 255;
+		পূর্ণসংখ্যা b = (pal[(pix - 1) * 3 + 2] * 100 + 127) / 255;
 
 		defined[pix] = true;
-		if (ga_append(&hdr, '#') == FAIL
+		যদি (ga_append(&hdr, '#') == FAIL
 			|| ga_concat_int(&hdr, pix) == FAIL
 			|| ga_concat_bytes(&hdr, ";2;", 3) == FAIL
 			|| ga_concat_int(&hdr, r) == FAIL
@@ -737,69 +737,69 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
 			|| ga_concat_int(&hdr, g) == FAIL
 			|| ga_append(&hdr, ';') == FAIL
 			|| ga_concat_int(&hdr, b) == FAIL)
-		    goto fail;
+		    যাও fail;
 	    }
 
-	    if (last_was_cr && ga_append(&body, '$') == FAIL)
-		goto fail;
-	    if (ga_append(&body, '#') == FAIL
+	    যদি (last_was_cr && ga_append(&body, '$') == FAIL)
+		যাও fail;
+	    যদি (ga_append(&body, '#') == FAIL
 		    || ga_concat_int(&body, pix) == FAIL)
-		goto fail;
+		যাও fail;
 
 	    row = band_state->bits + (size_t)pix * width;
-	    if (start > 0 && emit_run(&body, 0, start) == FAIL)
-		goto fail;
+	    যদি (start > 0 && emit_run(&body, 0, start) == FAIL)
+		যাও fail;
 	    ch0 = row[start];
 	    cnt = 1;
-	    for (x = start + 1; x <= end; x++)
+	    জন্য (x = start + 1; x <= end; x++)
 	    {
 		char_u  ch = row[x];
 
-		if (ch == ch0)
+		যদি (ch == ch0)
 		{
 		    cnt++;
-		    continue;
+		    চালু;
 		}
-		if (emit_run(&body, ch0, cnt) == FAIL)
-		    goto fail;
+		যদি (emit_run(&body, ch0, cnt) == FAIL)
+		    যাও fail;
 		ch0 = ch;
 		cnt = 1;
 	    }
-	    if (emit_run(&body, ch0, cnt) == FAIL)
-		goto fail;
+	    যদি (emit_run(&body, ch0, cnt) == FAIL)
+		যাও fail;
 	    last_was_cr = 1;
 	}
     }
 
-    if (ga_append(&hdr, NUL) == FAIL
+    যদি (ga_append(&hdr, NUL) == FAIL
 	    || ga_concat_bytes(&body, "\033\\", 3) == FAIL)
-	goto fail;
+	যাও fail;
 
-    seq[0] = (char_u *)hdr.ga_data;
-    seq[1] = (char_u *)body.ga_data;
+    seq[0] = (char_u *)hdr.ga_তথ্য;
+    seq[1] = (char_u *)body.ga_তথ্য;
 
-    return OK;
+    ফেরত OK;
 
 fail:
     ga_clear(&hdr);
     ga_clear(&body);
-    return FAIL;
+    ফেরত FAIL;
 }
 
-    int
+    পূর্ণসংখ্যা
 image_sixel_init(image_T *img)
 {
     image_sixel_T *ctx;
 
     ctx = ALLOC_CLEAR_ONE(image_sixel_T);
-    if (ctx == NULL || sixel_image_quantize(img, &ctx->image8) == FAIL)
+    যদি (ctx == ফাঁকা || sixel_image_quantize(img, &ctx->image8) == FAIL)
     {
 	vim_free(ctx);
-	return FAIL;
+	ফেরত FAIL;
     }
 
-#if defined(FEAT_IMAGE_SIXEL) && defined(FEAT_TERMRESPONSE)
-    if (!sent_decsdm)
+#যদি defined(FEAT_IMAGE_SIXEL) && defined(FEAT_TERMRESPONSE)
+    যদি (!sent_decsdm)
     {
 	// Disable sixel scrolling using DECSDM
 	out_str((char_u *)"\033[?80l");
@@ -807,37 +807,37 @@ image_sixel_init(image_T *img)
     }
 #endif
 
-    img->backend_data = ctx;
-    return OK;
+    img->backend_তথ্য = ctx;
+    ফেরত OK;
 }
 
-    void
+    শূন্য
 image_sixel_uninit(image_T *img)
 {
-    image_sixel_T *ctx = img->backend_data;
+    image_sixel_T *ctx = img->backend_তথ্য;
 
     sixel_image8_clear(&ctx->image8);
-    vim_free(img->backend_data);
+    vim_free(img->backend_তথ্য);
 }
 
-    int
+    পূর্ণসংখ্যা
 image_placement_sixel_init(image_placement_T *place)
 {
     image_placement_sixel_T *ctx = ALLOC_CLEAR_ONE(image_placement_sixel_T);
 
-    if (ctx == NULL)
-	return FAIL;
-    place->backend_data = ctx;
-    return OK;
+    যদি (ctx == ফাঁকা)
+	ফেরত FAIL;
+    place->backend_তথ্য = ctx;
+    ফেরত OK;
 }
 
-    static void
+    স্থির শূন্য
 clear_chunks(image_placement_sixel_T *ctx)
 {
-    if (ctx->chunks == NULL)
-	return;
+    যদি (ctx->chunks == ফাঁকা)
+	ফেরত;
 
-    for (int i = 0; i < ctx->n_chunks; i++)
+    জন্য (পূর্ণসংখ্যা i = 0; i < ctx->n_chunks; i++)
     {
 	vim_free(ctx->chunks[i].seq[0]);
 	vim_free(ctx->chunks[i].seq[1]);
@@ -846,75 +846,75 @@ clear_chunks(image_placement_sixel_T *ctx)
     ctx->n_chunks = 0;
 }
 
-    void
+    শূন্য
 image_placement_sixel_uninit(image_placement_T *place)
 {
-    image_placement_sixel_T *ctx = place->backend_data;
+    image_placement_sixel_T *ctx = place->backend_তথ্য;
 
-    if (ctx->visible_init)
+    যদি (ctx->visible_init)
 	pixman_region32_fini(&ctx->visible_region);
     clear_chunks(ctx);
     vim_free(ctx);
 }
 
-    void
+    শূন্য
 image_placement_sixel_draw(image_placement_T *place)
 {
     image_T		    *img = place->img;
-    image_sixel_T	    *ictx = img->backend_data;
-    image_placement_sixel_T *ctx = place->backend_data;
+    image_sixel_T	    *ictx = img->backend_তথ্য;
+    image_placement_sixel_T *ctx = place->backend_তথ্য;
     sixel_view_T	    view;
     pixman_box32_t	    *rects;
-    int			    n_rects;
+    পূর্ণসংখ্যা			    n_rects;
 
     // Check if visible region is still the same, if so then use the cached
     // sixel sequences.
-    if (!(place->flags & IMAGEPF_FORCE) && ctx->visible_init
+    যদি (!(place->flags & IMAGEPF_FORCE) && ctx->visible_init
 	    && pixman_region32_equal(&ctx->visible_region, &place->visible))
     {
-	for (int i = 0; i < pixman_region32_n_rects(&ctx->visible_region); i++)
+	জন্য (পূর্ণসংখ্যা i = 0; i < pixman_region32_n_rects(&ctx->visible_region); i++)
 	{
 	    sixel_chunk_T *chunk = ctx->chunks + i;
 
 	    windgoto(place->row + place->row_off
 		    + chunk->row_off, place->col + chunk->col_off);
-	    if (chunk->seq[0] != NULL)
+	    যদি (chunk->seq[0] != ফাঁকা)
 		out_str(chunk->seq[0]);
-	    if (chunk->seq[1] != NULL)
+	    যদি (chunk->seq[1] != ফাঁকা)
 		out_str(chunk->seq[1]);
 	    screen_start();
 	}
-	return;
+	ফেরত;
     }
 
     rects = pixman_region32_rectangles(&place->visible, &n_rects);
-    if (rects == NULL || n_rects == 0)
-	return;
+    যদি (rects == ফাঁকা || n_rects == 0)
+	ফেরত;
 
     clear_chunks(ctx);
     ctx->chunks = ALLOC_CLEAR_MULT(sixel_chunk_T, n_rects);
 
-    if (ctx->chunks == NULL)
-	return;
+    যদি (ctx->chunks == ফাঁকা)
+	ফেরত;
 
-    for (int i = 0; i < n_rects; i++)
+    জন্য (পূর্ণসংখ্যা i = 0; i < n_rects; i++)
     {
 	pixman_box32_t	rect = rects[i];
-	int		row, col;
-	int		x, y, w, h;
+	পূর্ণসংখ্যা		row, col;
+	পূর্ণসংখ্যা		x, y, w, h;
 	sixel_chunk_T	*chunk = ctx->chunks + i;
 	char_u		*seq[2];
 
 	image_placement_subrect(place, rect, &row, &col, &x, &y, &w, &h, false);
 
-	if (sixel_image8_crop(&ictx->image8, x, y, w, h, &view) == FAIL
+	যদি (sixel_image8_crop(&ictx->image8, x, y, w, h, &view) == FAIL
 		|| sixel_encode_view(&view, seq) == FAIL)
-	    continue;
+	    চালু;
 
 	windgoto(row, col);
-	if (seq[0] != NULL)
+	যদি (seq[0] != ফাঁকা)
 	    out_str(seq[0]);
-	if (seq[1] != NULL)
+	যদি (seq[1] != ফাঁকা)
 	    out_str(seq[1]);
 	screen_start();
 
@@ -925,13 +925,13 @@ image_placement_sixel_draw(image_placement_T *place)
 	ctx->n_chunks++;
     }
 
-    if (ctx->visible_init)
+    যদি (ctx->visible_init)
 	pixman_region32_clear(&ctx->visible_region);
     pixman_region32_copy(&ctx->visible_region, &place->visible);
     ctx->visible_init = true;
 }
 
-    void
+    শূন্য
 image_placement_sixel_clear(image_placement_T *place UNUSED)
 {
 }

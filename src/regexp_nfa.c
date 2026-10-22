@@ -32,7 +32,7 @@
 // Added to NFA_ANY - NFA_NUPPER_IC to include a NL.
 #define NFA_ADD_NL		31
 
-enum
+গণনা
 {
     NFA_SPLIT = -1024,
     NFA_MATCH,
@@ -85,11 +85,11 @@ enum
     NFA_OPT_CHARS,		    // \%[abc]
 
     // The following are used only in the postfix form, not in the NFA
-    NFA_PREV_ATOM_NO_WIDTH,	    // Used for \@=
-    NFA_PREV_ATOM_NO_WIDTH_NEG,	    // Used for \@!
-    NFA_PREV_ATOM_JUST_BEFORE,	    // Used for \@<=
-    NFA_PREV_ATOM_JUST_BEFORE_NEG,  // Used for \@<!
-    NFA_PREV_ATOM_LIKE_PATTERN,	    // Used for \@>
+    NFA_পূর্ব_ATOM_NO_WIDTH,	    // Used for \@=
+    NFA_পূর্ব_ATOM_NO_WIDTH_NEG,	    // Used for \@!
+    NFA_পূর্ব_ATOM_JUST_BEFORE,	    // Used for \@<=
+    NFA_পূর্ব_ATOM_JUST_BEFORE_NEG,  // Used for \@<!
+    NFA_পূর্ব_ATOM_LIKE_PATTERN,	    // Used for \@>
 
     NFA_BACKREF1,		    // \1
     NFA_BACKREF2,		    // \2
@@ -179,7 +179,7 @@ enum
     NFA_NOCTAL,		//	Match non-octal char
     NFA_WORD,		//	Match word char
     NFA_NWORD,		//	Match non-word char
-    NFA_HEAD,		//	Match head char
+    NFA_শীর্ষ,		//	Match head char
     NFA_NHEAD,		//	Match non-head char
     NFA_ALPHA,		//	Match alpha char
     NFA_NALPHA,		//	Match non-alpha char
@@ -233,93 +233,93 @@ enum
 };
 
 // Keep in sync with classchars.
-static const int nfa_classcodes[] = {
+স্থির ধ্রুবক পূর্ণসংখ্যা nfa_classcodes[] = {
     NFA_ANY, NFA_IDENT, NFA_SIDENT, NFA_KWORD,NFA_SKWORD,
     NFA_FNAME, NFA_SFNAME, NFA_PRINT, NFA_SPRINT,
     NFA_WHITE, NFA_NWHITE, NFA_DIGIT, NFA_NDIGIT,
     NFA_HEX, NFA_NHEX, NFA_OCTAL, NFA_NOCTAL,
-    NFA_WORD, NFA_NWORD, NFA_HEAD, NFA_NHEAD,
+    NFA_WORD, NFA_NWORD, NFA_শীর্ষ, NFA_NHEAD,
     NFA_ALPHA, NFA_NALPHA, NFA_LOWER, NFA_NLOWER,
     NFA_UPPER, NFA_NUPPER
 };
 
 // Variables only used in nfa_regcomp() and descendants.
-static int nfa_re_flags; // re_flags passed to nfa_regcomp()
-static int *post_start;  // holds the postfix form of r.e.
-static int post_start_len;  // size of allocated post_start (in ints)
-static int *post_end;
-static int *post_ptr;
-static int nfa_reg_parse_depth;	// nesting depth in nfa_reg()
+স্থির পূর্ণসংখ্যা nfa_re_flags; // re_flags passed to nfa_regcomp()
+স্থির পূর্ণসংখ্যা *post_start;  // holds the postfix form of r.e.
+স্থির পূর্ণসংখ্যা post_start_len;  // size of allocated post_start (in ints)
+স্থির পূর্ণসংখ্যা *post_end;
+স্থির পূর্ণসংখ্যা *post_ptr;
+স্থির পূর্ণসংখ্যা nfa_reg_parse_depth;	// nesting depth in nfa_reg()
 
 // The postfix list (post_start) and fragment stack (nfa_stack) are reused
 // across compilations; a buffer that grew past these sizes for a big pattern
 // is freed afterwards instead of being kept, to avoid holding much memory.
 #define NFA_POSTFIX_KEEP	10000	// number of ints (~40 Kbyte)
-#define NFA_STACK_KEEP		4000	// number of Frag_T (~64 Kbyte)
+#define NFA_স্তূপ_KEEP		4000	// number of Frag_T (~64 Kbyte)
 
 // Set when the pattern should use the NFA engine.
 // E.g. [[:upper:]] only allows 8bit characters for BT engine,
 // while NFA engine handles multibyte characters correctly.
-static int wants_nfa;
+স্থির পূর্ণসংখ্যা wants_nfa;
 
-static int nstate;	// Number of states in the NFA.
-static int istate;	// Index in the state vector, used in alloc_state()
+স্থির পূর্ণসংখ্যা nstate;	// Number of states in the NFA.
+স্থির পূর্ণসংখ্যা istate;	// Index in the state vector, used in alloc_state()
 
 // If not NULL match must end at this position
-static save_se_T *nfa_endp = NULL;
+স্থির save_se_T *nfa_endp = ফাঁকা;
 
 // 0 for first call to nfa_regmatch(), 1 for recursive call.
-static int nfa_ll_index = 0;
+স্থির পূর্ণসংখ্যা nfa_ll_সূচক = 0;
 
-static int realloc_post_list(void);
-static int nfa_reg(int paren);
+স্থির পূর্ণসংখ্যা realloc_post_list(শূন্য);
+স্থির পূর্ণসংখ্যা nfa_reg(পূর্ণসংখ্যা paren);
 #ifdef DEBUG
-static void nfa_print_state2(FILE *debugf, nfa_state_T *state, garray_T *indent);
+স্থির শূন্য nfa_print_state2(FILE *debugf, nfa_state_T *state, garray_T *indent);
 #endif
-static int match_follows(nfa_state_T *startstate, int depth);
-static int failure_chance(nfa_state_T *state, int depth);
+স্থির পূর্ণসংখ্যা match_follows(nfa_state_T *startstate, পূর্ণসংখ্যা depth);
+স্থির পূর্ণসংখ্যা failure_chance(nfa_state_T *state, পূর্ণসংখ্যা depth);
 
 // helper functions used when doing re2post() ... regatom() parsing
-#define EMIT(c)	do {				\
-		    if (post_ptr >= post_end && realloc_post_list() == FAIL) \
-			return FAIL;		\
+#define EMIT(c)	করো {				\
+		    যদি (post_ptr >= post_end && realloc_post_list() == FAIL) \
+			ফেরত FAIL;		\
 		    *post_ptr++ = c;		\
-		} while (0)
+		} যখন (0)
 
 /*
  * Initialize internal variables before NFA compilation.
  * Return OK on success, FAIL otherwise.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 nfa_regcomp_start(
-    char_u	*expr,
-    int		re_flags)	    // see vim_regcomp()
+    char_u	*রাশিমালা,
+    পূর্ণসংখ্যা		re_flags)	    // see vim_regcomp()
 {
-    size_t	postfix_size;
-    int		nstate_max;
+    size_t	postfix_আকার;
+    পূর্ণসংখ্যা		nstate_max;
 
     nstate = 0;
     istate = 0;
     // A reasonable estimation for maximum size
-    nstate_max = (int)(STRLEN(expr) + 1) * 25;
+    nstate_max = (পূর্ণসংখ্যা)(STRLEN(রাশিমালা) + 1) * 25;
 
     // Some items blow up in size, such as [A-z].  Add more space for that.
     // When it is still not enough realloc_post_list() will be used.
     nstate_max += 1000;
 
     // Size for postfix representation of expr.
-    postfix_size = sizeof(int) * nstate_max;
+    postfix_আকার = আকার(পূর্ণসংখ্যা) * nstate_max;
 
     // Reuse the postfix buffer across compilations, only growing it when the
     // estimate exceeds the current size; it is freed in free_regexp_stuff().
-    if (post_start == NULL || post_start_len < nstate_max)
+    যদি (post_start == ফাঁকা || post_start_len < nstate_max)
     {
 	vim_free(post_start);
-	post_start = alloc(postfix_size);
-	if (post_start == NULL)
+	post_start = alloc(postfix_আকার);
+	যদি (post_start == ফাঁকা)
 	{
 	    post_start_len = 0;
-	    return FAIL;
+	    ফেরত FAIL;
 	}
 	post_start_len = nstate_max;
     }
@@ -331,154 +331,154 @@ nfa_regcomp_start(
     nfa_reg_parse_depth = 0;
 
     // shared with BT engine
-    regcomp_start(expr, re_flags);
+    regcomp_start(রাশিমালা, re_flags);
 
-    return OK;
+    ফেরত OK;
 }
 
 /*
  * Figure out if the NFA state list starts with an anchor, must match at start
  * of the line.
  */
-    static int
-nfa_get_reganch(nfa_state_T *start, int depth)
+    স্থির পূর্ণসংখ্যা
+nfa_get_reganch(nfa_state_T *start, পূর্ণসংখ্যা depth)
 {
     nfa_state_T *p = start;
 
-    if (depth > 4)
-	return 0;
+    যদি (depth > 4)
+	ফেরত 0;
 
-    while (p != NULL)
+    যখন (p != ফাঁকা)
     {
-	switch (p->c)
+	নির্বাচন (p->c)
 	{
-	    case NFA_BOL:
-	    case NFA_BOF:
-		return 1; // yes!
+	    ক্ষেত্র NFA_BOL:
+	    ক্ষেত্র NFA_BOF:
+		ফেরত 1; // yes!
 
-	    case NFA_ZSTART:
-	    case NFA_ZEND:
-	    case NFA_CURSOR:
-	    case NFA_VISUAL:
+	    ক্ষেত্র NFA_ZSTART:
+	    ক্ষেত্র NFA_ZEND:
+	    ক্ষেত্র NFA_CURSOR:
+	    ক্ষেত্র NFA_VISUAL:
 
-	    case NFA_MOPEN:
-	    case NFA_MOPEN1:
-	    case NFA_MOPEN2:
-	    case NFA_MOPEN3:
-	    case NFA_MOPEN4:
-	    case NFA_MOPEN5:
-	    case NFA_MOPEN6:
-	    case NFA_MOPEN7:
-	    case NFA_MOPEN8:
-	    case NFA_MOPEN9:
-	    case NFA_NOPEN:
+	    ক্ষেত্র NFA_MOPEN:
+	    ক্ষেত্র NFA_MOPEN1:
+	    ক্ষেত্র NFA_MOPEN2:
+	    ক্ষেত্র NFA_MOPEN3:
+	    ক্ষেত্র NFA_MOPEN4:
+	    ক্ষেত্র NFA_MOPEN5:
+	    ক্ষেত্র NFA_MOPEN6:
+	    ক্ষেত্র NFA_MOPEN7:
+	    ক্ষেত্র NFA_MOPEN8:
+	    ক্ষেত্র NFA_MOPEN9:
+	    ক্ষেত্র NFA_NOPEN:
 #ifdef FEAT_SYN_HL
-	    case NFA_ZOPEN:
-	    case NFA_ZOPEN1:
-	    case NFA_ZOPEN2:
-	    case NFA_ZOPEN3:
-	    case NFA_ZOPEN4:
-	    case NFA_ZOPEN5:
-	    case NFA_ZOPEN6:
-	    case NFA_ZOPEN7:
-	    case NFA_ZOPEN8:
-	    case NFA_ZOPEN9:
+	    ক্ষেত্র NFA_ZOPEN:
+	    ক্ষেত্র NFA_ZOPEN1:
+	    ক্ষেত্র NFA_ZOPEN2:
+	    ক্ষেত্র NFA_ZOPEN3:
+	    ক্ষেত্র NFA_ZOPEN4:
+	    ক্ষেত্র NFA_ZOPEN5:
+	    ক্ষেত্র NFA_ZOPEN6:
+	    ক্ষেত্র NFA_ZOPEN7:
+	    ক্ষেত্র NFA_ZOPEN8:
+	    ক্ষেত্র NFA_ZOPEN9:
 #endif
 		p = p->out;
-		break;
+		বিরতি;
 
-	    case NFA_SPLIT:
-		return nfa_get_reganch(p->out, depth + 1)
+	    ক্ষেত্র NFA_SPLIT:
+		ফেরত nfa_get_reganch(p->out, depth + 1)
 				       && nfa_get_reganch(p->out1, depth + 1);
 
-	    default:
-		return 0; // noooo
+	    পূর্বনির্ধারিত:
+		ফেরত 0; // noooo
 	}
     }
-    return 0;
+    ফেরত 0;
 }
 
 /*
  * Figure out if the NFA state list starts with a character which must match
  * at start of the match.
  */
-    static int
-nfa_get_regstart(nfa_state_T *start, int depth)
+    স্থির পূর্ণসংখ্যা
+nfa_get_regstart(nfa_state_T *start, পূর্ণসংখ্যা depth)
 {
     nfa_state_T *p = start;
 
-    if (depth > 4)
-	return 0;
+    যদি (depth > 4)
+	ফেরত 0;
 
-    while (p != NULL)
+    যখন (p != ফাঁকা)
     {
-	switch (p->c)
+	নির্বাচন (p->c)
 	{
 	    // all kinds of zero-width matches
-	    case NFA_BOL:
-	    case NFA_BOF:
-	    case NFA_BOW:
-	    case NFA_EOW:
-	    case NFA_ZSTART:
-	    case NFA_ZEND:
-	    case NFA_CURSOR:
-	    case NFA_VISUAL:
-	    case NFA_LNUM:
-	    case NFA_LNUM_GT:
-	    case NFA_LNUM_LT:
-	    case NFA_COL:
-	    case NFA_COL_GT:
-	    case NFA_COL_LT:
-	    case NFA_VCOL:
-	    case NFA_VCOL_GT:
-	    case NFA_VCOL_LT:
-	    case NFA_MARK:
-	    case NFA_MARK_GT:
-	    case NFA_MARK_LT:
+	    ক্ষেত্র NFA_BOL:
+	    ক্ষেত্র NFA_BOF:
+	    ক্ষেত্র NFA_BOW:
+	    ক্ষেত্র NFA_EOW:
+	    ক্ষেত্র NFA_ZSTART:
+	    ক্ষেত্র NFA_ZEND:
+	    ক্ষেত্র NFA_CURSOR:
+	    ক্ষেত্র NFA_VISUAL:
+	    ক্ষেত্র NFA_LNUM:
+	    ক্ষেত্র NFA_LNUM_GT:
+	    ক্ষেত্র NFA_LNUM_LT:
+	    ক্ষেত্র NFA_COL:
+	    ক্ষেত্র NFA_COL_GT:
+	    ক্ষেত্র NFA_COL_LT:
+	    ক্ষেত্র NFA_VCOL:
+	    ক্ষেত্র NFA_VCOL_GT:
+	    ক্ষেত্র NFA_VCOL_LT:
+	    ক্ষেত্র NFA_MARK:
+	    ক্ষেত্র NFA_MARK_GT:
+	    ক্ষেত্র NFA_MARK_LT:
 
-	    case NFA_MOPEN:
-	    case NFA_MOPEN1:
-	    case NFA_MOPEN2:
-	    case NFA_MOPEN3:
-	    case NFA_MOPEN4:
-	    case NFA_MOPEN5:
-	    case NFA_MOPEN6:
-	    case NFA_MOPEN7:
-	    case NFA_MOPEN8:
-	    case NFA_MOPEN9:
-	    case NFA_NOPEN:
+	    ক্ষেত্র NFA_MOPEN:
+	    ক্ষেত্র NFA_MOPEN1:
+	    ক্ষেত্র NFA_MOPEN2:
+	    ক্ষেত্র NFA_MOPEN3:
+	    ক্ষেত্র NFA_MOPEN4:
+	    ক্ষেত্র NFA_MOPEN5:
+	    ক্ষেত্র NFA_MOPEN6:
+	    ক্ষেত্র NFA_MOPEN7:
+	    ক্ষেত্র NFA_MOPEN8:
+	    ক্ষেত্র NFA_MOPEN9:
+	    ক্ষেত্র NFA_NOPEN:
 #ifdef FEAT_SYN_HL
-	    case NFA_ZOPEN:
-	    case NFA_ZOPEN1:
-	    case NFA_ZOPEN2:
-	    case NFA_ZOPEN3:
-	    case NFA_ZOPEN4:
-	    case NFA_ZOPEN5:
-	    case NFA_ZOPEN6:
-	    case NFA_ZOPEN7:
-	    case NFA_ZOPEN8:
-	    case NFA_ZOPEN9:
+	    ক্ষেত্র NFA_ZOPEN:
+	    ক্ষেত্র NFA_ZOPEN1:
+	    ক্ষেত্র NFA_ZOPEN2:
+	    ক্ষেত্র NFA_ZOPEN3:
+	    ক্ষেত্র NFA_ZOPEN4:
+	    ক্ষেত্র NFA_ZOPEN5:
+	    ক্ষেত্র NFA_ZOPEN6:
+	    ক্ষেত্র NFA_ZOPEN7:
+	    ক্ষেত্র NFA_ZOPEN8:
+	    ক্ষেত্র NFA_ZOPEN9:
 #endif
 		p = p->out;
-		break;
+		বিরতি;
 
-	    case NFA_SPLIT:
+	    ক্ষেত্র NFA_SPLIT:
 	    {
-		int c1 = nfa_get_regstart(p->out, depth + 1);
-		int c2 = nfa_get_regstart(p->out1, depth + 1);
+		পূর্ণসংখ্যা c1 = nfa_get_regstart(p->out, depth + 1);
+		পূর্ণসংখ্যা c2 = nfa_get_regstart(p->out1, depth + 1);
 
-		if (c1 == c2)
-		    return c1; // yes!
-		return 0;
+		যদি (c1 == c2)
+		    ফেরত c1; // yes!
+		ফেরত 0;
 	    }
 
-	    default:
-		if (p->c > 0)
-		    return p->c; // yes!
-		return 0;
+	    পূর্বনির্ধারিত:
+		যদি (p->c > 0)
+		    ফেরত p->c; // yes!
+		ফেরত 0;
 	}
     }
-    return 0;
+    ফেরত 0;
 }
 
 /*
@@ -486,69 +486,69 @@ nfa_get_regstart(nfa_state_T *start, int depth)
  * else.  If so return a string in allocated memory with what must match after
  * regstart.  Otherwise return NULL.
  */
-    static char_u *
+    স্থির char_u *
 nfa_get_match_text(nfa_state_T *start)
 {
     nfa_state_T *p = start;
-    int		len = 0;
+    পূর্ণসংখ্যা		len = 0;
     char_u	*ret;
     char_u	*s;
 
-    if (p->c != NFA_MOPEN)
-	return NULL; // just in case
+    যদি (p->c != NFA_MOPEN)
+	ফেরত ফাঁকা; // just in case
     p = p->out;
-    while (p->c > 0)
+    যখন (p->c > 0)
     {
 	len += MB_CHAR2LEN(p->c);
 	p = p->out;
     }
-    if (p->c != NFA_MCLOSE || p->out->c != NFA_MATCH)
-	return NULL;
+    যদি (p->c != NFA_MCLOSE || p->out->c != NFA_MATCH)
+	ফেরত ফাঁকা;
 
     ret = alloc(len);
-    if (ret == NULL)
-	return NULL;
+    যদি (ret == ফাঁকা)
+	ফেরত ফাঁকা;
 
     p = start->out->out; // skip first char, it goes into regstart
     s = ret;
-    while (p->c > 0)
+    যখন (p->c > 0)
     {
-	if (has_mbyte)
+	যদি (has_mbyte)
 	    s += (*mb_char2bytes)(p->c, s);
-	else
+	অন্যথা
 	    *s++ = p->c;
 	p = p->out;
     }
     *s = NUL;
-    return ret;
+    ফেরত ret;
 }
 
 /*
  * Allocate more space for post_start.  Called when
  * running above the estimated number of states.
  */
-    static int
-realloc_post_list(void)
+    স্থির পূর্ণসংখ্যা
+realloc_post_list(শূন্য)
 {
-    int   nstate_max = (int)(post_end - post_start);
-    int   new_max;
-    int   *new_start;
-    int	  *old_start;
+    পূর্ণসংখ্যা   nstate_max = (পূর্ণসংখ্যা)(post_end - post_start);
+    পূর্ণসংখ্যা   new_max;
+    পূর্ণসংখ্যা   *new_start;
+    পূর্ণসংখ্যা	  *old_start;
 
     // For weird patterns the number of states can be very high. Increasing by
     // 50% seems a reasonable compromise between memory use and speed.
     new_max = nstate_max * 3 / 2;
-    new_start = ALLOC_MULT(int, new_max);
-    if (new_start == NULL)
-	return FAIL;
-    mch_memmove(new_start, post_start, nstate_max * sizeof(int));
+    new_start = ALLOC_MULT(পূর্ণসংখ্যা, new_max);
+    যদি (new_start == ফাঁকা)
+	ফেরত FAIL;
+    mch_memmove(new_start, post_start, nstate_max * আকার(পূর্ণসংখ্যা));
     old_start = post_start;
     post_start = new_start;
     post_start_len = new_max;
     post_ptr = new_start + (post_ptr - old_start);
     post_end = post_start + new_max;
     vim_free(old_start);
-    return OK;
+    ফেরত OK;
 }
 
 /*
@@ -561,57 +561,57 @@ realloc_post_list(void)
  * Keep in mind that 'ignorecase' applies at execution time, thus [a-z] may
  * need to be interpreted as [a-zA-Z].
  */
-    static int
-nfa_recognize_char_class(char_u *start, char_u *end, int extra_newl)
+    স্থির পূর্ণসংখ্যা
+nfa_recognize_char_class(char_u *start, char_u *end, পূর্ণসংখ্যা extra_newl)
 {
-    int		newl;
-    int		config = get_char_class_bits(start, end, &newl);
+    পূর্ণসংখ্যা		newl;
+    পূর্ণসংখ্যা		config = get_char_class_bits(start, end, &newl);
 
-    if (config < 0)
-	return FAIL;
+    যদি (config < 0)
+	ফেরত FAIL;
 
-    if (extra_newl == TRUE)
+    যদি (extra_newl == TRUE)
 	newl = TRUE;
 
-    if (newl == TRUE)
+    যদি (newl == TRUE)
 	extra_newl = NFA_ADD_NL;
 
-    switch (config)
+    নির্বাচন (config)
     {
-	case CLASS_o9:
-	    return extra_newl + NFA_DIGIT;
-	case CLASS_not |  CLASS_o9:
-	    return extra_newl + NFA_NDIGIT;
-	case CLASS_af | CLASS_AF | CLASS_o9:
-	    return extra_newl + NFA_HEX;
-	case CLASS_not | CLASS_af | CLASS_AF | CLASS_o9:
-	    return extra_newl + NFA_NHEX;
-	case CLASS_o7:
-	    return extra_newl + NFA_OCTAL;
-	case CLASS_not | CLASS_o7:
-	    return extra_newl + NFA_NOCTAL;
-	case CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
-	    return extra_newl + NFA_WORD;
-	case CLASS_not | CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
-	    return extra_newl + NFA_NWORD;
-	case CLASS_az | CLASS_AZ | CLASS_underscore:
-	    return extra_newl + NFA_HEAD;
-	case CLASS_not | CLASS_az | CLASS_AZ | CLASS_underscore:
-	    return extra_newl + NFA_NHEAD;
-	case CLASS_az | CLASS_AZ:
-	    return extra_newl + NFA_ALPHA;
-	case CLASS_not | CLASS_az | CLASS_AZ:
-	    return extra_newl + NFA_NALPHA;
-	case CLASS_az:
-	   return extra_newl + NFA_LOWER_IC;
-	case CLASS_not | CLASS_az:
-	    return extra_newl + NFA_NLOWER_IC;
-	case CLASS_AZ:
-	    return extra_newl + NFA_UPPER_IC;
-	case CLASS_not | CLASS_AZ:
-	    return extra_newl + NFA_NUPPER_IC;
+	ক্ষেত্র CLASS_o9:
+	    ফেরত extra_newl + NFA_DIGIT;
+	ক্ষেত্র CLASS_not |  CLASS_o9:
+	    ফেরত extra_newl + NFA_NDIGIT;
+	ক্ষেত্র CLASS_af | CLASS_AF | CLASS_o9:
+	    ফেরত extra_newl + NFA_HEX;
+	ক্ষেত্র CLASS_not | CLASS_af | CLASS_AF | CLASS_o9:
+	    ফেরত extra_newl + NFA_NHEX;
+	ক্ষেত্র CLASS_o7:
+	    ফেরত extra_newl + NFA_OCTAL;
+	ক্ষেত্র CLASS_not | CLASS_o7:
+	    ফেরত extra_newl + NFA_NOCTAL;
+	ক্ষেত্র CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
+	    ফেরত extra_newl + NFA_WORD;
+	ক্ষেত্র CLASS_not | CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
+	    ফেরত extra_newl + NFA_NWORD;
+	ক্ষেত্র CLASS_az | CLASS_AZ | CLASS_underscore:
+	    ফেরত extra_newl + NFA_শীর্ষ;
+	ক্ষেত্র CLASS_not | CLASS_az | CLASS_AZ | CLASS_underscore:
+	    ফেরত extra_newl + NFA_NHEAD;
+	ক্ষেত্র CLASS_az | CLASS_AZ:
+	    ফেরত extra_newl + NFA_ALPHA;
+	ক্ষেত্র CLASS_not | CLASS_az | CLASS_AZ:
+	    ফেরত extra_newl + NFA_NALPHA;
+	ক্ষেত্র CLASS_az:
+	   ফেরত extra_newl + NFA_LOWER_IC;
+	ক্ষেত্র CLASS_not | CLASS_az:
+	    ফেরত extra_newl + NFA_NLOWER_IC;
+	ক্ষেত্র CLASS_AZ:
+	    ফেরত extra_newl + NFA_UPPER_IC;
+	ক্ষেত্র CLASS_not | CLASS_AZ:
+	    ফেরত extra_newl + NFA_NUPPER_IC;
     }
-    return FAIL;
+    ফেরত FAIL;
 }
 
 /*
@@ -622,12 +622,12 @@ nfa_recognize_char_class(char_u *start, char_u *end, int extra_newl)
  *
  * NOTE! When changing this function, also update reg_equi_class()
  */
-    static int
-nfa_emit_equi_class(int c)
+    স্থির পূর্ণসংখ্যা
+nfa_emit_equi_class(পূর্ণসংখ্যা c)
 {
 #define EMIT2(c)    EMIT(c); EMIT(NFA_CONCAT);
 
-    if (enc_utf8 || STRCMP(p_enc, "latin1") == 0
+    যদি (enc_utf8 || STRCMP(p_enc, "latin1") == 0
 					 || STRCMP(p_enc, "iso-8859-15") == 0)
     {
 #define A_grave 0xc0
@@ -685,16 +685,16 @@ nfa_emit_equi_class(int c)
 #define u_diaeresis 0xfc
 #define y_acute 0xfd
 #define y_diaeresis 0xff
-	switch (c)
+	নির্বাচন (c)
 	{
-	    case 'A': case A_grave: case A_acute: case A_circumflex:
-	    case A_virguilla: case A_diaeresis: case A_ring:
-	    case 0x100: case 0x102: case 0x104: case 0x1cd:
-	    case 0x1de: case 0x1e0: case 0x1fa: case 0x200:
-	    case 0x202: case 0x226: case 0x23a: case 0x1e00:
-	    case 0x1ea0: case 0x1ea2: case 0x1ea4: case 0x1ea6:
-	    case 0x1ea8: case 0x1eaa: case 0x1eac: case 0x1eae:
-	    case 0x1eb0: case 0x1eb2: case 0x1eb4: case 0x1eb6:
+	    ক্ষেত্র 'A': ক্ষেত্র A_grave: ক্ষেত্র A_acute: ক্ষেত্র A_circumflex:
+	    ক্ষেত্র A_virguilla: ক্ষেত্র A_diaeresis: ক্ষেত্র A_ring:
+	    ক্ষেত্র 0x100: ক্ষেত্র 0x102: ক্ষেত্র 0x104: ক্ষেত্র 0x1cd:
+	    ক্ষেত্র 0x1de: ক্ষেত্র 0x1e0: ক্ষেত্র 0x1fa: ক্ষেত্র 0x200:
+	    ক্ষেত্র 0x202: ক্ষেত্র 0x226: ক্ষেত্র 0x23a: ক্ষেত্র 0x1e00:
+	    ক্ষেত্র 0x1ea0: ক্ষেত্র 0x1ea2: ক্ষেত্র 0x1ea4: ক্ষেত্র 0x1ea6:
+	    ক্ষেত্র 0x1ea8: ক্ষেত্র 0x1eaa: ক্ষেত্র 0x1eac: ক্ষেত্র 0x1eae:
+	    ক্ষেত্র 0x1eb0: ক্ষেত্র 0x1eb2: ক্ষেত্র 0x1eb4: ক্ষেত্র 0x1eb6:
 		    EMIT2('A') EMIT2(A_grave) EMIT2(A_acute)
 		    EMIT2(A_circumflex) EMIT2(A_virguilla)
 		    EMIT2(A_diaeresis) EMIT2(A_ring)
@@ -706,39 +706,39 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1ea6) EMIT2(0x1ea8) EMIT2(0x1eaa)
 		    EMIT2(0x1eac) EMIT2(0x1eae) EMIT2(0x1eb0)
 		    EMIT2(0x1eb2) EMIT2(0x1eb6) EMIT2(0x1eb4)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'B': case 0x181: case 0x243: case 0x1e02:
-	    case 0x1e04: case 0x1e06:
+	    ক্ষেত্র 'B': ক্ষেত্র 0x181: ক্ষেত্র 0x243: ক্ষেত্র 0x1e02:
+	    ক্ষেত্র 0x1e04: ক্ষেত্র 0x1e06:
 		    EMIT2('B')
 		    EMIT2(0x181) EMIT2(0x243) EMIT2(0x1e02)
 		    EMIT2(0x1e04) EMIT2(0x1e06)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'C': case C_cedilla: case 0x106: case 0x108:
-	    case 0x10a: case 0x10c: case 0x187: case 0x23b:
-	    case 0x1e08: case 0xa792:
+	    ক্ষেত্র 'C': ক্ষেত্র C_cedilla: ক্ষেত্র 0x106: ক্ষেত্র 0x108:
+	    ক্ষেত্র 0x10a: ক্ষেত্র 0x10c: ক্ষেত্র 0x187: ক্ষেত্র 0x23b:
+	    ক্ষেত্র 0x1e08: ক্ষেত্র 0xa792:
 		    EMIT2('C') EMIT2(C_cedilla)
 		    EMIT2(0x106) EMIT2(0x108) EMIT2(0x10a)
 		    EMIT2(0x10c) EMIT2(0x187) EMIT2(0x23b)
 		    EMIT2(0x1e08) EMIT2(0xa792)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'D': case 0x10e: case 0x110: case 0x18a:
-	    case 0x1e0a: case 0x1e0c: case 0x1e0e: case 0x1e10:
-	    case 0x1e12:
+	    ক্ষেত্র 'D': ক্ষেত্র 0x10e: ক্ষেত্র 0x110: ক্ষেত্র 0x18a:
+	    ক্ষেত্র 0x1e0a: ক্ষেত্র 0x1e0c: ক্ষেত্র 0x1e0e: ক্ষেত্র 0x1e10:
+	    ক্ষেত্র 0x1e12:
 		    EMIT2('D') EMIT2(0x10e) EMIT2(0x110) EMIT2(0x18a)
 		    EMIT2(0x1e0a) EMIT2(0x1e0c) EMIT2(0x1e0e)
 		    EMIT2(0x1e10) EMIT2(0x1e12)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'E': case E_grave: case E_acute: case E_circumflex:
-	    case E_diaeresis: case 0x112: case 0x114: case 0x116:
-	    case 0x118: case 0x11a: case 0x204: case 0x206:
-	    case 0x228: case 0x246: case 0x1e14: case 0x1e16:
-	    case 0x1e18: case 0x1e1a: case 0x1e1c: case 0x1eb8:
-	    case 0x1eba: case 0x1ebc: case 0x1ebe: case 0x1ec0:
-	    case 0x1ec2: case 0x1ec4: case 0x1ec6:
+	    ক্ষেত্র 'E': ক্ষেত্র E_grave: ক্ষেত্র E_acute: ক্ষেত্র E_circumflex:
+	    ক্ষেত্র E_diaeresis: ক্ষেত্র 0x112: ক্ষেত্র 0x114: ক্ষেত্র 0x116:
+	    ক্ষেত্র 0x118: ক্ষেত্র 0x11a: ক্ষেত্র 0x204: ক্ষেত্র 0x206:
+	    ক্ষেত্র 0x228: ক্ষেত্র 0x246: ক্ষেত্র 0x1e14: ক্ষেত্র 0x1e16:
+	    ক্ষেত্র 0x1e18: ক্ষেত্র 0x1e1a: ক্ষেত্র 0x1e1c: ক্ষেত্র 0x1eb8:
+	    ক্ষেত্র 0x1eba: ক্ষেত্র 0x1ebc: ক্ষেত্র 0x1ebe: ক্ষেত্র 0x1ec0:
+	    ক্ষেত্র 0x1ec2: ক্ষেত্র 0x1ec4: ক্ষেত্র 0x1ec6:
 		    EMIT2('E') EMIT2(E_grave) EMIT2(E_acute)
 		    EMIT2(E_circumflex) EMIT2(E_diaeresis)
 		    EMIT2(0x112) EMIT2(0x114) EMIT2(0x116)
@@ -749,34 +749,34 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1eba) EMIT2(0x1ebc) EMIT2(0x1ebe)
 		    EMIT2(0x1ec0) EMIT2(0x1ec2) EMIT2(0x1ec4)
 		    EMIT2(0x1ec6)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'F': case 0x191: case 0x1e1e: case 0xa798:
+	    ক্ষেত্র 'F': ক্ষেত্র 0x191: ক্ষেত্র 0x1e1e: ক্ষেত্র 0xa798:
 		    EMIT2('F') EMIT2(0x191) EMIT2(0x1e1e) EMIT2(0xa798)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'G': case 0x11c: case 0x11e: case 0x120:
-	    case 0x122: case 0x193: case 0x1e4: case 0x1e6:
-	    case 0x1f4: case 0x1e20: case 0xa7a0:
+	    ক্ষেত্র 'G': ক্ষেত্র 0x11c: ক্ষেত্র 0x11e: ক্ষেত্র 0x120:
+	    ক্ষেত্র 0x122: ক্ষেত্র 0x193: ক্ষেত্র 0x1e4: ক্ষেত্র 0x1e6:
+	    ক্ষেত্র 0x1f4: ক্ষেত্র 0x1e20: ক্ষেত্র 0xa7a0:
 		    EMIT2('G') EMIT2(0x11c) EMIT2(0x11e) EMIT2(0x120)
 		    EMIT2(0x122) EMIT2(0x193) EMIT2(0x1e4)
 		    EMIT2(0x1e6) EMIT2(0x1f4) EMIT2(0x1e20)
 		    EMIT2(0xa7a0)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'H': case 0x124: case 0x126: case 0x21e:
-	    case 0x1e22: case 0x1e24: case 0x1e26: case 0x1e28:
-	    case 0x1e2a: case 0x2c67:
+	    ক্ষেত্র 'H': ক্ষেত্র 0x124: ক্ষেত্র 0x126: ক্ষেত্র 0x21e:
+	    ক্ষেত্র 0x1e22: ক্ষেত্র 0x1e24: ক্ষেত্র 0x1e26: ক্ষেত্র 0x1e28:
+	    ক্ষেত্র 0x1e2a: ক্ষেত্র 0x2c67:
 		    EMIT2('H') EMIT2(0x124) EMIT2(0x126) EMIT2(0x21e)
 		    EMIT2(0x1e22) EMIT2(0x1e24) EMIT2(0x1e26)
 		    EMIT2(0x1e28) EMIT2(0x1e2a) EMIT2(0x2c67)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'I': case I_grave: case I_acute: case I_circumflex:
-	    case I_diaeresis: case 0x128: case 0x12a: case 0x12c:
-	    case 0x12e: case 0x130: case 0x197: case 0x1cf:
-	    case 0x208: case 0x20a: case 0x1e2c: case 0x1e2e:
-	    case 0x1ec8: case 0x1eca:
+	    ক্ষেত্র 'I': ক্ষেত্র I_grave: ক্ষেত্র I_acute: ক্ষেত্র I_circumflex:
+	    ক্ষেত্র I_diaeresis: ক্ষেত্র 0x128: ক্ষেত্র 0x12a: ক্ষেত্র 0x12c:
+	    ক্ষেত্র 0x12e: ক্ষেত্র 0x130: ক্ষেত্র 0x197: ক্ষেত্র 0x1cf:
+	    ক্ষেত্র 0x208: ক্ষেত্র 0x20a: ক্ষেত্র 0x1e2c: ক্ষেত্র 0x1e2e:
+	    ক্ষেত্র 0x1ec8: ক্ষেত্র 0x1eca:
 		    EMIT2('I') EMIT2(I_grave) EMIT2(I_acute)
 		    EMIT2(I_circumflex) EMIT2(I_diaeresis)
 		    EMIT2(0x128) EMIT2(0x12a) EMIT2(0x12c)
@@ -784,53 +784,53 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1cf) EMIT2(0x208) EMIT2(0x20a)
 		    EMIT2(0x1e2c) EMIT2(0x1e2e) EMIT2(0x1ec8)
 		    EMIT2(0x1eca)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'J': case 0x134: case 0x248:
+	    ক্ষেত্র 'J': ক্ষেত্র 0x134: ক্ষেত্র 0x248:
 		    EMIT2('J') EMIT2(0x134) EMIT2(0x248)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'K': case 0x136: case 0x198: case 0x1e8: case 0x1e30:
-	    case 0x1e32: case 0x1e34: case 0x2c69: case 0xa740:
+	    ক্ষেত্র 'K': ক্ষেত্র 0x136: ক্ষেত্র 0x198: ক্ষেত্র 0x1e8: ক্ষেত্র 0x1e30:
+	    ক্ষেত্র 0x1e32: ক্ষেত্র 0x1e34: ক্ষেত্র 0x2c69: ক্ষেত্র 0xa740:
 		    EMIT2('K') EMIT2(0x136) EMIT2(0x198) EMIT2(0x1e8)
 		    EMIT2(0x1e30) EMIT2(0x1e32) EMIT2(0x1e34)
 		    EMIT2(0x2c69) EMIT2(0xa740)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'L': case 0x139: case 0x13b: case 0x13d:
-	    case 0x13f: case 0x141: case 0x23d: case 0x1e36:
-	    case 0x1e38: case 0x1e3a: case 0x1e3c: case 0x2c60:
+	    ক্ষেত্র 'L': ক্ষেত্র 0x139: ক্ষেত্র 0x13b: ক্ষেত্র 0x13d:
+	    ক্ষেত্র 0x13f: ক্ষেত্র 0x141: ক্ষেত্র 0x23d: ক্ষেত্র 0x1e36:
+	    ক্ষেত্র 0x1e38: ক্ষেত্র 0x1e3a: ক্ষেত্র 0x1e3c: ক্ষেত্র 0x2c60:
 		    EMIT2('L') EMIT2(0x139) EMIT2(0x13b)
 		    EMIT2(0x13d) EMIT2(0x13f) EMIT2(0x141)
 		    EMIT2(0x23d) EMIT2(0x1e36) EMIT2(0x1e38)
 		    EMIT2(0x1e3a) EMIT2(0x1e3c) EMIT2(0x2c60)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'M': case 0x1e3e: case 0x1e40: case 0x1e42:
+	    ক্ষেত্র 'M': ক্ষেত্র 0x1e3e: ক্ষেত্র 0x1e40: ক্ষেত্র 0x1e42:
 		    EMIT2('M') EMIT2(0x1e3e) EMIT2(0x1e40)
 		    EMIT2(0x1e42)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'N': case N_virguilla:
-	    case 0x143: case 0x145: case 0x147: case 0x1f8:
-	    case 0x1e44: case 0x1e46: case 0x1e48: case 0x1e4a:
-	    case 0xa7a4:
+	    ক্ষেত্র 'N': ক্ষেত্র N_virguilla:
+	    ক্ষেত্র 0x143: ক্ষেত্র 0x145: ক্ষেত্র 0x147: ক্ষেত্র 0x1f8:
+	    ক্ষেত্র 0x1e44: ক্ষেত্র 0x1e46: ক্ষেত্র 0x1e48: ক্ষেত্র 0x1e4a:
+	    ক্ষেত্র 0xa7a4:
 		    EMIT2('N') EMIT2(N_virguilla)
 		    EMIT2(0x143) EMIT2(0x145) EMIT2(0x147)
 		    EMIT2(0x1f8) EMIT2(0x1e44) EMIT2(0x1e46)
 		    EMIT2(0x1e48) EMIT2(0x1e4a) EMIT2(0xa7a4)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'O': case O_grave: case O_acute: case O_circumflex:
-	    case O_virguilla: case O_diaeresis: case O_slash:
-	    case 0x14c: case 0x14e: case 0x150: case 0x19f:
-	    case 0x1a0: case 0x1d1: case 0x1ea: case 0x1ec:
-	    case 0x1fe: case 0x20c: case 0x20e: case 0x22a:
-	    case 0x22c: case 0x22e: case 0x230: case 0x1e4c:
-	    case 0x1e4e: case 0x1e50: case 0x1e52: case 0x1ecc:
-	    case 0x1ece: case 0x1ed0: case 0x1ed2: case 0x1ed4:
-	    case 0x1ed6: case 0x1ed8: case 0x1eda: case 0x1edc:
-	    case 0x1ede: case 0x1ee0: case 0x1ee2:
+	    ক্ষেত্র 'O': ক্ষেত্র O_grave: ক্ষেত্র O_acute: ক্ষেত্র O_circumflex:
+	    ক্ষেত্র O_virguilla: ক্ষেত্র O_diaeresis: ক্ষেত্র O_slash:
+	    ক্ষেত্র 0x14c: ক্ষেত্র 0x14e: ক্ষেত্র 0x150: ক্ষেত্র 0x19f:
+	    ক্ষেত্র 0x1a0: ক্ষেত্র 0x1d1: ক্ষেত্র 0x1ea: ক্ষেত্র 0x1ec:
+	    ক্ষেত্র 0x1fe: ক্ষেত্র 0x20c: ক্ষেত্র 0x20e: ক্ষেত্র 0x22a:
+	    ক্ষেত্র 0x22c: ক্ষেত্র 0x22e: ক্ষেত্র 0x230: ক্ষেত্র 0x1e4c:
+	    ক্ষেত্র 0x1e4e: ক্ষেত্র 0x1e50: ক্ষেত্র 0x1e52: ক্ষেত্র 0x1ecc:
+	    ক্ষেত্র 0x1ece: ক্ষেত্র 0x1ed0: ক্ষেত্র 0x1ed2: ক্ষেত্র 0x1ed4:
+	    ক্ষেত্র 0x1ed6: ক্ষেত্র 0x1ed8: ক্ষেত্র 0x1eda: ক্ষেত্র 0x1edc:
+	    ক্ষেত্র 0x1ede: ক্ষেত্র 0x1ee0: ক্ষেত্র 0x1ee2:
 		    EMIT2('O') EMIT2(O_grave) EMIT2(O_acute)
 		    EMIT2(O_circumflex) EMIT2(O_virguilla)
 		    EMIT2(O_diaeresis) EMIT2(O_slash)
@@ -845,51 +845,51 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1ed6) EMIT2(0x1ed8) EMIT2(0x1eda)
 		    EMIT2(0x1edc) EMIT2(0x1ede) EMIT2(0x1ee0)
 		    EMIT2(0x1ee2)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'P': case 0x1a4: case 0x1e54: case 0x1e56: case 0x2c63:
+	    ক্ষেত্র 'P': ক্ষেত্র 0x1a4: ক্ষেত্র 0x1e54: ক্ষেত্র 0x1e56: ক্ষেত্র 0x2c63:
 		    EMIT2('P') EMIT2(0x1a4) EMIT2(0x1e54) EMIT2(0x1e56)
 		    EMIT2(0x2c63)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'Q': case 0x24a:
+	    ক্ষেত্র 'Q': ক্ষেত্র 0x24a:
 		    EMIT2('Q') EMIT2(0x24a)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'R': case 0x154: case 0x156: case 0x158: case 0x210:
-	    case 0x212: case 0x24c: case 0x1e58: case 0x1e5a:
-	    case 0x1e5c: case 0x1e5e: case 0x2c64: case 0xa7a6:
+	    ক্ষেত্র 'R': ক্ষেত্র 0x154: ক্ষেত্র 0x156: ক্ষেত্র 0x158: ক্ষেত্র 0x210:
+	    ক্ষেত্র 0x212: ক্ষেত্র 0x24c: ক্ষেত্র 0x1e58: ক্ষেত্র 0x1e5a:
+	    ক্ষেত্র 0x1e5c: ক্ষেত্র 0x1e5e: ক্ষেত্র 0x2c64: ক্ষেত্র 0xa7a6:
 		    EMIT2('R') EMIT2(0x154) EMIT2(0x156) EMIT2(0x158)
 		    EMIT2(0x210) EMIT2(0x212) EMIT2(0x24c) EMIT2(0x1e58)
 		    EMIT2(0x1e5a) EMIT2(0x1e5c) EMIT2(0x1e5e) EMIT2(0x2c64)
 		    EMIT2(0xa7a6)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'S': case 0x15a: case 0x15c: case 0x15e: case 0x160:
-	    case 0x218: case 0x1e60: case 0x1e62: case 0x1e64:
-	    case 0x1e66: case 0x1e68: case 0x2c7e: case 0xa7a8:
+	    ক্ষেত্র 'S': ক্ষেত্র 0x15a: ক্ষেত্র 0x15c: ক্ষেত্র 0x15e: ক্ষেত্র 0x160:
+	    ক্ষেত্র 0x218: ক্ষেত্র 0x1e60: ক্ষেত্র 0x1e62: ক্ষেত্র 0x1e64:
+	    ক্ষেত্র 0x1e66: ক্ষেত্র 0x1e68: ক্ষেত্র 0x2c7e: ক্ষেত্র 0xa7a8:
 		    EMIT2('S') EMIT2(0x15a) EMIT2(0x15c) EMIT2(0x15e)
 		    EMIT2(0x160) EMIT2(0x218) EMIT2(0x1e60) EMIT2(0x1e62)
 		    EMIT2(0x1e64) EMIT2(0x1e66) EMIT2(0x1e68) EMIT2(0x2c7e)
 		    EMIT2(0xa7a8)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'T': case 0x162: case 0x164: case 0x166: case 0x1ac:
-	    case 0x1ae: case 0x21a: case 0x23e: case 0x1e6a: case 0x1e6c:
-	    case 0x1e6e: case 0x1e70:
+	    ক্ষেত্র 'T': ক্ষেত্র 0x162: ক্ষেত্র 0x164: ক্ষেত্র 0x166: ক্ষেত্র 0x1ac:
+	    ক্ষেত্র 0x1ae: ক্ষেত্র 0x21a: ক্ষেত্র 0x23e: ক্ষেত্র 0x1e6a: ক্ষেত্র 0x1e6c:
+	    ক্ষেত্র 0x1e6e: ক্ষেত্র 0x1e70:
 		    EMIT2('T') EMIT2(0x162) EMIT2(0x164) EMIT2(0x166)
 		    EMIT2(0x1ac) EMIT2(0x1ae) EMIT2(0x23e) EMIT2(0x21a)
 		    EMIT2(0x1e6a) EMIT2(0x1e6c) EMIT2(0x1e6e) EMIT2(0x1e70)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'U': case U_grave: case U_acute: case U_diaeresis:
-	    case U_circumflex: case 0x168: case 0x16a: case 0x16c:
-	    case 0x16e: case 0x170: case 0x172: case 0x1af:
-	    case 0x1d3: case 0x1d5: case 0x1d7: case 0x1d9:
-	    case 0x1db: case 0x214: case 0x216: case 0x244:
-	    case 0x1e72: case 0x1e74: case 0x1e76: case 0x1e78:
-	    case 0x1e7a: case 0x1ee4: case 0x1ee6: case 0x1ee8:
-	    case 0x1eea: case 0x1eec: case 0x1eee: case 0x1ef0:
+	    ক্ষেত্র 'U': ক্ষেত্র U_grave: ক্ষেত্র U_acute: ক্ষেত্র U_diaeresis:
+	    ক্ষেত্র U_circumflex: ক্ষেত্র 0x168: ক্ষেত্র 0x16a: ক্ষেত্র 0x16c:
+	    ক্ষেত্র 0x16e: ক্ষেত্র 0x170: ক্ষেত্র 0x172: ক্ষেত্র 0x1af:
+	    ক্ষেত্র 0x1d3: ক্ষেত্র 0x1d5: ক্ষেত্র 0x1d7: ক্ষেত্র 0x1d9:
+	    ক্ষেত্র 0x1db: ক্ষেত্র 0x214: ক্ষেত্র 0x216: ক্ষেত্র 0x244:
+	    ক্ষেত্র 0x1e72: ক্ষেত্র 0x1e74: ক্ষেত্র 0x1e76: ক্ষেত্র 0x1e78:
+	    ক্ষেত্র 0x1e7a: ক্ষেত্র 0x1ee4: ক্ষেত্র 0x1ee6: ক্ষেত্র 0x1ee8:
+	    ক্ষেত্র 0x1eea: ক্ষেত্র 0x1eec: ক্ষেত্র 0x1eee: ক্ষেত্র 0x1ef0:
 		    EMIT2('U') EMIT2(U_grave) EMIT2(U_acute)
 		    EMIT2(U_diaeresis) EMIT2(U_circumflex)
 		    EMIT2(0x168) EMIT2(0x16a)
@@ -902,49 +902,49 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1ee4) EMIT2(0x1ee6) EMIT2(0x1ee8)
 		    EMIT2(0x1eea) EMIT2(0x1eec) EMIT2(0x1eee)
 		    EMIT2(0x1ef0)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'V': case 0x1b2: case 0x1e7c: case 0x1e7e:
+	    ক্ষেত্র 'V': ক্ষেত্র 0x1b2: ক্ষেত্র 0x1e7c: ক্ষেত্র 0x1e7e:
 		    EMIT2('V') EMIT2(0x1b2) EMIT2(0x1e7c) EMIT2(0x1e7e)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'W': case 0x174: case 0x1e80: case 0x1e82: case 0x1e84:
-	    case 0x1e86: case 0x1e88:
+	    ক্ষেত্র 'W': ক্ষেত্র 0x174: ক্ষেত্র 0x1e80: ক্ষেত্র 0x1e82: ক্ষেত্র 0x1e84:
+	    ক্ষেত্র 0x1e86: ক্ষেত্র 0x1e88:
 		    EMIT2('W') EMIT2(0x174) EMIT2(0x1e80) EMIT2(0x1e82)
 		    EMIT2(0x1e84) EMIT2(0x1e86) EMIT2(0x1e88)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'X': case 0x1e8a: case 0x1e8c:
+	    ক্ষেত্র 'X': ক্ষেত্র 0x1e8a: ক্ষেত্র 0x1e8c:
 		    EMIT2('X') EMIT2(0x1e8a) EMIT2(0x1e8c)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'Y': case Y_acute: case 0x176: case 0x178:
-	    case 0x1b3: case 0x232: case 0x24e: case 0x1e8e:
-	    case 0x1ef2: case 0x1ef4: case 0x1ef6: case 0x1ef8:
+	    ক্ষেত্র 'Y': ক্ষেত্র Y_acute: ক্ষেত্র 0x176: ক্ষেত্র 0x178:
+	    ক্ষেত্র 0x1b3: ক্ষেত্র 0x232: ক্ষেত্র 0x24e: ক্ষেত্র 0x1e8e:
+	    ক্ষেত্র 0x1ef2: ক্ষেত্র 0x1ef4: ক্ষেত্র 0x1ef6: ক্ষেত্র 0x1ef8:
 		    EMIT2('Y') EMIT2(Y_acute)
 		    EMIT2(0x176) EMIT2(0x178) EMIT2(0x1b3)
 		    EMIT2(0x232) EMIT2(0x24e) EMIT2(0x1e8e)
 		    EMIT2(0x1ef2) EMIT2(0x1ef4) EMIT2(0x1ef6)
 		    EMIT2(0x1ef8)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'Z': case 0x179: case 0x17b: case 0x17d:
-	    case 0x1b5: case 0x1e90: case 0x1e92: case 0x1e94:
-	    case 0x2c6b:
+	    ক্ষেত্র 'Z': ক্ষেত্র 0x179: ক্ষেত্র 0x17b: ক্ষেত্র 0x17d:
+	    ক্ষেত্র 0x1b5: ক্ষেত্র 0x1e90: ক্ষেত্র 0x1e92: ক্ষেত্র 0x1e94:
+	    ক্ষেত্র 0x2c6b:
 		    EMIT2('Z') EMIT2(0x179) EMIT2(0x17b) EMIT2(0x17d)
 		    EMIT2(0x1b5) EMIT2(0x1e90) EMIT2(0x1e92)
 		    EMIT2(0x1e94) EMIT2(0x2c6b)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'a': case a_grave: case a_acute: case a_circumflex:
-	    case a_virguilla: case a_diaeresis: case a_ring:
-	    case 0x101: case 0x103: case 0x105: case 0x1ce:
-	    case 0x1df: case 0x1e1: case 0x1fb: case 0x201:
-	    case 0x203: case 0x227: case 0x1d8f: case 0x1e01:
-	    case 0x1e9a: case 0x1ea1: case 0x1ea3: case 0x1ea5:
-	    case 0x1ea7: case 0x1ea9: case 0x1eab: case 0x1ead:
-	    case 0x1eaf: case 0x1eb1: case 0x1eb3: case 0x1eb5:
-	    case 0x1eb7: case 0x2c65:
+	    ক্ষেত্র 'a': ক্ষেত্র a_grave: ক্ষেত্র a_acute: ক্ষেত্র a_circumflex:
+	    ক্ষেত্র a_virguilla: ক্ষেত্র a_diaeresis: ক্ষেত্র a_ring:
+	    ক্ষেত্র 0x101: ক্ষেত্র 0x103: ক্ষেত্র 0x105: ক্ষেত্র 0x1ce:
+	    ক্ষেত্র 0x1df: ক্ষেত্র 0x1e1: ক্ষেত্র 0x1fb: ক্ষেত্র 0x201:
+	    ক্ষেত্র 0x203: ক্ষেত্র 0x227: ক্ষেত্র 0x1d8f: ক্ষেত্র 0x1e01:
+	    ক্ষেত্র 0x1e9a: ক্ষেত্র 0x1ea1: ক্ষেত্র 0x1ea3: ক্ষেত্র 0x1ea5:
+	    ক্ষেত্র 0x1ea7: ক্ষেত্র 0x1ea9: ক্ষেত্র 0x1eab: ক্ষেত্র 0x1ead:
+	    ক্ষেত্র 0x1eaf: ক্ষেত্র 0x1eb1: ক্ষেত্র 0x1eb3: ক্ষেত্র 0x1eb5:
+	    ক্ষেত্র 0x1eb7: ক্ষেত্র 0x2c65:
 		    EMIT2('a') EMIT2(a_grave) EMIT2(a_acute)
 		    EMIT2(a_circumflex) EMIT2(a_virguilla)
 		    EMIT2(a_diaeresis) EMIT2(a_ring)
@@ -957,39 +957,39 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1eab) EMIT2(0x1ead) EMIT2(0x1eaf)
 		    EMIT2(0x1eb1) EMIT2(0x1eb3) EMIT2(0x1eb5)
 		    EMIT2(0x1eb7) EMIT2(0x2c65)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'b': case 0x180: case 0x253: case 0x1d6c: case 0x1d80:
-	    case 0x1e03: case 0x1e05: case 0x1e07:
+	    ক্ষেত্র 'b': ক্ষেত্র 0x180: ক্ষেত্র 0x253: ক্ষেত্র 0x1d6c: ক্ষেত্র 0x1d80:
+	    ক্ষেত্র 0x1e03: ক্ষেত্র 0x1e05: ক্ষেত্র 0x1e07:
 		    EMIT2('b') EMIT2(0x180) EMIT2(0x253) EMIT2(0x1d6c)
 		    EMIT2(0x1d80) EMIT2(0x1e03) EMIT2(0x1e05) EMIT2(0x1e07)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'c': case c_cedilla: case 0x107: case 0x109: case 0x10b:
-	    case 0x10d: case 0x188: case 0x23c: case 0x1e09: case 0xa793:
-	    case 0xa794:
+	    ক্ষেত্র 'c': ক্ষেত্র c_cedilla: ক্ষেত্র 0x107: ক্ষেত্র 0x109: ক্ষেত্র 0x10b:
+	    ক্ষেত্র 0x10d: ক্ষেত্র 0x188: ক্ষেত্র 0x23c: ক্ষেত্র 0x1e09: ক্ষেত্র 0xa793:
+	    ক্ষেত্র 0xa794:
 		    EMIT2('c') EMIT2(c_cedilla)
 		    EMIT2(0x107) EMIT2(0x109) EMIT2(0x10b)
 		    EMIT2(0x10d) EMIT2(0x188) EMIT2(0x23c)
 		    EMIT2(0x1e09) EMIT2(0xa793) EMIT2(0xa794)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'd': case 0x10f: case 0x111: case 0x257: case 0x1d6d:
-	    case 0x1d81: case 0x1d91: case 0x1e0b: case 0x1e0d: case 0x1e0f:
-	    case 0x1e11: case 0x1e13:
+	    ক্ষেত্র 'd': ক্ষেত্র 0x10f: ক্ষেত্র 0x111: ক্ষেত্র 0x257: ক্ষেত্র 0x1d6d:
+	    ক্ষেত্র 0x1d81: ক্ষেত্র 0x1d91: ক্ষেত্র 0x1e0b: ক্ষেত্র 0x1e0d: ক্ষেত্র 0x1e0f:
+	    ক্ষেত্র 0x1e11: ক্ষেত্র 0x1e13:
 		    EMIT2('d') EMIT2(0x10f) EMIT2(0x111)
 		    EMIT2(0x257) EMIT2(0x1d6d) EMIT2(0x1d81)
 		    EMIT2(0x1d91) EMIT2(0x1e0b) EMIT2(0x1e0d)
 		    EMIT2(0x1e0f) EMIT2(0x1e11) EMIT2(0x1e13)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'e': case e_grave: case e_acute: case e_circumflex:
-	    case e_diaeresis: case 0x113: case 0x115: case 0x117:
-	    case 0x119: case 0x11b: case 0x205: case 0x207:
-	    case 0x229: case 0x247: case 0x1d92: case 0x1e15:
-	    case 0x1e17: case 0x1e19: case 0x1e1b: case 0x1e1d:
-	    case 0x1eb9: case 0x1ebb: case 0x1ebd: case 0x1ebf:
-	    case 0x1ec1: case 0x1ec3: case 0x1ec5: case 0x1ec7:
+	    ক্ষেত্র 'e': ক্ষেত্র e_grave: ক্ষেত্র e_acute: ক্ষেত্র e_circumflex:
+	    ক্ষেত্র e_diaeresis: ক্ষেত্র 0x113: ক্ষেত্র 0x115: ক্ষেত্র 0x117:
+	    ক্ষেত্র 0x119: ক্ষেত্র 0x11b: ক্ষেত্র 0x205: ক্ষেত্র 0x207:
+	    ক্ষেত্র 0x229: ক্ষেত্র 0x247: ক্ষেত্র 0x1d92: ক্ষেত্র 0x1e15:
+	    ক্ষেত্র 0x1e17: ক্ষেত্র 0x1e19: ক্ষেত্র 0x1e1b: ক্ষেত্র 0x1e1d:
+	    ক্ষেত্র 0x1eb9: ক্ষেত্র 0x1ebb: ক্ষেত্র 0x1ebd: ক্ষেত্র 0x1ebf:
+	    ক্ষেত্র 0x1ec1: ক্ষেত্র 0x1ec3: ক্ষেত্র 0x1ec5: ক্ষেত্র 0x1ec7:
 		    EMIT2('e') EMIT2(e_grave) EMIT2(e_acute)
 		    EMIT2(e_circumflex) EMIT2(e_diaeresis)
 		    EMIT2(0x113) EMIT2(0x115)
@@ -1000,37 +1000,37 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1e1d) EMIT2(0x1eb9) EMIT2(0x1ebb)
 		    EMIT2(0x1ebd) EMIT2(0x1ebf) EMIT2(0x1ec1)
 		    EMIT2(0x1ec3) EMIT2(0x1ec5) EMIT2(0x1ec7)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'f': case 0x192: case 0x1d6e: case 0x1d82:
-	    case 0x1e1f: case 0xa799:
+	    ক্ষেত্র 'f': ক্ষেত্র 0x192: ক্ষেত্র 0x1d6e: ক্ষেত্র 0x1d82:
+	    ক্ষেত্র 0x1e1f: ক্ষেত্র 0xa799:
 		    EMIT2('f') EMIT2(0x192) EMIT2(0x1d6e) EMIT2(0x1d82)
 		    EMIT2(0x1e1f) EMIT2(0xa799)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'g': case 0x11d: case 0x11f: case 0x121: case 0x123:
-	    case 0x1e5: case 0x1e7: case 0x1f5: case 0x260: case 0x1d83:
-	    case 0x1e21: case 0xa7a1:
+	    ক্ষেত্র 'g': ক্ষেত্র 0x11d: ক্ষেত্র 0x11f: ক্ষেত্র 0x121: ক্ষেত্র 0x123:
+	    ক্ষেত্র 0x1e5: ক্ষেত্র 0x1e7: ক্ষেত্র 0x1f5: ক্ষেত্র 0x260: ক্ষেত্র 0x1d83:
+	    ক্ষেত্র 0x1e21: ক্ষেত্র 0xa7a1:
 		    EMIT2('g') EMIT2(0x11d) EMIT2(0x11f) EMIT2(0x121)
 		    EMIT2(0x123) EMIT2(0x1e5) EMIT2(0x1e7)
 		    EMIT2(0x1f5) EMIT2(0x260) EMIT2(0x1d83)
 		    EMIT2(0x1e21) EMIT2(0xa7a1)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'h': case 0x125: case 0x127: case 0x21f: case 0x1e23:
-	    case 0x1e25: case 0x1e27: case 0x1e29: case 0x1e2b:
-	    case 0x1e96: case 0x2c68: case 0xa795:
+	    ক্ষেত্র 'h': ক্ষেত্র 0x125: ক্ষেত্র 0x127: ক্ষেত্র 0x21f: ক্ষেত্র 0x1e23:
+	    ক্ষেত্র 0x1e25: ক্ষেত্র 0x1e27: ক্ষেত্র 0x1e29: ক্ষেত্র 0x1e2b:
+	    ক্ষেত্র 0x1e96: ক্ষেত্র 0x2c68: ক্ষেত্র 0xa795:
 		    EMIT2('h') EMIT2(0x125) EMIT2(0x127) EMIT2(0x21f)
 		    EMIT2(0x1e23) EMIT2(0x1e25) EMIT2(0x1e27)
 		    EMIT2(0x1e29) EMIT2(0x1e2b) EMIT2(0x1e96)
 		    EMIT2(0x2c68) EMIT2(0xa795)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'i': case i_grave: case i_acute: case i_circumflex:
-	    case i_diaeresis: case 0x129: case 0x12b: case 0x12d:
-	    case 0x12f: case 0x1d0: case 0x209: case 0x20b:
-	    case 0x268: case 0x1d96: case 0x1e2d: case 0x1e2f:
-	    case 0x1ec9: case 0x1ecb:
+	    ক্ষেত্র 'i': ক্ষেত্র i_grave: ক্ষেত্র i_acute: ক্ষেত্র i_circumflex:
+	    ক্ষেত্র i_diaeresis: ক্ষেত্র 0x129: ক্ষেত্র 0x12b: ক্ষেত্র 0x12d:
+	    ক্ষেত্র 0x12f: ক্ষেত্র 0x1d0: ক্ষেত্র 0x209: ক্ষেত্র 0x20b:
+	    ক্ষেত্র 0x268: ক্ষেত্র 0x1d96: ক্ষেত্র 0x1e2d: ক্ষেত্র 0x1e2f:
+	    ক্ষেত্র 0x1ec9: ক্ষেত্র 0x1ecb:
 		    EMIT2('i') EMIT2(i_grave) EMIT2(i_acute)
 		    EMIT2(i_circumflex) EMIT2(i_diaeresis)
 		    EMIT2(0x129) EMIT2(0x12b) EMIT2(0x12d)
@@ -1038,53 +1038,53 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x20b) EMIT2(0x268) EMIT2(0x1d96)
 		    EMIT2(0x1e2d) EMIT2(0x1e2f) EMIT2(0x1ec9)
 		    EMIT2(0x1ecb)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'j': case 0x135: case 0x1f0: case 0x249:
+	    ক্ষেত্র 'j': ক্ষেত্র 0x135: ক্ষেত্র 0x1f0: ক্ষেত্র 0x249:
 		    EMIT2('j') EMIT2(0x135) EMIT2(0x1f0) EMIT2(0x249)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'k': case 0x137: case 0x199: case 0x1e9: case 0x1d84:
-	    case 0x1e31: case 0x1e33: case 0x1e35: case 0x2c6a: case 0xa741:
+	    ক্ষেত্র 'k': ক্ষেত্র 0x137: ক্ষেত্র 0x199: ক্ষেত্র 0x1e9: ক্ষেত্র 0x1d84:
+	    ক্ষেত্র 0x1e31: ক্ষেত্র 0x1e33: ক্ষেত্র 0x1e35: ক্ষেত্র 0x2c6a: ক্ষেত্র 0xa741:
 		    EMIT2('k') EMIT2(0x137) EMIT2(0x199) EMIT2(0x1e9)
 		    EMIT2(0x1d84) EMIT2(0x1e31) EMIT2(0x1e33)
 		    EMIT2(0x1e35) EMIT2(0x2c6a) EMIT2(0xa741)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'l': case 0x13a: case 0x13c: case 0x13e: case 0x140:
-	    case 0x142: case 0x19a: case 0x1e37: case 0x1e39: case 0x1e3b:
-	    case 0x1e3d: case 0x2c61:
+	    ক্ষেত্র 'l': ক্ষেত্র 0x13a: ক্ষেত্র 0x13c: ক্ষেত্র 0x13e: ক্ষেত্র 0x140:
+	    ক্ষেত্র 0x142: ক্ষেত্র 0x19a: ক্ষেত্র 0x1e37: ক্ষেত্র 0x1e39: ক্ষেত্র 0x1e3b:
+	    ক্ষেত্র 0x1e3d: ক্ষেত্র 0x2c61:
 		    EMIT2('l') EMIT2(0x13a) EMIT2(0x13c)
 		    EMIT2(0x13e) EMIT2(0x140) EMIT2(0x142)
 		    EMIT2(0x19a) EMIT2(0x1e37) EMIT2(0x1e39)
 		    EMIT2(0x1e3b) EMIT2(0x1e3d) EMIT2(0x2c61)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'm': case 0x1d6f: case 0x1e3f: case 0x1e41: case 0x1e43:
+	    ক্ষেত্র 'm': ক্ষেত্র 0x1d6f: ক্ষেত্র 0x1e3f: ক্ষেত্র 0x1e41: ক্ষেত্র 0x1e43:
 		    EMIT2('m') EMIT2(0x1d6f) EMIT2(0x1e3f)
 		    EMIT2(0x1e41) EMIT2(0x1e43)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'n': case n_virguilla: case 0x144: case 0x146: case 0x148:
-	    case 0x149: case 0x1f9: case 0x1d70: case 0x1d87: case 0x1e45:
-	    case 0x1e47: case 0x1e49: case 0x1e4b: case 0xa7a5:
+	    ক্ষেত্র 'n': ক্ষেত্র n_virguilla: ক্ষেত্র 0x144: ক্ষেত্র 0x146: ক্ষেত্র 0x148:
+	    ক্ষেত্র 0x149: ক্ষেত্র 0x1f9: ক্ষেত্র 0x1d70: ক্ষেত্র 0x1d87: ক্ষেত্র 0x1e45:
+	    ক্ষেত্র 0x1e47: ক্ষেত্র 0x1e49: ক্ষেত্র 0x1e4b: ক্ষেত্র 0xa7a5:
 		    EMIT2('n') EMIT2(n_virguilla)
 		    EMIT2(0x144) EMIT2(0x146) EMIT2(0x148)
 		    EMIT2(0x149) EMIT2(0x1f9) EMIT2(0x1d70)
 		    EMIT2(0x1d87) EMIT2(0x1e45) EMIT2(0x1e47)
 		    EMIT2(0x1e49) EMIT2(0x1e4b) EMIT2(0xa7a5)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'o': case o_grave: case o_acute: case o_circumflex:
-	    case o_virguilla: case o_diaeresis: case o_slash:
-	    case 0x14d: case 0x14f: case 0x151: case 0x1a1:
-	    case 0x1d2: case 0x1eb: case 0x1ed: case 0x1ff:
-	    case 0x20d: case 0x20f: case 0x22b: case 0x22d:
-	    case 0x22f: case 0x231: case 0x275: case 0x1e4d:
-	    case 0x1e4f: case 0x1e51: case 0x1e53: case 0x1ecd:
-	    case 0x1ecf: case 0x1ed1: case 0x1ed3: case 0x1ed5:
-	    case 0x1ed7: case 0x1ed9: case 0x1edb: case 0x1edd:
-	    case 0x1edf: case 0x1ee1: case 0x1ee3:
+	    ক্ষেত্র 'o': ক্ষেত্র o_grave: ক্ষেত্র o_acute: ক্ষেত্র o_circumflex:
+	    ক্ষেত্র o_virguilla: ক্ষেত্র o_diaeresis: ক্ষেত্র o_slash:
+	    ক্ষেত্র 0x14d: ক্ষেত্র 0x14f: ক্ষেত্র 0x151: ক্ষেত্র 0x1a1:
+	    ক্ষেত্র 0x1d2: ক্ষেত্র 0x1eb: ক্ষেত্র 0x1ed: ক্ষেত্র 0x1ff:
+	    ক্ষেত্র 0x20d: ক্ষেত্র 0x20f: ক্ষেত্র 0x22b: ক্ষেত্র 0x22d:
+	    ক্ষেত্র 0x22f: ক্ষেত্র 0x231: ক্ষেত্র 0x275: ক্ষেত্র 0x1e4d:
+	    ক্ষেত্র 0x1e4f: ক্ষেত্র 0x1e51: ক্ষেত্র 0x1e53: ক্ষেত্র 0x1ecd:
+	    ক্ষেত্র 0x1ecf: ক্ষেত্র 0x1ed1: ক্ষেত্র 0x1ed3: ক্ষেত্র 0x1ed5:
+	    ক্ষেত্র 0x1ed7: ক্ষেত্র 0x1ed9: ক্ষেত্র 0x1edb: ক্ষেত্র 0x1edd:
+	    ক্ষেত্র 0x1edf: ক্ষেত্র 0x1ee1: ক্ষেত্র 0x1ee3:
 		    EMIT2('o') EMIT2(o_grave) EMIT2(o_acute)
 		    EMIT2(o_circumflex) EMIT2(o_virguilla)
 		    EMIT2(o_diaeresis) EMIT2(o_slash)
@@ -1099,54 +1099,54 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1ed7) EMIT2(0x1ed9) EMIT2(0x1edb)
 		    EMIT2(0x1edd) EMIT2(0x1edf) EMIT2(0x1ee1)
 		    EMIT2(0x1ee3)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'p': case 0x1a5: case 0x1d71: case 0x1d7d: case 0x1d88:
-	    case 0x1e55: case 0x1e57:
+	    ক্ষেত্র 'p': ক্ষেত্র 0x1a5: ক্ষেত্র 0x1d71: ক্ষেত্র 0x1d7d: ক্ষেত্র 0x1d88:
+	    ক্ষেত্র 0x1e55: ক্ষেত্র 0x1e57:
 		    EMIT2('p') EMIT2(0x1a5) EMIT2(0x1d71) EMIT2(0x1d7d)
 		    EMIT2(0x1d88) EMIT2(0x1e55) EMIT2(0x1e57)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'q': case 0x24b: case 0x2a0:
+	    ক্ষেত্র 'q': ক্ষেত্র 0x24b: ক্ষেত্র 0x2a0:
 		    EMIT2('q') EMIT2(0x24b) EMIT2(0x2a0)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'r': case 0x155: case 0x157: case 0x159: case 0x211:
-	    case 0x213: case 0x24d: case 0x27d: case 0x1d72: case 0x1d73:
-	    case 0x1d89: case 0x1e59: case 0x1e5b: case 0x1e5d: case 0x1e5f:
-	    case 0xa7a7:
+	    ক্ষেত্র 'r': ক্ষেত্র 0x155: ক্ষেত্র 0x157: ক্ষেত্র 0x159: ক্ষেত্র 0x211:
+	    ক্ষেত্র 0x213: ক্ষেত্র 0x24d: ক্ষেত্র 0x27d: ক্ষেত্র 0x1d72: ক্ষেত্র 0x1d73:
+	    ক্ষেত্র 0x1d89: ক্ষেত্র 0x1e59: ক্ষেত্র 0x1e5b: ক্ষেত্র 0x1e5d: ক্ষেত্র 0x1e5f:
+	    ক্ষেত্র 0xa7a7:
 		    EMIT2('r') EMIT2(0x155) EMIT2(0x157) EMIT2(0x159)
 		    EMIT2(0x211) EMIT2(0x213) EMIT2(0x24d) EMIT2(0x27d)
 		    EMIT2(0x1d72) EMIT2(0x1d73) EMIT2(0x1d89) EMIT2(0x1e59)
 		    EMIT2(0x1e5b) EMIT2(0x1e5d) EMIT2(0x1e5f) EMIT2(0xa7a7)
-		    return OK;
+		    ফেরত OK;
 
-	    case 's': case 0x15b: case 0x15d: case 0x15f: case 0x161:
-	    case 0x219: case 0x23f: case 0x1d74: case 0x1d8a: case 0x1e61:
-	    case 0x1e63: case 0x1e65: case 0x1e67: case 0x1e69: case 0xa7a9:
+	    ক্ষেত্র 's': ক্ষেত্র 0x15b: ক্ষেত্র 0x15d: ক্ষেত্র 0x15f: ক্ষেত্র 0x161:
+	    ক্ষেত্র 0x219: ক্ষেত্র 0x23f: ক্ষেত্র 0x1d74: ক্ষেত্র 0x1d8a: ক্ষেত্র 0x1e61:
+	    ক্ষেত্র 0x1e63: ক্ষেত্র 0x1e65: ক্ষেত্র 0x1e67: ক্ষেত্র 0x1e69: ক্ষেত্র 0xa7a9:
 		    EMIT2('s') EMIT2(0x15b) EMIT2(0x15d) EMIT2(0x15f)
 		    EMIT2(0x161) EMIT2(0x219) EMIT2(0x23f) EMIT2(0x1d74)
 		    EMIT2(0x1d8a) EMIT2(0x1e61) EMIT2(0x1e63) EMIT2(0x1e65)
 		    EMIT2(0x1e67) EMIT2(0x1e69) EMIT2(0xa7a9)
-		    return OK;
+		    ফেরত OK;
 
-	    case 't': case 0x163: case 0x165: case 0x167: case 0x1ab:
-	    case 0x1ad: case 0x21b: case 0x288: case 0x1d75: case 0x1e6b:
-	    case 0x1e6d: case 0x1e6f: case 0x1e71: case 0x1e97: case 0x2c66:
+	    ক্ষেত্র 't': ক্ষেত্র 0x163: ক্ষেত্র 0x165: ক্ষেত্র 0x167: ক্ষেত্র 0x1ab:
+	    ক্ষেত্র 0x1ad: ক্ষেত্র 0x21b: ক্ষেত্র 0x288: ক্ষেত্র 0x1d75: ক্ষেত্র 0x1e6b:
+	    ক্ষেত্র 0x1e6d: ক্ষেত্র 0x1e6f: ক্ষেত্র 0x1e71: ক্ষেত্র 0x1e97: ক্ষেত্র 0x2c66:
 		    EMIT2('t') EMIT2(0x163) EMIT2(0x165) EMIT2(0x167)
 		    EMIT2(0x1ab) EMIT2(0x1ad) EMIT2(0x21b) EMIT2(0x288)
 		    EMIT2(0x1d75) EMIT2(0x1e6b) EMIT2(0x1e6d) EMIT2(0x1e6f)
 		    EMIT2(0x1e71) EMIT2(0x1e97) EMIT2(0x2c66)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'u': case u_grave: case u_acute: case u_circumflex:
-	    case u_diaeresis: case 0x169: case 0x16b: case 0x16d:
-	    case 0x16f: case 0x171: case 0x173: case 0x1b0: case 0x1d4:
-	    case 0x1d6: case 0x1d8: case 0x1da: case 0x1dc: case 0x215:
-	    case 0x217: case 0x289: case 0x1d7e: case 0x1d99: case 0x1e73:
-	    case 0x1e75: case 0x1e77: case 0x1e79: case 0x1e7b:
-	    case 0x1ee5: case 0x1ee7: case 0x1ee9: case 0x1eeb:
-	    case 0x1eed: case 0x1eef: case 0x1ef1:
+	    ক্ষেত্র 'u': ক্ষেত্র u_grave: ক্ষেত্র u_acute: ক্ষেত্র u_circumflex:
+	    ক্ষেত্র u_diaeresis: ক্ষেত্র 0x169: ক্ষেত্র 0x16b: ক্ষেত্র 0x16d:
+	    ক্ষেত্র 0x16f: ক্ষেত্র 0x171: ক্ষেত্র 0x173: ক্ষেত্র 0x1b0: ক্ষেত্র 0x1d4:
+	    ক্ষেত্র 0x1d6: ক্ষেত্র 0x1d8: ক্ষেত্র 0x1da: ক্ষেত্র 0x1dc: ক্ষেত্র 0x215:
+	    ক্ষেত্র 0x217: ক্ষেত্র 0x289: ক্ষেত্র 0x1d7e: ক্ষেত্র 0x1d99: ক্ষেত্র 0x1e73:
+	    ক্ষেত্র 0x1e75: ক্ষেত্র 0x1e77: ক্ষেত্র 0x1e79: ক্ষেত্র 0x1e7b:
+	    ক্ষেত্র 0x1ee5: ক্ষেত্র 0x1ee7: ক্ষেত্র 0x1ee9: ক্ষেত্র 0x1eeb:
+	    ক্ষেত্র 0x1eed: ক্ষেত্র 0x1eef: ক্ষেত্র 0x1ef1:
 		    EMIT2('u') EMIT2(u_grave) EMIT2(u_acute)
 		    EMIT2(u_circumflex) EMIT2(u_diaeresis)
 		    EMIT2(0x169) EMIT2(0x16b)
@@ -1159,47 +1159,47 @@ nfa_emit_equi_class(int c)
 		    EMIT2(0x1e79) EMIT2(0x1e7b) EMIT2(0x1ee5)
 		    EMIT2(0x1ee7) EMIT2(0x1ee9) EMIT2(0x1eeb)
 		    EMIT2(0x1eed) EMIT2(0x1eef) EMIT2(0x1ef1)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'v': case 0x28b: case 0x1d8c: case 0x1e7d: case 0x1e7f:
+	    ক্ষেত্র 'v': ক্ষেত্র 0x28b: ক্ষেত্র 0x1d8c: ক্ষেত্র 0x1e7d: ক্ষেত্র 0x1e7f:
 		    EMIT2('v') EMIT2(0x28b) EMIT2(0x1d8c) EMIT2(0x1e7d)
 		    EMIT2(0x1e7f)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'w': case 0x175: case 0x1e81: case 0x1e83: case 0x1e85:
-	    case 0x1e87: case 0x1e89: case 0x1e98:
+	    ক্ষেত্র 'w': ক্ষেত্র 0x175: ক্ষেত্র 0x1e81: ক্ষেত্র 0x1e83: ক্ষেত্র 0x1e85:
+	    ক্ষেত্র 0x1e87: ক্ষেত্র 0x1e89: ক্ষেত্র 0x1e98:
 		    EMIT2('w') EMIT2(0x175) EMIT2(0x1e81) EMIT2(0x1e83)
 		    EMIT2(0x1e85) EMIT2(0x1e87) EMIT2(0x1e89) EMIT2(0x1e98)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'x': case 0x1e8b: case 0x1e8d:
+	    ক্ষেত্র 'x': ক্ষেত্র 0x1e8b: ক্ষেত্র 0x1e8d:
 		    EMIT2('x') EMIT2(0x1e8b) EMIT2(0x1e8d)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'y': case y_acute: case y_diaeresis: case 0x177:
-	    case 0x1b4: case 0x233: case 0x24f: case 0x1e8f:
-	    case 0x1e99: case 0x1ef3: case 0x1ef5: case 0x1ef7:
-	    case 0x1ef9:
+	    ক্ষেত্র 'y': ক্ষেত্র y_acute: ক্ষেত্র y_diaeresis: ক্ষেত্র 0x177:
+	    ক্ষেত্র 0x1b4: ক্ষেত্র 0x233: ক্ষেত্র 0x24f: ক্ষেত্র 0x1e8f:
+	    ক্ষেত্র 0x1e99: ক্ষেত্র 0x1ef3: ক্ষেত্র 0x1ef5: ক্ষেত্র 0x1ef7:
+	    ক্ষেত্র 0x1ef9:
 		    EMIT2('y') EMIT2(y_acute) EMIT2(y_diaeresis)
 		    EMIT2(0x177) EMIT2(0x1b4) EMIT2(0x233) EMIT2(0x24f)
 		    EMIT2(0x1e8f) EMIT2(0x1e99) EMIT2(0x1ef3)
 		    EMIT2(0x1ef5) EMIT2(0x1ef7) EMIT2(0x1ef9)
-		    return OK;
+		    ফেরত OK;
 
-	    case 'z': case 0x17a: case 0x17c: case 0x17e: case 0x1b6:
-	    case 0x1d76: case 0x1d8e: case 0x1e91: case 0x1e93:
-	    case 0x1e95: case 0x2c6c:
+	    ক্ষেত্র 'z': ক্ষেত্র 0x17a: ক্ষেত্র 0x17c: ক্ষেত্র 0x17e: ক্ষেত্র 0x1b6:
+	    ক্ষেত্র 0x1d76: ক্ষেত্র 0x1d8e: ক্ষেত্র 0x1e91: ক্ষেত্র 0x1e93:
+	    ক্ষেত্র 0x1e95: ক্ষেত্র 0x2c6c:
 		    EMIT2('z') EMIT2(0x17a) EMIT2(0x17c) EMIT2(0x17e)
 		    EMIT2(0x1b6) EMIT2(0x1d76) EMIT2(0x1d8e) EMIT2(0x1e91)
 		    EMIT2(0x1e93) EMIT2(0x1e95) EMIT2(0x2c6c)
-		    return OK;
+		    ফেরত OK;
 
 	    // default: character itself
 	}
     }
 
     EMIT2(c);
-    return OK;
+    ফেরত OK;
 #undef EMIT2
 }
 
@@ -1223,73 +1223,73 @@ nfa_emit_equi_class(int c)
  *     or  \%( pattern \)
  *     or  \z( pattern \)
  */
-    static int
-nfa_regatom(void)
+    স্থির পূর্ণসংখ্যা
+nfa_regatom(শূন্য)
 {
-    int		c;
-    int		charclass;
-    int		equiclass;
-    int		collclass;
-    int		got_coll_char;
+    পূর্ণসংখ্যা		c;
+    পূর্ণসংখ্যা		charclass;
+    পূর্ণসংখ্যা		equiclass;
+    পূর্ণসংখ্যা		collclass;
+    পূর্ণসংখ্যা		got_coll_char;
     char_u	*p;
     char_u	*endp;
     char_u	*old_regparse = regparse;
-    int		extra = 0;
-    int		emit_range;
-    int		negated;
-    int		result;
-    int		startc = -1;
-    int		save_prev_at_start = prev_at_start;
+    পূর্ণসংখ্যা		extra = 0;
+    পূর্ণসংখ্যা		emit_range;
+    পূর্ণসংখ্যা		negated;
+    পূর্ণসংখ্যা		ফলাফল;
+    পূর্ণসংখ্যা		startc = -1;
+    পূর্ণসংখ্যা		save_পূর্ব_at_start = পূর্ব_at_start;
 
     c = getchr();
-    switch (c)
+    নির্বাচন (c)
     {
-	case NUL:
+	ক্ষেত্র NUL:
 	    EMSG_RET_FAIL(_(e_nfa_regexp_end_encountered_prematurely));
 
-	case Magic('^'):
+	ক্ষেত্র Magic('^'):
 	    EMIT(NFA_BOL);
-	    break;
+	    বিরতি;
 
-	case Magic('$'):
+	ক্ষেত্র Magic('$'):
 	    EMIT(NFA_EOL);
-#if defined(FEAT_SYN_HL)
+#যদি defined(FEAT_SYN_HL)
 	    had_eol = TRUE;
 #endif
-	    break;
+	    বিরতি;
 
-	case Magic('<'):
+	ক্ষেত্র Magic('<'):
 	    EMIT(NFA_BOW);
-	    break;
+	    বিরতি;
 
-	case Magic('>'):
+	ক্ষেত্র Magic('>'):
 	    EMIT(NFA_EOW);
-	    break;
+	    বিরতি;
 
-	case Magic('_'):
+	ক্ষেত্র Magic('_'):
 	    c = no_Magic(getchr());
-	    if (c == NUL)
+	    যদি (c == NUL)
 		EMSG_RET_FAIL(_(e_nfa_regexp_end_encountered_prematurely));
 
-	    if (c == '^')	// "\_^" is start-of-line
+	    যদি (c == '^')	// "\_^" is start-of-line
 	    {
 		EMIT(NFA_BOL);
-		break;
+		বিরতি;
 	    }
-	    if (c == '$')	// "\_$" is end-of-line
+	    যদি (c == '$')	// "\_$" is end-of-line
 	    {
 		EMIT(NFA_EOL);
-#if defined(FEAT_SYN_HL)
+#যদি defined(FEAT_SYN_HL)
 		had_eol = TRUE;
 #endif
-		break;
+		বিরতি;
 	    }
 
 	    extra = NFA_ADD_NL;
 
 	    // "\_[" is collection plus newline
-	    if (c == '[')
-		goto collection;
+	    যদি (c == '[')
+		যাও collection;
 
 	// "\_x" is character class plus newline
 	// FALLTHROUGH
@@ -1297,268 +1297,268 @@ nfa_regatom(void)
 	/*
 	 * Character classes.
 	 */
-	case Magic('.'):
-	case Magic('i'):
-	case Magic('I'):
-	case Magic('k'):
-	case Magic('K'):
-	case Magic('f'):
-	case Magic('F'):
-	case Magic('p'):
-	case Magic('P'):
-	case Magic('s'):
-	case Magic('S'):
-	case Magic('d'):
-	case Magic('D'):
-	case Magic('x'):
-	case Magic('X'):
-	case Magic('o'):
-	case Magic('O'):
-	case Magic('w'):
-	case Magic('W'):
-	case Magic('h'):
-	case Magic('H'):
-	case Magic('a'):
-	case Magic('A'):
-	case Magic('l'):
-	case Magic('L'):
-	case Magic('u'):
-	case Magic('U'):
+	ক্ষেত্র Magic('.'):
+	ক্ষেত্র Magic('i'):
+	ক্ষেত্র Magic('I'):
+	ক্ষেত্র Magic('k'):
+	ক্ষেত্র Magic('K'):
+	ক্ষেত্র Magic('f'):
+	ক্ষেত্র Magic('F'):
+	ক্ষেত্র Magic('p'):
+	ক্ষেত্র Magic('P'):
+	ক্ষেত্র Magic('s'):
+	ক্ষেত্র Magic('S'):
+	ক্ষেত্র Magic('d'):
+	ক্ষেত্র Magic('D'):
+	ক্ষেত্র Magic('x'):
+	ক্ষেত্র Magic('X'):
+	ক্ষেত্র Magic('o'):
+	ক্ষেত্র Magic('O'):
+	ক্ষেত্র Magic('w'):
+	ক্ষেত্র Magic('W'):
+	ক্ষেত্র Magic('h'):
+	ক্ষেত্র Magic('H'):
+	ক্ষেত্র Magic('a'):
+	ক্ষেত্র Magic('A'):
+	ক্ষেত্র Magic('l'):
+	ক্ষেত্র Magic('L'):
+	ক্ষেত্র Magic('u'):
+	ক্ষেত্র Magic('U'):
 	    p = vim_strchr(classchars, no_Magic(c));
-	    if (p == NULL)
+	    যদি (p == ফাঁকা)
 	    {
-		if (extra == NFA_ADD_NL)
+		যদি (extra == NFA_ADD_NL)
 		{
 		    semsg(_(e_nfa_regexp_invalid_character_class_nr), c);
 		    rc_did_emsg = TRUE;
-		    return FAIL;
+		    ফেরত FAIL;
 		}
 		siemsg("Unknown character class char: %d", c);
-		return FAIL;
+		ফেরত FAIL;
 	    }
 
 	    // When '.' is followed by a composing char ignore the dot, so that
 	    // the composing char is matched here.
-	    if (enc_utf8 && c == Magic('.') && utf_iscomposing(peekchr()))
+	    যদি (enc_utf8 && c == Magic('.') && utf_iscomposing(peekchr()))
 	    {
 		old_regparse = regparse;
 		c = getchr();
-		goto nfa_do_multibyte;
+		যাও nfa_do_multibyte;
 	    }
 	    EMIT(nfa_classcodes[p - classchars]);
-	    if (extra == NFA_ADD_NL)
+	    যদি (extra == NFA_ADD_NL)
 	    {
 		EMIT(NFA_NEWL);
 		EMIT(NFA_OR);
 		regflags |= RF_HASNL;
 	    }
-	    break;
+	    বিরতি;
 
-	case Magic('n'):
-	    if (reg_string)
+	ক্ষেত্র Magic('n'):
+	    যদি (reg_string)
 		// In a string "\n" matches a newline character.
 		EMIT(NL);
-	    else
+	    অন্যথা
 	    {
 		// In buffer text "\n" matches the end of a line.
 		EMIT(NFA_NEWL);
 		regflags |= RF_HASNL;
 	    }
-	    break;
+	    বিরতি;
 
-	case Magic('('):
-	    if (nfa_reg(REG_PAREN) == FAIL)
-		return FAIL;	    // cascaded error
-	    break;
+	ক্ষেত্র Magic('('):
+	    যদি (nfa_reg(REG_PAREN) == FAIL)
+		ফেরত FAIL;	    // cascaded error
+	    বিরতি;
 
-	case Magic('|'):
-	case Magic('&'):
-	case Magic(')'):
+	ক্ষেত্র Magic('|'):
+	ক্ষেত্র Magic('&'):
+	ক্ষেত্র Magic(')'):
 	    semsg(_(e_nfa_regexp_misplaced_chr), no_Magic(c));
-	    return FAIL;
+	    ফেরত FAIL;
 
-	case Magic('='):
-	case Magic('?'):
-	case Magic('+'):
-	case Magic('@'):
-	case Magic('*'):
-	case Magic('{'):
+	ক্ষেত্র Magic('='):
+	ক্ষেত্র Magic('?'):
+	ক্ষেত্র Magic('+'):
+	ক্ষেত্র Magic('@'):
+	ক্ষেত্র Magic('*'):
+	ক্ষেত্র Magic('{'):
 	    // these should follow an atom, not form an atom
 	    semsg(_(e_nfa_regexp_misplaced_chr), no_Magic(c));
-	    return FAIL;
+	    ফেরত FAIL;
 
-	case Magic('~'):
+	ক্ষেত্র Magic('~'):
 	    {
 		char_u	    *lp;
 
 		// Previous substitute pattern.
 		// Generated as "\%(pattern\)".
-		if (reg_prev_sub == NULL)
+		যদি (reg_পূর্ব_sub == ফাঁকা)
 		{
 		    emsg(_(e_no_previous_substitute_regular_expression));
-		    return FAIL;
+		    ফেরত FAIL;
 		}
-		for (lp = reg_prev_sub; *lp != NUL; MB_CPTR_ADV(lp))
+		জন্য (lp = reg_পূর্ব_sub; *lp != NUL; MB_CPTR_ADV(lp))
 		{
 		    EMIT(PTR2CHAR(lp));
-		    if (lp != reg_prev_sub)
+		    যদি (lp != reg_পূর্ব_sub)
 			EMIT(NFA_CONCAT);
 		}
 		EMIT(NFA_NOPEN);
-		break;
+		বিরতি;
 	    }
 
-	case Magic('1'):
-	case Magic('2'):
-	case Magic('3'):
-	case Magic('4'):
-	case Magic('5'):
-	case Magic('6'):
-	case Magic('7'):
-	case Magic('8'):
-	case Magic('9'):
+	ক্ষেত্র Magic('1'):
+	ক্ষেত্র Magic('2'):
+	ক্ষেত্র Magic('3'):
+	ক্ষেত্র Magic('4'):
+	ক্ষেত্র Magic('5'):
+	ক্ষেত্র Magic('6'):
+	ক্ষেত্র Magic('7'):
+	ক্ষেত্র Magic('8'):
+	ক্ষেত্র Magic('9'):
 	    {
-		int refnum = no_Magic(c) - '1';
+		পূর্ণসংখ্যা refnum = no_Magic(c) - '1';
 
-		if (!seen_endbrace(refnum + 1))
-		    return FAIL;
+		যদি (!seen_endbrace(refnum + 1))
+		    ফেরত FAIL;
 		EMIT(NFA_BACKREF1 + refnum);
 		rex.nfa_has_backref = TRUE;
 	    }
-	    break;
+	    বিরতি;
 
-	case Magic('z'):
+	ক্ষেত্র Magic('z'):
 	    c = no_Magic(getchr());
-	    switch (c)
+	    নির্বাচন (c)
 	    {
-		case 's':
+		ক্ষেত্র 's':
 		    EMIT(NFA_ZSTART);
-		    if (re_mult_next("\\zs") == FAIL)
-			return FAIL;
-		    break;
-		case 'e':
+		    যদি (re_mult_পরবর্তী("\\zs") == FAIL)
+			ফেরত FAIL;
+		    বিরতি;
+		ক্ষেত্র 'e':
 		    EMIT(NFA_ZEND);
 		    rex.nfa_has_zend = TRUE;
-		    if (re_mult_next("\\ze") == FAIL)
-			return FAIL;
-		    break;
+		    যদি (re_mult_পরবর্তী("\\ze") == FAIL)
+			ফেরত FAIL;
+		    বিরতি;
 #ifdef FEAT_SYN_HL
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
+		ক্ষেত্র '1':
+		ক্ষেত্র '2':
+		ক্ষেত্র '3':
+		ক্ষেত্র '4':
+		ক্ষেত্র '5':
+		ক্ষেত্র '6':
+		ক্ষেত্র '7':
+		ক্ষেত্র '8':
+		ক্ষেত্র '9':
 		    // \z1...\z9
-		    if ((reg_do_extmatch & REX_USE) == 0)
+		    যদি ((reg_do_extmatch & REX_USE) == 0)
 			EMSG_RET_FAIL(_(e_z1_z9_not_allowed_here));
 		    EMIT(NFA_ZREF1 + (no_Magic(c) - '1'));
 		    // No need to set rex.nfa_has_backref, the sub-matches don't
 		    // change when \z1 .. \z9 matches or not.
 		    re_has_z = REX_USE;
-		    break;
-		case '(':
+		    বিরতি;
+		ক্ষেত্র '(':
 		    // \z(
-		    if ((reg_do_extmatch & REX_SET) == 0)
+		    যদি ((reg_do_extmatch & REX_SET) == 0)
 			EMSG_RET_FAIL(_(e_z_not_allowed_here));
-		    if (nfa_reg(REG_ZPAREN) == FAIL)
-			return FAIL;	    // cascaded error
+		    যদি (nfa_reg(REG_ZPAREN) == FAIL)
+			ফেরত FAIL;	    // cascaded error
 		    re_has_z = REX_SET;
-		    break;
+		    বিরতি;
 #endif
-		default:
+		পূর্বনির্ধারিত:
 		    semsg(_(e_nfa_regexp_unknown_operator_z_chr), no_Magic(c));
-		    return FAIL;
+		    ফেরত FAIL;
 	    }
-	    break;
+	    বিরতি;
 
-	case Magic('%'):
+	ক্ষেত্র Magic('%'):
 	    c = no_Magic(getchr());
-	    switch (c)
+	    নির্বাচন (c)
 	    {
 		// () without a back reference
-		case '(':
-		    if (nfa_reg(REG_NPAREN) == FAIL)
-			return FAIL;
+		ক্ষেত্র '(':
+		    যদি (nfa_reg(REG_NPAREN) == FAIL)
+			ফেরত FAIL;
 		    EMIT(NFA_NOPEN);
-		    break;
+		    বিরতি;
 
-		case 'd':   // %d123 decimal
-		case 'o':   // %o123 octal
-		case 'x':   // %xab hex 2
-		case 'u':   // %uabcd hex 4
-		case 'U':   // %U1234abcd hex 8
+		ক্ষেত্র 'd':   // %d123 decimal
+		ক্ষেত্র 'o':   // %o123 octal
+		ক্ষেত্র 'x':   // %xab hex 2
+		ক্ষেত্র 'u':   // %uabcd hex 4
+		ক্ষেত্র 'U':   // %U1234abcd hex 8
 		    {
 			vimlong_T nr;
 
-			switch (c)
+			নির্বাচন (c)
 			{
-			    case 'd': nr = getdecchrs(); break;
-			    case 'o': nr = getoctchrs(); break;
-			    case 'x': nr = gethexchrs(2); break;
-			    case 'u': nr = gethexchrs(4); break;
-			    case 'U': nr = gethexchrs(8); break;
-			    default:  nr = -1; break;
+			    ক্ষেত্র 'd': nr = getdecchrs(); বিরতি;
+			    ক্ষেত্র 'o': nr = getoctchrs(); বিরতি;
+			    ক্ষেত্র 'x': nr = gethexchrs(2); বিরতি;
+			    ক্ষেত্র 'u': nr = gethexchrs(4); বিরতি;
+			    ক্ষেত্র 'U': nr = gethexchrs(8); বিরতি;
+			    পূর্বনির্ধারিত:  nr = -1; বিরতি;
 			}
 
-			if (nr < 0 || nr > INT_MAX)
+			যদি (nr < 0 || nr > INT_MAX)
 			    EMSG2_RET_FAIL(_(e_invalid_character_after_str_2),
 						       reg_magic == MAGIC_ALL);
 			// A NUL is stored in the text as NL
 			// TODO: what if a composing character follows?
 			EMIT(nr == 0 ? 0x0a : (long)nr);
 		    }
-		    break;
+		    বিরতি;
 
 		// Catch \%^ and \%$ regardless of where they appear in the
 		// pattern -- regardless of whether or not it makes sense.
-		case '^':
+		ক্ষেত্র '^':
 		    EMIT(NFA_BOF);
-		    break;
+		    বিরতি;
 
-		case '$':
+		ক্ষেত্র '$':
 		    EMIT(NFA_EOF);
-		    break;
+		    বিরতি;
 
-		case '#':
-		    if (regparse[0] == '=' && regparse[1] >= 48
+		ক্ষেত্র '#':
+		    যদি (regparse[0] == '=' && regparse[1] >= 48
 							  && regparse[1] <= 50)
 		    {
 			// misplaced \%#=1
 			semsg(_(e_atom_engine_must_be_at_start_of_pattern),
 								  regparse[1]);
-			return FAIL;
+			ফেরত FAIL;
 		    }
 		    EMIT(NFA_CURSOR);
-		    break;
+		    বিরতি;
 
-		case 'V':
+		ক্ষেত্র 'V':
 		    EMIT(NFA_VISUAL);
-		    break;
+		    বিরতি;
 
-		case 'C':
+		ক্ষেত্র 'C':
 		    EMIT(NFA_ANY_COMPOSING);
-		    break;
+		    বিরতি;
 
-		case '[':
+		ক্ষেত্র '[':
 		    {
-			int	    n;
+			পূর্ণসংখ্যা	    n;
 
 			// \%[abc]
-			for (n = 0; (c = peekchr()) != ']'; ++n)
+			জন্য (n = 0; (c = peekchr()) != ']'; ++n)
 			{
-			    if (c == NUL)
+			    যদি (c == NUL)
 				EMSG2_RET_FAIL(_(e_missing_sb_after_str),
 						      reg_magic == MAGIC_ALL);
 			    // recursive call!
-			    if (nfa_regatom() == FAIL)
-				return FAIL;
+			    যদি (nfa_regatom() == FAIL)
+				ফেরত FAIL;
 			}
 			getchr();  // get the ]
-			if (n == 0)
+			যদি (n == 0)
 			    EMSG2_RET_FAIL(_(e_empty_str_brackets),
 						      reg_magic == MAGIC_ALL);
 			EMIT(NFA_OPT_CHARS);
@@ -1572,68 +1572,68 @@ nfa_regatom(void)
 			// not allowing NFA_SPLIT multiple times, it is used
 			// a lot.
 			EMIT(NFA_NOPEN);
-			break;
+			বিরতি;
 		    }
 
-		default:
+		পূর্বনির্ধারিত:
 		    {
 			long_u	n = 0;
-			int	cmp = c;
-			int	cur = FALSE;
-			int	got_digit = FALSE;
+			পূর্ণসংখ্যা	cmp = c;
+			পূর্ণসংখ্যা	cur = FALSE;
+			পূর্ণসংখ্যা	got_digit = FALSE;
 
-			if (c == '<' || c == '>')
+			যদি (c == '<' || c == '>')
 			    c = getchr();
-			if (no_Magic(c) == '.')
+			যদি (no_Magic(c) == '.')
 			{
 			    cur = TRUE;
 			    c = getchr();
 			}
-			while (VIM_ISDIGIT(c))
+			যখন (VIM_ISDIGIT(c))
 			{
 			    long_u tmp;
 
-			    if (cur)
+			    যদি (cur)
 			    {
-				semsg(_(e_regexp_number_after_dot_pos_search_chr),
+				semsg(_(e_regexp_সংখ্যা_after_dot_pos_অনুসন্ধান_chr),
 								  no_Magic(c));
-				return FAIL;
+				ফেরত FAIL;
 			    }
 			    tmp = n * 10 + (c - '0');
 
-			    if (tmp < n)
+			    যদি (tmp < n)
 			    {
 				// overflow.
-				emsg(_(e_percent_value_too_large));
-				return FAIL;
+				emsg(_(e_percent_মান_too_large));
+				ফেরত FAIL;
 			    }
 			    n = tmp;
 			    c = getchr();
 			    got_digit = TRUE;
 			}
-			if (c == 'l' || c == 'c' || c == 'v')
+			যদি (c == 'l' || c == 'c' || c == 'v')
 			{
 			    long_u limit = INT_MAX;
 
-			    if (!cur && !got_digit)
+			    যদি (!cur && !got_digit)
 			    {
-				semsg(_(e_nfa_regexp_missing_value_in_chr),
+				semsg(_(e_nfa_regexp_missing_মান_in_chr),
 								  no_Magic(c));
-				return FAIL;
+				ফেরত FAIL;
 			    }
-			    if (c == 'l')
+			    যদি (c == 'l')
 			    {
-				if (cur)
+				যদি (cur)
 				    n = curwin->w_cursor.lnum;
 				// \%{n}l  \%{n}<l  \%{n}>l
 				EMIT(cmp == '<' ? NFA_LNUM_LT :
 				     cmp == '>' ? NFA_LNUM_GT : NFA_LNUM);
-				if (save_prev_at_start)
+				যদি (save_পূর্ব_at_start)
 				    at_start = TRUE;
 			    }
-			    else if (c == 'c')
+			    অন্যথা যদি (c == 'c')
 			    {
-				if (cur)
+				যদি (cur)
 				{
 				    n = curwin->w_cursor.col;
 				    n++;
@@ -1642,14 +1642,14 @@ nfa_regatom(void)
 				EMIT(cmp == '<' ? NFA_COL_LT :
 				     cmp == '>' ? NFA_COL_GT : NFA_COL);
 			    }
-			    else
+			    অন্যথা
 			    {
-				if (cur)
+				যদি (cur)
 				{
 				    colnr_T vcol = 0;
 
 				    getvvcol(curwin, &curwin->w_cursor,
-							 NULL, NULL, &vcol, 0);
+							 ফাঁকা, ফাঁকা, &vcol, 0);
 				    n = ++vcol;
 				}
 				// \%{n}v  \%{n}<v  \%{n}>v
@@ -1657,30 +1657,30 @@ nfa_regatom(void)
 				     cmp == '>' ? NFA_VCOL_GT : NFA_VCOL);
 				limit = INT_MAX / MB_MAXBYTES;
 			    }
-			    if (n >= limit)
+			    যদি (n >= limit)
 			    {
-				emsg(_(e_percent_value_too_large));
-				return FAIL;
+				emsg(_(e_percent_মান_too_large));
+				ফেরত FAIL;
 			    }
-			    EMIT((int)n);
-			    break;
+			    EMIT((পূর্ণসংখ্যা)n);
+			    বিরতি;
 			}
-			else if (no_Magic(c) == '\'' && n == 0)
+			অন্যথা যদি (no_Magic(c) == '\'' && n == 0)
 			{
 			    // \%'m  \%<'m  \%>'m
 			    EMIT(cmp == '<' ? NFA_MARK_LT :
 				 cmp == '>' ? NFA_MARK_GT : NFA_MARK);
 			    EMIT(getchr());
-			    break;
+			    বিরতি;
 			}
 		    }
 		    semsg(_(e_nfa_regexp_unknown_operator_percent_chr),
 								  no_Magic(c));
-		    return FAIL;
+		    ফেরত FAIL;
 	    }
-	    break;
+	    বিরতি;
 
-	case Magic('['):
+	ক্ষেত্র Magic('['):
 collection:
 	    /*
 	     * [abc]  uses NFA_START_COLL - NFA_END_COLL
@@ -1694,30 +1694,30 @@ collection:
 
 	    p = regparse;
 	    endp = skip_anyof(p);
-	    if (*endp == ']')
+	    যদি (*endp == ']')
 	    {
-		int plen;
+		পূর্ণসংখ্যা plen;
 		bool range_endpoint;
 		/*
 		 * Try to reverse engineer character classes. For example,
 		 * recognize that [0-9] stands for \d and [A-Za-z_] for \h,
 		 * and perform the necessary substitutions in the NFA.
 		 */
-		result = nfa_recognize_char_class(regparse, endp,
+		ফলাফল = nfa_recognize_char_class(regparse, endp,
 							 extra == NFA_ADD_NL);
-		if (result != FAIL)
+		যদি (ফলাফল != FAIL)
 		{
-		    if (result >= NFA_FIRST_NL && result <= NFA_LAST_NL)
+		    যদি (ফলাফল >= NFA_FIRST_NL && ফলাফল <= NFA_LAST_NL)
 		    {
-			EMIT(result - NFA_ADD_NL);
+			EMIT(ফলাফল - NFA_ADD_NL);
 			EMIT(NFA_NEWL);
 			EMIT(NFA_OR);
 		    }
-		    else
-			EMIT(result);
+		    অন্যথা
+			EMIT(ফলাফল);
 		    regparse = endp;
 		    MB_PTR_ADV(regparse);
-		    return OK;
+		    ফেরত OK;
 		}
 		/*
 		 * Failed to recognize a character class. Use the simple
@@ -1725,15 +1725,15 @@ collection:
 		 */
 		startc = -1;
 		negated = FALSE;
-		if (*regparse == '^')			// negated range
+		যদি (*regparse == '^')			// negated range
 		{
 		    negated = TRUE;
 		    MB_PTR_ADV(regparse);
 		    EMIT(NFA_START_NEG_COLL);
 		}
-		else
+		অন্যথা
 		    EMIT(NFA_START_COLL);
-		if (*regparse == '-')
+		যদি (*regparse == '-')
 		{
 		    startc = '-';
 		    EMIT(startc);
@@ -1742,106 +1742,106 @@ collection:
 		}
 		// Emit the OR branches for each character in the []
 		emit_range = FALSE;
-		while (regparse < endp)
+		যখন (regparse < endp)
 		{
-		    int	    oldstartc = startc;
+		    পূর্ণসংখ্যা	    oldstartc = startc;
 		    range_endpoint = false;
 
 		    startc = -1;
 		    got_coll_char = FALSE;
-		    if (*regparse == '[')
+		    যদি (*regparse == '[')
 		    {
 			// Check for [: :], [= =], [. .]
 			equiclass = collclass = 0;
 			charclass = get_char_class(&regparse);
-			if (charclass == CLASS_NONE)
+			যদি (charclass == CLASS_NONE)
 			{
 			    equiclass = get_equi_class(&regparse);
-			    if (equiclass == 0)
+			    যদি (equiclass == 0)
 				collclass = get_coll_element(&regparse);
 			}
 
 			// Character class like [:alpha:]
-			if (charclass != CLASS_NONE)
+			যদি (charclass != CLASS_NONE)
 			{
-			    switch (charclass)
+			    নির্বাচন (charclass)
 			    {
-				case CLASS_ALNUM:
+				ক্ষেত্র CLASS_ALNUM:
 				    EMIT(NFA_CLASS_ALNUM);
-				    break;
-				case CLASS_ALPHA:
+				    বিরতি;
+				ক্ষেত্র CLASS_ALPHA:
 				    EMIT(NFA_CLASS_ALPHA);
-				    break;
-				case CLASS_BLANK:
+				    বিরতি;
+				ক্ষেত্র CLASS_BLANK:
 				    EMIT(NFA_CLASS_BLANK);
-				    break;
-				case CLASS_CNTRL:
+				    বিরতি;
+				ক্ষেত্র CLASS_CNTRL:
 				    EMIT(NFA_CLASS_CNTRL);
-				    break;
-				case CLASS_DIGIT:
+				    বিরতি;
+				ক্ষেত্র CLASS_DIGIT:
 				    EMIT(NFA_CLASS_DIGIT);
-				    break;
-				case CLASS_GRAPH:
+				    বিরতি;
+				ক্ষেত্র CLASS_GRAPH:
 				    EMIT(NFA_CLASS_GRAPH);
-				    break;
-				case CLASS_LOWER:
+				    বিরতি;
+				ক্ষেত্র CLASS_LOWER:
 				    wants_nfa = TRUE;
 				    EMIT(NFA_CLASS_LOWER);
-				    break;
-				case CLASS_PRINT:
+				    বিরতি;
+				ক্ষেত্র CLASS_PRINT:
 				    EMIT(NFA_CLASS_PRINT);
-				    break;
-				case CLASS_PUNCT:
+				    বিরতি;
+				ক্ষেত্র CLASS_PUNCT:
 				    EMIT(NFA_CLASS_PUNCT);
-				    break;
-				case CLASS_SPACE:
+				    বিরতি;
+				ক্ষেত্র CLASS_SPACE:
 				    EMIT(NFA_CLASS_SPACE);
-				    break;
-				case CLASS_UPPER:
+				    বিরতি;
+				ক্ষেত্র CLASS_UPPER:
 				    wants_nfa = TRUE;
 				    EMIT(NFA_CLASS_UPPER);
-				    break;
-				case CLASS_XDIGIT:
+				    বিরতি;
+				ক্ষেত্র CLASS_XDIGIT:
 				    EMIT(NFA_CLASS_XDIGIT);
-				    break;
-				case CLASS_TAB:
+				    বিরতি;
+				ক্ষেত্র CLASS_TAB:
 				    EMIT(NFA_CLASS_TAB);
-				    break;
-				case CLASS_RETURN:
+				    বিরতি;
+				ক্ষেত্র CLASS_RETURN:
 				    EMIT(NFA_CLASS_RETURN);
-				    break;
-				case CLASS_BACKSPACE:
+				    বিরতি;
+				ক্ষেত্র CLASS_BACKSPACE:
 				    EMIT(NFA_CLASS_BACKSPACE);
-				    break;
-				case CLASS_ESCAPE:
+				    বিরতি;
+				ক্ষেত্র CLASS_ESCAPE:
 				    EMIT(NFA_CLASS_ESCAPE);
-				    break;
-				case CLASS_IDENT:
+				    বিরতি;
+				ক্ষেত্র CLASS_IDENT:
 				    EMIT(NFA_CLASS_IDENT);
-				    break;
-				case CLASS_KEYWORD:
+				    বিরতি;
+				ক্ষেত্র CLASS_KEYWORD:
 				    EMIT(NFA_CLASS_KEYWORD);
-				    break;
-				case CLASS_FNAME:
+				    বিরতি;
+				ক্ষেত্র CLASS_FNAME:
 				    EMIT(NFA_CLASS_FNAME);
-				    break;
+				    বিরতি;
 			    }
 			    EMIT(NFA_CONCAT);
-			    continue;
+			    চালু;
 			}
 			// Try equivalence class [=a=] and the like
-			if (equiclass != 0)
+			যদি (equiclass != 0)
 			{
-			    result = nfa_emit_equi_class(equiclass);
-			    if (result == FAIL)
+			    ফলাফল = nfa_emit_equi_class(equiclass);
+			    যদি (ফলাফল == FAIL)
 			    {
 				// should never happen
 				EMSG_RET_FAIL(_(e_error_building_nfa_with_equivalence_class));
 			    }
-			    continue;
+			    চালু;
 			}
 			// Try collating class like [. .]
-			if (collclass != 0)
+			যদি (collclass != 0)
 			{
 			    startc = collclass;	 // allow [.a.]-x as a range
 			    // Will emit the proper atom at the end of the
@@ -1850,12 +1850,12 @@ collection:
 		    }
 		    // Try a range like 'a-x' or '\t-z'. Also allows '-' as a
 		    // start character.
-		    if (*regparse == '-' && oldstartc != -1)
+		    যদি (*regparse == '-' && oldstartc != -1)
 		    {
 			emit_range = TRUE;
 			startc = oldstartc;
 			MB_PTR_ADV(regparse);
-			continue;	    // reading the end of the range
+			চালু;	    // reading the end of the range
 		    }
 
 		    // Now handle simple and escaped characters.
@@ -1863,22 +1863,22 @@ collection:
 		    // accepts "\t", "\e", etc., but only when the 'l' flag in
 		    // 'cpoptions' is not included.
 		    // Posix doesn't recognize backslash at all.
-		    if (*regparse == '\\'
+		    যদি (*regparse == '\\'
 			    && !reg_cpo_bsl
 			    && regparse + 1 <= endp
-			    && (vim_strchr(REGEXP_INRANGE, regparse[1]) != NULL
+			    && (vim_strchr(REGEXP_INRANGE, regparse[1]) != ফাঁকা
 				|| (!reg_cpo_lit
 				    && vim_strchr(REGEXP_ABBR, regparse[1])
-								      != NULL)
+								      != ফাঁকা)
 			    )
 			)
 		    {
 			MB_PTR_ADV(regparse);
 
-			if (*regparse == 'n')
+			যদি (*regparse == 'n')
 			    startc = (reg_string || emit_range
 					|| regparse[1] == '-') ? NL : NFA_NEWL;
-			else if (*regparse == 'd'
+			অন্যথা যদি (*regparse == 'd'
 				    || *regparse == 'o'
 				    || *regparse == 'x'
 				    || *regparse == 'u'
@@ -1889,12 +1889,12 @@ collection:
 				startc = coll_get_char();
 				// max UTF-8 Codepoint is U+10FFFF,
 				// but allow values until INT_MAX
-				if (startc == INT_MAX)
+				যদি (startc == INT_MAX)
 				    EMSG_RET_FAIL(_(e_unicode_val_too_large));
 				got_coll_char = TRUE;
 				MB_PTR_BACK(old_regparse, regparse);
 			    }
-			    else
+			    অন্যথা
 			    {
 				// \r,\t,\e,\b
 				startc = backslash_trans(*regparse);
@@ -1902,49 +1902,49 @@ collection:
 		    }
 
 		    // Normal printable char
-		    if (startc == -1)
+		    যদি (startc == -1)
 			startc = PTR2CHAR(regparse);
 
 		    // Previous char was '-', so this char is end of range.
-		    if (emit_range)
+		    যদি (emit_range)
 		    {
-			int	endc = startc;
+			পূর্ণসংখ্যা	endc = startc;
 			range_endpoint = true;
 
 			startc = oldstartc;
-			if (startc > endc)
+			যদি (startc > endc)
 			    EMSG_RET_FAIL(_(e_reverse_range_in_character_class));
 
-			if (endc > startc + 2)
+			যদি (endc > startc + 2)
 			{
 			    // Emit a range instead of the sequence of
 			    // individual characters.
-			    if (startc == 0)
+			    যদি (startc == 0)
 				// \x00 is translated to \x0a, start at \x01.
 				EMIT(1);
-			    else
+			    অন্যথা
 				--post_ptr; // remove NFA_CONCAT
 			    EMIT(endc);
 			    EMIT(NFA_RANGE);
 			    EMIT(NFA_CONCAT);
 			}
-			else if (has_mbyte && ((*mb_char2len)(startc) > 1
+			অন্যথা যদি (has_mbyte && ((*mb_char2len)(startc) > 1
 				    || (*mb_char2len)(endc) > 1))
 			{
 			    // Emit the characters in the range.
 			    // "startc" was already emitted, so skip it.
 			    //
-			    for (c = startc + 1; c <= endc; c++)
+			    জন্য (c = startc + 1; c <= endc; c++)
 			    {
 				EMIT(c);
 				EMIT(NFA_CONCAT);
 			    }
 			}
-			else
+			অন্যথা
 			{
 			    // Emit the range. "startc" was already emitted, so
 			    // skip it.
-			    for (c = startc + 1; c <= endc; c++)
+			    জন্য (c = startc + 1; c <= endc; c++)
 			    {
 				EMIT(c);
 				EMIT(NFA_CONCAT);
@@ -1953,7 +1953,7 @@ collection:
 			emit_range = FALSE;
 			startc = -1;
 		    }
-		    else
+		    অন্যথা
 		    {
 			// This char (startc) is not part of a range. Just
 			// emit it.
@@ -1962,25 +1962,25 @@ collection:
 			// 0x0a.
 			// This is needed to completely mimic the behaviour of
 			// the backtracking engine.
-			if (startc == NFA_NEWL)
+			যদি (startc == NFA_NEWL)
 			{
 			    // Line break can't be matched as part of the
 			    // collection, add an OR below. But not for negated
 			    // range.
-			    if (!negated)
+			    যদি (!negated)
 				extra = NFA_ADD_NL;
 			}
-			else
+			অন্যথা
 			{
-			    if (got_coll_char == TRUE && startc == 0)
+			    যদি (got_coll_char == TRUE && startc == 0)
 			    {
 				EMIT(0x0a);
 				EMIT(NFA_CONCAT);
 			    }
-			    else
+			    অন্যথা
 			    {
 				EMIT(startc);
-				if (!(enc_utf8 && (utf_ptr2len(regparse) != (plen = utfc_ptr2len(regparse)))))
+				যদি (!(enc_utf8 && (utf_ptr2len(regparse) != (plen = utfc_ptr2len(regparse)))))
 				{
 				    EMIT(NFA_CONCAT);
 				}
@@ -1994,24 +1994,24 @@ collection:
 		    // codepoint; emitting the composing part again would duplicate the
 		    // character in the postfix stream and corrupt the NFA stack.
 		    //
-		    if (!range_endpoint && enc_utf8 &&
+		    যদি (!range_endpoint && enc_utf8 &&
 			    (utf_ptr2len(regparse) != (plen = utfc_ptr2len(regparse))))
 		    {
-			int i = utf_ptr2len(regparse);
+			পূর্ণসংখ্যা i = utf_ptr2len(regparse);
 
 			c = utf_ptr2char(regparse + i);
 
 			// Add composing characters
-			for (;;)
+			জন্য (;;)
 			{
-			    if (c == 0)
+			    যদি (c == 0)
 				// \x00 is translated to \x0a, start at \x01.
 				EMIT(1);
-			    else
+			    অন্যথা
 				EMIT(c);
 			    EMIT(NFA_CONCAT);
-			    if ((i += utf_char2len(c)) >= plen)
-				break;
+			    যদি ((i += utf_char2len(c)) >= plen)
+				বিরতি;
 			    c = utf_ptr2char(regparse + i);
 			}
 			EMIT(NFA_COMPOSING);
@@ -2021,7 +2021,7 @@ collection:
 		} // while (p < endp)
 
 		MB_PTR_BACK(old_regparse, regparse);
-		if (*regparse == '-')	    // if last, '-' is just a char
+		যদি (*regparse == '-')	    // if last, '-' is just a char
 		{
 		    EMIT('-');
 		    EMIT(NFA_CONCAT);
@@ -2032,36 +2032,36 @@ collection:
 		MB_PTR_ADV(regparse);
 
 		// Mark end of the collection.
-		if (negated == TRUE)
+		যদি (negated == TRUE)
 		    EMIT(NFA_END_NEG_COLL);
-		else
+		অন্যথা
 		    EMIT(NFA_END_COLL);
 
 		// \_[] also matches \n but it's not negated
-		if (extra == NFA_ADD_NL)
+		যদি (extra == NFA_ADD_NL)
 		{
 		    EMIT(reg_string ? NL : NFA_NEWL);
 		    EMIT(NFA_OR);
 		}
 
-		return OK;
+		ফেরত OK;
 	    } // if exists closing ]
 
-	    if (reg_strict)
+	    যদি (reg_strict)
 		EMSG_RET_FAIL(_(e_missing_rsb_after_str_lsb));
 	    // FALLTHROUGH
 
-	default:
+	পূর্বনির্ধারিত:
 	    {
-		int	plen;
+		পূর্ণসংখ্যা	plen;
 
 nfa_do_multibyte:
 		// plen is length of current char with composing chars
-		if (enc_utf8 && ((*mb_char2len)(c)
+		যদি (enc_utf8 && ((*mb_char2len)(c)
 			    != (plen = utfc_ptr2len(old_regparse))
 						       || utf_iscomposing(c)))
 		{
-		    int i = 0;
+		    পূর্ণসংখ্যা i = 0;
 
 		    // A base character plus composing characters, or just one
 		    // or more composing characters.
@@ -2071,28 +2071,28 @@ nfa_do_multibyte:
 		    // building the postfix form, not the NFA itself;
 		    // a composing char could be: a, b, c, NFA_COMPOSING
 		    // where 'b' and 'c' are chars with codes > 256.
-		    for (;;)
+		    জন্য (;;)
 		    {
 			EMIT(c);
-			if (i > 0)
+			যদি (i > 0)
 			    EMIT(NFA_CONCAT);
-			if ((i += utf_char2len(c)) >= plen)
-			    break;
+			যদি ((i += utf_char2len(c)) >= plen)
+			    বিরতি;
 			c = utf_ptr2char(old_regparse + i);
 		    }
 		    EMIT(NFA_COMPOSING);
 		    regparse = old_regparse + plen;
 		}
-		else
+		অন্যথা
 		{
 		    c = no_Magic(c);
 		    EMIT(c);
 		}
-		return OK;
+		ফেরত OK;
 	    }
     }
 
-    return OK;
+    ফেরত OK;
 }
 
 /*
@@ -2105,44 +2105,44 @@ nfa_do_multibyte:
  * piece   ::=	    atom
  *	or  atom  multi
  */
-    static int
-nfa_regpiece(void)
+    স্থির পূর্ণসংখ্যা
+nfa_regpiece(শূন্য)
 {
-    int		i;
-    int		op;
-    int		ret;
+    পূর্ণসংখ্যা		i;
+    পূর্ণসংখ্যা		op;
+    পূর্ণসংখ্যা		ret;
     long	minval, maxval;
-    int		greedy = TRUE;      // Braces are prefixed with '-' ?
+    পূর্ণসংখ্যা		greedy = TRUE;      // Braces are prefixed with '-' ?
     parse_state_T old_state;
     parse_state_T new_state;
     long	c2;
-    int		old_post_pos;
-    int		my_post_start;
-    int		quest;
+    পূর্ণসংখ্যা		old_post_pos;
+    পূর্ণসংখ্যা		my_post_start;
+    পূর্ণসংখ্যা		quest;
 
     // Save the current parse state, so that we can use it if <atom>{m,n} is
     // next.
     save_parse_state(&old_state);
 
     // store current pos in the postfix form, for \{m,n} involving 0s
-    my_post_start = (int)(post_ptr - post_start);
+    my_post_start = (পূর্ণসংখ্যা)(post_ptr - post_start);
 
     ret = nfa_regatom();
-    if (ret == FAIL)
-	return FAIL;	    // cascaded error
+    যদি (ret == FAIL)
+	ফেরত FAIL;	    // cascaded error
 
     op = peekchr();
-    if (re_multi_type(op) == NOT_MULTI)
-	return OK;
+    যদি (re_multi_type(op) == NOT_MULTI)
+	ফেরত OK;
 
     skipchr();
-    switch (op)
+    নির্বাচন (op)
     {
-	case Magic('*'):
+	ক্ষেত্র Magic('*'):
 	    EMIT(NFA_STAR);
-	    break;
+	    বিরতি;
 
-	case Magic('+'):
+	ক্ষেত্র Magic('+'):
 	    /*
 	     * Trick: Normally, (a*)\+ would match the whole input "aaa".  The
 	     * first and only submatch would be "aaa". But the backtracking
@@ -2156,58 +2156,58 @@ nfa_regpiece(void)
 	     */
 	    restore_parse_state(&old_state);
 	    curchr = -1;
-	    if (nfa_regatom() == FAIL)
-		return FAIL;
+	    যদি (nfa_regatom() == FAIL)
+		ফেরত FAIL;
 	    EMIT(NFA_STAR);
 	    EMIT(NFA_CONCAT);
 	    skipchr();		// skip the \+
-	    break;
+	    বিরতি;
 
-	case Magic('@'):
+	ক্ষেত্র Magic('@'):
 	    c2 = (long)getdecchrs();
 	    op = no_Magic(getchr());
 	    i = 0;
-	    switch(op)
+	    নির্বাচন(op)
 	    {
-		case '=':
+		ক্ষেত্র '=':
 		    // \@=
-		    i = NFA_PREV_ATOM_NO_WIDTH;
-		    break;
-		case '!':
+		    i = NFA_পূর্ব_ATOM_NO_WIDTH;
+		    বিরতি;
+		ক্ষেত্র '!':
 		    // \@!
-		    i = NFA_PREV_ATOM_NO_WIDTH_NEG;
-		    break;
-		case '<':
+		    i = NFA_পূর্ব_ATOM_NO_WIDTH_NEG;
+		    বিরতি;
+		ক্ষেত্র '<':
 		    op = no_Magic(getchr());
-		    if (op == '=')
+		    যদি (op == '=')
 			// \@<=
-			i = NFA_PREV_ATOM_JUST_BEFORE;
-		    else if (op == '!')
+			i = NFA_পূর্ব_ATOM_JUST_BEFORE;
+		    অন্যথা যদি (op == '!')
 			// \@<!
-			i = NFA_PREV_ATOM_JUST_BEFORE_NEG;
-		    break;
-		case '>':
+			i = NFA_পূর্ব_ATOM_JUST_BEFORE_NEG;
+		    বিরতি;
+		ক্ষেত্র '>':
 		    // \@>
-		    i = NFA_PREV_ATOM_LIKE_PATTERN;
-		    break;
+		    i = NFA_পূর্ব_ATOM_LIKE_PATTERN;
+		    বিরতি;
 	    }
-	    if (i == 0)
+	    যদি (i == 0)
 	    {
 		semsg(_(e_nfa_regexp_unknown_operator_at_chr), op);
-		return FAIL;
+		ফেরত FAIL;
 	    }
 	    EMIT(i);
-	    if (i == NFA_PREV_ATOM_JUST_BEFORE
-					|| i == NFA_PREV_ATOM_JUST_BEFORE_NEG)
+	    যদি (i == NFA_পূর্ব_ATOM_JUST_BEFORE
+					|| i == NFA_পূর্ব_ATOM_JUST_BEFORE_NEG)
 		EMIT(c2);
-	    break;
+	    বিরতি;
 
-	case Magic('?'):
-	case Magic('='):
+	ক্ষেত্র Magic('?'):
+	ক্ষেত্র Magic('='):
 	    EMIT(NFA_QUEST);
-	    break;
+	    বিরতি;
 
-	case Magic('{'):
+	ক্ষেত্র Magic('{'):
 	    // a{2,5} will expand to 'aaa?a?a?'
 	    // a{-1,3} will expand to 'aa??a??', where ?? is the nongreedy
 	    // version of '?'
@@ -2216,35 +2216,35 @@ nfa_regpiece(void)
 
 	    greedy = TRUE;
 	    c2 = peekchr();
-	    if (c2 == '-' || c2 == Magic('-'))
+	    যদি (c2 == '-' || c2 == Magic('-'))
 	    {
 		skipchr();
 		greedy = FALSE;
 	    }
-	    if (!read_limits(&minval, &maxval))
+	    যদি (!read_limits(&minval, &maxval))
 		EMSG_RET_FAIL(_(e_nfa_regexp_error_reading_repetition_limits));
 
 	    //  <atom>{0,inf}, <atom>{0,} and <atom>{}  are equivalent to
 	    //  <atom>*
-	    if (minval == 0 && maxval == MAX_LIMIT)
+	    যদি (minval == 0 && maxval == MAX_LIMIT)
 	    {
-		if (greedy)		// { { (match the braces)
+		যদি (greedy)		// { { (match the braces)
 		    // \{}, \{0,}
 		    EMIT(NFA_STAR);
-		else			// { { (match the braces)
+		অন্যথা			// { { (match the braces)
 		    // \{-}, \{-0,}
 		    EMIT(NFA_STAR_NONGREEDY);
-		break;
+		বিরতি;
 	    }
 
 	    // Special case: x{0} or x{-0}
-	    if (maxval == 0)
+	    যদি (maxval == 0)
 	    {
 		// Ignore result of previous call to nfa_regatom()
 		post_ptr = post_start + my_post_start;
 		// NFA_EMPTY is 0-length and works everywhere
 		EMIT(NFA_EMPTY);
-		return OK;
+		ফেরত OK;
 	    }
 
 	    // The engine is very inefficient (uses too many states) when the
@@ -2254,11 +2254,11 @@ nfa_regpiece(void)
 	    // Bail out if we can use the other engine, but only, when the
 	    // pattern does not need the NFA engine like (e.g. [[:upper:]]\{2,\}
 	    // does not work with characters > 8 bit with the BT engine)
-	    if ((nfa_re_flags & RE_AUTO)
+	    যদি ((nfa_re_flags & RE_AUTO)
 				   && (maxval > 500 || maxval > minval + 200)
 				   && (maxval != MAX_LIMIT && minval < 200)
 				   && !wants_nfa)
-		return FAIL;
+		ফেরত FAIL;
 
 	    // Ignore previous call to nfa_regatom()
 	    post_ptr = post_start + my_post_start;
@@ -2266,48 +2266,48 @@ nfa_regpiece(void)
 	    save_parse_state(&new_state);
 
 	    quest = (greedy == TRUE? NFA_QUEST : NFA_QUEST_NONGREEDY);
-	    for (i = 0; i < maxval; i++)
+	    জন্য (i = 0; i < maxval; i++)
 	    {
 		// Goto beginning of the repeated atom
 		restore_parse_state(&old_state);
-		old_post_pos = (int)(post_ptr - post_start);
-		if (nfa_regatom() == FAIL)
-		    return FAIL;
+		old_post_pos = (পূর্ণসংখ্যা)(post_ptr - post_start);
+		যদি (nfa_regatom() == FAIL)
+		    ফেরত FAIL;
 		// after "minval" times, atoms are optional
-		if (i + 1 > minval)
+		যদি (i + 1 > minval)
 		{
-		    if (maxval == MAX_LIMIT)
+		    যদি (maxval == MAX_LIMIT)
 		    {
-			if (greedy)
+			যদি (greedy)
 			    EMIT(NFA_STAR);
-			else
+			অন্যথা
 			    EMIT(NFA_STAR_NONGREEDY);
 		    }
-		    else
+		    অন্যথা
 			EMIT(quest);
 		}
-		if (old_post_pos != my_post_start)
+		যদি (old_post_pos != my_post_start)
 		    EMIT(NFA_CONCAT);
-		if (i + 1 > minval && maxval == MAX_LIMIT)
-		    break;
+		যদি (i + 1 > minval && maxval == MAX_LIMIT)
+		    বিরতি;
 	    }
 
 	    // Go to just after the repeated atom and the \{}
 	    restore_parse_state(&new_state);
 	    curchr = -1;
 
-	    break;
+	    বিরতি;
 
 
-	default:
-	    break;
+	পূর্বনির্ধারিত:
+	    বিরতি;
     }	// end switch
 
-    if (re_multi_type(peekchr()) != NOT_MULTI)
+    যদি (re_multi_type(peekchr()) != NOT_MULTI)
 	// Can't have a multi follow a multi.
 	EMSG_RET_FAIL(_(e_nfa_regexp_cant_have_multi_follow_multi));
 
-    return OK;
+    ফেরত OK;
 }
 
 /*
@@ -2320,68 +2320,68 @@ nfa_regpiece(void)
  *	or  piece piece piece
  *	etc.
  */
-    static int
-nfa_regconcat(void)
+    স্থির পূর্ণসংখ্যা
+nfa_regconcat(শূন্য)
 {
-    int		cont = TRUE;
-    int		first = TRUE;
+    পূর্ণসংখ্যা		cont = TRUE;
+    পূর্ণসংখ্যা		first = TRUE;
 
-    while (cont)
+    যখন (cont)
     {
-	switch (peekchr())
+	নির্বাচন (peekchr())
 	{
-	    case NUL:
-	    case Magic('|'):
-	    case Magic('&'):
-	    case Magic(')'):
+	    ক্ষেত্র NUL:
+	    ক্ষেত্র Magic('|'):
+	    ক্ষেত্র Magic('&'):
+	    ক্ষেত্র Magic(')'):
 		cont = FALSE;
-		break;
+		বিরতি;
 
-	    case Magic('Z'):
+	    ক্ষেত্র Magic('Z'):
 		regflags |= RF_ICOMBINE;
 		skipchr_keepstart();
-		break;
-	    case Magic('c'):
+		বিরতি;
+	    ক্ষেত্র Magic('c'):
 		regflags |= RF_ICASE;
 		skipchr_keepstart();
-		break;
-	    case Magic('C'):
+		বিরতি;
+	    ক্ষেত্র Magic('C'):
 		regflags |= RF_NOICASE;
 		skipchr_keepstart();
-		break;
-	    case Magic('v'):
+		বিরতি;
+	    ক্ষেত্র Magic('v'):
 		reg_magic = MAGIC_ALL;
 		skipchr_keepstart();
 		curchr = -1;
-		break;
-	    case Magic('m'):
+		বিরতি;
+	    ক্ষেত্র Magic('m'):
 		reg_magic = MAGIC_ON;
 		skipchr_keepstart();
 		curchr = -1;
-		break;
-	    case Magic('M'):
+		বিরতি;
+	    ক্ষেত্র Magic('M'):
 		reg_magic = MAGIC_OFF;
 		skipchr_keepstart();
 		curchr = -1;
-		break;
-	    case Magic('V'):
+		বিরতি;
+	    ক্ষেত্র Magic('V'):
 		reg_magic = MAGIC_NONE;
 		skipchr_keepstart();
 		curchr = -1;
-		break;
+		বিরতি;
 
-	    default:
-		if (nfa_regpiece() == FAIL)
-		    return FAIL;
-		if (first == FALSE)
+	    পূর্বনির্ধারিত:
+		যদি (nfa_regpiece() == FAIL)
+		    ফেরত FAIL;
+		যদি (first == FALSE)
 		    EMIT(NFA_CONCAT);
-		else
+		অন্যথা
 		    first = FALSE;
-		break;
+		বিরতি;
 	}
     }
 
-    return OK;
+    ফেরত OK;
 }
 
 /*
@@ -2396,40 +2396,40 @@ nfa_regconcat(void)
  *		or  concat \& concat \& concat
  *		etc.
  */
-    static int
-nfa_regbranch(void)
+    স্থির পূর্ণসংখ্যা
+nfa_regbranch(শূন্য)
 {
-    int		old_post_pos;
+    পূর্ণসংখ্যা		old_post_pos;
 
-    old_post_pos = (int)(post_ptr - post_start);
+    old_post_pos = (পূর্ণসংখ্যা)(post_ptr - post_start);
 
     // First branch, possibly the only one
-    if (nfa_regconcat() == FAIL)
-	return FAIL;
+    যদি (nfa_regconcat() == FAIL)
+	ফেরত FAIL;
 
     // Try next concats
-    while (peekchr() == Magic('&'))
+    যখন (peekchr() == Magic('&'))
     {
 	skipchr();
 	// if concat is empty do emit a node
-	if (old_post_pos == (int)(post_ptr - post_start))
+	যদি (old_post_pos == (পূর্ণসংখ্যা)(post_ptr - post_start))
 	    EMIT(NFA_EMPTY);
 	EMIT(NFA_NOPEN);
-	EMIT(NFA_PREV_ATOM_NO_WIDTH);
-	old_post_pos = (int)(post_ptr - post_start);
-	if (nfa_regconcat() == FAIL)
-	    return FAIL;
+	EMIT(NFA_পূর্ব_ATOM_NO_WIDTH);
+	old_post_pos = (পূর্ণসংখ্যা)(post_ptr - post_start);
+	যদি (nfa_regconcat() == FAIL)
+	    ফেরত FAIL;
 	// if concat is empty do emit a node
-	if (old_post_pos == (int)(post_ptr - post_start))
+	যদি (old_post_pos == (পূর্ণসংখ্যা)(post_ptr - post_start))
 	    EMIT(NFA_EMPTY);
 	EMIT(NFA_CONCAT);
     }
 
     // if a branch is empty, emit one node for it
-    if (old_post_pos == (int)(post_ptr - post_start))
+    যদি (old_post_pos == (পূর্ণসংখ্যা)(post_ptr - post_start))
 	EMIT(NFA_EMPTY);
 
-    return OK;
+    ফেরত OK;
 }
 
 /*
@@ -2443,77 +2443,77 @@ nfa_regbranch(void)
  *	or  branch \| branch \| branch
  *	etc.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 nfa_reg(
-    int		paren)	// REG_NOPAREN, REG_PAREN, REG_NPAREN or REG_ZPAREN
+    পূর্ণসংখ্যা		paren)	// REG_NOPAREN, REG_PAREN, REG_NPAREN or REG_ZPAREN
 {
-    int		parno = 0;
-    int		status = FAIL;
+    পূর্ণসংখ্যা		parno = 0;
+    পূর্ণসংখ্যা		status = FAIL;
 
-    if (paren == REG_PAREN)
+    যদি (paren == REG_PAREN)
     {
-	if (regnpar >= NSUBEXP) // Too many `('
+	যদি (regnpar >= NSUBEXP) // Too many `('
 	    EMSG_RET_FAIL(_(e_nfa_regexp_too_many_parens));
 	parno = regnpar++;
     }
 #ifdef FEAT_SYN_HL
-    else if (paren == REG_ZPAREN)
+    অন্যথা যদি (paren == REG_ZPAREN)
     {
 	// Make a ZOPEN node.
-	if (regnzpar >= NSUBEXP)
+	যদি (regnzpar >= NSUBEXP)
 	    EMSG_RET_FAIL(_(e_nfa_regexp_too_many_z));
 	parno = regnzpar++;
     }
 #endif
 
-    if (nfa_reg_parse_depth >= REG_MAX_PAREN_DEPTH)
+    যদি (nfa_reg_parse_depth >= REG_MAX_PAREN_DEPTH)
 	EMSG_RET_FAIL(_(e_command_too_complex));
     ++nfa_reg_parse_depth;
 
-    if (nfa_regbranch() == FAIL)
-	goto theend;	    // cascaded error
+    যদি (nfa_regbranch() == FAIL)
+	যাও theend;	    // cascaded error
 
-    while (peekchr() == Magic('|'))
+    যখন (peekchr() == Magic('|'))
     {
 	skipchr();
-	if (nfa_regbranch() == FAIL)
-	    goto theend;    // cascaded error
+	যদি (nfa_regbranch() == FAIL)
+	    যাও theend;    // cascaded error
 	EMIT(NFA_OR);
     }
 
     // Check for proper termination.
-    if (paren != REG_NOPAREN && getchr() != Magic(')'))
+    যদি (paren != REG_NOPAREN && getchr() != Magic(')'))
     {
-	if (paren == REG_NPAREN)
+	যদি (paren == REG_NPAREN)
 	    semsg(_(e_unmatched_str_percent_open),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
-	else
+	অন্যথা
 	    semsg(_(e_unmatched_str_open),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
 	rc_did_emsg = TRUE;
-	goto theend;
+	যাও theend;
     }
-    else if (paren == REG_NOPAREN && peekchr() != NUL)
+    অন্যথা যদি (paren == REG_NOPAREN && peekchr() != NUL)
     {
-	if (peekchr() == Magic(')'))
+	যদি (peekchr() == Magic(')'))
 	    semsg(_(e_unmatched_str_close),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
-	else
+	অন্যথা
 	    emsg(_(e_nfa_regexp_proper_termination_error));
 	rc_did_emsg = TRUE;
-	goto theend;
+	যাও theend;
     }
     /*
      * Here we set the flag allowing back references to this set of
      * parentheses.
      */
-    if (paren == REG_PAREN)
+    যদি (paren == REG_PAREN)
     {
 	had_endbrace[parno] = TRUE;     // have seen the close paren
 	EMIT(NFA_MOPEN + parno);
     }
 #ifdef FEAT_SYN_HL
-    else if (paren == REG_ZPAREN)
+    অন্যথা যদি (paren == REG_ZPAREN)
 	EMIT(NFA_ZOPEN + parno);
 #endif
 
@@ -2521,275 +2521,275 @@ nfa_reg(
 
 theend:
     --nfa_reg_parse_depth;
-    return status;
+    ফেরত status;
 }
 
 #ifdef DEBUG
-static char_u code[50];
+স্থির char_u code[50];
 
-    static void
-nfa_set_code(int c)
+    স্থির শূন্য
+nfa_set_code(পূর্ণসংখ্যা c)
 {
-    int	    addnl = FALSE;
+    পূর্ণসংখ্যা	    addnl = FALSE;
 
-    if (c >= NFA_FIRST_NL && c <= NFA_LAST_NL)
+    যদি (c >= NFA_FIRST_NL && c <= NFA_LAST_NL)
     {
 	addnl = TRUE;
 	c -= NFA_ADD_NL;
     }
 
     STRCPY(code, "");
-    switch (c)
+    নির্বাচন (c)
     {
-	case NFA_MATCH:	    STRCPY(code, "NFA_MATCH "); break;
-	case NFA_SPLIT:	    STRCPY(code, "NFA_SPLIT "); break;
-	case NFA_CONCAT:    STRCPY(code, "NFA_CONCAT "); break;
-	case NFA_NEWL:	    STRCPY(code, "NFA_NEWL "); break;
-	case NFA_ZSTART:    STRCPY(code, "NFA_ZSTART"); break;
-	case NFA_ZEND:	    STRCPY(code, "NFA_ZEND"); break;
+	ক্ষেত্র NFA_MATCH:	    STRCPY(code, "NFA_MATCH "); বিরতি;
+	ক্ষেত্র NFA_SPLIT:	    STRCPY(code, "NFA_SPLIT "); বিরতি;
+	ক্ষেত্র NFA_CONCAT:    STRCPY(code, "NFA_CONCAT "); বিরতি;
+	ক্ষেত্র NFA_NEWL:	    STRCPY(code, "NFA_NEWL "); বিরতি;
+	ক্ষেত্র NFA_ZSTART:    STRCPY(code, "NFA_ZSTART"); বিরতি;
+	ক্ষেত্র NFA_ZEND:	    STRCPY(code, "NFA_ZEND"); বিরতি;
 
-	case NFA_BACKREF1:  STRCPY(code, "NFA_BACKREF1"); break;
-	case NFA_BACKREF2:  STRCPY(code, "NFA_BACKREF2"); break;
-	case NFA_BACKREF3:  STRCPY(code, "NFA_BACKREF3"); break;
-	case NFA_BACKREF4:  STRCPY(code, "NFA_BACKREF4"); break;
-	case NFA_BACKREF5:  STRCPY(code, "NFA_BACKREF5"); break;
-	case NFA_BACKREF6:  STRCPY(code, "NFA_BACKREF6"); break;
-	case NFA_BACKREF7:  STRCPY(code, "NFA_BACKREF7"); break;
-	case NFA_BACKREF8:  STRCPY(code, "NFA_BACKREF8"); break;
-	case NFA_BACKREF9:  STRCPY(code, "NFA_BACKREF9"); break;
+	ক্ষেত্র NFA_BACKREF1:  STRCPY(code, "NFA_BACKREF1"); বিরতি;
+	ক্ষেত্র NFA_BACKREF2:  STRCPY(code, "NFA_BACKREF2"); বিরতি;
+	ক্ষেত্র NFA_BACKREF3:  STRCPY(code, "NFA_BACKREF3"); বিরতি;
+	ক্ষেত্র NFA_BACKREF4:  STRCPY(code, "NFA_BACKREF4"); বিরতি;
+	ক্ষেত্র NFA_BACKREF5:  STRCPY(code, "NFA_BACKREF5"); বিরতি;
+	ক্ষেত্র NFA_BACKREF6:  STRCPY(code, "NFA_BACKREF6"); বিরতি;
+	ক্ষেত্র NFA_BACKREF7:  STRCPY(code, "NFA_BACKREF7"); বিরতি;
+	ক্ষেত্র NFA_BACKREF8:  STRCPY(code, "NFA_BACKREF8"); বিরতি;
+	ক্ষেত্র NFA_BACKREF9:  STRCPY(code, "NFA_BACKREF9"); বিরতি;
 # ifdef FEAT_SYN_HL
-	case NFA_ZREF1:	    STRCPY(code, "NFA_ZREF1"); break;
-	case NFA_ZREF2:	    STRCPY(code, "NFA_ZREF2"); break;
-	case NFA_ZREF3:	    STRCPY(code, "NFA_ZREF3"); break;
-	case NFA_ZREF4:	    STRCPY(code, "NFA_ZREF4"); break;
-	case NFA_ZREF5:	    STRCPY(code, "NFA_ZREF5"); break;
-	case NFA_ZREF6:	    STRCPY(code, "NFA_ZREF6"); break;
-	case NFA_ZREF7:	    STRCPY(code, "NFA_ZREF7"); break;
-	case NFA_ZREF8:	    STRCPY(code, "NFA_ZREF8"); break;
-	case NFA_ZREF9:	    STRCPY(code, "NFA_ZREF9"); break;
+	ক্ষেত্র NFA_ZREF1:	    STRCPY(code, "NFA_ZREF1"); বিরতি;
+	ক্ষেত্র NFA_ZREF2:	    STRCPY(code, "NFA_ZREF2"); বিরতি;
+	ক্ষেত্র NFA_ZREF3:	    STRCPY(code, "NFA_ZREF3"); বিরতি;
+	ক্ষেত্র NFA_ZREF4:	    STRCPY(code, "NFA_ZREF4"); বিরতি;
+	ক্ষেত্র NFA_ZREF5:	    STRCPY(code, "NFA_ZREF5"); বিরতি;
+	ক্ষেত্র NFA_ZREF6:	    STRCPY(code, "NFA_ZREF6"); বিরতি;
+	ক্ষেত্র NFA_ZREF7:	    STRCPY(code, "NFA_ZREF7"); বিরতি;
+	ক্ষেত্র NFA_ZREF8:	    STRCPY(code, "NFA_ZREF8"); বিরতি;
+	ক্ষেত্র NFA_ZREF9:	    STRCPY(code, "NFA_ZREF9"); বিরতি;
 # endif
-	case NFA_SKIP:	    STRCPY(code, "NFA_SKIP"); break;
+	ক্ষেত্র NFA_SKIP:	    STRCPY(code, "NFA_SKIP"); বিরতি;
 
-	case NFA_PREV_ATOM_NO_WIDTH:
-			    STRCPY(code, "NFA_PREV_ATOM_NO_WIDTH"); break;
-	case NFA_PREV_ATOM_NO_WIDTH_NEG:
-			    STRCPY(code, "NFA_PREV_ATOM_NO_WIDTH_NEG"); break;
-	case NFA_PREV_ATOM_JUST_BEFORE:
-			    STRCPY(code, "NFA_PREV_ATOM_JUST_BEFORE"); break;
-	case NFA_PREV_ATOM_JUST_BEFORE_NEG:
-			 STRCPY(code, "NFA_PREV_ATOM_JUST_BEFORE_NEG"); break;
-	case NFA_PREV_ATOM_LIKE_PATTERN:
-			    STRCPY(code, "NFA_PREV_ATOM_LIKE_PATTERN"); break;
+	ক্ষেত্র NFA_পূর্ব_ATOM_NO_WIDTH:
+			    STRCPY(code, "NFA_PREV_ATOM_NO_WIDTH"); বিরতি;
+	ক্ষেত্র NFA_পূর্ব_ATOM_NO_WIDTH_NEG:
+			    STRCPY(code, "NFA_PREV_ATOM_NO_WIDTH_NEG"); বিরতি;
+	ক্ষেত্র NFA_পূর্ব_ATOM_JUST_BEFORE:
+			    STRCPY(code, "NFA_PREV_ATOM_JUST_BEFORE"); বিরতি;
+	ক্ষেত্র NFA_পূর্ব_ATOM_JUST_BEFORE_NEG:
+			 STRCPY(code, "NFA_PREV_ATOM_JUST_BEFORE_NEG"); বিরতি;
+	ক্ষেত্র NFA_পূর্ব_ATOM_LIKE_PATTERN:
+			    STRCPY(code, "NFA_PREV_ATOM_LIKE_PATTERN"); বিরতি;
 
-	case NFA_NOPEN:		    STRCPY(code, "NFA_NOPEN"); break;
-	case NFA_NCLOSE:	    STRCPY(code, "NFA_NCLOSE"); break;
-	case NFA_START_INVISIBLE:   STRCPY(code, "NFA_START_INVISIBLE"); break;
-	case NFA_START_INVISIBLE_FIRST:
-			     STRCPY(code, "NFA_START_INVISIBLE_FIRST"); break;
-	case NFA_START_INVISIBLE_NEG:
-			       STRCPY(code, "NFA_START_INVISIBLE_NEG"); break;
-	case NFA_START_INVISIBLE_NEG_FIRST:
-			 STRCPY(code, "NFA_START_INVISIBLE_NEG_FIRST"); break;
-	case NFA_START_INVISIBLE_BEFORE:
-			    STRCPY(code, "NFA_START_INVISIBLE_BEFORE"); break;
-	case NFA_START_INVISIBLE_BEFORE_FIRST:
-		      STRCPY(code, "NFA_START_INVISIBLE_BEFORE_FIRST"); break;
-	case NFA_START_INVISIBLE_BEFORE_NEG:
-			STRCPY(code, "NFA_START_INVISIBLE_BEFORE_NEG"); break;
-	case NFA_START_INVISIBLE_BEFORE_NEG_FIRST:
-		  STRCPY(code, "NFA_START_INVISIBLE_BEFORE_NEG_FIRST"); break;
-	case NFA_START_PATTERN:   STRCPY(code, "NFA_START_PATTERN"); break;
-	case NFA_END_INVISIBLE:	    STRCPY(code, "NFA_END_INVISIBLE"); break;
-	case NFA_END_INVISIBLE_NEG: STRCPY(code, "NFA_END_INVISIBLE_NEG"); break;
-	case NFA_END_PATTERN:	    STRCPY(code, "NFA_END_PATTERN"); break;
+	ক্ষেত্র NFA_NOPEN:		    STRCPY(code, "NFA_NOPEN"); বিরতি;
+	ক্ষেত্র NFA_NCLOSE:	    STRCPY(code, "NFA_NCLOSE"); বিরতি;
+	ক্ষেত্র NFA_START_INVISIBLE:   STRCPY(code, "NFA_START_INVISIBLE"); বিরতি;
+	ক্ষেত্র NFA_START_INVISIBLE_FIRST:
+			     STRCPY(code, "NFA_START_INVISIBLE_FIRST"); বিরতি;
+	ক্ষেত্র NFA_START_INVISIBLE_NEG:
+			       STRCPY(code, "NFA_START_INVISIBLE_NEG"); বিরতি;
+	ক্ষেত্র NFA_START_INVISIBLE_NEG_FIRST:
+			 STRCPY(code, "NFA_START_INVISIBLE_NEG_FIRST"); বিরতি;
+	ক্ষেত্র NFA_START_INVISIBLE_BEFORE:
+			    STRCPY(code, "NFA_START_INVISIBLE_BEFORE"); বিরতি;
+	ক্ষেত্র NFA_START_INVISIBLE_BEFORE_FIRST:
+		      STRCPY(code, "NFA_START_INVISIBLE_BEFORE_FIRST"); বিরতি;
+	ক্ষেত্র NFA_START_INVISIBLE_BEFORE_NEG:
+			STRCPY(code, "NFA_START_INVISIBLE_BEFORE_NEG"); বিরতি;
+	ক্ষেত্র NFA_START_INVISIBLE_BEFORE_NEG_FIRST:
+		  STRCPY(code, "NFA_START_INVISIBLE_BEFORE_NEG_FIRST"); বিরতি;
+	ক্ষেত্র NFA_START_PATTERN:   STRCPY(code, "NFA_START_PATTERN"); বিরতি;
+	ক্ষেত্র NFA_END_INVISIBLE:	    STRCPY(code, "NFA_END_INVISIBLE"); বিরতি;
+	ক্ষেত্র NFA_END_INVISIBLE_NEG: STRCPY(code, "NFA_END_INVISIBLE_NEG"); বিরতি;
+	ক্ষেত্র NFA_END_PATTERN:	    STRCPY(code, "NFA_END_PATTERN"); বিরতি;
 
-	case NFA_COMPOSING:	    STRCPY(code, "NFA_COMPOSING"); break;
-	case NFA_END_COMPOSING:	    STRCPY(code, "NFA_END_COMPOSING"); break;
-	case NFA_OPT_CHARS:	    STRCPY(code, "NFA_OPT_CHARS"); break;
+	ক্ষেত্র NFA_COMPOSING:	    STRCPY(code, "NFA_COMPOSING"); বিরতি;
+	ক্ষেত্র NFA_END_COMPOSING:	    STRCPY(code, "NFA_END_COMPOSING"); বিরতি;
+	ক্ষেত্র NFA_OPT_CHARS:	    STRCPY(code, "NFA_OPT_CHARS"); বিরতি;
 
-	case NFA_MOPEN:
-	case NFA_MOPEN1:
-	case NFA_MOPEN2:
-	case NFA_MOPEN3:
-	case NFA_MOPEN4:
-	case NFA_MOPEN5:
-	case NFA_MOPEN6:
-	case NFA_MOPEN7:
-	case NFA_MOPEN8:
-	case NFA_MOPEN9:
+	ক্ষেত্র NFA_MOPEN:
+	ক্ষেত্র NFA_MOPEN1:
+	ক্ষেত্র NFA_MOPEN2:
+	ক্ষেত্র NFA_MOPEN3:
+	ক্ষেত্র NFA_MOPEN4:
+	ক্ষেত্র NFA_MOPEN5:
+	ক্ষেত্র NFA_MOPEN6:
+	ক্ষেত্র NFA_MOPEN7:
+	ক্ষেত্র NFA_MOPEN8:
+	ক্ষেত্র NFA_MOPEN9:
 	    STRCPY(code, "NFA_MOPEN(x)");
 	    code[10] = c - NFA_MOPEN + '0';
-	    break;
-	case NFA_MCLOSE:
-	case NFA_MCLOSE1:
-	case NFA_MCLOSE2:
-	case NFA_MCLOSE3:
-	case NFA_MCLOSE4:
-	case NFA_MCLOSE5:
-	case NFA_MCLOSE6:
-	case NFA_MCLOSE7:
-	case NFA_MCLOSE8:
-	case NFA_MCLOSE9:
+	    বিরতি;
+	ক্ষেত্র NFA_MCLOSE:
+	ক্ষেত্র NFA_MCLOSE1:
+	ক্ষেত্র NFA_MCLOSE2:
+	ক্ষেত্র NFA_MCLOSE3:
+	ক্ষেত্র NFA_MCLOSE4:
+	ক্ষেত্র NFA_MCLOSE5:
+	ক্ষেত্র NFA_MCLOSE6:
+	ক্ষেত্র NFA_MCLOSE7:
+	ক্ষেত্র NFA_MCLOSE8:
+	ক্ষেত্র NFA_MCLOSE9:
 	    STRCPY(code, "NFA_MCLOSE(x)");
 	    code[11] = c - NFA_MCLOSE + '0';
-	    break;
+	    বিরতি;
 # ifdef FEAT_SYN_HL
-	case NFA_ZOPEN:
-	case NFA_ZOPEN1:
-	case NFA_ZOPEN2:
-	case NFA_ZOPEN3:
-	case NFA_ZOPEN4:
-	case NFA_ZOPEN5:
-	case NFA_ZOPEN6:
-	case NFA_ZOPEN7:
-	case NFA_ZOPEN8:
-	case NFA_ZOPEN9:
+	ক্ষেত্র NFA_ZOPEN:
+	ক্ষেত্র NFA_ZOPEN1:
+	ক্ষেত্র NFA_ZOPEN2:
+	ক্ষেত্র NFA_ZOPEN3:
+	ক্ষেত্র NFA_ZOPEN4:
+	ক্ষেত্র NFA_ZOPEN5:
+	ক্ষেত্র NFA_ZOPEN6:
+	ক্ষেত্র NFA_ZOPEN7:
+	ক্ষেত্র NFA_ZOPEN8:
+	ক্ষেত্র NFA_ZOPEN9:
 	    STRCPY(code, "NFA_ZOPEN(x)");
 	    code[10] = c - NFA_ZOPEN + '0';
-	    break;
-	case NFA_ZCLOSE:
-	case NFA_ZCLOSE1:
-	case NFA_ZCLOSE2:
-	case NFA_ZCLOSE3:
-	case NFA_ZCLOSE4:
-	case NFA_ZCLOSE5:
-	case NFA_ZCLOSE6:
-	case NFA_ZCLOSE7:
-	case NFA_ZCLOSE8:
-	case NFA_ZCLOSE9:
+	    বিরতি;
+	ক্ষেত্র NFA_ZCLOSE:
+	ক্ষেত্র NFA_ZCLOSE1:
+	ক্ষেত্র NFA_ZCLOSE2:
+	ক্ষেত্র NFA_ZCLOSE3:
+	ক্ষেত্র NFA_ZCLOSE4:
+	ক্ষেত্র NFA_ZCLOSE5:
+	ক্ষেত্র NFA_ZCLOSE6:
+	ক্ষেত্র NFA_ZCLOSE7:
+	ক্ষেত্র NFA_ZCLOSE8:
+	ক্ষেত্র NFA_ZCLOSE9:
 	    STRCPY(code, "NFA_ZCLOSE(x)");
 	    code[11] = c - NFA_ZCLOSE + '0';
-	    break;
+	    বিরতি;
 # endif
-	case NFA_EOL:		STRCPY(code, "NFA_EOL "); break;
-	case NFA_BOL:		STRCPY(code, "NFA_BOL "); break;
-	case NFA_EOW:		STRCPY(code, "NFA_EOW "); break;
-	case NFA_BOW:		STRCPY(code, "NFA_BOW "); break;
-	case NFA_EOF:		STRCPY(code, "NFA_EOF "); break;
-	case NFA_BOF:		STRCPY(code, "NFA_BOF "); break;
-	case NFA_LNUM:		STRCPY(code, "NFA_LNUM "); break;
-	case NFA_LNUM_GT:	STRCPY(code, "NFA_LNUM_GT "); break;
-	case NFA_LNUM_LT:	STRCPY(code, "NFA_LNUM_LT "); break;
-	case NFA_COL:		STRCPY(code, "NFA_COL "); break;
-	case NFA_COL_GT:	STRCPY(code, "NFA_COL_GT "); break;
-	case NFA_COL_LT:	STRCPY(code, "NFA_COL_LT "); break;
-	case NFA_VCOL:		STRCPY(code, "NFA_VCOL "); break;
-	case NFA_VCOL_GT:	STRCPY(code, "NFA_VCOL_GT "); break;
-	case NFA_VCOL_LT:	STRCPY(code, "NFA_VCOL_LT "); break;
-	case NFA_MARK:		STRCPY(code, "NFA_MARK "); break;
-	case NFA_MARK_GT:	STRCPY(code, "NFA_MARK_GT "); break;
-	case NFA_MARK_LT:	STRCPY(code, "NFA_MARK_LT "); break;
-	case NFA_CURSOR:	STRCPY(code, "NFA_CURSOR "); break;
-	case NFA_VISUAL:	STRCPY(code, "NFA_VISUAL "); break;
-	case NFA_ANY_COMPOSING:	STRCPY(code, "NFA_ANY_COMPOSING "); break;
+	ক্ষেত্র NFA_EOL:		STRCPY(code, "NFA_EOL "); বিরতি;
+	ক্ষেত্র NFA_BOL:		STRCPY(code, "NFA_BOL "); বিরতি;
+	ক্ষেত্র NFA_EOW:		STRCPY(code, "NFA_EOW "); বিরতি;
+	ক্ষেত্র NFA_BOW:		STRCPY(code, "NFA_BOW "); বিরতি;
+	ক্ষেত্র NFA_EOF:		STRCPY(code, "NFA_EOF "); বিরতি;
+	ক্ষেত্র NFA_BOF:		STRCPY(code, "NFA_BOF "); বিরতি;
+	ক্ষেত্র NFA_LNUM:		STRCPY(code, "NFA_LNUM "); বিরতি;
+	ক্ষেত্র NFA_LNUM_GT:	STRCPY(code, "NFA_LNUM_GT "); বিরতি;
+	ক্ষেত্র NFA_LNUM_LT:	STRCPY(code, "NFA_LNUM_LT "); বিরতি;
+	ক্ষেত্র NFA_COL:		STRCPY(code, "NFA_COL "); বিরতি;
+	ক্ষেত্র NFA_COL_GT:	STRCPY(code, "NFA_COL_GT "); বিরতি;
+	ক্ষেত্র NFA_COL_LT:	STRCPY(code, "NFA_COL_LT "); বিরতি;
+	ক্ষেত্র NFA_VCOL:		STRCPY(code, "NFA_VCOL "); বিরতি;
+	ক্ষেত্র NFA_VCOL_GT:	STRCPY(code, "NFA_VCOL_GT "); বিরতি;
+	ক্ষেত্র NFA_VCOL_LT:	STRCPY(code, "NFA_VCOL_LT "); বিরতি;
+	ক্ষেত্র NFA_MARK:		STRCPY(code, "NFA_MARK "); বিরতি;
+	ক্ষেত্র NFA_MARK_GT:	STRCPY(code, "NFA_MARK_GT "); বিরতি;
+	ক্ষেত্র NFA_MARK_LT:	STRCPY(code, "NFA_MARK_LT "); বিরতি;
+	ক্ষেত্র NFA_CURSOR:	STRCPY(code, "NFA_CURSOR "); বিরতি;
+	ক্ষেত্র NFA_VISUAL:	STRCPY(code, "NFA_VISUAL "); বিরতি;
+	ক্ষেত্র NFA_ANY_COMPOSING:	STRCPY(code, "NFA_ANY_COMPOSING "); বিরতি;
 
-	case NFA_STAR:		STRCPY(code, "NFA_STAR "); break;
-	case NFA_STAR_NONGREEDY: STRCPY(code, "NFA_STAR_NONGREEDY "); break;
-	case NFA_QUEST:		STRCPY(code, "NFA_QUEST"); break;
-	case NFA_QUEST_NONGREEDY: STRCPY(code, "NFA_QUEST_NON_GREEDY"); break;
-	case NFA_EMPTY:		STRCPY(code, "NFA_EMPTY"); break;
-	case NFA_OR:		STRCPY(code, "NFA_OR"); break;
+	ক্ষেত্র NFA_STAR:		STRCPY(code, "NFA_STAR "); বিরতি;
+	ক্ষেত্র NFA_STAR_NONGREEDY: STRCPY(code, "NFA_STAR_NONGREEDY "); বিরতি;
+	ক্ষেত্র NFA_QUEST:		STRCPY(code, "NFA_QUEST"); বিরতি;
+	ক্ষেত্র NFA_QUEST_NONGREEDY: STRCPY(code, "NFA_QUEST_NON_GREEDY"); বিরতি;
+	ক্ষেত্র NFA_EMPTY:		STRCPY(code, "NFA_EMPTY"); বিরতি;
+	ক্ষেত্র NFA_OR:		STRCPY(code, "NFA_OR"); বিরতি;
 
-	case NFA_START_COLL:	STRCPY(code, "NFA_START_COLL"); break;
-	case NFA_END_COLL:	STRCPY(code, "NFA_END_COLL"); break;
-	case NFA_START_NEG_COLL: STRCPY(code, "NFA_START_NEG_COLL"); break;
-	case NFA_END_NEG_COLL:	STRCPY(code, "NFA_END_NEG_COLL"); break;
-	case NFA_RANGE:		STRCPY(code, "NFA_RANGE"); break;
-	case NFA_RANGE_MIN:	STRCPY(code, "NFA_RANGE_MIN"); break;
-	case NFA_RANGE_MAX:	STRCPY(code, "NFA_RANGE_MAX"); break;
+	ক্ষেত্র NFA_START_COLL:	STRCPY(code, "NFA_START_COLL"); বিরতি;
+	ক্ষেত্র NFA_END_COLL:	STRCPY(code, "NFA_END_COLL"); বিরতি;
+	ক্ষেত্র NFA_START_NEG_COLL: STRCPY(code, "NFA_START_NEG_COLL"); বিরতি;
+	ক্ষেত্র NFA_END_NEG_COLL:	STRCPY(code, "NFA_END_NEG_COLL"); বিরতি;
+	ক্ষেত্র NFA_RANGE:		STRCPY(code, "NFA_RANGE"); বিরতি;
+	ক্ষেত্র NFA_RANGE_MIN:	STRCPY(code, "NFA_RANGE_MIN"); বিরতি;
+	ক্ষেত্র NFA_RANGE_MAX:	STRCPY(code, "NFA_RANGE_MAX"); বিরতি;
 
-	case NFA_CLASS_ALNUM:	STRCPY(code, "NFA_CLASS_ALNUM"); break;
-	case NFA_CLASS_ALPHA:	STRCPY(code, "NFA_CLASS_ALPHA"); break;
-	case NFA_CLASS_BLANK:	STRCPY(code, "NFA_CLASS_BLANK"); break;
-	case NFA_CLASS_CNTRL:	STRCPY(code, "NFA_CLASS_CNTRL"); break;
-	case NFA_CLASS_DIGIT:	STRCPY(code, "NFA_CLASS_DIGIT"); break;
-	case NFA_CLASS_GRAPH:	STRCPY(code, "NFA_CLASS_GRAPH"); break;
-	case NFA_CLASS_LOWER:	STRCPY(code, "NFA_CLASS_LOWER"); break;
-	case NFA_CLASS_PRINT:	STRCPY(code, "NFA_CLASS_PRINT"); break;
-	case NFA_CLASS_PUNCT:	STRCPY(code, "NFA_CLASS_PUNCT"); break;
-	case NFA_CLASS_SPACE:	STRCPY(code, "NFA_CLASS_SPACE"); break;
-	case NFA_CLASS_UPPER:	STRCPY(code, "NFA_CLASS_UPPER"); break;
-	case NFA_CLASS_XDIGIT:	STRCPY(code, "NFA_CLASS_XDIGIT"); break;
-	case NFA_CLASS_TAB:	STRCPY(code, "NFA_CLASS_TAB"); break;
-	case NFA_CLASS_RETURN:	STRCPY(code, "NFA_CLASS_RETURN"); break;
-	case NFA_CLASS_BACKSPACE:   STRCPY(code, "NFA_CLASS_BACKSPACE"); break;
-	case NFA_CLASS_ESCAPE:	STRCPY(code, "NFA_CLASS_ESCAPE"); break;
-	case NFA_CLASS_IDENT:	STRCPY(code, "NFA_CLASS_IDENT"); break;
-	case NFA_CLASS_KEYWORD:	STRCPY(code, "NFA_CLASS_KEYWORD"); break;
-	case NFA_CLASS_FNAME:	STRCPY(code, "NFA_CLASS_FNAME"); break;
+	ক্ষেত্র NFA_CLASS_ALNUM:	STRCPY(code, "NFA_CLASS_ALNUM"); বিরতি;
+	ক্ষেত্র NFA_CLASS_ALPHA:	STRCPY(code, "NFA_CLASS_ALPHA"); বিরতি;
+	ক্ষেত্র NFA_CLASS_BLANK:	STRCPY(code, "NFA_CLASS_BLANK"); বিরতি;
+	ক্ষেত্র NFA_CLASS_CNTRL:	STRCPY(code, "NFA_CLASS_CNTRL"); বিরতি;
+	ক্ষেত্র NFA_CLASS_DIGIT:	STRCPY(code, "NFA_CLASS_DIGIT"); বিরতি;
+	ক্ষেত্র NFA_CLASS_GRAPH:	STRCPY(code, "NFA_CLASS_GRAPH"); বিরতি;
+	ক্ষেত্র NFA_CLASS_LOWER:	STRCPY(code, "NFA_CLASS_LOWER"); বিরতি;
+	ক্ষেত্র NFA_CLASS_PRINT:	STRCPY(code, "NFA_CLASS_PRINT"); বিরতি;
+	ক্ষেত্র NFA_CLASS_PUNCT:	STRCPY(code, "NFA_CLASS_PUNCT"); বিরতি;
+	ক্ষেত্র NFA_CLASS_SPACE:	STRCPY(code, "NFA_CLASS_SPACE"); বিরতি;
+	ক্ষেত্র NFA_CLASS_UPPER:	STRCPY(code, "NFA_CLASS_UPPER"); বিরতি;
+	ক্ষেত্র NFA_CLASS_XDIGIT:	STRCPY(code, "NFA_CLASS_XDIGIT"); বিরতি;
+	ক্ষেত্র NFA_CLASS_TAB:	STRCPY(code, "NFA_CLASS_TAB"); বিরতি;
+	ক্ষেত্র NFA_CLASS_RETURN:	STRCPY(code, "NFA_CLASS_RETURN"); বিরতি;
+	ক্ষেত্র NFA_CLASS_BACKSPACE:   STRCPY(code, "NFA_CLASS_BACKSPACE"); বিরতি;
+	ক্ষেত্র NFA_CLASS_ESCAPE:	STRCPY(code, "NFA_CLASS_ESCAPE"); বিরতি;
+	ক্ষেত্র NFA_CLASS_IDENT:	STRCPY(code, "NFA_CLASS_IDENT"); বিরতি;
+	ক্ষেত্র NFA_CLASS_KEYWORD:	STRCPY(code, "NFA_CLASS_KEYWORD"); বিরতি;
+	ক্ষেত্র NFA_CLASS_FNAME:	STRCPY(code, "NFA_CLASS_FNAME"); বিরতি;
 
-	case NFA_ANY:	STRCPY(code, "NFA_ANY"); break;
-	case NFA_IDENT:	STRCPY(code, "NFA_IDENT"); break;
-	case NFA_SIDENT:STRCPY(code, "NFA_SIDENT"); break;
-	case NFA_KWORD:	STRCPY(code, "NFA_KWORD"); break;
-	case NFA_SKWORD:STRCPY(code, "NFA_SKWORD"); break;
-	case NFA_FNAME:	STRCPY(code, "NFA_FNAME"); break;
-	case NFA_SFNAME:STRCPY(code, "NFA_SFNAME"); break;
-	case NFA_PRINT:	STRCPY(code, "NFA_PRINT"); break;
-	case NFA_SPRINT:STRCPY(code, "NFA_SPRINT"); break;
-	case NFA_WHITE:	STRCPY(code, "NFA_WHITE"); break;
-	case NFA_NWHITE:STRCPY(code, "NFA_NWHITE"); break;
-	case NFA_DIGIT:	STRCPY(code, "NFA_DIGIT"); break;
-	case NFA_NDIGIT:STRCPY(code, "NFA_NDIGIT"); break;
-	case NFA_HEX:	STRCPY(code, "NFA_HEX"); break;
-	case NFA_NHEX:	STRCPY(code, "NFA_NHEX"); break;
-	case NFA_OCTAL:	STRCPY(code, "NFA_OCTAL"); break;
-	case NFA_NOCTAL:STRCPY(code, "NFA_NOCTAL"); break;
-	case NFA_WORD:	STRCPY(code, "NFA_WORD"); break;
-	case NFA_NWORD:	STRCPY(code, "NFA_NWORD"); break;
-	case NFA_HEAD:	STRCPY(code, "NFA_HEAD"); break;
-	case NFA_NHEAD:	STRCPY(code, "NFA_NHEAD"); break;
-	case NFA_ALPHA:	STRCPY(code, "NFA_ALPHA"); break;
-	case NFA_NALPHA:STRCPY(code, "NFA_NALPHA"); break;
-	case NFA_LOWER:	STRCPY(code, "NFA_LOWER"); break;
-	case NFA_NLOWER:STRCPY(code, "NFA_NLOWER"); break;
-	case NFA_UPPER:	STRCPY(code, "NFA_UPPER"); break;
-	case NFA_NUPPER:STRCPY(code, "NFA_NUPPER"); break;
-	case NFA_LOWER_IC:  STRCPY(code, "NFA_LOWER_IC"); break;
-	case NFA_NLOWER_IC: STRCPY(code, "NFA_NLOWER_IC"); break;
-	case NFA_UPPER_IC:  STRCPY(code, "NFA_UPPER_IC"); break;
-	case NFA_NUPPER_IC: STRCPY(code, "NFA_NUPPER_IC"); break;
+	ক্ষেত্র NFA_ANY:	STRCPY(code, "NFA_ANY"); বিরতি;
+	ক্ষেত্র NFA_IDENT:	STRCPY(code, "NFA_IDENT"); বিরতি;
+	ক্ষেত্র NFA_SIDENT:STRCPY(code, "NFA_SIDENT"); বিরতি;
+	ক্ষেত্র NFA_KWORD:	STRCPY(code, "NFA_KWORD"); বিরতি;
+	ক্ষেত্র NFA_SKWORD:STRCPY(code, "NFA_SKWORD"); বিরতি;
+	ক্ষেত্র NFA_FNAME:	STRCPY(code, "NFA_FNAME"); বিরতি;
+	ক্ষেত্র NFA_SFNAME:STRCPY(code, "NFA_SFNAME"); বিরতি;
+	ক্ষেত্র NFA_PRINT:	STRCPY(code, "NFA_PRINT"); বিরতি;
+	ক্ষেত্র NFA_SPRINT:STRCPY(code, "NFA_SPRINT"); বিরতি;
+	ক্ষেত্র NFA_WHITE:	STRCPY(code, "NFA_WHITE"); বিরতি;
+	ক্ষেত্র NFA_NWHITE:STRCPY(code, "NFA_NWHITE"); বিরতি;
+	ক্ষেত্র NFA_DIGIT:	STRCPY(code, "NFA_DIGIT"); বিরতি;
+	ক্ষেত্র NFA_NDIGIT:STRCPY(code, "NFA_NDIGIT"); বিরতি;
+	ক্ষেত্র NFA_HEX:	STRCPY(code, "NFA_HEX"); বিরতি;
+	ক্ষেত্র NFA_NHEX:	STRCPY(code, "NFA_NHEX"); বিরতি;
+	ক্ষেত্র NFA_OCTAL:	STRCPY(code, "NFA_OCTAL"); বিরতি;
+	ক্ষেত্র NFA_NOCTAL:STRCPY(code, "NFA_NOCTAL"); বিরতি;
+	ক্ষেত্র NFA_WORD:	STRCPY(code, "NFA_WORD"); বিরতি;
+	ক্ষেত্র NFA_NWORD:	STRCPY(code, "NFA_NWORD"); বিরতি;
+	ক্ষেত্র NFA_শীর্ষ:	STRCPY(code, "NFA_HEAD"); বিরতি;
+	ক্ষেত্র NFA_NHEAD:	STRCPY(code, "NFA_NHEAD"); বিরতি;
+	ক্ষেত্র NFA_ALPHA:	STRCPY(code, "NFA_ALPHA"); বিরতি;
+	ক্ষেত্র NFA_NALPHA:STRCPY(code, "NFA_NALPHA"); বিরতি;
+	ক্ষেত্র NFA_LOWER:	STRCPY(code, "NFA_LOWER"); বিরতি;
+	ক্ষেত্র NFA_NLOWER:STRCPY(code, "NFA_NLOWER"); বিরতি;
+	ক্ষেত্র NFA_UPPER:	STRCPY(code, "NFA_UPPER"); বিরতি;
+	ক্ষেত্র NFA_NUPPER:STRCPY(code, "NFA_NUPPER"); বিরতি;
+	ক্ষেত্র NFA_LOWER_IC:  STRCPY(code, "NFA_LOWER_IC"); বিরতি;
+	ক্ষেত্র NFA_NLOWER_IC: STRCPY(code, "NFA_NLOWER_IC"); বিরতি;
+	ক্ষেত্র NFA_UPPER_IC:  STRCPY(code, "NFA_UPPER_IC"); বিরতি;
+	ক্ষেত্র NFA_NUPPER_IC: STRCPY(code, "NFA_NUPPER_IC"); বিরতি;
 
-	default:
+	পূর্বনির্ধারিত:
 	    STRCPY(code, "CHAR(x)");
 	    code[5] = c;
     }
 
-    if (addnl == TRUE)
+    যদি (addnl == TRUE)
 	STRCAT(code, " + NEWLINE ");
 
 }
 
 # ifdef ENABLE_LOG
-static FILE *log_fd;
-static char_u e_log_open_failed[] = N_("Could not open temporary log file for writing, displaying on stderr... ");
+স্থির FILE *log_fd;
+স্থির char_u e_log_open_failed[] = N_("Could not open temporary log file for writing, displaying on stderr... ");
 
 /*
  * Print the postfix notation of the current regexp.
  */
-    static void
-nfa_postfix_dump(char_u *expr, int retval)
+    স্থির শূন্য
+nfa_postfix_dump(char_u *রাশিমালা, পূর্ণসংখ্যা retval)
 {
-    int *p;
+    পূর্ণসংখ্যা *p;
     FILE *f;
 
     f = fopen(NFA_REGEXP_DUMP_LOG, "a");
-    if (f == NULL)
-	return;
+    যদি (f == ফাঁকা)
+	ফেরত;
 
     fprintf(f, "\n-------------------------\n");
-    if (retval == FAIL)
+    যদি (retval == FAIL)
 	fprintf(f, ">>> NFA engine failed... \n");
-    else if (retval == OK)
+    অন্যথা যদি (retval == OK)
 	fprintf(f, ">>> NFA engine succeeded !\n");
-    fprintf(f, "Regexp: \"%s\"\nPostfix notation (char): \"", expr);
-    for (p = post_start; *p && p < post_ptr; p++)
+    fprintf(f, "Regexp: \"%s\"\nPostfix notation (char): \"", রাশিমালা);
+    জন্য (p = post_start; *p && p < post_ptr; p++)
     {
 	nfa_set_code(*p);
 	fprintf(f, "%s, ", code);
     }
     fprintf(f, "\"\nPostfix notation (int): ");
-    for (p = post_start; *p && p < post_ptr; p++)
+    জন্য (p = post_start; *p && p < post_ptr; p++)
 	fprintf(f, "%d ", *p);
     fprintf(f, "\n\n");
     fclose(f);
@@ -2798,7 +2798,7 @@ nfa_postfix_dump(char_u *expr, int retval)
 /*
  * Print the NFA starting with a root node "state".
  */
-    static void
+    স্থির শূন্য
 nfa_print_state(FILE *debugf, nfa_state_T *state)
 {
     garray_T indent;
@@ -2809,21 +2809,21 @@ nfa_print_state(FILE *debugf, nfa_state_T *state)
     ga_clear(&indent);
 }
 
-    static void
+    স্থির শূন্য
 nfa_print_state2(FILE *debugf, nfa_state_T *state, garray_T *indent)
 {
     char_u  *p;
 
-    if (state == NULL)
-	return;
+    যদি (state == ফাঁকা)
+	ফেরত;
 
     fprintf(debugf, "(%2d)", abs(state->id));
 
     // Output indent
-    p = (char_u *)indent->ga_data;
-    if (indent->ga_len >= 3)
+    p = (char_u *)indent->ga_তথ্য;
+    যদি (indent->ga_len >= 3)
     {
-	int	last = indent->ga_len - 3;
+	পূর্ণসংখ্যা	last = indent->ga_len - 3;
 	char_u	save[2];
 
 	STRNCPY(save, &p[last], 2);
@@ -2831,7 +2831,7 @@ nfa_print_state2(FILE *debugf, nfa_state_T *state, garray_T *indent)
 	fprintf(debugf, " %s", p);
 	STRNCPY(&p[last], save, 2);
     }
-    else
+    অন্যথা
 	fprintf(debugf, " %s", p);
 
     nfa_set_code(state->c);
@@ -2840,16 +2840,16 @@ nfa_print_state2(FILE *debugf, nfa_state_T *state, garray_T *indent)
 		 state->c,
 		 abs(state->id),
 		 state->val);
-    if (state->id < 0)
-	return;
+    যদি (state->id < 0)
+	ফেরত;
 
     state->id = abs(state->id) * -1;
 
     // grow indent for state->out
     indent->ga_len -= 1;
-    if (state->out1)
+    যদি (state->out1)
 	GA_CONCAT_LITERAL(indent, "| ");
-    else
+    অন্যথা
 	GA_CONCAT_LITERAL(indent, "  ");
     ga_append(indent, NUL);
 
@@ -2870,22 +2870,22 @@ nfa_print_state2(FILE *debugf, nfa_state_T *state, garray_T *indent)
 /*
  * Print the NFA state machine.
  */
-    static void
+    স্থির শূন্য
 nfa_dump(nfa_regprog_T *prog)
 {
     FILE *debugf = fopen(NFA_REGEXP_DUMP_LOG, "a");
 
-    if (debugf == NULL)
-	return;
+    যদি (debugf == ফাঁকা)
+	ফেরত;
 
     nfa_print_state(debugf, prog->start);
 
-    if (prog->reganch)
+    যদি (prog->reganch)
 	fprintf(debugf, "reganch: %d\n", prog->reganch);
-    if (prog->regstart != NUL)
+    যদি (prog->regstart != NUL)
 	fprintf(debugf, "regstart: %c (decimal: %d)\n",
 		prog->regstart, prog->regstart);
-    if (prog->match_text != NULL)
+    যদি (prog->match_text != ফাঁকা)
 	fprintf(debugf, "match_text: \"%s\"\n", prog->match_text);
 
     fclose(debugf);
@@ -2897,13 +2897,13 @@ nfa_dump(nfa_regprog_T *prog)
  * Parse r.e. @expr and convert it into postfix form.
  * Return the postfix string on success, NULL otherwise.
  */
-    static int *
-re2post(void)
+    স্থির পূর্ণসংখ্যা *
+re2post(শূন্য)
 {
-    if (nfa_reg(REG_NOPAREN) == FAIL)
-	return NULL;
+    যদি (nfa_reg(REG_NOPAREN) == FAIL)
+	ফেরত ফাঁকা;
     EMIT(NFA_MOPEN);
-    return post_start;
+    ফেরত post_start;
 }
 
 // NB. Some of the code below is inspired by Russ's.
@@ -2915,18 +2915,18 @@ re2post(void)
  * If c < 256, labeled arrow with character c to out.
  */
 
-static nfa_state_T	*state_ptr; // points to nfa_prog->state
+স্থির nfa_state_T	*state_ptr; // points to nfa_prog->state
 
 /*
  * Allocate and initialize nfa_state_T.
  */
-    static nfa_state_T *
-alloc_state(int c, nfa_state_T *out, nfa_state_T *out1)
+    স্থির nfa_state_T *
+alloc_state(পূর্ণসংখ্যা c, nfa_state_T *out, nfa_state_T *out1)
 {
     nfa_state_T *s;
 
-    if (istate >= nstate)
-	return NULL;
+    যদি (istate >= nstate)
+	ফেরত ফাঁকা;
 
     s = &state_ptr[istate++];
 
@@ -2939,7 +2939,7 @@ alloc_state(int c, nfa_state_T *out, nfa_state_T *out1)
     s->lastlist[0] = 0;
     s->lastlist[1] = 0;
 
-    return s;
+    ফেরত s;
 }
 
 /*
@@ -2952,62 +2952,62 @@ alloc_state(int c, nfa_state_T *out, nfa_state_T *out1)
 // Since the out pointers in the list are always
 // uninitialized, we use the pointers themselves
 // as storage for the Ptrlists.
-typedef union Ptrlist Ptrlist;
-union Ptrlist
+প্রকারলেখ সংঘ Ptrlist Ptrlist;
+সংঘ Ptrlist
 {
-    Ptrlist	*next;
+    Ptrlist	*পরবর্তী;
     nfa_state_T	*s;
 };
 
-struct Frag
+কাঠামো Frag
 {
     nfa_state_T *start;
     Ptrlist	*out;
 };
-typedef struct Frag Frag_T;
+প্রকারলেখ কাঠামো Frag Frag_T;
 
 // Reused across compilations by post2nfa(); freed in free_regexp_stuff().
-static Frag_T *nfa_stack;
-static int nfa_stack_len;
+স্থির Frag_T *nfa_স্তূপ;
+স্থির পূর্ণসংখ্যা nfa_স্তূপ_len;
 
 /*
  * Initialize a Frag_T struct and return it.
  */
-    static Frag_T
+    স্থির Frag_T
 frag(nfa_state_T *start, Ptrlist *out)
 {
     Frag_T n;
 
     n.start = start;
     n.out = out;
-    return n;
+    ফেরত n;
 }
 
 /*
  * Create singleton list containing just outp.
  */
-    static Ptrlist *
+    স্থির Ptrlist *
 list1(
     nfa_state_T	**outp)
 {
     Ptrlist *l;
 
     l = (Ptrlist *)outp;
-    l->next = NULL;
-    return l;
+    l->পরবর্তী = ফাঁকা;
+    ফেরত l;
 }
 
 /*
  * Patch the list of states at out to point to start.
  */
-    static void
+    স্থির শূন্য
 patch(Ptrlist *l, nfa_state_T *s)
 {
-    Ptrlist *next;
+    Ptrlist *পরবর্তী;
 
-    for (; l; l = next)
+    জন্য (; l; l = পরবর্তী)
     {
-	next = l->next;
+	পরবর্তী = l->পরবর্তী;
 	l->s = s;
     }
 }
@@ -3016,75 +3016,75 @@ patch(Ptrlist *l, nfa_state_T *s)
 /*
  * Join the two lists l1 and l2, returning the combination.
  */
-    static Ptrlist *
+    স্থির Ptrlist *
 append(Ptrlist *l1, Ptrlist *l2)
 {
     Ptrlist *oldl1;
 
     oldl1 = l1;
-    while (l1->next)
-	l1 = l1->next;
-    l1->next = l2;
-    return oldl1;
+    যখন (l1->পরবর্তী)
+	l1 = l1->পরবর্তী;
+    l1->পরবর্তী = l2;
+    ফেরত oldl1;
 }
 
 /*
  * Stack used for transforming postfix form into NFA.
  */
-static Frag_T empty;
+স্থির Frag_T empty;
 
-    static void
-st_error(int *postfix UNUSED, int *end UNUSED, int *p UNUSED)
+    স্থির শূন্য
+st_error(পূর্ণসংখ্যা *postfix UNUSED, পূর্ণসংখ্যা *end UNUSED, পূর্ণসংখ্যা *p UNUSED)
 {
 #ifdef NFA_REGEXP_ERROR_LOG
     FILE *df;
-    int *p2;
+    পূর্ণসংখ্যা *p2;
 
     df = fopen(NFA_REGEXP_ERROR_LOG, "a");
-    if (df)
+    যদি (df)
     {
 	fprintf(df, "Error popping the stack!\n");
 # ifdef DEBUG
-	fprintf(df, "Current regexp is \"%s\"\n", nfa_regengine.expr);
+	fprintf(df, "Current regexp is \"%s\"\n", nfa_regengine.রাশিমালা);
 # endif
 	fprintf(df, "Postfix form is: ");
 # ifdef DEBUG
-	for (p2 = postfix; p2 < end; p2++)
+	জন্য (p2 = postfix; p2 < end; p2++)
 	{
 	    nfa_set_code(*p2);
 	    fprintf(df, "%s, ", code);
 	}
 	nfa_set_code(*p);
 	fprintf(df, "\nCurrent position is: ");
-	for (p2 = postfix; p2 <= p; p2 ++)
+	জন্য (p2 = postfix; p2 <= p; p2 ++)
 	{
 	    nfa_set_code(*p2);
 	    fprintf(df, "%s, ", code);
 	}
-# else
-	for (p2 = postfix; p2 < end; p2++)
+# অন্যথা
+	জন্য (p2 = postfix; p2 < end; p2++)
 	    fprintf(df, "%d, ", *p2);
 	fprintf(df, "\nCurrent position is: ");
-	for (p2 = postfix; p2 <= p; p2 ++)
+	জন্য (p2 = postfix; p2 <= p; p2 ++)
 	    fprintf(df, "%d, ", *p2);
 # endif
 	fprintf(df, "\n--------------------------\n");
 	fclose(df);
     }
 #endif
-    emsg(_(e_nfa_regexp_could_not_pop_stack));
+    emsg(_(e_nfa_regexp_could_not_বের_করো_স্তূপ));
 }
 
 /*
  * Push an item onto the stack.
  */
-    static void
-st_push(Frag_T s, Frag_T **p, Frag_T *stack_end)
+    স্থির শূন্য
+st_ঠেলো(Frag_T s, Frag_T **p, Frag_T *স্তূপ_end)
 {
     Frag_T *stackp = *p;
 
-    if (stackp >= stack_end)
-	return;
+    যদি (stackp >= স্তূপ_end)
+	ফেরত;
     *stackp = s;
     *p = *p + 1;
 }
@@ -3092,230 +3092,230 @@ st_push(Frag_T s, Frag_T **p, Frag_T *stack_end)
 /*
  * Pop an item from the stack.
  */
-    static Frag_T
-st_pop(Frag_T **p, Frag_T *stack)
+    স্থির Frag_T
+st_বের_করো(Frag_T **p, Frag_T *স্তূপ)
 {
     Frag_T *stackp;
 
     *p = *p - 1;
     stackp = *p;
-    if (stackp < stack)
-	return empty;
-    return **p;
+    যদি (stackp < স্তূপ)
+	ফেরত empty;
+    ফেরত **p;
 }
 
 /*
  * Estimate the maximum byte length of anything matching "state".
  * When unknown or unlimited return -1.
  */
-    static int
-nfa_max_width(nfa_state_T *startstate, int depth)
+    স্থির পূর্ণসংখ্যা
+nfa_max_width(nfa_state_T *startstate, পূর্ণসংখ্যা depth)
 {
-    int		    l, r;
+    পূর্ণসংখ্যা		    l, r;
     nfa_state_T	    *state = startstate;
-    int		    len = 0;
+    পূর্ণসংখ্যা		    len = 0;
 
     // detect looping in a NFA_SPLIT
-    if (depth > 4)
-	return -1;
+    যদি (depth > 4)
+	ফেরত -1;
 
-    while (state != NULL)
+    যখন (state != ফাঁকা)
     {
-	switch (state->c)
+	নির্বাচন (state->c)
 	{
-	    case NFA_END_INVISIBLE:
-	    case NFA_END_INVISIBLE_NEG:
+	    ক্ষেত্র NFA_END_INVISIBLE:
+	    ক্ষেত্র NFA_END_INVISIBLE_NEG:
 		// the end, return what we have
-		return len;
+		ফেরত len;
 
-	    case NFA_SPLIT:
+	    ক্ষেত্র NFA_SPLIT:
 		// two alternatives, use the maximum
 		l = nfa_max_width(state->out, depth + 1);
 		r = nfa_max_width(state->out1, depth + 1);
-		if (l < 0 || r < 0)
-		    return -1;
-		return len + (l > r ? l : r);
+		যদি (l < 0 || r < 0)
+		    ফেরত -1;
+		ফেরত len + (l > r ? l : r);
 
-	    case NFA_ANY:
-	    case NFA_START_COLL:
-	    case NFA_START_NEG_COLL:
+	    ক্ষেত্র NFA_ANY:
+	    ক্ষেত্র NFA_START_COLL:
+	    ক্ষেত্র NFA_START_NEG_COLL:
 		// matches some character, including composing chars
-		if (enc_utf8)
+		যদি (enc_utf8)
 		    len += MB_MAXBYTES;
-		else if (has_mbyte)
+		অন্যথা যদি (has_mbyte)
 		    len += 2;
-		else
+		অন্যথা
 		    ++len;
-		if (state->c != NFA_ANY)
+		যদি (state->c != NFA_ANY)
 		{
 		    // Skip over the compiled collection.
 		    // malformed NFAs must not crash width estimation.
-		    if (state->out1 == NULL || state->out1->out == NULL)
-			return -1;
+		    যদি (state->out1 == ফাঁকা || state->out1->out == ফাঁকা)
+			ফেরত -1;
 		    state = state->out1->out;
-		    continue;
+		    চালু;
 		}
-		break;
+		বিরতি;
 
-	    case NFA_DIGIT:
-	    case NFA_WHITE:
-	    case NFA_HEX:
-	    case NFA_OCTAL:
+	    ক্ষেত্র NFA_DIGIT:
+	    ক্ষেত্র NFA_WHITE:
+	    ক্ষেত্র NFA_HEX:
+	    ক্ষেত্র NFA_OCTAL:
 		// ascii
 		++len;
-		break;
+		বিরতি;
 
-	    case NFA_IDENT:
-	    case NFA_SIDENT:
-	    case NFA_KWORD:
-	    case NFA_SKWORD:
-	    case NFA_FNAME:
-	    case NFA_SFNAME:
-	    case NFA_PRINT:
-	    case NFA_SPRINT:
-	    case NFA_NWHITE:
-	    case NFA_NDIGIT:
-	    case NFA_NHEX:
-	    case NFA_NOCTAL:
-	    case NFA_WORD:
-	    case NFA_NWORD:
-	    case NFA_HEAD:
-	    case NFA_NHEAD:
-	    case NFA_ALPHA:
-	    case NFA_NALPHA:
-	    case NFA_LOWER:
-	    case NFA_NLOWER:
-	    case NFA_UPPER:
-	    case NFA_NUPPER:
-	    case NFA_LOWER_IC:
-	    case NFA_NLOWER_IC:
-	    case NFA_UPPER_IC:
-	    case NFA_NUPPER_IC:
-	    case NFA_ANY_COMPOSING:
+	    ক্ষেত্র NFA_IDENT:
+	    ক্ষেত্র NFA_SIDENT:
+	    ক্ষেত্র NFA_KWORD:
+	    ক্ষেত্র NFA_SKWORD:
+	    ক্ষেত্র NFA_FNAME:
+	    ক্ষেত্র NFA_SFNAME:
+	    ক্ষেত্র NFA_PRINT:
+	    ক্ষেত্র NFA_SPRINT:
+	    ক্ষেত্র NFA_NWHITE:
+	    ক্ষেত্র NFA_NDIGIT:
+	    ক্ষেত্র NFA_NHEX:
+	    ক্ষেত্র NFA_NOCTAL:
+	    ক্ষেত্র NFA_WORD:
+	    ক্ষেত্র NFA_NWORD:
+	    ক্ষেত্র NFA_শীর্ষ:
+	    ক্ষেত্র NFA_NHEAD:
+	    ক্ষেত্র NFA_ALPHA:
+	    ক্ষেত্র NFA_NALPHA:
+	    ক্ষেত্র NFA_LOWER:
+	    ক্ষেত্র NFA_NLOWER:
+	    ক্ষেত্র NFA_UPPER:
+	    ক্ষেত্র NFA_NUPPER:
+	    ক্ষেত্র NFA_LOWER_IC:
+	    ক্ষেত্র NFA_NLOWER_IC:
+	    ক্ষেত্র NFA_UPPER_IC:
+	    ক্ষেত্র NFA_NUPPER_IC:
+	    ক্ষেত্র NFA_ANY_COMPOSING:
 		// possibly non-ascii
-		if (has_mbyte)
+		যদি (has_mbyte)
 		    len += 3;
-		else
+		অন্যথা
 		    ++len;
-		break;
+		বিরতি;
 
-	    case NFA_START_INVISIBLE:
-	    case NFA_START_INVISIBLE_NEG:
-	    case NFA_START_INVISIBLE_BEFORE:
-	    case NFA_START_INVISIBLE_BEFORE_NEG:
+	    ক্ষেত্র NFA_START_INVISIBLE:
+	    ক্ষেত্র NFA_START_INVISIBLE_NEG:
+	    ক্ষেত্র NFA_START_INVISIBLE_BEFORE:
+	    ক্ষেত্র NFA_START_INVISIBLE_BEFORE_NEG:
 		// zero-width, out1 points to the END state
 		state = state->out1->out;
-		continue;
+		চালু;
 
-	    case NFA_BACKREF1:
-	    case NFA_BACKREF2:
-	    case NFA_BACKREF3:
-	    case NFA_BACKREF4:
-	    case NFA_BACKREF5:
-	    case NFA_BACKREF6:
-	    case NFA_BACKREF7:
-	    case NFA_BACKREF8:
-	    case NFA_BACKREF9:
+	    ক্ষেত্র NFA_BACKREF1:
+	    ক্ষেত্র NFA_BACKREF2:
+	    ক্ষেত্র NFA_BACKREF3:
+	    ক্ষেত্র NFA_BACKREF4:
+	    ক্ষেত্র NFA_BACKREF5:
+	    ক্ষেত্র NFA_BACKREF6:
+	    ক্ষেত্র NFA_BACKREF7:
+	    ক্ষেত্র NFA_BACKREF8:
+	    ক্ষেত্র NFA_BACKREF9:
 #ifdef FEAT_SYN_HL
-	    case NFA_ZREF1:
-	    case NFA_ZREF2:
-	    case NFA_ZREF3:
-	    case NFA_ZREF4:
-	    case NFA_ZREF5:
-	    case NFA_ZREF6:
-	    case NFA_ZREF7:
-	    case NFA_ZREF8:
-	    case NFA_ZREF9:
+	    ক্ষেত্র NFA_ZREF1:
+	    ক্ষেত্র NFA_ZREF2:
+	    ক্ষেত্র NFA_ZREF3:
+	    ক্ষেত্র NFA_ZREF4:
+	    ক্ষেত্র NFA_ZREF5:
+	    ক্ষেত্র NFA_ZREF6:
+	    ক্ষেত্র NFA_ZREF7:
+	    ক্ষেত্র NFA_ZREF8:
+	    ক্ষেত্র NFA_ZREF9:
 #endif
-	    case NFA_NEWL:
-	    case NFA_SKIP:
+	    ক্ষেত্র NFA_NEWL:
+	    ক্ষেত্র NFA_SKIP:
 		// unknown width
-		return -1;
+		ফেরত -1;
 
-	    case NFA_BOL:
-	    case NFA_EOL:
-	    case NFA_BOF:
-	    case NFA_EOF:
-	    case NFA_BOW:
-	    case NFA_EOW:
-	    case NFA_MOPEN:
-	    case NFA_MOPEN1:
-	    case NFA_MOPEN2:
-	    case NFA_MOPEN3:
-	    case NFA_MOPEN4:
-	    case NFA_MOPEN5:
-	    case NFA_MOPEN6:
-	    case NFA_MOPEN7:
-	    case NFA_MOPEN8:
-	    case NFA_MOPEN9:
+	    ক্ষেত্র NFA_BOL:
+	    ক্ষেত্র NFA_EOL:
+	    ক্ষেত্র NFA_BOF:
+	    ক্ষেত্র NFA_EOF:
+	    ক্ষেত্র NFA_BOW:
+	    ক্ষেত্র NFA_EOW:
+	    ক্ষেত্র NFA_MOPEN:
+	    ক্ষেত্র NFA_MOPEN1:
+	    ক্ষেত্র NFA_MOPEN2:
+	    ক্ষেত্র NFA_MOPEN3:
+	    ক্ষেত্র NFA_MOPEN4:
+	    ক্ষেত্র NFA_MOPEN5:
+	    ক্ষেত্র NFA_MOPEN6:
+	    ক্ষেত্র NFA_MOPEN7:
+	    ক্ষেত্র NFA_MOPEN8:
+	    ক্ষেত্র NFA_MOPEN9:
 #ifdef FEAT_SYN_HL
-	    case NFA_ZOPEN:
-	    case NFA_ZOPEN1:
-	    case NFA_ZOPEN2:
-	    case NFA_ZOPEN3:
-	    case NFA_ZOPEN4:
-	    case NFA_ZOPEN5:
-	    case NFA_ZOPEN6:
-	    case NFA_ZOPEN7:
-	    case NFA_ZOPEN8:
-	    case NFA_ZOPEN9:
-	    case NFA_ZCLOSE:
-	    case NFA_ZCLOSE1:
-	    case NFA_ZCLOSE2:
-	    case NFA_ZCLOSE3:
-	    case NFA_ZCLOSE4:
-	    case NFA_ZCLOSE5:
-	    case NFA_ZCLOSE6:
-	    case NFA_ZCLOSE7:
-	    case NFA_ZCLOSE8:
-	    case NFA_ZCLOSE9:
+	    ক্ষেত্র NFA_ZOPEN:
+	    ক্ষেত্র NFA_ZOPEN1:
+	    ক্ষেত্র NFA_ZOPEN2:
+	    ক্ষেত্র NFA_ZOPEN3:
+	    ক্ষেত্র NFA_ZOPEN4:
+	    ক্ষেত্র NFA_ZOPEN5:
+	    ক্ষেত্র NFA_ZOPEN6:
+	    ক্ষেত্র NFA_ZOPEN7:
+	    ক্ষেত্র NFA_ZOPEN8:
+	    ক্ষেত্র NFA_ZOPEN9:
+	    ক্ষেত্র NFA_ZCLOSE:
+	    ক্ষেত্র NFA_ZCLOSE1:
+	    ক্ষেত্র NFA_ZCLOSE2:
+	    ক্ষেত্র NFA_ZCLOSE3:
+	    ক্ষেত্র NFA_ZCLOSE4:
+	    ক্ষেত্র NFA_ZCLOSE5:
+	    ক্ষেত্র NFA_ZCLOSE6:
+	    ক্ষেত্র NFA_ZCLOSE7:
+	    ক্ষেত্র NFA_ZCLOSE8:
+	    ক্ষেত্র NFA_ZCLOSE9:
 #endif
-	    case NFA_MCLOSE:
-	    case NFA_MCLOSE1:
-	    case NFA_MCLOSE2:
-	    case NFA_MCLOSE3:
-	    case NFA_MCLOSE4:
-	    case NFA_MCLOSE5:
-	    case NFA_MCLOSE6:
-	    case NFA_MCLOSE7:
-	    case NFA_MCLOSE8:
-	    case NFA_MCLOSE9:
-	    case NFA_NOPEN:
-	    case NFA_NCLOSE:
+	    ক্ষেত্র NFA_MCLOSE:
+	    ক্ষেত্র NFA_MCLOSE1:
+	    ক্ষেত্র NFA_MCLOSE2:
+	    ক্ষেত্র NFA_MCLOSE3:
+	    ক্ষেত্র NFA_MCLOSE4:
+	    ক্ষেত্র NFA_MCLOSE5:
+	    ক্ষেত্র NFA_MCLOSE6:
+	    ক্ষেত্র NFA_MCLOSE7:
+	    ক্ষেত্র NFA_MCLOSE8:
+	    ক্ষেত্র NFA_MCLOSE9:
+	    ক্ষেত্র NFA_NOPEN:
+	    ক্ষেত্র NFA_NCLOSE:
 
-	    case NFA_LNUM_GT:
-	    case NFA_LNUM_LT:
-	    case NFA_COL_GT:
-	    case NFA_COL_LT:
-	    case NFA_VCOL_GT:
-	    case NFA_VCOL_LT:
-	    case NFA_MARK_GT:
-	    case NFA_MARK_LT:
-	    case NFA_VISUAL:
-	    case NFA_LNUM:
-	    case NFA_CURSOR:
-	    case NFA_COL:
-	    case NFA_VCOL:
-	    case NFA_MARK:
+	    ক্ষেত্র NFA_LNUM_GT:
+	    ক্ষেত্র NFA_LNUM_LT:
+	    ক্ষেত্র NFA_COL_GT:
+	    ক্ষেত্র NFA_COL_LT:
+	    ক্ষেত্র NFA_VCOL_GT:
+	    ক্ষেত্র NFA_VCOL_LT:
+	    ক্ষেত্র NFA_MARK_GT:
+	    ক্ষেত্র NFA_MARK_LT:
+	    ক্ষেত্র NFA_VISUAL:
+	    ক্ষেত্র NFA_LNUM:
+	    ক্ষেত্র NFA_CURSOR:
+	    ক্ষেত্র NFA_COL:
+	    ক্ষেত্র NFA_VCOL:
+	    ক্ষেত্র NFA_MARK:
 
-	    case NFA_ZSTART:
-	    case NFA_ZEND:
-	    case NFA_OPT_CHARS:
-	    case NFA_EMPTY:
-	    case NFA_START_PATTERN:
-	    case NFA_END_PATTERN:
-	    case NFA_COMPOSING:
-	    case NFA_END_COMPOSING:
+	    ক্ষেত্র NFA_ZSTART:
+	    ক্ষেত্র NFA_ZEND:
+	    ক্ষেত্র NFA_OPT_CHARS:
+	    ক্ষেত্র NFA_EMPTY:
+	    ক্ষেত্র NFA_START_PATTERN:
+	    ক্ষেত্র NFA_END_PATTERN:
+	    ক্ষেত্র NFA_COMPOSING:
+	    ক্ষেত্র NFA_END_COMPOSING:
 		// zero-width
-		break;
+		বিরতি;
 
-	    default:
-		if (state->c < 0)
+	    পূর্বনির্ধারিত:
+		যদি (state->c < 0)
 		    // don't know what this is
-		    return -1;
+		    ফেরত -1;
 		// normal character
 		len += MB_CHAR2LEN(state->c);
-		break;
+		বিরতি;
 	}
 
 	// normal way to continue
@@ -3323,207 +3323,207 @@ nfa_max_width(nfa_state_T *startstate, int depth)
     }
 
     // unrecognized, "cannot happen"
-    return -1;
+    ফেরত -1;
 }
 
 /*
  * Convert a postfix form into its equivalent NFA.
  * Return the NFA start state on success, NULL otherwise.
  */
-    static nfa_state_T *
-post2nfa(int *postfix, int *end, int nfa_calc_size)
+    স্থির nfa_state_T *
+post2nfa(পূর্ণসংখ্যা *postfix, পূর্ণসংখ্যা *end, পূর্ণসংখ্যা nfa_calc_আকার)
 {
-    int		*p;
-    int		mopen;
-    int		mclose;
-    Frag_T	*stack = NULL;
-    Frag_T	*stackp = NULL;
-    Frag_T	*stack_end = NULL;
+    পূর্ণসংখ্যা		*p;
+    পূর্ণসংখ্যা		mopen;
+    পূর্ণসংখ্যা		mclose;
+    Frag_T	*স্তূপ = ফাঁকা;
+    Frag_T	*stackp = ফাঁকা;
+    Frag_T	*স্তূপ_end = ফাঁকা;
     Frag_T	e1;
     Frag_T	e2;
     Frag_T	e;
     nfa_state_T	*s;
     nfa_state_T	*s1;
     nfa_state_T	*matchstate;
-    nfa_state_T	*ret = NULL;
+    nfa_state_T	*ret = ফাঁকা;
 
-    if (postfix == NULL)
-	return NULL;
+    যদি (postfix == ফাঁকা)
+	ফেরত ফাঁকা;
 
-#define PUSH(s)	    st_push((s), &stackp, stack_end)
-#define POP()	    st_pop(&stackp, stack);		\
-		    if (stackp < stack)			\
+#define ঠেলো_2(s)	    st_ঠেলো((s), &stackp, স্তূপ_end)
+#define বের_করো_2()	    st_বের_করো(&stackp, স্তূপ);		\
+		    যদি (stackp < স্তূপ)			\
 		    {					\
 			st_error(postfix, end, p);	\
-			return NULL;			\
+			ফেরত ফাঁকা;			\
 		    }
 
-    if (nfa_calc_size == FALSE)
+    যদি (nfa_calc_আকার == FALSE)
     {
 	// Reuse the fragment stack across compilations, growing when needed;
 	// it is freed in free_regexp_stuff().
-	if (nfa_stack == NULL || nfa_stack_len < nstate + 1)
+	যদি (nfa_স্তূপ == ফাঁকা || nfa_স্তূপ_len < nstate + 1)
 	{
-	    vim_free(nfa_stack);
-	    nfa_stack = ALLOC_MULT(Frag_T, nstate + 1);
-	    if (nfa_stack == NULL)
+	    vim_free(nfa_স্তূপ);
+	    nfa_স্তূপ = ALLOC_MULT(Frag_T, nstate + 1);
+	    যদি (nfa_স্তূপ == ফাঁকা)
 	    {
-		nfa_stack_len = 0;
-		return NULL;
+		nfa_স্তূপ_len = 0;
+		ফেরত ফাঁকা;
 	    }
-	    nfa_stack_len = nstate + 1;
+	    nfa_স্তূপ_len = nstate + 1;
 	}
-	stack = nfa_stack;
-	stackp = stack;
-	stack_end = stack + (nstate + 1);
+	স্তূপ = nfa_স্তূপ;
+	stackp = স্তূপ;
+	স্তূপ_end = স্তূপ + (nstate + 1);
     }
 
-    for (p = postfix; p < end; ++p)
+    জন্য (p = postfix; p < end; ++p)
     {
-	switch (*p)
+	নির্বাচন (*p)
 	{
-	case NFA_CONCAT:
+	ক্ষেত্র NFA_CONCAT:
 	    // Concatenation.
 	    // Pay attention: this operator does not exist in the r.e. itself
 	    // (it is implicit, really).  It is added when r.e. is translated
 	    // to postfix form in re2post().
-	    if (nfa_calc_size == TRUE)
+	    যদি (nfa_calc_আকার == TRUE)
 	    {
 		// nstate += 0;
-		break;
+		বিরতি;
 	    }
-	    e2 = POP();
-	    e1 = POP();
+	    e2 = বের_করো_2();
+	    e1 = বের_করো_2();
 	    patch(e1.out, e2.start);
-	    PUSH(frag(e1.start, e2.out));
-	    break;
+	    ঠেলো_2(frag(e1.start, e2.out));
+	    বিরতি;
 
-	case NFA_OR:
+	ক্ষেত্র NFA_OR:
 	    // Alternation
-	    if (nfa_calc_size == TRUE)
+	    যদি (nfa_calc_আকার == TRUE)
 	    {
 		nstate++;
-		break;
+		বিরতি;
 	    }
-	    e2 = POP();
-	    e1 = POP();
+	    e2 = বের_করো_2();
+	    e1 = বের_করো_2();
 	    s = alloc_state(NFA_SPLIT, e1.start, e2.start);
-	    if (s == NULL)
-		goto theend;
-	    PUSH(frag(s, append(e1.out, e2.out)));
-	    break;
+	    যদি (s == ফাঁকা)
+		যাও theend;
+	    ঠেলো_2(frag(s, append(e1.out, e2.out)));
+	    বিরতি;
 
-	case NFA_STAR:
+	ক্ষেত্র NFA_STAR:
 	    // Zero or more, prefer more
-	    if (nfa_calc_size == TRUE)
+	    যদি (nfa_calc_আকার == TRUE)
 	    {
 		nstate++;
-		break;
+		বিরতি;
 	    }
-	    e = POP();
-	    s = alloc_state(NFA_SPLIT, e.start, NULL);
-	    if (s == NULL)
-		goto theend;
+	    e = বের_করো_2();
+	    s = alloc_state(NFA_SPLIT, e.start, ফাঁকা);
+	    যদি (s == ফাঁকা)
+		যাও theend;
 	    patch(e.out, s);
-	    PUSH(frag(s, list1(&s->out1)));
-	    break;
+	    ঠেলো_2(frag(s, list1(&s->out1)));
+	    বিরতি;
 
-	case NFA_STAR_NONGREEDY:
+	ক্ষেত্র NFA_STAR_NONGREEDY:
 	    // Zero or more, prefer zero
-	    if (nfa_calc_size == TRUE)
+	    যদি (nfa_calc_আকার == TRUE)
 	    {
 		nstate++;
-		break;
+		বিরতি;
 	    }
-	    e = POP();
-	    s = alloc_state(NFA_SPLIT, NULL, e.start);
-	    if (s == NULL)
-		goto theend;
+	    e = বের_করো_2();
+	    s = alloc_state(NFA_SPLIT, ফাঁকা, e.start);
+	    যদি (s == ফাঁকা)
+		যাও theend;
 	    patch(e.out, s);
-	    PUSH(frag(s, list1(&s->out)));
-	    break;
+	    ঠেলো_2(frag(s, list1(&s->out)));
+	    বিরতি;
 
-	case NFA_QUEST:
+	ক্ষেত্র NFA_QUEST:
 	    // one or zero atoms=> greedy match
-	    if (nfa_calc_size == TRUE)
+	    যদি (nfa_calc_আকার == TRUE)
 	    {
 		nstate++;
-		break;
+		বিরতি;
 	    }
-	    e = POP();
-	    s = alloc_state(NFA_SPLIT, e.start, NULL);
-	    if (s == NULL)
-		goto theend;
-	    PUSH(frag(s, append(e.out, list1(&s->out1))));
-	    break;
+	    e = বের_করো_2();
+	    s = alloc_state(NFA_SPLIT, e.start, ফাঁকা);
+	    যদি (s == ফাঁকা)
+		যাও theend;
+	    ঠেলো_2(frag(s, append(e.out, list1(&s->out1))));
+	    বিরতি;
 
-	case NFA_QUEST_NONGREEDY:
+	ক্ষেত্র NFA_QUEST_NONGREEDY:
 	    // zero or one atoms => non-greedy match
-	    if (nfa_calc_size == TRUE)
+	    যদি (nfa_calc_আকার == TRUE)
 	    {
 		nstate++;
-		break;
+		বিরতি;
 	    }
-	    e = POP();
-	    s = alloc_state(NFA_SPLIT, NULL, e.start);
-	    if (s == NULL)
-		goto theend;
-	    PUSH(frag(s, append(e.out, list1(&s->out))));
-	    break;
+	    e = বের_করো_2();
+	    s = alloc_state(NFA_SPLIT, ফাঁকা, e.start);
+	    যদি (s == ফাঁকা)
+		যাও theend;
+	    ঠেলো_2(frag(s, append(e.out, list1(&s->out))));
+	    বিরতি;
 
-	case NFA_END_COLL:
-	case NFA_END_NEG_COLL:
+	ক্ষেত্র NFA_END_COLL:
+	ক্ষেত্র NFA_END_NEG_COLL:
 	    // On the stack is the sequence starting with NFA_START_COLL or
 	    // NFA_START_NEG_COLL and all possible characters. Patch it to
 	    // add the output to the start.
-	    if (nfa_calc_size == TRUE)
+	    যদি (nfa_calc_আকার == TRUE)
 	    {
 		nstate++;
-		break;
+		বিরতি;
 	    }
-	    e = POP();
-	    s = alloc_state(NFA_END_COLL, NULL, NULL);
-	    if (s == NULL)
-		goto theend;
+	    e = বের_করো_2();
+	    s = alloc_state(NFA_END_COLL, ফাঁকা, ফাঁকা);
+	    যদি (s == ফাঁকা)
+		যাও theend;
 	    patch(e.out, s);
 	    e.start->out1 = s;
-	    PUSH(frag(e.start, list1(&s->out)));
-	    break;
+	    ঠেলো_2(frag(e.start, list1(&s->out)));
+	    বিরতি;
 
-	case NFA_RANGE:
+	ক্ষেত্র NFA_RANGE:
 	    // Before this are two characters, the low and high end of a
 	    // range.  Turn them into two states with MIN and MAX.
-	    if (nfa_calc_size == TRUE)
+	    যদি (nfa_calc_আকার == TRUE)
 	    {
 		// nstate += 0;
-		break;
+		বিরতি;
 	    }
-	    e2 = POP();
-	    e1 = POP();
+	    e2 = বের_করো_2();
+	    e1 = বের_করো_2();
 	    e2.start->val = e2.start->c;
 	    e2.start->c = NFA_RANGE_MAX;
 	    e1.start->val = e1.start->c;
 	    e1.start->c = NFA_RANGE_MIN;
 	    patch(e1.out, e2.start);
-	    PUSH(frag(e1.start, e2.out));
-	    break;
+	    ঠেলো_2(frag(e1.start, e2.out));
+	    বিরতি;
 
-	case NFA_EMPTY:
+	ক্ষেত্র NFA_EMPTY:
 	    // 0-length, used in a repetition with max/min count of 0
-	    if (nfa_calc_size == TRUE)
+	    যদি (nfa_calc_আকার == TRUE)
 	    {
 		nstate++;
-		break;
+		বিরতি;
 	    }
-	    s = alloc_state(NFA_EMPTY, NULL, NULL);
-	    if (s == NULL)
-		goto theend;
-	    PUSH(frag(s, list1(&s->out)));
-	    break;
+	    s = alloc_state(NFA_EMPTY, ফাঁকা, ফাঁকা);
+	    যদি (s == ফাঁকা)
+		যাও theend;
+	    ঠেলো_2(frag(s, list1(&s->out)));
+	    বিরতি;
 
-	case NFA_OPT_CHARS:
+	ক্ষেত্র NFA_OPT_CHARS:
 	  {
-	    int    n;
+	    পূর্ণসংখ্যা    n;
 
 	    // \%[abc] implemented as:
 	    //    NFA_SPLIT
@@ -3537,70 +3537,70 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	    //    |   +- next
 	    //    +- next
 	    n = *++p; // get number of characters
-	    if (nfa_calc_size == TRUE)
+	    যদি (nfa_calc_আকার == TRUE)
 	    {
 		nstate += n;
-		break;
+		বিরতি;
 	    }
-	    s = NULL; // avoid compiler warning
-	    e1.out = NULL; // stores list with out1's
-	    s1 = NULL; // previous NFA_SPLIT to connect to
-	    while (n-- > 0)
+	    s = ফাঁকা; // avoid compiler warning
+	    e1.out = ফাঁকা; // stores list with out1's
+	    s1 = ফাঁকা; // previous NFA_SPLIT to connect to
+	    যখন (n-- > 0)
 	    {
-		e = POP(); // get character
-		s = alloc_state(NFA_SPLIT, e.start, NULL);
-		if (s == NULL)
-		    goto theend;
-		if (e1.out == NULL)
+		e = বের_করো_2(); // get character
+		s = alloc_state(NFA_SPLIT, e.start, ফাঁকা);
+		যদি (s == ফাঁকা)
+		    যাও theend;
+		যদি (e1.out == ফাঁকা)
 		    e1 = e;
 		patch(e.out, s1);
 		append(e1.out, list1(&s->out1));
 		s1 = s;
 	    }
-	    PUSH(frag(s, e1.out));
-	    break;
+	    ঠেলো_2(frag(s, e1.out));
+	    বিরতি;
 	  }
 
-	case NFA_PREV_ATOM_NO_WIDTH:
-	case NFA_PREV_ATOM_NO_WIDTH_NEG:
-	case NFA_PREV_ATOM_JUST_BEFORE:
-	case NFA_PREV_ATOM_JUST_BEFORE_NEG:
-	case NFA_PREV_ATOM_LIKE_PATTERN:
+	ক্ষেত্র NFA_পূর্ব_ATOM_NO_WIDTH:
+	ক্ষেত্র NFA_পূর্ব_ATOM_NO_WIDTH_NEG:
+	ক্ষেত্র NFA_পূর্ব_ATOM_JUST_BEFORE:
+	ক্ষেত্র NFA_পূর্ব_ATOM_JUST_BEFORE_NEG:
+	ক্ষেত্র NFA_পূর্ব_ATOM_LIKE_PATTERN:
 	  {
-	    int before = (*p == NFA_PREV_ATOM_JUST_BEFORE
-				      || *p == NFA_PREV_ATOM_JUST_BEFORE_NEG);
-	    int pattern = (*p == NFA_PREV_ATOM_LIKE_PATTERN);
-	    int start_state;
-	    int end_state;
-	    int n = 0;
+	    পূর্ণসংখ্যা before = (*p == NFA_পূর্ব_ATOM_JUST_BEFORE
+				      || *p == NFA_পূর্ব_ATOM_JUST_BEFORE_NEG);
+	    পূর্ণসংখ্যা pattern = (*p == NFA_পূর্ব_ATOM_LIKE_PATTERN);
+	    পূর্ণসংখ্যা start_state;
+	    পূর্ণসংখ্যা end_state;
+	    পূর্ণসংখ্যা n = 0;
 	    nfa_state_T *zend;
 	    nfa_state_T *skip;
 
-	    switch (*p)
+	    নির্বাচন (*p)
 	    {
-		case NFA_PREV_ATOM_NO_WIDTH:
+		ক্ষেত্র NFA_পূর্ব_ATOM_NO_WIDTH:
 		    start_state = NFA_START_INVISIBLE;
 		    end_state = NFA_END_INVISIBLE;
-		    break;
-		case NFA_PREV_ATOM_NO_WIDTH_NEG:
+		    বিরতি;
+		ক্ষেত্র NFA_পূর্ব_ATOM_NO_WIDTH_NEG:
 		    start_state = NFA_START_INVISIBLE_NEG;
 		    end_state = NFA_END_INVISIBLE_NEG;
-		    break;
-		case NFA_PREV_ATOM_JUST_BEFORE:
+		    বিরতি;
+		ক্ষেত্র NFA_পূর্ব_ATOM_JUST_BEFORE:
 		    start_state = NFA_START_INVISIBLE_BEFORE;
 		    end_state = NFA_END_INVISIBLE;
-		    break;
-		case NFA_PREV_ATOM_JUST_BEFORE_NEG:
+		    বিরতি;
+		ক্ষেত্র NFA_পূর্ব_ATOM_JUST_BEFORE_NEG:
 		    start_state = NFA_START_INVISIBLE_BEFORE_NEG;
 		    end_state = NFA_END_INVISIBLE_NEG;
-		    break;
-		default: // NFA_PREV_ATOM_LIKE_PATTERN:
+		    বিরতি;
+		পূর্বনির্ধারিত: // NFA_PREV_ATOM_LIKE_PATTERN:
 		    start_state = NFA_START_PATTERN;
 		    end_state = NFA_END_PATTERN;
-		    break;
+		    বিরতি;
 	    }
 
-	    if (before)
+	    যদি (before)
 		n = *++p; // get the count
 
 	    // The \@= operator: match the preceding atom with zero width.
@@ -3610,310 +3610,310 @@ post2nfa(int *postfix, int *end, int nfa_calc_size)
 	    // Surrounds the preceding atom with START_INVISIBLE and
 	    // END_INVISIBLE, similarly to MOPEN.
 
-	    if (nfa_calc_size == TRUE)
+	    যদি (nfa_calc_আকার == TRUE)
 	    {
 		nstate += pattern ? 4 : 2;
-		break;
+		বিরতি;
 	    }
-	    e = POP();
-	    s1 = alloc_state(end_state, NULL, NULL);
-	    if (s1 == NULL)
-		goto theend;
+	    e = বের_করো_2();
+	    s1 = alloc_state(end_state, ফাঁকা, ফাঁকা);
+	    যদি (s1 == ফাঁকা)
+		যাও theend;
 
 	    s = alloc_state(start_state, e.start, s1);
-	    if (s == NULL)
-		goto theend;
-	    if (pattern)
+	    যদি (s == ফাঁকা)
+		যাও theend;
+	    যদি (pattern)
 	    {
 		// NFA_ZEND -> NFA_END_PATTERN -> NFA_SKIP -> what follows.
-		skip = alloc_state(NFA_SKIP, NULL, NULL);
-		if (skip == NULL)
-		    goto theend;
-		zend = alloc_state(NFA_ZEND, s1, NULL);
-		if (zend == NULL)
-		    goto theend;
+		skip = alloc_state(NFA_SKIP, ফাঁকা, ফাঁকা);
+		যদি (skip == ফাঁকা)
+		    যাও theend;
+		zend = alloc_state(NFA_ZEND, s1, ফাঁকা);
+		যদি (zend == ফাঁকা)
+		    যাও theend;
 		s1->out= skip;
 		patch(e.out, zend);
-		PUSH(frag(s, list1(&skip->out)));
+		ঠেলো_2(frag(s, list1(&skip->out)));
 	    }
-	    else
+	    অন্যথা
 	    {
 		patch(e.out, s1);
-		PUSH(frag(s, list1(&s1->out)));
-		if (before)
+		ঠেলো_2(frag(s, list1(&s1->out)));
+		যদি (before)
 		{
-		    if (n <= 0)
+		    যদি (n <= 0)
 			// See if we can guess the maximum width, it avoids a
 			// lot of pointless tries.
 			n = nfa_max_width(e.start, 0);
 		    s->val = n; // store the count
 		}
 	    }
-	    break;
+	    বিরতি;
 	  }
 
-	case NFA_COMPOSING:	// char with composing char
-#if 0
+	ক্ষেত্র NFA_COMPOSING:	// char with composing char
+#যদি 0
 	    // TODO
-	    if (regflags & RF_ICOMBINE)
+	    যদি (regflags & RF_ICOMBINE)
 	    {
 		// use the base character only
 	    }
 #endif
 	    // FALLTHROUGH
 
-	case NFA_MOPEN:	// \( \) Submatch
-	case NFA_MOPEN1:
-	case NFA_MOPEN2:
-	case NFA_MOPEN3:
-	case NFA_MOPEN4:
-	case NFA_MOPEN5:
-	case NFA_MOPEN6:
-	case NFA_MOPEN7:
-	case NFA_MOPEN8:
-	case NFA_MOPEN9:
+	ক্ষেত্র NFA_MOPEN:	// \( \) Submatch
+	ক্ষেত্র NFA_MOPEN1:
+	ক্ষেত্র NFA_MOPEN2:
+	ক্ষেত্র NFA_MOPEN3:
+	ক্ষেত্র NFA_MOPEN4:
+	ক্ষেত্র NFA_MOPEN5:
+	ক্ষেত্র NFA_MOPEN6:
+	ক্ষেত্র NFA_MOPEN7:
+	ক্ষেত্র NFA_MOPEN8:
+	ক্ষেত্র NFA_MOPEN9:
 #ifdef FEAT_SYN_HL
-	case NFA_ZOPEN:	// \z( \) Submatch
-	case NFA_ZOPEN1:
-	case NFA_ZOPEN2:
-	case NFA_ZOPEN3:
-	case NFA_ZOPEN4:
-	case NFA_ZOPEN5:
-	case NFA_ZOPEN6:
-	case NFA_ZOPEN7:
-	case NFA_ZOPEN8:
-	case NFA_ZOPEN9:
+	ক্ষেত্র NFA_ZOPEN:	// \z( \) Submatch
+	ক্ষেত্র NFA_ZOPEN1:
+	ক্ষেত্র NFA_ZOPEN2:
+	ক্ষেত্র NFA_ZOPEN3:
+	ক্ষেত্র NFA_ZOPEN4:
+	ক্ষেত্র NFA_ZOPEN5:
+	ক্ষেত্র NFA_ZOPEN6:
+	ক্ষেত্র NFA_ZOPEN7:
+	ক্ষেত্র NFA_ZOPEN8:
+	ক্ষেত্র NFA_ZOPEN9:
 #endif
-	case NFA_NOPEN:	// \%( \) "Invisible Submatch"
-	    if (nfa_calc_size == TRUE)
+	ক্ষেত্র NFA_NOPEN:	// \%( \) "Invisible Submatch"
+	    যদি (nfa_calc_আকার == TRUE)
 	    {
 		nstate += 2;
-		break;
+		বিরতি;
 	    }
 
 	    mopen = *p;
-	    switch (*p)
+	    নির্বাচন (*p)
 	    {
-		case NFA_NOPEN: mclose = NFA_NCLOSE; break;
+		ক্ষেত্র NFA_NOPEN: mclose = NFA_NCLOSE; বিরতি;
 #ifdef FEAT_SYN_HL
-		case NFA_ZOPEN: mclose = NFA_ZCLOSE; break;
-		case NFA_ZOPEN1: mclose = NFA_ZCLOSE1; break;
-		case NFA_ZOPEN2: mclose = NFA_ZCLOSE2; break;
-		case NFA_ZOPEN3: mclose = NFA_ZCLOSE3; break;
-		case NFA_ZOPEN4: mclose = NFA_ZCLOSE4; break;
-		case NFA_ZOPEN5: mclose = NFA_ZCLOSE5; break;
-		case NFA_ZOPEN6: mclose = NFA_ZCLOSE6; break;
-		case NFA_ZOPEN7: mclose = NFA_ZCLOSE7; break;
-		case NFA_ZOPEN8: mclose = NFA_ZCLOSE8; break;
-		case NFA_ZOPEN9: mclose = NFA_ZCLOSE9; break;
+		ক্ষেত্র NFA_ZOPEN: mclose = NFA_ZCLOSE; বিরতি;
+		ক্ষেত্র NFA_ZOPEN1: mclose = NFA_ZCLOSE1; বিরতি;
+		ক্ষেত্র NFA_ZOPEN2: mclose = NFA_ZCLOSE2; বিরতি;
+		ক্ষেত্র NFA_ZOPEN3: mclose = NFA_ZCLOSE3; বিরতি;
+		ক্ষেত্র NFA_ZOPEN4: mclose = NFA_ZCLOSE4; বিরতি;
+		ক্ষেত্র NFA_ZOPEN5: mclose = NFA_ZCLOSE5; বিরতি;
+		ক্ষেত্র NFA_ZOPEN6: mclose = NFA_ZCLOSE6; বিরতি;
+		ক্ষেত্র NFA_ZOPEN7: mclose = NFA_ZCLOSE7; বিরতি;
+		ক্ষেত্র NFA_ZOPEN8: mclose = NFA_ZCLOSE8; বিরতি;
+		ক্ষেত্র NFA_ZOPEN9: mclose = NFA_ZCLOSE9; বিরতি;
 #endif
-		case NFA_COMPOSING: mclose = NFA_END_COMPOSING; break;
-		default:
+		ক্ষেত্র NFA_COMPOSING: mclose = NFA_END_COMPOSING; বিরতি;
+		পূর্বনির্ধারিত:
 		    // NFA_MOPEN, NFA_MOPEN1 .. NFA_MOPEN9
 		    mclose = *p + NSUBEXP;
-		    break;
+		    বিরতি;
 	    }
 
 	    // Allow "NFA_MOPEN" as a valid postfix representation for
 	    // the empty regexp "". In this case, the NFA will be
 	    // NFA_MOPEN -> NFA_MCLOSE. Note that this also allows
 	    // empty groups of parenthesis, and empty mbyte chars
-	    if (stackp == stack)
+	    যদি (stackp == স্তূপ)
 	    {
-		s = alloc_state(mopen, NULL, NULL);
-		if (s == NULL)
-		    goto theend;
-		s1 = alloc_state(mclose, NULL, NULL);
-		if (s1 == NULL)
-		    goto theend;
+		s = alloc_state(mopen, ফাঁকা, ফাঁকা);
+		যদি (s == ফাঁকা)
+		    যাও theend;
+		s1 = alloc_state(mclose, ফাঁকা, ফাঁকা);
+		যদি (s1 == ফাঁকা)
+		    যাও theend;
 		patch(list1(&s->out), s1);
-		PUSH(frag(s, list1(&s1->out)));
-		break;
+		ঠেলো_2(frag(s, list1(&s1->out)));
+		বিরতি;
 	    }
 
 	    // At least one node was emitted before NFA_MOPEN, so
 	    // at least one node will be between NFA_MOPEN and NFA_MCLOSE
-	    e = POP();
-	    s = alloc_state(mopen, e.start, NULL);   // `('
-	    if (s == NULL)
-		goto theend;
+	    e = বের_করো_2();
+	    s = alloc_state(mopen, e.start, ফাঁকা);   // `('
+	    যদি (s == ফাঁকা)
+		যাও theend;
 
-	    s1 = alloc_state(mclose, NULL, NULL);   // `)'
-	    if (s1 == NULL)
-		goto theend;
+	    s1 = alloc_state(mclose, ফাঁকা, ফাঁকা);   // `)'
+	    যদি (s1 == ফাঁকা)
+		যাও theend;
 	    patch(e.out, s1);
 
-	    if (mopen == NFA_COMPOSING)
+	    যদি (mopen == NFA_COMPOSING)
 		// COMPOSING->out1 = END_COMPOSING
 		patch(list1(&s->out1), s1);
 
-	    PUSH(frag(s, list1(&s1->out)));
-	    break;
+	    ঠেলো_2(frag(s, list1(&s1->out)));
+	    বিরতি;
 
-	case NFA_BACKREF1:
-	case NFA_BACKREF2:
-	case NFA_BACKREF3:
-	case NFA_BACKREF4:
-	case NFA_BACKREF5:
-	case NFA_BACKREF6:
-	case NFA_BACKREF7:
-	case NFA_BACKREF8:
-	case NFA_BACKREF9:
+	ক্ষেত্র NFA_BACKREF1:
+	ক্ষেত্র NFA_BACKREF2:
+	ক্ষেত্র NFA_BACKREF3:
+	ক্ষেত্র NFA_BACKREF4:
+	ক্ষেত্র NFA_BACKREF5:
+	ক্ষেত্র NFA_BACKREF6:
+	ক্ষেত্র NFA_BACKREF7:
+	ক্ষেত্র NFA_BACKREF8:
+	ক্ষেত্র NFA_BACKREF9:
 #ifdef FEAT_SYN_HL
-	case NFA_ZREF1:
-	case NFA_ZREF2:
-	case NFA_ZREF3:
-	case NFA_ZREF4:
-	case NFA_ZREF5:
-	case NFA_ZREF6:
-	case NFA_ZREF7:
-	case NFA_ZREF8:
-	case NFA_ZREF9:
+	ক্ষেত্র NFA_ZREF1:
+	ক্ষেত্র NFA_ZREF2:
+	ক্ষেত্র NFA_ZREF3:
+	ক্ষেত্র NFA_ZREF4:
+	ক্ষেত্র NFA_ZREF5:
+	ক্ষেত্র NFA_ZREF6:
+	ক্ষেত্র NFA_ZREF7:
+	ক্ষেত্র NFA_ZREF8:
+	ক্ষেত্র NFA_ZREF9:
 #endif
-	    if (nfa_calc_size == TRUE)
+	    যদি (nfa_calc_আকার == TRUE)
 	    {
 		nstate += 2;
-		break;
+		বিরতি;
 	    }
-	    s = alloc_state(*p, NULL, NULL);
-	    if (s == NULL)
-		goto theend;
-	    s1 = alloc_state(NFA_SKIP, NULL, NULL);
-	    if (s1 == NULL)
-		goto theend;
+	    s = alloc_state(*p, ফাঁকা, ফাঁকা);
+	    যদি (s == ফাঁকা)
+		যাও theend;
+	    s1 = alloc_state(NFA_SKIP, ফাঁকা, ফাঁকা);
+	    যদি (s1 == ফাঁকা)
+		যাও theend;
 	    patch(list1(&s->out), s1);
-	    PUSH(frag(s, list1(&s1->out)));
-	    break;
+	    ঠেলো_2(frag(s, list1(&s1->out)));
+	    বিরতি;
 
-	case NFA_LNUM:
-	case NFA_LNUM_GT:
-	case NFA_LNUM_LT:
-	case NFA_VCOL:
-	case NFA_VCOL_GT:
-	case NFA_VCOL_LT:
-	case NFA_COL:
-	case NFA_COL_GT:
-	case NFA_COL_LT:
-	case NFA_MARK:
-	case NFA_MARK_GT:
-	case NFA_MARK_LT:
+	ক্ষেত্র NFA_LNUM:
+	ক্ষেত্র NFA_LNUM_GT:
+	ক্ষেত্র NFA_LNUM_LT:
+	ক্ষেত্র NFA_VCOL:
+	ক্ষেত্র NFA_VCOL_GT:
+	ক্ষেত্র NFA_VCOL_LT:
+	ক্ষেত্র NFA_COL:
+	ক্ষেত্র NFA_COL_GT:
+	ক্ষেত্র NFA_COL_LT:
+	ক্ষেত্র NFA_MARK:
+	ক্ষেত্র NFA_MARK_GT:
+	ক্ষেত্র NFA_MARK_LT:
 	  {
-	    int n = *++p; // lnum, col or mark name
+	    পূর্ণসংখ্যা n = *++p; // lnum, col or mark name
 
-	    if (nfa_calc_size == TRUE)
+	    যদি (nfa_calc_আকার == TRUE)
 	    {
 		nstate += 1;
-		break;
+		বিরতি;
 	    }
-	    s = alloc_state(p[-1], NULL, NULL);
-	    if (s == NULL)
-		goto theend;
+	    s = alloc_state(p[-1], ফাঁকা, ফাঁকা);
+	    যদি (s == ফাঁকা)
+		যাও theend;
 	    s->val = n;
-	    PUSH(frag(s, list1(&s->out)));
-	    break;
+	    ঠেলো_2(frag(s, list1(&s->out)));
+	    বিরতি;
 	  }
 
-	case NFA_ZSTART:
-	case NFA_ZEND:
-	default:
+	ক্ষেত্র NFA_ZSTART:
+	ক্ষেত্র NFA_ZEND:
+	পূর্বনির্ধারিত:
 	    // Operands
-	    if (nfa_calc_size == TRUE)
+	    যদি (nfa_calc_আকার == TRUE)
 	    {
 		nstate++;
-		break;
+		বিরতি;
 	    }
-	    s = alloc_state(*p, NULL, NULL);
-	    if (s == NULL)
-		goto theend;
-	    PUSH(frag(s, list1(&s->out)));
-	    break;
+	    s = alloc_state(*p, ফাঁকা, ফাঁকা);
+	    যদি (s == ফাঁকা)
+		যাও theend;
+	    ঠেলো_2(frag(s, list1(&s->out)));
+	    বিরতি;
 
 	} // switch(*p)
 
     } // for (p = postfix; *p; ++p)
 
-    if (nfa_calc_size == TRUE)
+    যদি (nfa_calc_আকার == TRUE)
     {
 	nstate++;
-	goto theend;	// Return value when counting size is ignored anyway
+	যাও theend;	// Return value when counting size is ignored anyway
     }
 
-    e = POP();
-    if (stackp != stack)
-	EMSG_RET_NULL(_(e_nfa_regexp_while_converting_from_postfix_to_nfa_too_many_stats_left_on_stack));
+    e = বের_করো_2();
+    যদি (stackp != স্তূপ)
+	EMSG_RET_NULL(_(e_nfa_regexp_while_converting_from_postfix_to_nfa_too_many_stats_বাম_on_স্তূপ));
 
-    if (istate >= nstate)
+    যদি (istate >= nstate)
 	EMSG_RET_NULL(_(e_nfa_regexp_not_enough_space_to_store_whole_nfa));
 
     matchstate = &state_ptr[istate++]; // the match state
     matchstate->c = NFA_MATCH;
-    matchstate->out = matchstate->out1 = NULL;
+    matchstate->out = matchstate->out1 = ফাঁকা;
     matchstate->id = 0;
 
     patch(e.out, matchstate);
     ret = e.start;
 
 theend:
-    return ret;
+    ফেরত ret;
 
 #undef POP1
 #undef PUSH1
 #undef POP2
 #undef PUSH2
-#undef POP
-#undef PUSH
+#undef বের_করো_2
+#undef ঠেলো_2
 }
 
 /*
  * After building the NFA program, inspect it to add optimization hints.
  */
-    static void
+    স্থির শূন্য
 nfa_postprocess(nfa_regprog_T *prog)
 {
-    int i;
-    int c;
+    পূর্ণসংখ্যা i;
+    পূর্ণসংখ্যা c;
 
-    for (i = 0; i < prog->nstate; ++i)
+    জন্য (i = 0; i < prog->nstate; ++i)
     {
 	c = prog->state[i].c;
-	if (c == NFA_START_INVISIBLE
+	যদি (c == NFA_START_INVISIBLE
 		|| c == NFA_START_INVISIBLE_NEG
 		|| c == NFA_START_INVISIBLE_BEFORE
 		|| c == NFA_START_INVISIBLE_BEFORE_NEG)
 	{
-	    int directly;
+	    পূর্ণসংখ্যা directly;
 
 	    // Do it directly when what follows is possibly the end of the
 	    // match.
-	    if (match_follows(prog->state[i].out1->out, 0))
+	    যদি (match_follows(prog->state[i].out1->out, 0))
 		directly = TRUE;
-	    else
+	    অন্যথা
 	    {
-		int ch_invisible = failure_chance(prog->state[i].out, 0);
-		int ch_follows = failure_chance(prog->state[i].out1->out, 0);
+		পূর্ণসংখ্যা ch_invisible = failure_chance(prog->state[i].out, 0);
+		পূর্ণসংখ্যা ch_follows = failure_chance(prog->state[i].out1->out, 0);
 
 		// Postpone when the invisible match is expensive or has a
 		// lower chance of failing.
-		if (c == NFA_START_INVISIBLE_BEFORE
+		যদি (c == NFA_START_INVISIBLE_BEFORE
 		     || c == NFA_START_INVISIBLE_BEFORE_NEG)
 		{
 		    // "before" matches are very expensive when
 		    // unbounded, always prefer what follows then,
 		    // unless what follows will always match.
 		    // Otherwise strongly prefer what follows.
-		    if (prog->state[i].val <= 0 && ch_follows > 0)
+		    যদি (prog->state[i].val <= 0 && ch_follows > 0)
 			directly = FALSE;
-		    else
+		    অন্যথা
 			directly = ch_follows * 10 < ch_invisible;
 		}
-		else
+		অন্যথা
 		{
 		    // normal invisible, first do the one with the
 		    // highest failure chance
 		    directly = ch_follows < ch_invisible;
 		}
 	    }
-	    if (directly)
+	    যদি (directly)
 		// switch to the _FIRST state
 		++prog->state[i].c;
 	}
@@ -3924,30 +3924,30 @@ nfa_postprocess(nfa_regprog_T *prog)
 // NFA execution code.
 /////////////////////////////////////////////////////////////////
 
-typedef struct
+প্রকারলেখ কাঠামো
 {
-    int	    in_use; // number of subexpr with useful info
+    পূর্ণসংখ্যা	    in_use; // number of subexpr with useful info
 
     // When REG_MULTI is TRUE list.multi is used, otherwise list.line.
-    union
+    সংঘ
     {
-	struct multipos
+	কাঠামো multipos
 	{
 	    linenr_T	start_lnum;
 	    linenr_T	end_lnum;
 	    colnr_T	start_col;
 	    colnr_T	end_col;
 	} multi[NSUBEXP];
-	struct linepos
+	কাঠামো linepos
 	{
 	    char_u	*start;
 	    char_u	*end;
-	} line[NSUBEXP];
+	} সারি[NSUBEXP];
     } list;
     colnr_T	orig_start_col;  // list.multi[0].start_col without \zs
 } regsub_T;
 
-typedef struct
+প্রকারলেখ কাঠামো
 {
     regsub_T	norm; // \( .. \) matches
 #ifdef FEAT_SYN_HL
@@ -3956,13 +3956,13 @@ typedef struct
 } regsubs_T;
 
 // nfa_pim_T stores a Postponed Invisible Match.
-typedef struct nfa_pim_S nfa_pim_T;
-struct nfa_pim_S
+প্রকারলেখ কাঠামো nfa_pim_S nfa_pim_T;
+কাঠামো nfa_pim_S
 {
-    int		result;		// NFA_PIM_*, see below
+    পূর্ণসংখ্যা		ফলাফল;		// NFA_PIM_*, see below
     nfa_state_T	*state;		// the invisible match start state
     regsubs_T	subs;		// submatch info, only party used
-    union
+    সংঘ
     {
 	lpos_T	pos;
 	char_u	*ptr;
@@ -3977,197 +3977,197 @@ struct nfa_pim_S
 
 
 // nfa_thread_T contains execution information of a NFA state
-typedef struct
+প্রকারলেখ কাঠামো
 {
     nfa_state_T	*state;
-    int		count;
+    পূর্ণসংখ্যা		গুনতি;
     nfa_pim_T	pim;		// if pim.result != NFA_PIM_UNUSED: postponed
 				// invisible match
     regsubs_T	subs;		// submatch info, only party used
 } nfa_thread_T;
 
 // nfa_list_T contains the alternative NFA execution states.
-typedef struct
+প্রকারলেখ কাঠামো
 {
     nfa_thread_T    *t;		// allocated array of states
-    int		    n;		// nr of states currently in "t"
-    int		    len;	// max nr of states in "t"
-    int		    id;		// ID of the list
-    int		    has_pim;	// TRUE when any state has a PIM
+    পূর্ণসংখ্যা		    n;		// nr of states currently in "t"
+    পূর্ণসংখ্যা		    len;	// max nr of states in "t"
+    পূর্ণসংখ্যা		    id;		// ID of the list
+    পূর্ণসংখ্যা		    has_pim;	// TRUE when any state has a PIM
 } nfa_list_T;
 
 #ifdef ENABLE_LOG
-static void log_subexpr(regsub_T *sub);
+স্থির শূন্য log_subexpr(regsub_T *sub);
 
-    static void
+    স্থির শূন্য
 log_subsexpr(regsubs_T *subs)
 {
     log_subexpr(&subs->norm);
 # ifdef FEAT_SYN_HL
-    if (rex.nfa_has_zsubexpr)
+    যদি (rex.nfa_has_zsubexpr)
 	log_subexpr(&subs->synt);
 # endif
 }
 
-    static void
+    স্থির শূন্য
 log_subexpr(regsub_T *sub)
 {
-    int j;
+    পূর্ণসংখ্যা j;
 
-    for (j = 0; j < sub->in_use; j++)
-	if (REG_MULTI)
+    জন্য (j = 0; j < sub->in_use; j++)
+	যদি (REG_MULTI)
 	    fprintf(log_fd,
 		    "*** group %d, start: c=%d, l=%d, end: c=%d, l=%d\n",
 		    j,
 		    sub->list.multi[j].start_col,
-		    (int)sub->list.multi[j].start_lnum,
+		    (পূর্ণসংখ্যা)sub->list.multi[j].start_lnum,
 		    sub->list.multi[j].end_col,
-		    (int)sub->list.multi[j].end_lnum);
-	else
+		    (পূর্ণসংখ্যা)sub->list.multi[j].end_lnum);
+	অন্যথা
 	{
-	    char *s = (char *)sub->list.line[j].start;
-	    char *e = (char *)sub->list.line[j].end;
+	    অক্ষর *s = (অক্ষর *)sub->list.সারি[j].start;
+	    অক্ষর *e = (অক্ষর *)sub->list.সারি[j].end;
 
 	    fprintf(log_fd, "*** group %d, start: \"%s\", end: \"%s\"\n",
 		    j,
-		    s == NULL ? "NULL" : s,
-		    e == NULL ? "NULL" : e);
+		    s == ফাঁকা ? "NULL" : s,
+		    e == ফাঁকা ? "NULL" : e);
 	}
 }
 
-    static char *
+    স্থির অক্ষর *
 pim_info(nfa_pim_T *pim)
 {
-    static char buf[30];
+    স্থির অক্ষর buf[30];
 
-    if (pim == NULL || pim->result == NFA_PIM_UNUSED)
+    যদি (pim == ফাঁকা || pim->ফলাফল == NFA_PIM_UNUSED)
 	buf[0] = NUL;
-    else
+    অন্যথা
     {
-	sprintf(buf, " PIM col %d", REG_MULTI ? (int)pim->end.pos.col
-		: (int)(pim->end.ptr - rex.input));
+	sprintf(buf, " PIM col %d", REG_MULTI ? (পূর্ণসংখ্যা)pim->end.pos.col
+		: (পূর্ণসংখ্যা)(pim->end.ptr - rex.প্রবেশ));
     }
-    return buf;
+    ফেরত buf;
 }
 
 #endif
 
 // Used during execution: whether a match has been found.
-static int	    nfa_match;
+স্থির পূর্ণসংখ্যা	    nfa_match;
 #ifdef FEAT_RELTIME
-static int	   *nfa_timed_out;
+স্থির পূর্ণসংখ্যা	   *nfa_timed_out;
 #endif
 
-static inline void copy_sub(regsub_T *to, regsub_T *from);
-static int pim_equal(nfa_pim_T *one, nfa_pim_T *two);
+স্থির অন্তঃরেখ শূন্য copy_sub(regsub_T *to, regsub_T *from);
+স্থির পূর্ণসংখ্যা pim_equal(nfa_pim_T *one, nfa_pim_T *two);
 
 /*
  * Copy postponed invisible match info from "from" to "to".
  */
-    static void
+    স্থির শূন্য
 copy_pim(nfa_pim_T *to, nfa_pim_T *from)
 {
-    to->result = from->result;
+    to->ফলাফল = from->ফলাফল;
     to->state = from->state;
     copy_sub(&to->subs.norm, &from->subs.norm);
 #ifdef FEAT_SYN_HL
-    if (rex.nfa_has_zsubexpr)
+    যদি (rex.nfa_has_zsubexpr)
 	copy_sub(&to->subs.synt, &from->subs.synt);
 #endif
     to->end = from->end;
 }
 
-    static void
+    স্থির শূন্য
 clear_sub(regsub_T *sub)
 {
-    if (REG_MULTI)
+    যদি (REG_MULTI)
 	// Use 0xff to set lnum to -1
 	vim_memset(sub->list.multi, 0xff,
-				  sizeof(struct multipos) * rex.nfa_nsubexpr);
-    else
-	vim_memset(sub->list.line, 0,
-				   sizeof(struct linepos) * rex.nfa_nsubexpr);
+				  আকার(কাঠামো multipos) * rex.nfa_nsubexpr);
+    অন্যথা
+	vim_memset(sub->list.সারি, 0,
+				   আকার(কাঠামো linepos) * rex.nfa_nsubexpr);
     sub->in_use = 0;
 }
 
 /*
  * Copy the submatches from "from" to "to".
  */
-    static inline void
+    স্থির অন্তঃরেখ শূন্য
 copy_sub(regsub_T *to, regsub_T *from)
 {
     to->in_use = from->in_use;
-    if (from->in_use <= 0)
-	return;
+    যদি (from->in_use <= 0)
+	ফেরত;
 
     // Copy the match start and end positions.  addstate() calls this for
     // every state it adds, so it is very hot.  Patterns without capturing
     // groups only use subexpression zero (the whole match), so special-case
     // "in_use == 1" with a direct assignment to avoid the mch_memmove() call.
-    if (REG_MULTI)
+    যদি (REG_MULTI)
     {
-	if (from->in_use == 1)
+	যদি (from->in_use == 1)
 	    to->list.multi[0] = from->list.multi[0];
-	else
+	অন্যথা
 	    mch_memmove(&to->list.multi[0],
 		    &from->list.multi[0],
-		    sizeof(struct multipos) * from->in_use);
+		    আকার(কাঠামো multipos) * from->in_use);
 	to->orig_start_col = from->orig_start_col;
     }
-    else
+    অন্যথা
     {
-	if (from->in_use == 1)
-	    to->list.line[0] = from->list.line[0];
-	else
-	    mch_memmove(&to->list.line[0],
-		    &from->list.line[0],
-		    sizeof(struct linepos) * from->in_use);
+	যদি (from->in_use == 1)
+	    to->list.সারি[0] = from->list.সারি[0];
+	অন্যথা
+	    mch_memmove(&to->list.সারি[0],
+		    &from->list.সারি[0],
+		    আকার(কাঠামো linepos) * from->in_use);
     }
 }
 
 /*
  * Like copy_sub() but exclude the main match.
  */
-    static void
+    স্থির শূন্য
 copy_sub_off(regsub_T *to, regsub_T *from)
 {
-    if (to->in_use < from->in_use)
+    যদি (to->in_use < from->in_use)
 	to->in_use = from->in_use;
-    if (from->in_use <= 1)
-	return;
+    যদি (from->in_use <= 1)
+	ফেরত;
 
     // Copy the match start and end positions.
-    if (REG_MULTI)
+    যদি (REG_MULTI)
 	mch_memmove(&to->list.multi[1],
 		&from->list.multi[1],
-		sizeof(struct multipos) * (from->in_use - 1));
-    else
-	mch_memmove(&to->list.line[1],
-		&from->list.line[1],
-		sizeof(struct linepos) * (from->in_use - 1));
+		আকার(কাঠামো multipos) * (from->in_use - 1));
+    অন্যথা
+	mch_memmove(&to->list.সারি[1],
+		&from->list.সারি[1],
+		আকার(কাঠামো linepos) * (from->in_use - 1));
 }
 
 /*
  * Like copy_sub() but only do the end of the main match if \ze is present.
  */
-    static void
+    স্থির শূন্য
 copy_ze_off(regsub_T *to, regsub_T *from)
 {
-    if (!rex.nfa_has_zend)
-	return;
+    যদি (!rex.nfa_has_zend)
+	ফেরত;
 
-    if (REG_MULTI)
+    যদি (REG_MULTI)
     {
-	if (from->list.multi[0].end_lnum >= 0)
+	যদি (from->list.multi[0].end_lnum >= 0)
 	{
 	    to->list.multi[0].end_lnum = from->list.multi[0].end_lnum;
 	    to->list.multi[0].end_col = from->list.multi[0].end_col;
 	}
     }
-    else
+    অন্যথা
     {
-	if (from->list.line[0].end != NULL)
-	    to->list.line[0].end = from->list.line[0].end;
+	যদি (from->list.সারি[0].end != ফাঁকা)
+	    to->list.সারি[0].end = from->list.সারি[0].end;
     }
 }
 
@@ -4175,115 +4175,115 @@ copy_ze_off(regsub_T *to, regsub_T *from)
  * Return TRUE if "sub1" and "sub2" have the same start positions.
  * When using back-references also check the end position.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 sub_equal(regsub_T *sub1, regsub_T *sub2)
 {
-    int		i;
-    int		todo;
+    পূর্ণসংখ্যা		i;
+    পূর্ণসংখ্যা		todo;
     linenr_T	s1;
     linenr_T	s2;
     char_u	*sp1;
     char_u	*sp2;
 
     todo = sub1->in_use > sub2->in_use ? sub1->in_use : sub2->in_use;
-    if (REG_MULTI)
+    যদি (REG_MULTI)
     {
-	for (i = 0; i < todo; ++i)
+	জন্য (i = 0; i < todo; ++i)
 	{
-	    if (i < sub1->in_use)
+	    যদি (i < sub1->in_use)
 		s1 = sub1->list.multi[i].start_lnum;
-	    else
+	    অন্যথা
 		s1 = -1;
-	    if (i < sub2->in_use)
+	    যদি (i < sub2->in_use)
 		s2 = sub2->list.multi[i].start_lnum;
-	    else
+	    অন্যথা
 		s2 = -1;
-	    if (s1 != s2)
-		return FALSE;
-	    if (s1 != -1 && sub1->list.multi[i].start_col
+	    যদি (s1 != s2)
+		ফেরত FALSE;
+	    যদি (s1 != -1 && sub1->list.multi[i].start_col
 					     != sub2->list.multi[i].start_col)
-		return FALSE;
+		ফেরত FALSE;
 
-	    if (rex.nfa_has_backref)
+	    যদি (rex.nfa_has_backref)
 	    {
-		if (i < sub1->in_use)
+		যদি (i < sub1->in_use)
 		    s1 = sub1->list.multi[i].end_lnum;
-		else
+		অন্যথা
 		    s1 = -1;
-		if (i < sub2->in_use)
+		যদি (i < sub2->in_use)
 		    s2 = sub2->list.multi[i].end_lnum;
-		else
+		অন্যথা
 		    s2 = -1;
-		if (s1 != s2)
-		    return FALSE;
-		if (s1 != -1 && sub1->list.multi[i].end_col
+		যদি (s1 != s2)
+		    ফেরত FALSE;
+		যদি (s1 != -1 && sub1->list.multi[i].end_col
 					       != sub2->list.multi[i].end_col)
-		return FALSE;
+		ফেরত FALSE;
 	    }
 	}
     }
-    else
+    অন্যথা
     {
-	for (i = 0; i < todo; ++i)
+	জন্য (i = 0; i < todo; ++i)
 	{
-	    if (i < sub1->in_use)
-		sp1 = sub1->list.line[i].start;
-	    else
-		sp1 = NULL;
-	    if (i < sub2->in_use)
-		sp2 = sub2->list.line[i].start;
-	    else
-		sp2 = NULL;
-	    if (sp1 != sp2)
-		return FALSE;
-	    if (rex.nfa_has_backref)
+	    যদি (i < sub1->in_use)
+		sp1 = sub1->list.সারি[i].start;
+	    অন্যথা
+		sp1 = ফাঁকা;
+	    যদি (i < sub2->in_use)
+		sp2 = sub2->list.সারি[i].start;
+	    অন্যথা
+		sp2 = ফাঁকা;
+	    যদি (sp1 != sp2)
+		ফেরত FALSE;
+	    যদি (rex.nfa_has_backref)
 	    {
-		if (i < sub1->in_use)
-		    sp1 = sub1->list.line[i].end;
-		else
-		    sp1 = NULL;
-		if (i < sub2->in_use)
-		    sp2 = sub2->list.line[i].end;
-		else
-		    sp2 = NULL;
-		if (sp1 != sp2)
-		    return FALSE;
+		যদি (i < sub1->in_use)
+		    sp1 = sub1->list.সারি[i].end;
+		অন্যথা
+		    sp1 = ফাঁকা;
+		যদি (i < sub2->in_use)
+		    sp2 = sub2->list.সারি[i].end;
+		অন্যথা
+		    sp2 = ফাঁকা;
+		যদি (sp1 != sp2)
+		    ফেরত FALSE;
 	    }
 	}
     }
 
-    return TRUE;
+    ফেরত TRUE;
 }
 
 #ifdef FEAT_RELTIME
 /*
  * Check if we are past the time limit, if there is one.
  */
-    static int
-nfa_did_time_out(void)
+    স্থির পূর্ণসংখ্যা
+nfa_did_time_out(শূন্য)
 {
-    if (*timeout_flag)
+    যদি (*timeout_flag)
     {
-	if (nfa_timed_out != NULL)
+	যদি (nfa_timed_out != ফাঁকা)
 	{
 # ifdef FEAT_EVAL
-	    if (!*nfa_timed_out)
-		ch_log(NULL, "NFA regexp timed out");
+	    যদি (!*nfa_timed_out)
+		ch_log(ফাঁকা, "NFA regexp timed out");
 # endif
 	    *nfa_timed_out = TRUE;
 	}
-	return TRUE;
+	ফেরত TRUE;
     }
-    return FALSE;
+    ফেরত FALSE;
 }
 #endif
 
 #ifdef ENABLE_LOG
-    static void
-open_debug_log(int result)
+    স্থির শূন্য
+open_debug_log(পূর্ণসংখ্যা ফলাফল)
 {
     log_fd = fopen(NFA_REGEXP_RUN_LOG, "a");
-    if (log_fd == NULL)
+    যদি (log_fd == ফাঁকা)
     {
 	emsg(_(e_log_open_failed));
 	log_fd = stderr;
@@ -4291,28 +4291,28 @@ open_debug_log(int result)
 
     fprintf(log_fd, "****************************\n");
     fprintf(log_fd, "FINISHED RUNNING nfa_regmatch() recursively\n");
-    fprintf(log_fd, "MATCH = %s\n", result == TRUE ? "OK" : result == MAYBE
+    fprintf(log_fd, "MATCH = %s\n", ফলাফল == TRUE ? "OK" : ফলাফল == MAYBE
 	    ? "MAYBE" : "FALSE");
     fprintf(log_fd, "****************************\n");
 }
 
-    static void
-report_state(char *action,
+    স্থির শূন্য
+report_state(অক্ষর *action,
 	     regsub_T *sub,
 	     nfa_state_T *state,
-	     int lid,
+	     পূর্ণসংখ্যা lid,
 	     nfa_pim_T *pim)
 {
-    int col;
+    পূর্ণসংখ্যা col;
 
-    if (sub->in_use <= 0)
+    যদি (sub->in_use <= 0)
 	col = -1;
-    else if (REG_MULTI)
+    অন্যথা যদি (REG_MULTI)
 	col = sub->list.multi[0].start_col;
-    else
-	col = (int)(sub->list.line[0].start - rex.line);
+    অন্যথা
+	col = (পূর্ণসংখ্যা)(sub->list.সারি[0].start - rex.সারি);
     nfa_set_code(state->c);
-    if (log_fd == NULL)
+    যদি (log_fd == ফাঁকা)
 	open_debug_log(MAYBE);
 
     fprintf(log_fd, "> %s state %d to list %d. char %d: %s (start col %d)%s\n",
@@ -4325,7 +4325,7 @@ report_state(char *action,
  * Return TRUE if the same state is already in list "l" with the same
  * positions as "subs".
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 has_state_with_pos(
     nfa_list_T		*l,	// runtime state list
     nfa_state_T		*state,	// state to update
@@ -4333,157 +4333,157 @@ has_state_with_pos(
     nfa_pim_T		*pim)	// postponed match or NULL
 {
     nfa_thread_T	*thread;
-    int			i;
+    পূর্ণসংখ্যা			i;
 
-    for (i = 0; i < l->n; ++i)
+    জন্য (i = 0; i < l->n; ++i)
     {
 	thread = &l->t[i];
-	if (thread->state->id == state->id
+	যদি (thread->state->id == state->id
 		&& sub_equal(&thread->subs.norm, &subs->norm)
 #ifdef FEAT_SYN_HL
 		&& (!rex.nfa_has_zsubexpr
 				|| sub_equal(&thread->subs.synt, &subs->synt))
 #endif
 		&& pim_equal(&thread->pim, pim))
-	    return TRUE;
+	    ফেরত TRUE;
     }
-    return FALSE;
+    ফেরত FALSE;
 }
 
 /*
  * Return TRUE if "one" and "two" are equal.  That includes when both are not
  * set.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 pim_equal(nfa_pim_T *one, nfa_pim_T *two)
 {
-    int one_unused = (one == NULL || one->result == NFA_PIM_UNUSED);
-    int two_unused = (two == NULL || two->result == NFA_PIM_UNUSED);
+    পূর্ণসংখ্যা one_unused = (one == ফাঁকা || one->ফলাফল == NFA_PIM_UNUSED);
+    পূর্ণসংখ্যা two_unused = (two == ফাঁকা || two->ফলাফল == NFA_PIM_UNUSED);
 
-    if (one_unused)
+    যদি (one_unused)
 	// one is unused: equal when two is also unused
-	return two_unused;
-    if (two_unused)
+	ফেরত two_unused;
+    যদি (two_unused)
 	// one is used and two is not: not equal
-	return FALSE;
+	ফেরত FALSE;
     // compare the state id
-    if (one->state->id != two->state->id)
-	return FALSE;
+    যদি (one->state->id != two->state->id)
+	ফেরত FALSE;
     // compare the position
-    if (REG_MULTI)
-	return one->end.pos.lnum == two->end.pos.lnum
+    যদি (REG_MULTI)
+	ফেরত one->end.pos.lnum == two->end.pos.lnum
 	    && one->end.pos.col == two->end.pos.col;
-    return one->end.ptr == two->end.ptr;
+    ফেরত one->end.ptr == two->end.ptr;
 }
 
 /*
  * Return TRUE if "state" leads to a NFA_MATCH without advancing the input.
  */
-    static int
-match_follows(nfa_state_T *startstate, int depth)
+    স্থির পূর্ণসংখ্যা
+match_follows(nfa_state_T *startstate, পূর্ণসংখ্যা depth)
 {
     nfa_state_T	    *state = startstate;
 
     // avoid too much recursion
-    if (depth > 10)
-	return FALSE;
+    যদি (depth > 10)
+	ফেরত FALSE;
 
-    while (state != NULL)
+    যখন (state != ফাঁকা)
     {
-	switch (state->c)
+	নির্বাচন (state->c)
 	{
-	    case NFA_MATCH:
-	    case NFA_MCLOSE:
-	    case NFA_END_INVISIBLE:
-	    case NFA_END_INVISIBLE_NEG:
-	    case NFA_END_PATTERN:
-		return TRUE;
+	    ক্ষেত্র NFA_MATCH:
+	    ক্ষেত্র NFA_MCLOSE:
+	    ক্ষেত্র NFA_END_INVISIBLE:
+	    ক্ষেত্র NFA_END_INVISIBLE_NEG:
+	    ক্ষেত্র NFA_END_PATTERN:
+		ফেরত TRUE;
 
-	    case NFA_SPLIT:
-		return match_follows(state->out, depth + 1)
+	    ক্ষেত্র NFA_SPLIT:
+		ফেরত match_follows(state->out, depth + 1)
 				     || match_follows(state->out1, depth + 1);
 
-	    case NFA_START_INVISIBLE:
-	    case NFA_START_INVISIBLE_FIRST:
-	    case NFA_START_INVISIBLE_BEFORE:
-	    case NFA_START_INVISIBLE_BEFORE_FIRST:
-	    case NFA_START_INVISIBLE_NEG:
-	    case NFA_START_INVISIBLE_NEG_FIRST:
-	    case NFA_START_INVISIBLE_BEFORE_NEG:
-	    case NFA_START_INVISIBLE_BEFORE_NEG_FIRST:
-	    case NFA_COMPOSING:
+	    ক্ষেত্র NFA_START_INVISIBLE:
+	    ক্ষেত্র NFA_START_INVISIBLE_FIRST:
+	    ক্ষেত্র NFA_START_INVISIBLE_BEFORE:
+	    ক্ষেত্র NFA_START_INVISIBLE_BEFORE_FIRST:
+	    ক্ষেত্র NFA_START_INVISIBLE_NEG:
+	    ক্ষেত্র NFA_START_INVISIBLE_NEG_FIRST:
+	    ক্ষেত্র NFA_START_INVISIBLE_BEFORE_NEG:
+	    ক্ষেত্র NFA_START_INVISIBLE_BEFORE_NEG_FIRST:
+	    ক্ষেত্র NFA_COMPOSING:
 		// skip ahead to next state
 		state = state->out1->out;
-		continue;
+		চালু;
 
-	    case NFA_ANY:
-	    case NFA_ANY_COMPOSING:
-	    case NFA_IDENT:
-	    case NFA_SIDENT:
-	    case NFA_KWORD:
-	    case NFA_SKWORD:
-	    case NFA_FNAME:
-	    case NFA_SFNAME:
-	    case NFA_PRINT:
-	    case NFA_SPRINT:
-	    case NFA_WHITE:
-	    case NFA_NWHITE:
-	    case NFA_DIGIT:
-	    case NFA_NDIGIT:
-	    case NFA_HEX:
-	    case NFA_NHEX:
-	    case NFA_OCTAL:
-	    case NFA_NOCTAL:
-	    case NFA_WORD:
-	    case NFA_NWORD:
-	    case NFA_HEAD:
-	    case NFA_NHEAD:
-	    case NFA_ALPHA:
-	    case NFA_NALPHA:
-	    case NFA_LOWER:
-	    case NFA_NLOWER:
-	    case NFA_UPPER:
-	    case NFA_NUPPER:
-	    case NFA_LOWER_IC:
-	    case NFA_NLOWER_IC:
-	    case NFA_UPPER_IC:
-	    case NFA_NUPPER_IC:
-	    case NFA_START_COLL:
-	    case NFA_START_NEG_COLL:
-	    case NFA_NEWL:
+	    ক্ষেত্র NFA_ANY:
+	    ক্ষেত্র NFA_ANY_COMPOSING:
+	    ক্ষেত্র NFA_IDENT:
+	    ক্ষেত্র NFA_SIDENT:
+	    ক্ষেত্র NFA_KWORD:
+	    ক্ষেত্র NFA_SKWORD:
+	    ক্ষেত্র NFA_FNAME:
+	    ক্ষেত্র NFA_SFNAME:
+	    ক্ষেত্র NFA_PRINT:
+	    ক্ষেত্র NFA_SPRINT:
+	    ক্ষেত্র NFA_WHITE:
+	    ক্ষেত্র NFA_NWHITE:
+	    ক্ষেত্র NFA_DIGIT:
+	    ক্ষেত্র NFA_NDIGIT:
+	    ক্ষেত্র NFA_HEX:
+	    ক্ষেত্র NFA_NHEX:
+	    ক্ষেত্র NFA_OCTAL:
+	    ক্ষেত্র NFA_NOCTAL:
+	    ক্ষেত্র NFA_WORD:
+	    ক্ষেত্র NFA_NWORD:
+	    ক্ষেত্র NFA_শীর্ষ:
+	    ক্ষেত্র NFA_NHEAD:
+	    ক্ষেত্র NFA_ALPHA:
+	    ক্ষেত্র NFA_NALPHA:
+	    ক্ষেত্র NFA_LOWER:
+	    ক্ষেত্র NFA_NLOWER:
+	    ক্ষেত্র NFA_UPPER:
+	    ক্ষেত্র NFA_NUPPER:
+	    ক্ষেত্র NFA_LOWER_IC:
+	    ক্ষেত্র NFA_NLOWER_IC:
+	    ক্ষেত্র NFA_UPPER_IC:
+	    ক্ষেত্র NFA_NUPPER_IC:
+	    ক্ষেত্র NFA_START_COLL:
+	    ক্ষেত্র NFA_START_NEG_COLL:
+	    ক্ষেত্র NFA_NEWL:
 		// state will advance input
-		return FALSE;
+		ফেরত FALSE;
 
-	    default:
-		if (state->c > 0)
+	    পূর্বনির্ধারিত:
+		যদি (state->c > 0)
 		    // state will advance input
-		    return FALSE;
+		    ফেরত FALSE;
 
 		// Others: zero-width or possibly zero-width, might still find
 		// a match at the same position, keep looking.
-		break;
+		বিরতি;
 	}
 	state = state->out;
     }
-    return FALSE;
+    ফেরত FALSE;
 }
 
 
 /*
  * Return TRUE if "state" is already in list "l".
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 state_in_list(
     nfa_list_T		*l,	// runtime state list
     nfa_state_T		*state,	// state to update
     regsubs_T		*subs)	// pointers to subexpressions
 {
-    if (state->lastlist[nfa_ll_index] == l->id)
+    যদি (state->lastlist[nfa_ll_সূচক] == l->id)
     {
-	if (!rex.nfa_has_backref || has_state_with_pos(l, state, subs, NULL))
-	    return TRUE;
+	যদি (!rex.nfa_has_backref || has_state_with_pos(l, state, subs, ফাঁকা))
+	    ফেরত TRUE;
     }
-    return FALSE;
+    ফেরত FALSE;
 }
 
 // Offset used for "off" by addstate_here().
@@ -4494,212 +4494,212 @@ state_in_list(
  * Returns "subs_arg", possibly copied into temp_subs.
  * Returns NULL when recursiveness is too deep or timed out.
  */
-    static regsubs_T *
+    স্থির regsubs_T *
 addstate(
     nfa_list_T		*l,	    // runtime state list
     nfa_state_T		*state,	    // state to update
     regsubs_T		*subs_arg,  // pointers to subexpressions
     nfa_pim_T		*pim,	    // postponed look-behind match
-    int			off_arg,    // byte offset, when -1 go to next line
-    int			depth)	    // recursion depth
+    পূর্ণসংখ্যা			off_arg,    // byte offset, when -1 go to next line
+    পূর্ণসংখ্যা			depth)	    // recursion depth
 {
-    int			subidx;
-    int			off = off_arg;
-    int			add_here = FALSE;
-    int			listindex = 0;
-    int			k;
-    int			found = FALSE;
+    পূর্ণসংখ্যা			subidx;
+    পূর্ণসংখ্যা			off = off_arg;
+    পূর্ণসংখ্যা			add_here = FALSE;
+    পূর্ণসংখ্যা			listindex = 0;
+    পূর্ণসংখ্যা			k;
+    পূর্ণসংখ্যা			found = FALSE;
     nfa_thread_T	*thread;
-    struct multipos	save_multipos;
-    int			save_in_use;
+    কাঠামো multipos	save_multipos;
+    পূর্ণসংখ্যা			save_in_use;
     char_u		*save_ptr;
-    int			i;
+    পূর্ণসংখ্যা			i;
     regsub_T		*sub;
     regsubs_T		*subs = subs_arg;
-    static regsubs_T	temp_subs;
+    স্থির regsubs_T	অস্থায়ী_subs;
 #ifdef ENABLE_LOG
-    int			did_print = FALSE;
+    পূর্ণসংখ্যা			did_print = FALSE;
 #endif
 
 #ifdef FEAT_RELTIME
-    if (nfa_did_time_out())
-	return NULL;
+    যদি (nfa_did_time_out())
+	ফেরত ফাঁকা;
 #endif
 
     // This function is called recursively.  When the depth is too much we run
     // out of stack and crash, limit recursiveness here.
-    if (depth >= 5000 || subs == NULL)
-	return NULL;
+    যদি (depth >= 5000 || subs == ফাঁকা)
+	ফেরত ফাঁকা;
 
-    if (off_arg <= -ADDSTATE_HERE_OFFSET)
+    যদি (off_arg <= -ADDSTATE_HERE_OFFSET)
     {
 	add_here = TRUE;
 	off = 0;
 	listindex = -(off_arg + ADDSTATE_HERE_OFFSET);
     }
 
-    switch (state->c)
+    নির্বাচন (state->c)
     {
-	case NFA_NCLOSE:
-	case NFA_MCLOSE:
-	case NFA_MCLOSE1:
-	case NFA_MCLOSE2:
-	case NFA_MCLOSE3:
-	case NFA_MCLOSE4:
-	case NFA_MCLOSE5:
-	case NFA_MCLOSE6:
-	case NFA_MCLOSE7:
-	case NFA_MCLOSE8:
-	case NFA_MCLOSE9:
+	ক্ষেত্র NFA_NCLOSE:
+	ক্ষেত্র NFA_MCLOSE:
+	ক্ষেত্র NFA_MCLOSE1:
+	ক্ষেত্র NFA_MCLOSE2:
+	ক্ষেত্র NFA_MCLOSE3:
+	ক্ষেত্র NFA_MCLOSE4:
+	ক্ষেত্র NFA_MCLOSE5:
+	ক্ষেত্র NFA_MCLOSE6:
+	ক্ষেত্র NFA_MCLOSE7:
+	ক্ষেত্র NFA_MCLOSE8:
+	ক্ষেত্র NFA_MCLOSE9:
 #ifdef FEAT_SYN_HL
-	case NFA_ZCLOSE:
-	case NFA_ZCLOSE1:
-	case NFA_ZCLOSE2:
-	case NFA_ZCLOSE3:
-	case NFA_ZCLOSE4:
-	case NFA_ZCLOSE5:
-	case NFA_ZCLOSE6:
-	case NFA_ZCLOSE7:
-	case NFA_ZCLOSE8:
-	case NFA_ZCLOSE9:
+	ক্ষেত্র NFA_ZCLOSE:
+	ক্ষেত্র NFA_ZCLOSE1:
+	ক্ষেত্র NFA_ZCLOSE2:
+	ক্ষেত্র NFA_ZCLOSE3:
+	ক্ষেত্র NFA_ZCLOSE4:
+	ক্ষেত্র NFA_ZCLOSE5:
+	ক্ষেত্র NFA_ZCLOSE6:
+	ক্ষেত্র NFA_ZCLOSE7:
+	ক্ষেত্র NFA_ZCLOSE8:
+	ক্ষেত্র NFA_ZCLOSE9:
 #endif
-	case NFA_MOPEN:
-	case NFA_ZEND:
-	case NFA_SPLIT:
-	case NFA_EMPTY:
+	ক্ষেত্র NFA_MOPEN:
+	ক্ষেত্র NFA_ZEND:
+	ক্ষেত্র NFA_SPLIT:
+	ক্ষেত্র NFA_EMPTY:
 	    // These nodes are not added themselves but their "out" and/or
 	    // "out1" may be added below.
-	    break;
+	    বিরতি;
 
-	case NFA_BOL:
-	case NFA_BOF:
+	ক্ষেত্র NFA_BOL:
+	ক্ষেত্র NFA_BOF:
 	    // "^" won't match past end-of-line, don't bother trying.
 	    // Except when at the end of the line, or when we are going to the
 	    // next line for a look-behind match.
-	    if (rex.input > rex.line
-		    && *rex.input != NUL
-		    && (nfa_endp == NULL
+	    যদি (rex.প্রবেশ > rex.সারি
+		    && *rex.প্রবেশ != NUL
+		    && (nfa_endp == ফাঁকা
 			|| !REG_MULTI
 			|| rex.lnum == nfa_endp->se_u.pos.lnum))
-		goto skip_add;
+		যাও skip_add;
 	    // FALLTHROUGH
 
-	case NFA_MOPEN1:
-	case NFA_MOPEN2:
-	case NFA_MOPEN3:
-	case NFA_MOPEN4:
-	case NFA_MOPEN5:
-	case NFA_MOPEN6:
-	case NFA_MOPEN7:
-	case NFA_MOPEN8:
-	case NFA_MOPEN9:
+	ক্ষেত্র NFA_MOPEN1:
+	ক্ষেত্র NFA_MOPEN2:
+	ক্ষেত্র NFA_MOPEN3:
+	ক্ষেত্র NFA_MOPEN4:
+	ক্ষেত্র NFA_MOPEN5:
+	ক্ষেত্র NFA_MOPEN6:
+	ক্ষেত্র NFA_MOPEN7:
+	ক্ষেত্র NFA_MOPEN8:
+	ক্ষেত্র NFA_MOPEN9:
 #ifdef FEAT_SYN_HL
-	case NFA_ZOPEN:
-	case NFA_ZOPEN1:
-	case NFA_ZOPEN2:
-	case NFA_ZOPEN3:
-	case NFA_ZOPEN4:
-	case NFA_ZOPEN5:
-	case NFA_ZOPEN6:
-	case NFA_ZOPEN7:
-	case NFA_ZOPEN8:
-	case NFA_ZOPEN9:
+	ক্ষেত্র NFA_ZOPEN:
+	ক্ষেত্র NFA_ZOPEN1:
+	ক্ষেত্র NFA_ZOPEN2:
+	ক্ষেত্র NFA_ZOPEN3:
+	ক্ষেত্র NFA_ZOPEN4:
+	ক্ষেত্র NFA_ZOPEN5:
+	ক্ষেত্র NFA_ZOPEN6:
+	ক্ষেত্র NFA_ZOPEN7:
+	ক্ষেত্র NFA_ZOPEN8:
+	ক্ষেত্র NFA_ZOPEN9:
 #endif
-	case NFA_NOPEN:
-	case NFA_ZSTART:
+	ক্ষেত্র NFA_NOPEN:
+	ক্ষেত্র NFA_ZSTART:
 	    // These nodes need to be added so that we can bail out when it
 	    // was added to this list before at the same position to avoid an
 	    // endless loop for "\(\)*"
 
-	default:
-	    if (state->lastlist[nfa_ll_index] == l->id && state->c != NFA_SKIP)
+	পূর্বনির্ধারিত:
+	    যদি (state->lastlist[nfa_ll_সূচক] == l->id && state->c != NFA_SKIP)
 	    {
 		// This state is already in the list, don't add it again,
 		// unless it is an MOPEN that is used for a backreference or
 		// when there is a PIM. For NFA_MATCH check the position,
 		// lower position is preferred.
-		if (!rex.nfa_has_backref && pim == NULL && !l->has_pim
+		যদি (!rex.nfa_has_backref && pim == ফাঁকা && !l->has_pim
 						     && state->c != NFA_MATCH)
 		{
 		    // When called from addstate_here() do insert before
 		    // existing states.
-		    if (add_here)
+		    যদি (add_here)
 		    {
-			for (k = 0; k < l->n && k < listindex; ++k)
-			    if (l->t[k].state->id == state->id)
+			জন্য (k = 0; k < l->n && k < listindex; ++k)
+			    যদি (l->t[k].state->id == state->id)
 			    {
 				found = TRUE;
-				break;
+				বিরতি;
 			    }
 		    }
-		    if (!add_here || found)
+		    যদি (!add_here || found)
 		    {
 skip_add:
 #ifdef ENABLE_LOG
 			nfa_set_code(state->c);
 			fprintf(log_fd, "> Not adding state %d to list %d. char %d: %s pim: %s has_pim: %d found: %d\n",
 			    abs(state->id), l->id, state->c, code,
-			    pim == NULL ? "NULL" : "yes", l->has_pim, found);
+			    pim == ফাঁকা ? "NULL" : "yes", l->has_pim, found);
 #endif
-			return subs;
+			ফেরত subs;
 		    }
 		}
 
 		// Do not add the state again when it exists with the same
 		// positions.
-		if (has_state_with_pos(l, state, subs, pim))
-		    goto skip_add;
+		যদি (has_state_with_pos(l, state, subs, pim))
+		    যাও skip_add;
 	    }
 
 	    // When there are backreferences or PIMs the number of states may
 	    // be (a lot) bigger than anticipated.
-	    if (l->n == l->len)
+	    যদি (l->n == l->len)
 	    {
-		int		newlen = l->len * 3 / 2 + 50;
-		size_t		newsize = newlen * sizeof(nfa_thread_T);
+		পূর্ণসংখ্যা		newlen = l->len * 3 / 2 + 50;
+		size_t		newsize = newlen * আকার(nfa_thread_T);
 		nfa_thread_T	*newt;
 
-		if ((long)(newsize >> 10) >= p_mmp)
+		যদি ((long)(newsize >> 10) >= p_mmp)
 		{
 		    emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
-		    return NULL;
+		    ফেরত ফাঁকা;
 		}
-		if (subs != &temp_subs)
+		যদি (subs != &অস্থায়ী_subs)
 		{
 		    // "subs" may point into the current array, need to make a
 		    // copy before it becomes invalid.
-		    copy_sub(&temp_subs.norm, &subs->norm);
+		    copy_sub(&অস্থায়ী_subs.norm, &subs->norm);
 #ifdef FEAT_SYN_HL
-		    if (rex.nfa_has_zsubexpr)
-			copy_sub(&temp_subs.synt, &subs->synt);
+		    যদি (rex.nfa_has_zsubexpr)
+			copy_sub(&অস্থায়ী_subs.synt, &subs->synt);
 #endif
-		    subs = &temp_subs;
+		    subs = &অস্থায়ী_subs;
 		}
 
 		newt = vim_realloc(l->t, newsize);
-		if (newt == NULL)
+		যদি (newt == ফাঁকা)
 		{
 		    // out of memory
-		    return NULL;
+		    ফেরত ফাঁকা;
 		}
 		l->t = newt;
 		l->len = newlen;
 	    }
 
 	    // add the state to the list
-	    state->lastlist[nfa_ll_index] = l->id;
+	    state->lastlist[nfa_ll_সূচক] = l->id;
 	    thread = &l->t[l->n++];
 	    thread->state = state;
-	    if (pim == NULL)
-		thread->pim.result = NFA_PIM_UNUSED;
-	    else
+	    যদি (pim == ফাঁকা)
+		thread->pim.ফলাফল = NFA_PIM_UNUSED;
+	    অন্যথা
 	    {
 		copy_pim(&thread->pim, pim);
 		l->has_pim = TRUE;
 	    }
 	    copy_sub(&thread->subs.norm, &subs->norm);
 #ifdef FEAT_SYN_HL
-	    if (rex.nfa_has_zsubexpr)
+	    যদি (rex.nfa_has_zsubexpr)
 		copy_sub(&thread->subs.synt, &subs->synt);
 #endif
 #ifdef ENABLE_LOG
@@ -4709,190 +4709,190 @@ skip_add:
     }
 
 #ifdef ENABLE_LOG
-    if (!did_print)
+    যদি (!did_print)
 	report_state("Processing", &subs->norm, state, l->id, pim);
 #endif
-    switch (state->c)
+    নির্বাচন (state->c)
     {
-	case NFA_MATCH:
-	    break;
+	ক্ষেত্র NFA_MATCH:
+	    বিরতি;
 
-	case NFA_SPLIT:
+	ক্ষেত্র NFA_SPLIT:
 	    // order matters here
 	    subs = addstate(l, state->out, subs, pim, off_arg, depth + 1);
 	    subs = addstate(l, state->out1, subs, pim, off_arg, depth + 1);
-	    break;
+	    বিরতি;
 
-	case NFA_EMPTY:
-	case NFA_NOPEN:
-	case NFA_NCLOSE:
+	ক্ষেত্র NFA_EMPTY:
+	ক্ষেত্র NFA_NOPEN:
+	ক্ষেত্র NFA_NCLOSE:
 	    subs = addstate(l, state->out, subs, pim, off_arg, depth + 1);
-	    break;
+	    বিরতি;
 
-	case NFA_MOPEN:
-	case NFA_MOPEN1:
-	case NFA_MOPEN2:
-	case NFA_MOPEN3:
-	case NFA_MOPEN4:
-	case NFA_MOPEN5:
-	case NFA_MOPEN6:
-	case NFA_MOPEN7:
-	case NFA_MOPEN8:
-	case NFA_MOPEN9:
+	ক্ষেত্র NFA_MOPEN:
+	ক্ষেত্র NFA_MOPEN1:
+	ক্ষেত্র NFA_MOPEN2:
+	ক্ষেত্র NFA_MOPEN3:
+	ক্ষেত্র NFA_MOPEN4:
+	ক্ষেত্র NFA_MOPEN5:
+	ক্ষেত্র NFA_MOPEN6:
+	ক্ষেত্র NFA_MOPEN7:
+	ক্ষেত্র NFA_MOPEN8:
+	ক্ষেত্র NFA_MOPEN9:
 #ifdef FEAT_SYN_HL
-	case NFA_ZOPEN:
-	case NFA_ZOPEN1:
-	case NFA_ZOPEN2:
-	case NFA_ZOPEN3:
-	case NFA_ZOPEN4:
-	case NFA_ZOPEN5:
-	case NFA_ZOPEN6:
-	case NFA_ZOPEN7:
-	case NFA_ZOPEN8:
-	case NFA_ZOPEN9:
+	ক্ষেত্র NFA_ZOPEN:
+	ক্ষেত্র NFA_ZOPEN1:
+	ক্ষেত্র NFA_ZOPEN2:
+	ক্ষেত্র NFA_ZOPEN3:
+	ক্ষেত্র NFA_ZOPEN4:
+	ক্ষেত্র NFA_ZOPEN5:
+	ক্ষেত্র NFA_ZOPEN6:
+	ক্ষেত্র NFA_ZOPEN7:
+	ক্ষেত্র NFA_ZOPEN8:
+	ক্ষেত্র NFA_ZOPEN9:
 #endif
-	case NFA_ZSTART:
-	    if (state->c == NFA_ZSTART)
+	ক্ষেত্র NFA_ZSTART:
+	    যদি (state->c == NFA_ZSTART)
 	    {
 		subidx = 0;
 		sub = &subs->norm;
 	    }
 #ifdef FEAT_SYN_HL
-	    else if (state->c >= NFA_ZOPEN && state->c <= NFA_ZOPEN9)
+	    অন্যথা যদি (state->c >= NFA_ZOPEN && state->c <= NFA_ZOPEN9)
 	    {
 		subidx = state->c - NFA_ZOPEN;
 		sub = &subs->synt;
 	    }
 #endif
-	    else
+	    অন্যথা
 	    {
 		subidx = state->c - NFA_MOPEN;
 		sub = &subs->norm;
 	    }
 
 	    // avoid compiler warnings
-	    save_ptr = NULL;
+	    save_ptr = ফাঁকা;
 	    CLEAR_FIELD(save_multipos);
 
 	    // Set the position (with "off" added) in the subexpression.  Save
 	    // and restore it when it was in use.  Otherwise fill any gap.
-	    if (REG_MULTI)
+	    যদি (REG_MULTI)
 	    {
-		if (subidx < sub->in_use)
+		যদি (subidx < sub->in_use)
 		{
 		    save_multipos = sub->list.multi[subidx];
 		    save_in_use = -1;
 		}
-		else
+		অন্যথা
 		{
 		    save_in_use = sub->in_use;
-		    for (i = sub->in_use; i < subidx; ++i)
+		    জন্য (i = sub->in_use; i < subidx; ++i)
 		    {
 			sub->list.multi[i].start_lnum = -1;
 			sub->list.multi[i].end_lnum = -1;
 		    }
 		    sub->in_use = subidx + 1;
 		}
-		if (off == -1)
+		যদি (off == -1)
 		{
 		    sub->list.multi[subidx].start_lnum = rex.lnum + 1;
 		    sub->list.multi[subidx].start_col = 0;
 		}
-		else
+		অন্যথা
 		{
 		    sub->list.multi[subidx].start_lnum = rex.lnum;
 		    sub->list.multi[subidx].start_col =
-					 (colnr_T)(rex.input - rex.line + off);
+					 (colnr_T)(rex.প্রবেশ - rex.সারি + off);
 		}
 		sub->list.multi[subidx].end_lnum = -1;
 	    }
-	    else
+	    অন্যথা
 	    {
-		if (subidx < sub->in_use)
+		যদি (subidx < sub->in_use)
 		{
-		    save_ptr = sub->list.line[subidx].start;
+		    save_ptr = sub->list.সারি[subidx].start;
 		    save_in_use = -1;
 		}
-		else
+		অন্যথা
 		{
 		    save_in_use = sub->in_use;
-		    for (i = sub->in_use; i < subidx; ++i)
+		    জন্য (i = sub->in_use; i < subidx; ++i)
 		    {
-			sub->list.line[i].start = NULL;
-			sub->list.line[i].end = NULL;
+			sub->list.সারি[i].start = ফাঁকা;
+			sub->list.সারি[i].end = ফাঁকা;
 		    }
 		    sub->in_use = subidx + 1;
 		}
-		sub->list.line[subidx].start = rex.input + off;
+		sub->list.সারি[subidx].start = rex.প্রবেশ + off;
 	    }
 
 	    subs = addstate(l, state->out, subs, pim, off_arg, depth + 1);
-	    if (subs == NULL)
-		break;
+	    যদি (subs == ফাঁকা)
+		বিরতি;
 	    // "subs" may have changed, need to set "sub" again
 #ifdef FEAT_SYN_HL
-	    if (state->c >= NFA_ZOPEN && state->c <= NFA_ZOPEN9)
+	    যদি (state->c >= NFA_ZOPEN && state->c <= NFA_ZOPEN9)
 		sub = &subs->synt;
-	    else
+	    অন্যথা
 #endif
 		sub = &subs->norm;
 
-	    if (save_in_use == -1)
+	    যদি (save_in_use == -1)
 	    {
-		if (REG_MULTI)
+		যদি (REG_MULTI)
 		    sub->list.multi[subidx] = save_multipos;
-		else
-		    sub->list.line[subidx].start = save_ptr;
+		অন্যথা
+		    sub->list.সারি[subidx].start = save_ptr;
 	    }
-	    else
+	    অন্যথা
 		sub->in_use = save_in_use;
-	    break;
+	    বিরতি;
 
-	case NFA_MCLOSE:
-	    if (rex.nfa_has_zend && (REG_MULTI
+	ক্ষেত্র NFA_MCLOSE:
+	    যদি (rex.nfa_has_zend && (REG_MULTI
 			? subs->norm.list.multi[0].end_lnum >= 0
-			: subs->norm.list.line[0].end != NULL))
+			: subs->norm.list.সারি[0].end != ফাঁকা))
 	    {
 		// Do not overwrite the position set by \ze.
 		subs = addstate(l, state->out, subs, pim, off_arg, depth + 1);
-		break;
+		বিরতি;
 	    }
 	    // FALLTHROUGH
-	case NFA_MCLOSE1:
-	case NFA_MCLOSE2:
-	case NFA_MCLOSE3:
-	case NFA_MCLOSE4:
-	case NFA_MCLOSE5:
-	case NFA_MCLOSE6:
-	case NFA_MCLOSE7:
-	case NFA_MCLOSE8:
-	case NFA_MCLOSE9:
+	ক্ষেত্র NFA_MCLOSE1:
+	ক্ষেত্র NFA_MCLOSE2:
+	ক্ষেত্র NFA_MCLOSE3:
+	ক্ষেত্র NFA_MCLOSE4:
+	ক্ষেত্র NFA_MCLOSE5:
+	ক্ষেত্র NFA_MCLOSE6:
+	ক্ষেত্র NFA_MCLOSE7:
+	ক্ষেত্র NFA_MCLOSE8:
+	ক্ষেত্র NFA_MCLOSE9:
 #ifdef FEAT_SYN_HL
-	case NFA_ZCLOSE:
-	case NFA_ZCLOSE1:
-	case NFA_ZCLOSE2:
-	case NFA_ZCLOSE3:
-	case NFA_ZCLOSE4:
-	case NFA_ZCLOSE5:
-	case NFA_ZCLOSE6:
-	case NFA_ZCLOSE7:
-	case NFA_ZCLOSE8:
-	case NFA_ZCLOSE9:
+	ক্ষেত্র NFA_ZCLOSE:
+	ক্ষেত্র NFA_ZCLOSE1:
+	ক্ষেত্র NFA_ZCLOSE2:
+	ক্ষেত্র NFA_ZCLOSE3:
+	ক্ষেত্র NFA_ZCLOSE4:
+	ক্ষেত্র NFA_ZCLOSE5:
+	ক্ষেত্র NFA_ZCLOSE6:
+	ক্ষেত্র NFA_ZCLOSE7:
+	ক্ষেত্র NFA_ZCLOSE8:
+	ক্ষেত্র NFA_ZCLOSE9:
 #endif
-	case NFA_ZEND:
-	    if (state->c == NFA_ZEND)
+	ক্ষেত্র NFA_ZEND:
+	    যদি (state->c == NFA_ZEND)
 	    {
 		subidx = 0;
 		sub = &subs->norm;
 	    }
 #ifdef FEAT_SYN_HL
-	    else if (state->c >= NFA_ZCLOSE && state->c <= NFA_ZCLOSE9)
+	    অন্যথা যদি (state->c >= NFA_ZCLOSE && state->c <= NFA_ZCLOSE9)
 	    {
 		subidx = state->c - NFA_ZCLOSE;
 		sub = &subs->synt;
 	    }
 #endif
-	    else
+	    অন্যথা
 	    {
 		subidx = state->c - NFA_MCLOSE;
 		sub = &subs->norm;
@@ -4901,52 +4901,52 @@ skip_add:
 	    // We don't fill in gaps here, there must have been an MOPEN that
 	    // has done that.
 	    save_in_use = sub->in_use;
-	    if (sub->in_use <= subidx)
+	    যদি (sub->in_use <= subidx)
 		sub->in_use = subidx + 1;
-	    if (REG_MULTI)
+	    যদি (REG_MULTI)
 	    {
 		save_multipos = sub->list.multi[subidx];
-		if (off == -1)
+		যদি (off == -1)
 		{
 		    sub->list.multi[subidx].end_lnum = rex.lnum + 1;
 		    sub->list.multi[subidx].end_col = 0;
 		}
-		else
+		অন্যথা
 		{
 		    sub->list.multi[subidx].end_lnum = rex.lnum;
 		    sub->list.multi[subidx].end_col =
-					  (colnr_T)(rex.input - rex.line + off);
+					  (colnr_T)(rex.প্রবেশ - rex.সারি + off);
 		}
 		// avoid compiler warnings
-		save_ptr = NULL;
+		save_ptr = ফাঁকা;
 	    }
-	    else
+	    অন্যথা
 	    {
-		save_ptr = sub->list.line[subidx].end;
-		sub->list.line[subidx].end = rex.input + off;
+		save_ptr = sub->list.সারি[subidx].end;
+		sub->list.সারি[subidx].end = rex.প্রবেশ + off;
 		// avoid compiler warnings
 		CLEAR_FIELD(save_multipos);
 	    }
 
 	    subs = addstate(l, state->out, subs, pim, off_arg, depth + 1);
-	    if (subs == NULL)
-		break;
+	    যদি (subs == ফাঁকা)
+		বিরতি;
 	    // "subs" may have changed, need to set "sub" again
 #ifdef FEAT_SYN_HL
-	    if (state->c >= NFA_ZCLOSE && state->c <= NFA_ZCLOSE9)
+	    যদি (state->c >= NFA_ZCLOSE && state->c <= NFA_ZCLOSE9)
 		sub = &subs->synt;
-	    else
+	    অন্যথা
 #endif
 		sub = &subs->norm;
 
-	    if (REG_MULTI)
+	    যদি (REG_MULTI)
 		sub->list.multi[subidx] = save_multipos;
-	    else
-		sub->list.line[subidx].end = save_ptr;
+	    অন্যথা
+		sub->list.সারি[subidx].end = save_ptr;
 	    sub->in_use = save_in_use;
-	    break;
+	    বিরতি;
     }
-    return subs;
+    ফেরত subs;
 }
 
 /*
@@ -4955,242 +4955,242 @@ skip_add:
  * This makes sure the order of states to be tried does not change, which
  * matters for alternatives.
  */
-    static regsubs_T *
+    স্থির regsubs_T *
 addstate_here(
     nfa_list_T		*l,	// runtime state list
     nfa_state_T		*state,	// state to update
     regsubs_T		*subs,	// pointers to subexpressions
     nfa_pim_T		*pim,   // postponed look-behind match
-    int			*ip)
+    পূর্ণসংখ্যা			*ip)
 {
-    int tlen = l->n;
-    int count;
-    int listidx = *ip;
+    পূর্ণসংখ্যা tlen = l->n;
+    পূর্ণসংখ্যা গুনতি;
+    পূর্ণসংখ্যা listidx = *ip;
     regsubs_T *r;
 
     // First add the state(s) at the end, so that we know how many there are.
     // Pass the listidx as offset (avoids adding another argument to
     // addstate()).
     r = addstate(l, state, subs, pim, -listidx - ADDSTATE_HERE_OFFSET, 0);
-    if (r == NULL)
-	return NULL;
+    যদি (r == ফাঁকা)
+	ফেরত ফাঁকা;
 
     // when "*ip" was at the end of the list, nothing to do
-    if (listidx + 1 == tlen)
-	return r;
+    যদি (listidx + 1 == tlen)
+	ফেরত r;
 
     // re-order to put the new state at the current position
-    count = l->n - tlen;
-    if (count == 0)
-	return r; // no state got added
-    if (count == 1)
+    গুনতি = l->n - tlen;
+    যদি (গুনতি == 0)
+	ফেরত r; // no state got added
+    যদি (গুনতি == 1)
     {
 	// overwrite the current state
 	l->t[listidx] = l->t[l->n - 1];
     }
-    else if (count > 1)
+    অন্যথা যদি (গুনতি > 1)
     {
-	if (l->n + count - 1 >= l->len)
+	যদি (l->n + গুনতি - 1 >= l->len)
 	{
 	    // not enough space to move the new states, reallocate the list
 	    // and move the states to the right position
-	    int		    newlen = l->len * 3 / 2 + 50;
-	    size_t	    newsize = newlen * sizeof(nfa_thread_T);
+	    পূর্ণসংখ্যা		    newlen = l->len * 3 / 2 + 50;
+	    size_t	    newsize = newlen * আকার(nfa_thread_T);
 	    nfa_thread_T    *newl;
 
-	    if ((long)(newsize >> 10) >= p_mmp)
+	    যদি ((long)(newsize >> 10) >= p_mmp)
 	    {
 		emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
-		return NULL;
+		ফেরত ফাঁকা;
 	    }
 	    newl = alloc(newsize);
-	    if (newl == NULL)
-		return NULL;
+	    যদি (newl == ফাঁকা)
+		ফেরত ফাঁকা;
 	    l->len = newlen;
 	    mch_memmove(&(newl[0]),
 		    &(l->t[0]),
-		    sizeof(nfa_thread_T) * listidx);
+		    আকার(nfa_thread_T) * listidx);
 	    mch_memmove(&(newl[listidx]),
-		    &(l->t[l->n - count]),
-		    sizeof(nfa_thread_T) * count);
-	    mch_memmove(&(newl[listidx + count]),
+		    &(l->t[l->n - গুনতি]),
+		    আকার(nfa_thread_T) * গুনতি);
+	    mch_memmove(&(newl[listidx + গুনতি]),
 		    &(l->t[listidx + 1]),
-		    sizeof(nfa_thread_T) * (l->n - count - listidx - 1));
+		    আকার(nfa_thread_T) * (l->n - গুনতি - listidx - 1));
 	    vim_free(l->t);
 	    l->t = newl;
 	}
-	else
+	অন্যথা
 	{
 	    // make space for new states, then move them from the
 	    // end to the current position
-	    mch_memmove(&(l->t[listidx + count]),
+	    mch_memmove(&(l->t[listidx + গুনতি]),
 		    &(l->t[listidx + 1]),
-		    sizeof(nfa_thread_T) * (l->n - listidx - 1));
+		    আকার(nfa_thread_T) * (l->n - listidx - 1));
 	    mch_memmove(&(l->t[listidx]),
 		    &(l->t[l->n - 1]),
-		    sizeof(nfa_thread_T) * count);
+		    আকার(nfa_thread_T) * গুনতি);
 	}
     }
     --l->n;
     *ip = listidx - 1;
 
-    return r;
+    ফেরত r;
 }
 
 /*
  * Check character class "class" against current character c.
  */
-    static int
-check_char_class(int class, int c)
+    স্থির পূর্ণসংখ্যা
+check_char_class(পূর্ণসংখ্যা class, পূর্ণসংখ্যা c)
 {
-    switch (class)
+    নির্বাচন (class)
     {
-	case NFA_CLASS_ALNUM:
-	    if (c >= 1 && c < 128 && isalnum(c))
-		return OK;
-	    break;
-	case NFA_CLASS_ALPHA:
-	    if (c >= 1 && c < 128 && isalpha(c))
-		return OK;
-	    break;
-	case NFA_CLASS_BLANK:
-	    if (c == ' ' || c == '\t')
-		return OK;
-	    break;
-	case NFA_CLASS_CNTRL:
-	    if (c >= 1 && c <= 127 && iscntrl(c))
-		return OK;
-	    break;
-	case NFA_CLASS_DIGIT:
-	    if (VIM_ISDIGIT(c))
-		return OK;
-	    break;
-	case NFA_CLASS_GRAPH:
-	    if (c >= 1 && c <= 127 && isgraph(c))
-		return OK;
-	    break;
-	case NFA_CLASS_LOWER:
-	    if (MB_ISLOWER(c) && c != 170 && c != 186)
-		return OK;
-	    break;
-	case NFA_CLASS_PRINT:
-	    if (vim_isprintc(c))
-		return OK;
-	    break;
-	case NFA_CLASS_PUNCT:
-	    if (c >= 1 && c < 128 && ispunct(c))
-		return OK;
-	    break;
-	case NFA_CLASS_SPACE:
-	    if ((c >= 9 && c <= 13) || (c == ' '))
-		return OK;
-	    break;
-	case NFA_CLASS_UPPER:
-	    if (MB_ISUPPER(c))
-		return OK;
-	    break;
-	case NFA_CLASS_XDIGIT:
-	    if (vim_isxdigit(c))
-		return OK;
-	    break;
-	case NFA_CLASS_TAB:
-	    if (c == '\t')
-		return OK;
-	    break;
-	case NFA_CLASS_RETURN:
-	    if (c == '\r')
-		return OK;
-	    break;
-	case NFA_CLASS_BACKSPACE:
-	    if (c == '\b')
-		return OK;
-	    break;
-	case NFA_CLASS_ESCAPE:
-	    if (c == '\033')
-		return OK;
-	    break;
-	case NFA_CLASS_IDENT:
-	    if (vim_isIDc(c))
-		return OK;
-	    break;
-	case NFA_CLASS_KEYWORD:
-	    if (reg_iswordc(c))
-		return OK;
-	    break;
-	case NFA_CLASS_FNAME:
-	    if (vim_isfilec(c))
-		return OK;
-	    break;
+	ক্ষেত্র NFA_CLASS_ALNUM:
+	    যদি (c >= 1 && c < 128 && isalnum(c))
+		ফেরত OK;
+	    বিরতি;
+	ক্ষেত্র NFA_CLASS_ALPHA:
+	    যদি (c >= 1 && c < 128 && isalpha(c))
+		ফেরত OK;
+	    বিরতি;
+	ক্ষেত্র NFA_CLASS_BLANK:
+	    যদি (c == ' ' || c == '\t')
+		ফেরত OK;
+	    বিরতি;
+	ক্ষেত্র NFA_CLASS_CNTRL:
+	    যদি (c >= 1 && c <= 127 && iscntrl(c))
+		ফেরত OK;
+	    বিরতি;
+	ক্ষেত্র NFA_CLASS_DIGIT:
+	    যদি (VIM_ISDIGIT(c))
+		ফেরত OK;
+	    বিরতি;
+	ক্ষেত্র NFA_CLASS_GRAPH:
+	    যদি (c >= 1 && c <= 127 && isgraph(c))
+		ফেরত OK;
+	    বিরতি;
+	ক্ষেত্র NFA_CLASS_LOWER:
+	    যদি (MB_ISLOWER(c) && c != 170 && c != 186)
+		ফেরত OK;
+	    বিরতি;
+	ক্ষেত্র NFA_CLASS_PRINT:
+	    যদি (vim_isprintc(c))
+		ফেরত OK;
+	    বিরতি;
+	ক্ষেত্র NFA_CLASS_PUNCT:
+	    যদি (c >= 1 && c < 128 && ispunct(c))
+		ফেরত OK;
+	    বিরতি;
+	ক্ষেত্র NFA_CLASS_SPACE:
+	    যদি ((c >= 9 && c <= 13) || (c == ' '))
+		ফেরত OK;
+	    বিরতি;
+	ক্ষেত্র NFA_CLASS_UPPER:
+	    যদি (MB_ISUPPER(c))
+		ফেরত OK;
+	    বিরতি;
+	ক্ষেত্র NFA_CLASS_XDIGIT:
+	    যদি (vim_isxdigit(c))
+		ফেরত OK;
+	    বিরতি;
+	ক্ষেত্র NFA_CLASS_TAB:
+	    যদি (c == '\t')
+		ফেরত OK;
+	    বিরতি;
+	ক্ষেত্র NFA_CLASS_RETURN:
+	    যদি (c == '\r')
+		ফেরত OK;
+	    বিরতি;
+	ক্ষেত্র NFA_CLASS_BACKSPACE:
+	    যদি (c == '\b')
+		ফেরত OK;
+	    বিরতি;
+	ক্ষেত্র NFA_CLASS_ESCAPE:
+	    যদি (c == '\033')
+		ফেরত OK;
+	    বিরতি;
+	ক্ষেত্র NFA_CLASS_IDENT:
+	    যদি (vim_isIDc(c))
+		ফেরত OK;
+	    বিরতি;
+	ক্ষেত্র NFA_CLASS_KEYWORD:
+	    যদি (reg_iswordc(c))
+		ফেরত OK;
+	    বিরতি;
+	ক্ষেত্র NFA_CLASS_FNAME:
+	    যদি (vim_isfilec(c))
+		ফেরত OK;
+	    বিরতি;
 
-	default:
+	পূর্বনির্ধারিত:
 	    // should not be here :P
 	    siemsg(_(e_nfa_regexp_invalid_character_class_nr), class);
-	    return FAIL;
+	    ফেরত FAIL;
     }
-    return FAIL;
+    ফেরত FAIL;
 }
 
 /*
  * Check for a match with subexpression "subidx".
  * Return TRUE if it matches.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 match_backref(
     regsub_T	*sub,	    // pointers to subexpressions
-    int		subidx,
-    int		*bytelen)   // out: length of match in bytes
+    পূর্ণসংখ্যা		subidx,
+    পূর্ণসংখ্যা		*bytelen)   // out: length of match in bytes
 {
-    int		len;
+    পূর্ণসংখ্যা		len;
 
-    if (sub->in_use <= subidx)
+    যদি (sub->in_use <= subidx)
     {
 retempty:
 	// backref was not set, match an empty string
 	*bytelen = 0;
-	return TRUE;
+	ফেরত TRUE;
     }
 
-    if (REG_MULTI)
+    যদি (REG_MULTI)
     {
-	if (sub->list.multi[subidx].start_lnum < 0
+	যদি (sub->list.multi[subidx].start_lnum < 0
 				       || sub->list.multi[subidx].end_lnum < 0)
-	    goto retempty;
-	if (sub->list.multi[subidx].start_lnum == rex.lnum
+	    যাও retempty;
+	যদি (sub->list.multi[subidx].start_lnum == rex.lnum
 			       && sub->list.multi[subidx].end_lnum == rex.lnum)
 	{
 	    len = sub->list.multi[subidx].end_col
 					  - sub->list.multi[subidx].start_col;
-	    if (cstrncmp(rex.line + sub->list.multi[subidx].start_col,
-							 rex.input, &len) == 0)
+	    যদি (cstrncmp(rex.সারি + sub->list.multi[subidx].start_col,
+							 rex.প্রবেশ, &len) == 0)
 	    {
 		*bytelen = len;
-		return TRUE;
+		ফেরত TRUE;
 	    }
 	}
-	else
+	অন্যথা
 	{
-	    if (match_with_backref(
+	    যদি (match_with_backref(
 			sub->list.multi[subidx].start_lnum,
 			sub->list.multi[subidx].start_col,
 			sub->list.multi[subidx].end_lnum,
 			sub->list.multi[subidx].end_col,
 			bytelen) == RA_MATCH)
-		return TRUE;
+		ফেরত TRUE;
 	}
     }
-    else
+    অন্যথা
     {
-	if (sub->list.line[subidx].start == NULL
-					|| sub->list.line[subidx].end == NULL)
-	    goto retempty;
-	len = (int)(sub->list.line[subidx].end - sub->list.line[subidx].start);
-	if (cstrncmp(sub->list.line[subidx].start, rex.input, &len) == 0)
+	যদি (sub->list.সারি[subidx].start == ফাঁকা
+					|| sub->list.সারি[subidx].end == ফাঁকা)
+	    যাও retempty;
+	len = (পূর্ণসংখ্যা)(sub->list.সারি[subidx].end - sub->list.সারি[subidx].start);
+	যদি (cstrncmp(sub->list.সারি[subidx].start, rex.প্রবেশ, &len) == 0)
 	{
 	    *bytelen = len;
-	    return TRUE;
+	    ফেরত TRUE;
 	}
     }
-    return FALSE;
+    ফেরত FALSE;
 }
 
 #ifdef FEAT_SYN_HL
@@ -5199,28 +5199,28 @@ retempty:
  * Check for a match with \z subexpression "subidx".
  * Return TRUE if it matches.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 match_zref(
-    int		subidx,
-    int		*bytelen)   // out: length of match in bytes
+    পূর্ণসংখ্যা		subidx,
+    পূর্ণসংখ্যা		*bytelen)   // out: length of match in bytes
 {
-    int		len;
+    পূর্ণসংখ্যা		len;
 
     cleanup_zsubexpr();
-    if (re_extmatch_in == NULL || re_extmatch_in->matches[subidx] == NULL)
+    যদি (re_extmatch_in == ফাঁকা || re_extmatch_in->matches[subidx] == ফাঁকা)
     {
 	// backref was not set, match an empty string
 	*bytelen = 0;
-	return TRUE;
+	ফেরত TRUE;
     }
 
-    len = (int)STRLEN(re_extmatch_in->matches[subidx]);
-    if (cstrncmp(re_extmatch_in->matches[subidx], rex.input, &len) == 0)
+    len = (পূর্ণসংখ্যা)STRLEN(re_extmatch_in->matches[subidx]);
+    যদি (cstrncmp(re_extmatch_in->matches[subidx], rex.প্রবেশ, &len) == 0)
     {
 	*bytelen = len;
-	return TRUE;
+	ফেরত TRUE;
     }
-    return FALSE;
+    ফেরত FALSE;
 }
 #endif
 
@@ -5229,15 +5229,15 @@ match_zref(
  * Also reset the IDs to zero.
  * Only used for the recursive value lastlist[1].
  */
-    static void
-nfa_save_listids(nfa_regprog_T *prog, int *list)
+    স্থির শূন্য
+nfa_save_listids(nfa_regprog_T *prog, পূর্ণসংখ্যা *list)
 {
-    int		    i;
+    পূর্ণসংখ্যা		    i;
     nfa_state_T	    *p;
 
     // Order in the list is reverse, it's a bit faster that way.
     p = &prog->state[0];
-    for (i = prog->nstate; --i >= 0; )
+    জন্য (i = prog->nstate; --i >= 0; )
     {
 	list[i] = p->lastlist[1];
 	p->lastlist[1] = 0;
@@ -5248,65 +5248,65 @@ nfa_save_listids(nfa_regprog_T *prog, int *list)
 /*
  * Restore list IDs from "list" to all NFA states.
  */
-    static void
-nfa_restore_listids(nfa_regprog_T *prog, int *list)
+    স্থির শূন্য
+nfa_restore_listids(nfa_regprog_T *prog, পূর্ণসংখ্যা *list)
 {
-    int		    i;
+    পূর্ণসংখ্যা		    i;
     nfa_state_T	    *p;
 
     p = &prog->state[0];
-    for (i = prog->nstate; --i >= 0; )
+    জন্য (i = prog->nstate; --i >= 0; )
     {
 	p->lastlist[1] = list[i];
 	++p;
     }
 }
 
-    static int
-nfa_re_num_cmp(long_u val, int op, long_u pos)
+    স্থির পূর্ণসংখ্যা
+nfa_re_অঙ্ক_cmp(long_u val, পূর্ণসংখ্যা op, long_u pos)
 {
-    if (op == 1) return pos > val;
-    if (op == 2) return pos < val;
-    return val == pos;
+    যদি (op == 1) ফেরত pos > val;
+    যদি (op == 2) ফেরত pos < val;
+    ফেরত val == pos;
 }
 
-static int nfa_regmatch(nfa_regprog_T *prog, nfa_state_T *start, regsubs_T *submatch, regsubs_T *m);
+স্থির পূর্ণসংখ্যা nfa_regmatch(nfa_regprog_T *prog, nfa_state_T *start, regsubs_T *submatch, regsubs_T *m);
 
 /*
  * Recursively call nfa_regmatch()
  * "pim" is NULL or contains info about a Postponed Invisible Match (start
  * position).
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 recursive_regmatch(
     nfa_state_T	    *state,
     nfa_pim_T	    *pim,
     nfa_regprog_T   *prog,
     regsubs_T	    *submatch,
     regsubs_T	    *m,
-    int		    **listids,
-    int		    *listids_len)
+    পূর্ণসংখ্যা		    **listids,
+    পূর্ণসংখ্যা		    *listids_len)
 {
-    int		save_reginput_col = (int)(rex.input - rex.line);
-    int		save_reglnum = rex.lnum;
-    int		save_nfa_match = nfa_match;
-    int		save_nfa_listid = rex.nfa_listid;
+    পূর্ণসংখ্যা		save_reginput_col = (পূর্ণসংখ্যা)(rex.প্রবেশ - rex.সারি);
+    পূর্ণসংখ্যা		save_reglnum = rex.lnum;
+    পূর্ণসংখ্যা		save_nfa_match = nfa_match;
+    পূর্ণসংখ্যা		save_nfa_listid = rex.nfa_listid;
     save_se_T   *save_nfa_endp = nfa_endp;
     save_se_T   endpos;
-    save_se_T   *endposp = NULL;
-    int		result;
-    int		need_restore = FALSE;
+    save_se_T   *endposp = ফাঁকা;
+    পূর্ণসংখ্যা		ফলাফল;
+    পূর্ণসংখ্যা		need_restore = FALSE;
 
-    if (pim != NULL)
+    যদি (pim != ফাঁকা)
     {
 	// start at the position where the postponed match was
-	if (REG_MULTI)
-	    rex.input = rex.line + pim->end.pos.col;
-	else
-	    rex.input = pim->end.ptr;
+	যদি (REG_MULTI)
+	    rex.প্রবেশ = rex.সারি + pim->end.pos.col;
+	অন্যথা
+	    rex.প্রবেশ = pim->end.ptr;
     }
 
-    if (state->c == NFA_START_INVISIBLE_BEFORE
+    যদি (state->c == NFA_START_INVISIBLE_BEFORE
 	    || state->c == NFA_START_INVISIBLE_BEFORE_FIRST
 	    || state->c == NFA_START_INVISIBLE_BEFORE_NEG
 	    || state->c == NFA_START_INVISIBLE_BEFORE_NEG_FIRST)
@@ -5314,21 +5314,21 @@ recursive_regmatch(
 	// The recursive match must end at the current position. When "pim" is
 	// not NULL it specifies the current position.
 	endposp = &endpos;
-	if (REG_MULTI)
+	যদি (REG_MULTI)
 	{
-	    if (pim == NULL)
+	    যদি (pim == ফাঁকা)
 	    {
-		endpos.se_u.pos.col = (int)(rex.input - rex.line);
+		endpos.se_u.pos.col = (পূর্ণসংখ্যা)(rex.প্রবেশ - rex.সারি);
 		endpos.se_u.pos.lnum = rex.lnum;
 	    }
-	    else
+	    অন্যথা
 		endpos.se_u.pos = pim->end.pos;
 	}
-	else
+	অন্যথা
 	{
-	    if (pim == NULL)
-		endpos.se_u.ptr = rex.input;
-	    else
+	    যদি (pim == ফাঁকা)
+		endpos.se_u.ptr = rex.প্রবেশ;
+	    অন্যথা
 		endpos.se_u.ptr = pim->end.ptr;
 	}
 
@@ -5336,63 +5336,63 @@ recursive_regmatch(
 	// start of the previous line, to try matching "\@<=" or
 	// not matching "\@<!". This is very inefficient, limit the number of
 	// bytes if possible.
-	if (state->val <= 0)
+	যদি (state->val <= 0)
 	{
-	    if (REG_MULTI)
+	    যদি (REG_MULTI)
 	    {
-		rex.line = reg_getline(--rex.lnum);
-		if (rex.line == NULL)
+		rex.সারি = reg_getline(--rex.lnum);
+		যদি (rex.সারি == ফাঁকা)
 		    // can't go before the first line
-		    rex.line = reg_getline(++rex.lnum);
+		    rex.সারি = reg_getline(++rex.lnum);
 	    }
-	    rex.input = rex.line;
+	    rex.প্রবেশ = rex.সারি;
 	}
-	else
+	অন্যথা
 	{
-	    if (REG_MULTI && (int)(rex.input - rex.line) < state->val)
+	    যদি (REG_MULTI && (পূর্ণসংখ্যা)(rex.প্রবেশ - rex.সারি) < state->val)
 	    {
 		// Not enough bytes in this line, go to end of
 		// previous line.
-		rex.line = reg_getline(--rex.lnum);
-		if (rex.line == NULL)
+		rex.সারি = reg_getline(--rex.lnum);
+		যদি (rex.সারি == ফাঁকা)
 		{
 		    // can't go before the first line
-		    rex.line = reg_getline(++rex.lnum);
-		    rex.input = rex.line;
+		    rex.সারি = reg_getline(++rex.lnum);
+		    rex.প্রবেশ = rex.সারি;
 		}
-		else
-		    rex.input = rex.line + reg_getline_len(rex.lnum);
+		অন্যথা
+		    rex.প্রবেশ = rex.সারি + reg_getline_len(rex.lnum);
 	    }
-	    if ((int)(rex.input - rex.line) >= state->val)
+	    যদি ((পূর্ণসংখ্যা)(rex.প্রবেশ - rex.সারি) >= state->val)
 	    {
-		rex.input -= state->val;
-		if (has_mbyte)
-		    rex.input -= mb_head_off(rex.line, rex.input);
+		rex.প্রবেশ -= state->val;
+		যদি (has_mbyte)
+		    rex.প্রবেশ -= mb_শীর্ষ_off(rex.সারি, rex.প্রবেশ);
 	    }
-	    else
-		rex.input = rex.line;
+	    অন্যথা
+		rex.প্রবেশ = rex.সারি;
 	}
     }
 
 #ifdef ENABLE_LOG
-    if (log_fd != stderr)
+    যদি (log_fd != stderr)
 	fclose(log_fd);
-    log_fd = NULL;
+    log_fd = ফাঁকা;
 #endif
     // Have to clear the lastlist field of the NFA nodes, so that
     // nfa_regmatch() and addstate() can run properly after recursion.
-    if (nfa_ll_index == 1)
+    যদি (nfa_ll_সূচক == 1)
     {
 	// Already calling nfa_regmatch() recursively.  Save the lastlist[1]
 	// values and clear them.
-	if (*listids == NULL || *listids_len < prog->nstate)
+	যদি (*listids == ফাঁকা || *listids_len < prog->nstate)
 	{
 	    vim_free(*listids);
-	    *listids = ALLOC_MULT(int, prog->nstate);
-	    if (*listids == NULL)
+	    *listids = ALLOC_MULT(পূর্ণসংখ্যা, prog->nstate);
+	    যদি (*listids == ফাঁকা)
 	    {
 		emsg(_(e_nfa_regexp_could_not_allocate_memory_for_branch_traversal));
-		return 0;
+		ফেরত 0;
 	    }
 	    *listids_len = prog->nstate;
 	}
@@ -5400,35 +5400,35 @@ recursive_regmatch(
 	need_restore = TRUE;
 	// any value of rex.nfa_listid will do
     }
-    else
+    অন্যথা
     {
 	// First recursive nfa_regmatch() call, switch to the second lastlist
 	// entry.  Make sure rex.nfa_listid is different from a previous
 	// recursive call, because some states may still have this ID.
-	++nfa_ll_index;
-	if (rex.nfa_listid <= rex.nfa_alt_listid)
+	++nfa_ll_সূচক;
+	যদি (rex.nfa_listid <= rex.nfa_alt_listid)
 	    rex.nfa_listid = rex.nfa_alt_listid;
     }
 
     // Call nfa_regmatch() to check if the current concat matches at this
     // position. The concat ends with the node NFA_END_INVISIBLE
     nfa_endp = endposp;
-    result = nfa_regmatch(prog, state->out, submatch, m);
+    ফলাফল = nfa_regmatch(prog, state->out, submatch, m);
 
-    if (need_restore)
+    যদি (need_restore)
 	nfa_restore_listids(prog, *listids);
-    else
+    অন্যথা
     {
-	--nfa_ll_index;
+	--nfa_ll_সূচক;
 	rex.nfa_alt_listid = rex.nfa_listid;
     }
 
     // restore position in input text
     rex.lnum = save_reglnum;
-    if (REG_MULTI)
-	rex.line = reg_getline(rex.lnum);
-    rex.input = rex.line + save_reginput_col;
-    if (result != NFA_TOO_EXPENSIVE)
+    যদি (REG_MULTI)
+	rex.সারি = reg_getline(rex.lnum);
+    rex.প্রবেশ = rex.সারি + save_reginput_col;
+    যদি (ফলাফল != NFA_TOO_EXPENSIVE)
     {
 	nfa_match = save_nfa_match;
 	rex.nfa_listid = save_nfa_listid;
@@ -5436,10 +5436,10 @@ recursive_regmatch(
     nfa_endp = save_nfa_endp;
 
 #ifdef ENABLE_LOG
-    open_debug_log(result);
+    open_debug_log(ফলাফল);
 #endif
 
-    return result;
+    ফেরত ফলাফল;
 }
 
 /*
@@ -5448,180 +5448,180 @@ recursive_regmatch(
  * NFA_ANY: 1
  * specific character: 99
  */
-    static int
-failure_chance(nfa_state_T *state, int depth)
+    স্থির পূর্ণসংখ্যা
+failure_chance(nfa_state_T *state, পূর্ণসংখ্যা depth)
 {
-    int c = state->c;
-    int l, r;
+    পূর্ণসংখ্যা c = state->c;
+    পূর্ণসংখ্যা l, r;
 
     // detect looping
-    if (depth > 4)
-	return 1;
+    যদি (depth > 4)
+	ফেরত 1;
 
-    switch (c)
+    নির্বাচন (c)
     {
-	case NFA_SPLIT:
-	    if (state->out->c == NFA_SPLIT || state->out1->c == NFA_SPLIT)
+	ক্ষেত্র NFA_SPLIT:
+	    যদি (state->out->c == NFA_SPLIT || state->out1->c == NFA_SPLIT)
 		// avoid recursive stuff
-		return 1;
+		ফেরত 1;
 	    // two alternatives, use the lowest failure chance
 	    l = failure_chance(state->out, depth + 1);
 	    r = failure_chance(state->out1, depth + 1);
-	    return l < r ? l : r;
+	    ফেরত l < r ? l : r;
 
-	case NFA_ANY:
+	ক্ষেত্র NFA_ANY:
 	    // matches anything, unlikely to fail
-	    return 1;
+	    ফেরত 1;
 
-	case NFA_MATCH:
-	case NFA_MCLOSE:
-	case NFA_ANY_COMPOSING:
+	ক্ষেত্র NFA_MATCH:
+	ক্ষেত্র NFA_MCLOSE:
+	ক্ষেত্র NFA_ANY_COMPOSING:
 	    // empty match works always
-	    return 0;
+	    ফেরত 0;
 
-	case NFA_START_INVISIBLE:
-	case NFA_START_INVISIBLE_FIRST:
-	case NFA_START_INVISIBLE_NEG:
-	case NFA_START_INVISIBLE_NEG_FIRST:
-	case NFA_START_INVISIBLE_BEFORE:
-	case NFA_START_INVISIBLE_BEFORE_FIRST:
-	case NFA_START_INVISIBLE_BEFORE_NEG:
-	case NFA_START_INVISIBLE_BEFORE_NEG_FIRST:
-	case NFA_START_PATTERN:
+	ক্ষেত্র NFA_START_INVISIBLE:
+	ক্ষেত্র NFA_START_INVISIBLE_FIRST:
+	ক্ষেত্র NFA_START_INVISIBLE_NEG:
+	ক্ষেত্র NFA_START_INVISIBLE_NEG_FIRST:
+	ক্ষেত্র NFA_START_INVISIBLE_BEFORE:
+	ক্ষেত্র NFA_START_INVISIBLE_BEFORE_FIRST:
+	ক্ষেত্র NFA_START_INVISIBLE_BEFORE_NEG:
+	ক্ষেত্র NFA_START_INVISIBLE_BEFORE_NEG_FIRST:
+	ক্ষেত্র NFA_START_PATTERN:
 	    // recursive regmatch is expensive, use low failure chance
-	    return 5;
+	    ফেরত 5;
 
-	case NFA_BOL:
-	case NFA_EOL:
-	case NFA_BOF:
-	case NFA_EOF:
-	case NFA_NEWL:
-	    return 99;
+	ক্ষেত্র NFA_BOL:
+	ক্ষেত্র NFA_EOL:
+	ক্ষেত্র NFA_BOF:
+	ক্ষেত্র NFA_EOF:
+	ক্ষেত্র NFA_NEWL:
+	    ফেরত 99;
 
-	case NFA_BOW:
-	case NFA_EOW:
-	    return 90;
+	ক্ষেত্র NFA_BOW:
+	ক্ষেত্র NFA_EOW:
+	    ফেরত 90;
 
-	case NFA_MOPEN:
-	case NFA_MOPEN1:
-	case NFA_MOPEN2:
-	case NFA_MOPEN3:
-	case NFA_MOPEN4:
-	case NFA_MOPEN5:
-	case NFA_MOPEN6:
-	case NFA_MOPEN7:
-	case NFA_MOPEN8:
-	case NFA_MOPEN9:
+	ক্ষেত্র NFA_MOPEN:
+	ক্ষেত্র NFA_MOPEN1:
+	ক্ষেত্র NFA_MOPEN2:
+	ক্ষেত্র NFA_MOPEN3:
+	ক্ষেত্র NFA_MOPEN4:
+	ক্ষেত্র NFA_MOPEN5:
+	ক্ষেত্র NFA_MOPEN6:
+	ক্ষেত্র NFA_MOPEN7:
+	ক্ষেত্র NFA_MOPEN8:
+	ক্ষেত্র NFA_MOPEN9:
 #ifdef FEAT_SYN_HL
-	case NFA_ZOPEN:
-	case NFA_ZOPEN1:
-	case NFA_ZOPEN2:
-	case NFA_ZOPEN3:
-	case NFA_ZOPEN4:
-	case NFA_ZOPEN5:
-	case NFA_ZOPEN6:
-	case NFA_ZOPEN7:
-	case NFA_ZOPEN8:
-	case NFA_ZOPEN9:
-	case NFA_ZCLOSE:
-	case NFA_ZCLOSE1:
-	case NFA_ZCLOSE2:
-	case NFA_ZCLOSE3:
-	case NFA_ZCLOSE4:
-	case NFA_ZCLOSE5:
-	case NFA_ZCLOSE6:
-	case NFA_ZCLOSE7:
-	case NFA_ZCLOSE8:
-	case NFA_ZCLOSE9:
+	ক্ষেত্র NFA_ZOPEN:
+	ক্ষেত্র NFA_ZOPEN1:
+	ক্ষেত্র NFA_ZOPEN2:
+	ক্ষেত্র NFA_ZOPEN3:
+	ক্ষেত্র NFA_ZOPEN4:
+	ক্ষেত্র NFA_ZOPEN5:
+	ক্ষেত্র NFA_ZOPEN6:
+	ক্ষেত্র NFA_ZOPEN7:
+	ক্ষেত্র NFA_ZOPEN8:
+	ক্ষেত্র NFA_ZOPEN9:
+	ক্ষেত্র NFA_ZCLOSE:
+	ক্ষেত্র NFA_ZCLOSE1:
+	ক্ষেত্র NFA_ZCLOSE2:
+	ক্ষেত্র NFA_ZCLOSE3:
+	ক্ষেত্র NFA_ZCLOSE4:
+	ক্ষেত্র NFA_ZCLOSE5:
+	ক্ষেত্র NFA_ZCLOSE6:
+	ক্ষেত্র NFA_ZCLOSE7:
+	ক্ষেত্র NFA_ZCLOSE8:
+	ক্ষেত্র NFA_ZCLOSE9:
 #endif
-	case NFA_NOPEN:
-	case NFA_MCLOSE1:
-	case NFA_MCLOSE2:
-	case NFA_MCLOSE3:
-	case NFA_MCLOSE4:
-	case NFA_MCLOSE5:
-	case NFA_MCLOSE6:
-	case NFA_MCLOSE7:
-	case NFA_MCLOSE8:
-	case NFA_MCLOSE9:
-	case NFA_NCLOSE:
-	    return failure_chance(state->out, depth + 1);
+	ক্ষেত্র NFA_NOPEN:
+	ক্ষেত্র NFA_MCLOSE1:
+	ক্ষেত্র NFA_MCLOSE2:
+	ক্ষেত্র NFA_MCLOSE3:
+	ক্ষেত্র NFA_MCLOSE4:
+	ক্ষেত্র NFA_MCLOSE5:
+	ক্ষেত্র NFA_MCLOSE6:
+	ক্ষেত্র NFA_MCLOSE7:
+	ক্ষেত্র NFA_MCLOSE8:
+	ক্ষেত্র NFA_MCLOSE9:
+	ক্ষেত্র NFA_NCLOSE:
+	    ফেরত failure_chance(state->out, depth + 1);
 
-	case NFA_BACKREF1:
-	case NFA_BACKREF2:
-	case NFA_BACKREF3:
-	case NFA_BACKREF4:
-	case NFA_BACKREF5:
-	case NFA_BACKREF6:
-	case NFA_BACKREF7:
-	case NFA_BACKREF8:
-	case NFA_BACKREF9:
+	ক্ষেত্র NFA_BACKREF1:
+	ক্ষেত্র NFA_BACKREF2:
+	ক্ষেত্র NFA_BACKREF3:
+	ক্ষেত্র NFA_BACKREF4:
+	ক্ষেত্র NFA_BACKREF5:
+	ক্ষেত্র NFA_BACKREF6:
+	ক্ষেত্র NFA_BACKREF7:
+	ক্ষেত্র NFA_BACKREF8:
+	ক্ষেত্র NFA_BACKREF9:
 #ifdef FEAT_SYN_HL
-	case NFA_ZREF1:
-	case NFA_ZREF2:
-	case NFA_ZREF3:
-	case NFA_ZREF4:
-	case NFA_ZREF5:
-	case NFA_ZREF6:
-	case NFA_ZREF7:
-	case NFA_ZREF8:
-	case NFA_ZREF9:
+	ক্ষেত্র NFA_ZREF1:
+	ক্ষেত্র NFA_ZREF2:
+	ক্ষেত্র NFA_ZREF3:
+	ক্ষেত্র NFA_ZREF4:
+	ক্ষেত্র NFA_ZREF5:
+	ক্ষেত্র NFA_ZREF6:
+	ক্ষেত্র NFA_ZREF7:
+	ক্ষেত্র NFA_ZREF8:
+	ক্ষেত্র NFA_ZREF9:
 #endif
 	    // backreferences don't match in many places
-	    return 94;
+	    ফেরত 94;
 
-	case NFA_LNUM_GT:
-	case NFA_LNUM_LT:
-	case NFA_COL_GT:
-	case NFA_COL_LT:
-	case NFA_VCOL_GT:
-	case NFA_VCOL_LT:
-	case NFA_MARK_GT:
-	case NFA_MARK_LT:
-	case NFA_VISUAL:
+	ক্ষেত্র NFA_LNUM_GT:
+	ক্ষেত্র NFA_LNUM_LT:
+	ক্ষেত্র NFA_COL_GT:
+	ক্ষেত্র NFA_COL_LT:
+	ক্ষেত্র NFA_VCOL_GT:
+	ক্ষেত্র NFA_VCOL_LT:
+	ক্ষেত্র NFA_MARK_GT:
+	ক্ষেত্র NFA_MARK_LT:
+	ক্ষেত্র NFA_VISUAL:
 	    // before/after positions don't match very often
-	    return 85;
+	    ফেরত 85;
 
-	case NFA_LNUM:
-	    return 90;
+	ক্ষেত্র NFA_LNUM:
+	    ফেরত 90;
 
-	case NFA_CURSOR:
-	case NFA_COL:
-	case NFA_VCOL:
-	case NFA_MARK:
+	ক্ষেত্র NFA_CURSOR:
+	ক্ষেত্র NFA_COL:
+	ক্ষেত্র NFA_VCOL:
+	ক্ষেত্র NFA_MARK:
 	    // specific positions rarely match
-	    return 98;
+	    ফেরত 98;
 
-	case NFA_COMPOSING:
-	    return 95;
+	ক্ষেত্র NFA_COMPOSING:
+	    ফেরত 95;
 
-	default:
-	    if (c > 0)
+	পূর্বনির্ধারিত:
+	    যদি (c > 0)
 		// character match fails often
-		return 95;
+		ফেরত 95;
     }
 
     // something else, includes character classes
-    return 50;
+    ফেরত 50;
 }
 
 /*
  * Skip until the char "c" we know a match must start with.
  */
-    static int
-skip_to_start(int c, colnr_T *colp)
+    স্থির পূর্ণসংখ্যা
+skip_to_start(পূর্ণসংখ্যা c, colnr_T *colp)
 {
     char_u *s;
 
     // Used often, do some work to avoid call overhead.
-    if (!rex.reg_ic && !has_mbyte)
-	s = vim_strbyte(rex.line + *colp, c);
-    else
-	s = cstrchr(rex.line + *colp, c);
-    if (s == NULL)
-	return FAIL;
-    *colp = (int)(s - rex.line);
-    return OK;
+    যদি (!rex.reg_ic && !has_mbyte)
+	s = vim_strbyte(rex.সারি + *colp, c);
+    অন্যথা
+	s = cstrchr(rex.সারি + *colp, c);
+    যদি (s == ফাঁকা)
+	ফেরত FAIL;
+    *colp = (পূর্ণসংখ্যা)(s - rex.সারি);
+    ফেরত OK;
 }
 
 /*
@@ -5629,61 +5629,61 @@ skip_to_start(int c, colnr_T *colp)
  * Called after skip_to_start() has found regstart.
  * Returns zero for no match, 1 for a match.
  */
-    static long
-find_match_text(colnr_T *startcol, int regstart, char_u *match_text)
+    স্থির long
+find_match_text(colnr_T *startcol, পূর্ণসংখ্যা regstart, char_u *match_text)
 {
     colnr_T col = *startcol;
-    int	    c1, c2;
-    int	    len1, len2;
-    int	    match;
+    পূর্ণসংখ্যা	    c1, c2;
+    পূর্ণসংখ্যা	    len1, len2;
+    পূর্ণসংখ্যা	    match;
 
-    for (;;)
+    জন্য (;;)
     {
 	match = TRUE;
 	// Skip the input character: case-folding can change its byte length.
-	len2 = MB_CPTR2LEN(rex.line + col);
-	for (len1 = 0; match_text[len1] != NUL; len1 += MB_CHAR2LEN(c1))
+	len2 = MB_CPTR2LEN(rex.সারি + col);
+	জন্য (len1 = 0; match_text[len1] != NUL; len1 += MB_CHAR2LEN(c1))
 	{
 	    c1 = PTR2CHAR(match_text + len1);
-	    c2 = PTR2CHAR(rex.line + col + len2);
-	    if (c1 != c2 && (!rex.reg_ic || MB_CASEFOLD(c1) != MB_CASEFOLD(c2)))
+	    c2 = PTR2CHAR(rex.সারি + col + len2);
+	    যদি (c1 != c2 && (!rex.reg_ic || MB_CASEFOLD(c1) != MB_CASEFOLD(c2)))
 	    {
 		match = FALSE;
-		break;
+		বিরতি;
 	    }
-	    len2 += enc_utf8 ? utf_ptr2len(rex.line + col + len2)
+	    len2 += enc_utf8 ? utf_ptr2len(rex.সারি + col + len2)
 							     : MB_CHAR2LEN(c2);
 	}
-	if (match
+	যদি (match
 		// check that no composing char follows
 		&& !(enc_utf8
-			  && utf_iscomposing(PTR2CHAR(rex.line + col + len2))))
+			  && utf_iscomposing(PTR2CHAR(rex.সারি + col + len2))))
 	{
 	    cleanup_subexpr();
-	    if (REG_MULTI)
+	    যদি (REG_MULTI)
 	    {
 		rex.reg_startpos[0].lnum = rex.lnum;
 		rex.reg_startpos[0].col = col;
 		rex.reg_endpos[0].lnum = rex.lnum;
 		rex.reg_endpos[0].col = col + len2;
 	    }
-	    else
+	    অন্যথা
 	    {
-		rex.reg_startp[0] = rex.line + col;
-		rex.reg_endp[0] = rex.line + col + len2;
+		rex.reg_startp[0] = rex.সারি + col;
+		rex.reg_endp[0] = rex.সারি + col + len2;
 	    }
 	    *startcol = col;
-	    return 1L;
+	    ফেরত 1L;
 	}
 
 	// Try finding regstart after the current match.
-	col += MB_CPTR2LEN(rex.line + col); // skip the input character
-	if (skip_to_start(regstart, &col) == FAIL)
-	    break;
+	col += MB_CPTR2LEN(rex.সারি + col); // skip the input character
+	যদি (skip_to_start(regstart, &col) == FAIL)
+	    বিরতি;
     }
 
     *startcol = col;
-    return 0L;
+    ফেরত 0L;
 }
 
 /*
@@ -5693,30 +5693,30 @@ find_match_text(colnr_T *startcol, int regstart, char_u *match_text)
  * length.
  * Returns OK when it matches, FAIL otherwise.
  */
-    static int
-match_composing(nfa_state_T *sta, int curc, int clen)
+    স্থির পূর্ণসংখ্যা
+match_composing(nfa_state_T *sta, পূর্ণসংখ্যা curc, পূর্ণসংখ্যা clen)
 {
-    int		mc = curc;
-    int		len = 0;
-    int		cchars[MAX_MCO];
-    int		ccount = 0;
-    int		j;
+    পূর্ণসংখ্যা		mc = curc;
+    পূর্ণসংখ্যা		len = 0;
+    পূর্ণসংখ্যা		cchars[MAX_MCO];
+    পূর্ণসংখ্যা		ccount = 0;
+    পূর্ণসংখ্যা		j;
 
-    if (utf_iscomposing(sta->c))
+    যদি (utf_iscomposing(sta->c))
 	// Only match composing character(s), ignore base character.  Used
 	// for ".{composing}" and "{composing}" (no preceding character).
 	len += mb_char2len(mc);
 
-    if (rex.reg_icombine && len == 0)
+    যদি (rex.reg_icombine && len == 0)
 	// If \Z was present, then ignore composing characters.  When
 	// ignoring the base character this always matches.
-	return sta->c == curc ? OK : FAIL;
+	ফেরত sta->c == curc ? OK : FAIL;
 
     // Check base character matches first, unless ignored.
-    if (len == 0 && mc != sta->c)
-	return FAIL;
+    যদি (len == 0 && mc != sta->c)
+	ফেরত FAIL;
 
-    if (len == 0)
+    যদি (len == 0)
     {
 	len += mb_char2len(mc);
 	sta = sta->out;
@@ -5724,28 +5724,28 @@ match_composing(nfa_state_T *sta, int curc, int clen)
 
     // We don't care about the order of composing characters.  Get them into
     // cchars[] first.
-    while (len < clen)
+    যখন (len < clen)
     {
-	mc = mb_ptr2char(rex.input + len);
+	mc = mb_ptr2char(rex.প্রবেশ + len);
 	cchars[ccount++] = mc;
 	len += mb_char2len(mc);
-	if (ccount == MAX_MCO)
-	    break;
+	যদি (ccount == MAX_MCO)
+	    বিরতি;
     }
 
     // Check that each composing char in the pattern matches a composing char
     // in the text.  We do not check if all composing chars are matched.
-    while (sta->c != NFA_END_COMPOSING)
+    যখন (sta->c != NFA_END_COMPOSING)
     {
-	for (j = 0; j < ccount; ++j)
-	    if (cchars[j] == sta->c)
-		break;
-	if (j == ccount)
-	    return FAIL;
+	জন্য (j = 0; j < ccount; ++j)
+	    যদি (cchars[j] == sta->c)
+		বিরতি;
+	যদি (j == ccount)
+	    ফেরত FAIL;
 	sta = sta->out;
     }
 
-    return OK;
+    ফেরত OK;
 }
 
 /*
@@ -5761,29 +5761,29 @@ match_composing(nfa_state_T *sta, int curc, int clen)
  *
  * Note: Caller must ensure that: start != NULL.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 nfa_regmatch(
     nfa_regprog_T	*prog,
     nfa_state_T		*start,
     regsubs_T		*submatch,
     regsubs_T		*m)
 {
-    int		result = FALSE;
-    size_t	size = 0;
-    int		flag = 0;
-    int		go_to_nextline = FALSE;
+    পূর্ণসংখ্যা		ফলাফল = FALSE;
+    size_t	আকার_2 = 0;
+    পূর্ণসংখ্যা		flag = 0;
+    পূর্ণসংখ্যা		go_to_nextline = FALSE;
     nfa_thread_T *t;
     nfa_list_T	list[2];
-    int		listidx;
+    পূর্ণসংখ্যা		listidx;
     nfa_list_T	*thislist;
     nfa_list_T	*nextlist;
-    int		*listids = NULL;
-    int		listids_len = 0;
+    পূর্ণসংখ্যা		*listids = ফাঁকা;
+    পূর্ণসংখ্যা		listids_len = 0;
     nfa_state_T *add_state;
-    int		add_here;
-    int		add_count;
-    int		add_off = 0;
-    int		toplevel = start->c == NFA_MOPEN;
+    পূর্ণসংখ্যা		add_here;
+    পূর্ণসংখ্যা		add_গুনতি;
+    পূর্ণসংখ্যা		add_off = 0;
+    পূর্ণসংখ্যা		toplevel = start->c == NFA_MOPEN;
     regsubs_T	*r;
 #ifdef NFA_REGEXP_DEBUG_LOG
     FILE	*debug;
@@ -5792,48 +5792,48 @@ nfa_regmatch(
     // Some patterns may take a long time to match, especially when using
     // recursive_regmatch(). Allow interrupting them with CTRL-C.
     fast_breakcheck();
-    if (got_int)
-	return FALSE;
+    যদি (got_int)
+	ফেরত FALSE;
 #ifdef FEAT_RELTIME
-    if (nfa_did_time_out())
-	return FALSE;
+    যদি (nfa_did_time_out())
+	ফেরত FALSE;
 #endif
 
 #ifdef NFA_REGEXP_DEBUG_LOG
     debug = fopen(NFA_REGEXP_DEBUG_LOG, "a");
-    if (debug == NULL)
+    যদি (debug == ফাঁকা)
     {
 	semsg("(NFA) COULD NOT OPEN %s!", NFA_REGEXP_DEBUG_LOG);
-	return FALSE;
+	ফেরত FALSE;
     }
 #endif
     nfa_match = FALSE;
 
     // Allocate memory for the lists of nodes.
-    size = (prog->nstate + 1) * sizeof(nfa_thread_T);
+    আকার_2 = (prog->nstate + 1) * আকার(nfa_thread_T);
 
     // Reuse cached list buffers from prog when available (top-level call).
     // Recursive calls must allocate their own buffers.
-    if (toplevel && prog->listbuf[0] != NULL)
+    যদি (toplevel && prog->listbuf[0] != ফাঁকা)
     {
 	list[0].t = (nfa_thread_T *)prog->listbuf[0];
 	list[1].t = (nfa_thread_T *)prog->listbuf[1];
-	prog->listbuf[0] = NULL;
-	prog->listbuf[1] = NULL;
+	prog->listbuf[0] = ফাঁকা;
+	prog->listbuf[1] = ফাঁকা;
     }
-    else
+    অন্যথা
     {
-	list[0].t = alloc(size);
-	list[1].t = alloc(size);
+	list[0].t = alloc(আকার_2);
+	list[1].t = alloc(আকার_2);
     }
     list[0].len = prog->nstate + 1;
     list[1].len = prog->nstate + 1;
-    if (list[0].t == NULL || list[1].t == NULL)
-	goto theend;
+    যদি (list[0].t == ফাঁকা || list[1].t == ফাঁকা)
+	যাও theend;
 
 #ifdef ENABLE_LOG
     log_fd = fopen(NFA_REGEXP_RUN_LOG, "a");
-    if (log_fd == NULL)
+    যদি (log_fd == ফাঁকা)
     {
 	emsg(_(e_log_open_failed));
 	log_fd = stderr;
@@ -5858,29 +5858,29 @@ nfa_regmatch(
 
     // Inline optimized code for addstate(thislist, start, m, 0) if we know
     // it's the first MOPEN.
-    if (toplevel)
+    যদি (toplevel)
     {
-	if (REG_MULTI)
+	যদি (REG_MULTI)
 	{
 	    m->norm.list.multi[0].start_lnum = rex.lnum;
-	    m->norm.list.multi[0].start_col = (colnr_T)(rex.input - rex.line);
+	    m->norm.list.multi[0].start_col = (colnr_T)(rex.প্রবেশ - rex.সারি);
 	    m->norm.orig_start_col = m->norm.list.multi[0].start_col;
 	}
-	else
-	    m->norm.list.line[0].start = rex.input;
+	অন্যথা
+	    m->norm.list.সারি[0].start = rex.প্রবেশ;
 	m->norm.in_use = 1;
-	r = addstate(thislist, start->out, m, NULL, 0, 0);
+	r = addstate(thislist, start->out, m, ফাঁকা, 0, 0);
     }
-    else
-	r = addstate(thislist, start, m, NULL, 0, 0);
-    if (r == NULL)
+    অন্যথা
+	r = addstate(thislist, start, m, ফাঁকা, 0, 0);
+    যদি (r == ফাঁকা)
     {
 	nfa_match = NFA_TOO_EXPENSIVE;
-	goto theend;
+	যাও theend;
     }
 
 #define	ADD_STATE_IF_MATCH(state)	\
-    if (result)				\
+    যদি (ফলাফল)				\
     {					\
 	add_state = state->out;		\
 	add_off = clen;			\
@@ -5889,33 +5889,33 @@ nfa_regmatch(
     /*
      * Run for each character.
      */
-    for (;;)
+    জন্য (;;)
     {
-	int	curc;
-	int	clen;
+	পূর্ণসংখ্যা	curc;
+	পূর্ণসংখ্যা	clen;
 
-	if (has_mbyte)
+	যদি (has_mbyte)
 	{
 	    // Fast path for an ASCII byte not followed by a composing
 	    // character, matching the check in utfc_ptr2len().  Avoids two
 	    // indirect calls for the common case.
-	    if (rex.input[0] != NUL && rex.input[0] < 0x80 && rex.input[1] < 0x80)
+	    যদি (rex.প্রবেশ[0] != NUL && rex.প্রবেশ[0] < 0x80 && rex.প্রবেশ[1] < 0x80)
 	    {
-		curc = rex.input[0];
+		curc = rex.প্রবেশ[0];
 		clen = 1;
 	    }
-	    else
+	    অন্যথা
 	    {
-		curc = (*mb_ptr2char)(rex.input);
-		clen = (*mb_ptr2len)(rex.input);
+		curc = (*mb_ptr2char)(rex.প্রবেশ);
+		clen = (*mb_ptr2len)(rex.প্রবেশ);
 	    }
 	}
-	else
+	অন্যথা
 	{
-	    curc = *rex.input;
+	    curc = *rex.প্রবেশ;
 	    clen = 1;
 	}
-	if (curc == NUL)
+	যদি (curc == NUL)
 	{
 	    clen = 0;
 	    go_to_nextline = FALSE;
@@ -5927,7 +5927,7 @@ nfa_regmatch(
 	nextlist->n = 0;	    // clear nextlist
 	nextlist->has_pim = FALSE;
 	++rex.nfa_listid;
-	if (prog->re_engine == AUTOMATIC_ENGINE
+	যদি (prog->re_engine == AUTOMATIC_ENGINE
 		&& (rex.nfa_listid >= NFA_MAX_STATES
 #ifdef FEAT_EVAL
 		    || nfa_fail_for_testing
@@ -5936,7 +5936,7 @@ nfa_regmatch(
 	{
 	    // too many states, retry with old engine
 	    nfa_match = NFA_TOO_EXPENSIVE;
-	    goto theend;
+	    যাও theend;
 	}
 
 	thislist->id = rex.nfa_listid;
@@ -5944,13 +5944,13 @@ nfa_regmatch(
 
 #ifdef ENABLE_LOG
 	fprintf(log_fd, "------------------------------------------\n");
-	fprintf(log_fd, ">>> Reginput is \"%s\"\n", rex.input);
-	fprintf(log_fd, ">>> Advanced one character... Current char is %c (code %d) \n", curc, (int)curc);
+	fprintf(log_fd, ">>> Reginput is \"%s\"\n", rex.প্রবেশ);
+	fprintf(log_fd, ">>> Advanced one character... Current char is %c (code %d) \n", curc, (পূর্ণসংখ্যা)curc);
 	fprintf(log_fd, ">>> Thislist has %d states available: ", thislist->n);
 	{
-	    int i;
+	    পূর্ণসংখ্যা i;
 
-	    for (i = 0; i < thislist->n; i++)
+	    জন্য (i = 0; i < thislist->n; i++)
 		fprintf(log_fd, "%d  ", abs(thislist->t[i].state->id));
 	}
 	fprintf(log_fd, "\n");
@@ -5962,26 +5962,26 @@ nfa_regmatch(
 	/*
 	 * If the state lists are empty we can stop.
 	 */
-	if (thislist->n == 0)
-	    break;
+	যদি (thislist->n == 0)
+	    বিরতি;
 
 	// compute nextlist
-	for (listidx = 0; listidx < thislist->n; ++listidx)
+	জন্য (listidx = 0; listidx < thislist->n; ++listidx)
 	{
 	    // If the list gets very long there probably is something wrong.
 	    // At least allow interrupting with CTRL-C.  Only check once in a
 	    // while, calling ui_breakcheck() for every state is too slow.
-	    static int	breakcheck_count = 0;  // using "static" makes it faster
-	    if (unlikely(++breakcheck_count >= 100000))
+	    স্থির পূর্ণসংখ্যা	breakcheck_গুনতি = 0;  // using "static" makes it faster
+	    যদি (unlikely(++breakcheck_গুনতি >= 100000))
 	    {
 		ui_breakcheck();
-		breakcheck_count = 0;
+		breakcheck_গুনতি = 0;
 	    }
-	    if (got_int)
-		break;
+	    যদি (got_int)
+		বিরতি;
 #ifdef FEAT_RELTIME
-	    if (nfa_did_time_out())
-		break;
+	    যদি (nfa_did_time_out())
+		বিরতি;
 #endif
 	    t = &thislist->t[listidx];
 
@@ -5991,17 +5991,17 @@ nfa_regmatch(
 #endif
 #ifdef ENABLE_LOG
 	    {
-		int col;
+		পূর্ণসংখ্যা col;
 
-		if (t->subs.norm.in_use <= 0)
+		যদি (t->subs.norm.in_use <= 0)
 		    col = -1;
-		else if (REG_MULTI)
+		অন্যথা যদি (REG_MULTI)
 		    col = t->subs.norm.list.multi[0].start_col;
-		else
-		    col = (int)(t->subs.norm.list.line[0].start - rex.line);
+		অন্যথা
+		    col = (পূর্ণসংখ্যা)(t->subs.norm.list.সারি[0].start - rex.সারি);
 		nfa_set_code(t->state->c);
 		fprintf(log_fd, "(%d) char %d %s (start col %d)%s... \n",
-			abs(t->state->id), (int)t->state->c, code, col,
+			abs(t->state->id), (পূর্ণসংখ্যা)t->state->c, code, col,
 			pim_info(&t->pim));
 	    }
 #endif
@@ -6010,24 +6010,24 @@ nfa_regmatch(
 	     * Handle the possible codes of the current state.
 	     * The most important is NFA_MATCH.
 	     */
-	    add_state = NULL;
+	    add_state = ফাঁকা;
 	    add_here = FALSE;
-	    add_count = 0;
-	    switch (t->state->c)
+	    add_গুনতি = 0;
+	    নির্বাচন (t->state->c)
 	    {
-	    case NFA_MATCH:
+	    ক্ষেত্র NFA_MATCH:
 	      {
 		// If the match is not at the start of the line, ends before a
 		// composing characters and rex.reg_icombine is not set, that
 		// is not really a match.
-		if (enc_utf8 && !rex.reg_icombine
-			     && rex.input != rex.line && utf_iscomposing(curc))
-		    break;
+		যদি (enc_utf8 && !rex.reg_icombine
+			     && rex.প্রবেশ != rex.সারি && utf_iscomposing(curc))
+		    বিরতি;
 
 		nfa_match = TRUE;
 		copy_sub(&submatch->norm, &t->subs.norm);
 #ifdef FEAT_SYN_HL
-		if (rex.nfa_has_zsubexpr)
+		যদি (rex.nfa_has_zsubexpr)
 		    copy_sub(&submatch->synt, &t->subs.synt);
 #endif
 #ifdef ENABLE_LOG
@@ -6037,14 +6037,14 @@ nfa_regmatch(
 		// states at this position.  When the list of states is going
 		// to be empty quit without advancing, so that "rex.input" is
 		// correct.
-		if (nextlist->n == 0)
+		যদি (nextlist->n == 0)
 		    clen = 0;
-		goto nextchar;
+		যাও nextchar;
 	      }
 
-	    case NFA_END_INVISIBLE:
-	    case NFA_END_INVISIBLE_NEG:
-	    case NFA_END_PATTERN:
+	    ক্ষেত্র NFA_END_INVISIBLE:
+	    ক্ষেত্র NFA_END_INVISIBLE_NEG:
+	    ক্ষেত্র NFA_END_PATTERN:
 		/*
 		 * This is only encountered after a NFA_START_INVISIBLE or
 		 * NFA_START_INVISIBLE_BEFORE node.
@@ -6057,35 +6057,35 @@ nfa_regmatch(
 		 * Submatches are stored in *m, and used in the parent call.
 		 */
 #ifdef ENABLE_LOG
-		if (nfa_endp != NULL)
+		যদি (nfa_endp != ফাঁকা)
 		{
-		    if (REG_MULTI)
+		    যদি (REG_MULTI)
 			fprintf(log_fd, "Current lnum: %d, endp lnum: %d; current col: %d, endp col: %d\n",
-				(int)rex.lnum,
-				(int)nfa_endp->se_u.pos.lnum,
-				(int)(rex.input - rex.line),
+				(পূর্ণসংখ্যা)rex.lnum,
+				(পূর্ণসংখ্যা)nfa_endp->se_u.pos.lnum,
+				(পূর্ণসংখ্যা)(rex.প্রবেশ - rex.সারি),
 				nfa_endp->se_u.pos.col);
-		    else
+		    অন্যথা
 			fprintf(log_fd, "Current col: %d, endp col: %d\n",
-				(int)(rex.input - rex.line),
-				(int)(nfa_endp->se_u.ptr - rex.input));
+				(পূর্ণসংখ্যা)(rex.প্রবেশ - rex.সারি),
+				(পূর্ণসংখ্যা)(nfa_endp->se_u.ptr - rex.প্রবেশ));
 		}
 #endif
 		// If "nfa_endp" is set it's only a match if it ends at
 		// "nfa_endp"
-		if (nfa_endp != NULL && (REG_MULTI
+		যদি (nfa_endp != ফাঁকা && (REG_MULTI
 			? (rex.lnum != nfa_endp->se_u.pos.lnum
-			    || (int)(rex.input - rex.line)
+			    || (পূর্ণসংখ্যা)(rex.প্রবেশ - rex.সারি)
 						!= nfa_endp->se_u.pos.col)
-			: rex.input != nfa_endp->se_u.ptr))
-		    break;
+			: rex.প্রবেশ != nfa_endp->se_u.ptr))
+		    বিরতি;
 
 		// do not set submatches for \@!
-		if (t->state->c != NFA_END_INVISIBLE_NEG)
+		যদি (t->state->c != NFA_END_INVISIBLE_NEG)
 		{
 		    copy_sub(&m->norm, &t->subs.norm);
 #ifdef FEAT_SYN_HL
-		    if (rex.nfa_has_zsubexpr)
+		    যদি (rex.nfa_has_zsubexpr)
 			copy_sub(&m->synt, &t->subs.synt);
 #endif
 		}
@@ -6095,18 +6095,18 @@ nfa_regmatch(
 #endif
 		nfa_match = TRUE;
 		// See comment above at "goto nextchar".
-		if (nextlist->n == 0)
+		যদি (nextlist->n == 0)
 		    clen = 0;
-		goto nextchar;
+		যাও nextchar;
 
-	    case NFA_START_INVISIBLE:
-	    case NFA_START_INVISIBLE_FIRST:
-	    case NFA_START_INVISIBLE_NEG:
-	    case NFA_START_INVISIBLE_NEG_FIRST:
-	    case NFA_START_INVISIBLE_BEFORE:
-	    case NFA_START_INVISIBLE_BEFORE_FIRST:
-	    case NFA_START_INVISIBLE_BEFORE_NEG:
-	    case NFA_START_INVISIBLE_BEFORE_NEG_FIRST:
+	    ক্ষেত্র NFA_START_INVISIBLE:
+	    ক্ষেত্র NFA_START_INVISIBLE_FIRST:
+	    ক্ষেত্র NFA_START_INVISIBLE_NEG:
+	    ক্ষেত্র NFA_START_INVISIBLE_NEG_FIRST:
+	    ক্ষেত্র NFA_START_INVISIBLE_BEFORE:
+	    ক্ষেত্র NFA_START_INVISIBLE_BEFORE_FIRST:
+	    ক্ষেত্র NFA_START_INVISIBLE_BEFORE_NEG:
+	    ক্ষেত্র NFA_START_INVISIBLE_BEFORE_NEG_FIRST:
 		{
 #ifdef ENABLE_LOG
 		    fprintf(log_fd, "Failure chance invisible: %d, what follows: %d\n",
@@ -6115,19 +6115,19 @@ nfa_regmatch(
 #endif
 		    // Do it directly if there already is a PIM or when
 		    // nfa_postprocess() detected it will work better.
-		    if (t->pim.result != NFA_PIM_UNUSED
+		    যদি (t->pim.ফলাফল != NFA_PIM_UNUSED
 			 || t->state->c == NFA_START_INVISIBLE_FIRST
 			 || t->state->c == NFA_START_INVISIBLE_NEG_FIRST
 			 || t->state->c == NFA_START_INVISIBLE_BEFORE_FIRST
 			 || t->state->c == NFA_START_INVISIBLE_BEFORE_NEG_FIRST)
 		    {
-			int in_use = m->norm.in_use;
+			পূর্ণসংখ্যা in_use = m->norm.in_use;
 
 			// Copy submatch info for the recursive call, opposite
 			// of what happens on success below.
 			copy_sub_off(&m->norm, &t->subs.norm);
 #ifdef FEAT_SYN_HL
-			if (rex.nfa_has_zsubexpr)
+			যদি (rex.nfa_has_zsubexpr)
 			    copy_sub_off(&m->synt, &t->subs.synt);
 #endif
 
@@ -6135,17 +6135,17 @@ nfa_regmatch(
 			 * First try matching the invisible match, then what
 			 * follows.
 			 */
-			result = recursive_regmatch(t->state, NULL, prog,
+			ফলাফল = recursive_regmatch(t->state, ফাঁকা, prog,
 					  submatch, m, &listids, &listids_len);
-			if (result == NFA_TOO_EXPENSIVE)
+			যদি (ফলাফল == NFA_TOO_EXPENSIVE)
 			{
-			    nfa_match = result;
-			    goto theend;
+			    nfa_match = ফলাফল;
+			    যাও theend;
 			}
 
 			// for \@! and \@<! it is a match when the result is
 			// FALSE
-			if (result != (t->state->c == NFA_START_INVISIBLE_NEG
+			যদি (ফলাফল != (t->state->c == NFA_START_INVISIBLE_NEG
 			       || t->state->c == NFA_START_INVISIBLE_NEG_FIRST
 			       || t->state->c
 					   == NFA_START_INVISIBLE_BEFORE_NEG
@@ -6155,7 +6155,7 @@ nfa_regmatch(
 			    // Copy submatch info from the recursive call
 			    copy_sub_off(&t->subs.norm, &m->norm);
 #ifdef FEAT_SYN_HL
-			    if (rex.nfa_has_zsubexpr)
+			    যদি (rex.nfa_has_zsubexpr)
 				copy_sub_off(&t->subs.synt, &m->synt);
 #endif
 			    // If the pattern has \ze and it matched in the
@@ -6170,7 +6170,7 @@ nfa_regmatch(
 			}
 			m->norm.in_use = in_use;
 		    }
-		    else
+		    অন্যথা
 		    {
 			nfa_pim_T pim;
 
@@ -6181,49 +6181,49 @@ nfa_regmatch(
 			 * about the invisible match.
 			 */
 			pim.state = t->state;
-			pim.result = NFA_PIM_TODO;
+			pim.ফলাফল = NFA_PIM_TODO;
 			pim.subs.norm.in_use = 0;
 #ifdef FEAT_SYN_HL
 			pim.subs.synt.in_use = 0;
 #endif
-			if (REG_MULTI)
+			যদি (REG_MULTI)
 			{
-			    pim.end.pos.col = (int)(rex.input - rex.line);
+			    pim.end.pos.col = (পূর্ণসংখ্যা)(rex.প্রবেশ - rex.সারি);
 			    pim.end.pos.lnum = rex.lnum;
 			}
-			else
-			    pim.end.ptr = rex.input;
+			অন্যথা
+			    pim.end.ptr = rex.প্রবেশ;
 
 			// t->state->out1 is the corresponding END_INVISIBLE
 			// node; Add its out to the current list (zero-width
 			// match).
-			if (addstate_here(thislist, t->state->out1->out,
-					     &t->subs, &pim, &listidx) == NULL)
+			যদি (addstate_here(thislist, t->state->out1->out,
+					     &t->subs, &pim, &listidx) == ফাঁকা)
 			{
 			    nfa_match = NFA_TOO_EXPENSIVE;
-			    goto theend;
+			    যাও theend;
 			}
 		    }
 		}
-		break;
+		বিরতি;
 
-	    case NFA_START_PATTERN:
+	    ক্ষেত্র NFA_START_PATTERN:
 	      {
-		nfa_state_T *skip = NULL;
+		nfa_state_T *skip = ফাঁকা;
 #ifdef ENABLE_LOG
-		int	    skip_lid = 0;
+		পূর্ণসংখ্যা	    skip_lid = 0;
 #endif
 
 		// There is no point in trying to match the pattern if the
 		// output state is not going to be added to the list.
-		if (state_in_list(nextlist, t->state->out1->out, &t->subs))
+		যদি (state_in_list(nextlist, t->state->out1->out, &t->subs))
 		{
 		    skip = t->state->out1->out;
 #ifdef ENABLE_LOG
 		    skip_lid = nextlist->id;
 #endif
 		}
-		else if (state_in_list(nextlist,
+		অন্যথা যদি (state_in_list(nextlist,
 					  t->state->out1->out->out, &t->subs))
 		{
 		    skip = t->state->out1->out->out;
@@ -6231,7 +6231,7 @@ nfa_regmatch(
 		    skip_lid = nextlist->id;
 #endif
 		}
-		else if (state_in_list(thislist,
+		অন্যথা যদি (state_in_list(thislist,
 					  t->state->out1->out->out, &t->subs))
 		{
 		    skip = t->state->out1->out->out;
@@ -6239,34 +6239,34 @@ nfa_regmatch(
 		    skip_lid = thislist->id;
 #endif
 		}
-		if (skip != NULL)
+		যদি (skip != ফাঁকা)
 		{
 #ifdef ENABLE_LOG
 		    nfa_set_code(skip->c);
 		    fprintf(log_fd, "> Not trying to match pattern, output state %d is already in list %d. char %d: %s\n",
 			    abs(skip->id), skip_lid, skip->c, code);
 #endif
-		    break;
+		    বিরতি;
 		}
 		// Copy submatch info to the recursive call, opposite of what
 		// happens afterwards.
 		copy_sub_off(&m->norm, &t->subs.norm);
 #ifdef FEAT_SYN_HL
-		if (rex.nfa_has_zsubexpr)
+		যদি (rex.nfa_has_zsubexpr)
 		    copy_sub_off(&m->synt, &t->subs.synt);
 #endif
 
 		// First try matching the pattern.
-		result = recursive_regmatch(t->state, NULL, prog,
+		ফলাফল = recursive_regmatch(t->state, ফাঁকা, prog,
 					  submatch, m, &listids, &listids_len);
-		if (result == NFA_TOO_EXPENSIVE)
+		যদি (ফলাফল == NFA_TOO_EXPENSIVE)
 		{
-		    nfa_match = result;
-		    goto theend;
+		    nfa_match = ফলাফল;
+		    যাও theend;
 		}
-		if (result)
+		যদি (ফলাফল)
 		{
-		    int bytelen;
+		    পূর্ণসংখ্যা bytelen;
 
 #ifdef ENABLE_LOG
 		    fprintf(log_fd, "NFA_START_PATTERN matches:\n");
@@ -6275,22 +6275,22 @@ nfa_regmatch(
 		    // Copy submatch info from the recursive call
 		    copy_sub_off(&t->subs.norm, &m->norm);
 #ifdef FEAT_SYN_HL
-		    if (rex.nfa_has_zsubexpr)
+		    যদি (rex.nfa_has_zsubexpr)
 			copy_sub_off(&t->subs.synt, &m->synt);
 #endif
 		    // Now we need to skip over the matched text and then
 		    // continue with what follows.
-		    if (REG_MULTI)
+		    যদি (REG_MULTI)
 			// TODO: multi-line match
 			bytelen = m->norm.list.multi[0].end_col
-						  - (int)(rex.input - rex.line);
-		    else
-			bytelen = (int)(m->norm.list.line[0].end - rex.input);
+						  - (পূর্ণসংখ্যা)(rex.প্রবেশ - rex.সারি);
+		    অন্যথা
+			bytelen = (পূর্ণসংখ্যা)(m->norm.list.সারি[0].end - rex.প্রবেশ);
 
 #ifdef ENABLE_LOG
 		    fprintf(log_fd, "NFA_START_PATTERN length: %d\n", bytelen);
 #endif
-		    if (bytelen == 0)
+		    যদি (bytelen == 0)
 		    {
 			// empty match, output of corresponding
 			// NFA_END_PATTERN/NFA_SKIP to be used at current
@@ -6298,124 +6298,124 @@ nfa_regmatch(
 			add_here = TRUE;
 			add_state = t->state->out1->out->out;
 		    }
-		    else if (bytelen <= clen)
+		    অন্যথা যদি (bytelen <= clen)
 		    {
 			// match current character, output of corresponding
 			// NFA_END_PATTERN to be used at next position.
 			add_state = t->state->out1->out->out;
 			add_off = clen;
 		    }
-		    else
+		    অন্যথা
 		    {
 			// skip over the matched characters, set character
 			// count in NFA_SKIP
 			add_state = t->state->out1->out;
 			add_off = bytelen;
-			add_count = bytelen - clen;
+			add_গুনতি = bytelen - clen;
 		    }
 		}
-		break;
+		বিরতি;
 	      }
 
-	    case NFA_BOL:
-		if (rex.input == rex.line)
+	    ক্ষেত্র NFA_BOL:
+		যদি (rex.প্রবেশ == rex.সারি)
 		{
 		    add_here = TRUE;
 		    add_state = t->state->out;
 		}
-		break;
+		বিরতি;
 
-	    case NFA_EOL:
-		if (curc == NUL)
+	    ক্ষেত্র NFA_EOL:
+		যদি (curc == NUL)
 		{
 		    add_here = TRUE;
 		    add_state = t->state->out;
 		}
-		break;
+		বিরতি;
 
-	    case NFA_BOW:
-		result = TRUE;
+	    ক্ষেত্র NFA_BOW:
+		ফলাফল = TRUE;
 
-		if (curc == NUL)
-		    result = FALSE;
-		else if (has_mbyte)
+		যদি (curc == NUL)
+		    ফলাফল = FALSE;
+		অন্যথা যদি (has_mbyte)
 		{
-		    int this_class;
+		    পূর্ণসংখ্যা this_class;
 
 		    // Get class of current and previous char (if it exists).
-		    this_class = mb_get_class_buf(rex.input, rex.reg_buf);
-		    if (this_class <= 1)
-			result = FALSE;
-		    else if (reg_prev_class() == this_class)
-			result = FALSE;
+		    this_class = mb_get_class_buf(rex.প্রবেশ, rex.reg_buf);
+		    যদি (this_class <= 1)
+			ফলাফল = FALSE;
+		    অন্যথা যদি (reg_পূর্ব_class() == this_class)
+			ফলাফল = FALSE;
 		}
-		else if (!vim_iswordc_buf(curc, rex.reg_buf)
-			   || (rex.input > rex.line
-			       && vim_iswordc_buf(rex.input[-1], rex.reg_buf)))
-		    result = FALSE;
-		if (result)
+		অন্যথা যদি (!vim_iswordc_buf(curc, rex.reg_buf)
+			   || (rex.প্রবেশ > rex.সারি
+			       && vim_iswordc_buf(rex.প্রবেশ[-1], rex.reg_buf)))
+		    ফলাফল = FALSE;
+		যদি (ফলাফল)
 		{
 		    add_here = TRUE;
 		    add_state = t->state->out;
 		}
-		break;
+		বিরতি;
 
-	    case NFA_EOW:
-		result = TRUE;
-		if (rex.input == rex.line)
-		    result = FALSE;
-		else if (has_mbyte)
+	    ক্ষেত্র NFA_EOW:
+		ফলাফল = TRUE;
+		যদি (rex.প্রবেশ == rex.সারি)
+		    ফলাফল = FALSE;
+		অন্যথা যদি (has_mbyte)
 		{
-		    int this_class, prev_class;
+		    পূর্ণসংখ্যা this_class, পূর্ব_class;
 
 		    // Get class of current and previous char (if it exists).
-		    this_class = mb_get_class_buf(rex.input, rex.reg_buf);
-		    prev_class = reg_prev_class();
-		    if (this_class == prev_class
-					|| prev_class == 0 || prev_class == 1)
-			result = FALSE;
+		    this_class = mb_get_class_buf(rex.প্রবেশ, rex.reg_buf);
+		    পূর্ব_class = reg_পূর্ব_class();
+		    যদি (this_class == পূর্ব_class
+					|| পূর্ব_class == 0 || পূর্ব_class == 1)
+			ফলাফল = FALSE;
 		}
-		else if (!vim_iswordc_buf(rex.input[-1], rex.reg_buf)
-			|| (rex.input[0] != NUL
+		অন্যথা যদি (!vim_iswordc_buf(rex.প্রবেশ[-1], rex.reg_buf)
+			|| (rex.প্রবেশ[0] != NUL
 					&& vim_iswordc_buf(curc, rex.reg_buf)))
-		    result = FALSE;
-		if (result)
+		    ফলাফল = FALSE;
+		যদি (ফলাফল)
 		{
 		    add_here = TRUE;
 		    add_state = t->state->out;
 		}
-		break;
+		বিরতি;
 
-	    case NFA_BOF:
-		if (rex.lnum == 0 && rex.input == rex.line
+	    ক্ষেত্র NFA_BOF:
+		যদি (rex.lnum == 0 && rex.প্রবেশ == rex.সারি
 				     && (!REG_MULTI || rex.reg_firstlnum == 1))
 		{
 		    add_here = TRUE;
 		    add_state = t->state->out;
 		}
-		break;
+		বিরতি;
 
-	    case NFA_EOF:
-		if (rex.lnum == rex.reg_maxline && curc == NUL)
+	    ক্ষেত্র NFA_EOF:
+		যদি (rex.lnum == rex.reg_maxline && curc == NUL)
 		{
 		    add_here = TRUE;
 		    add_state = t->state->out;
 		}
-		break;
+		বিরতি;
 
-	    case NFA_COMPOSING:
+	    ক্ষেত্র NFA_COMPOSING:
 	    {
 		nfa_state_T *end;
 
-		result = match_composing(t->state->out, curc, clen);
+		ফলাফল = match_composing(t->state->out, curc, clen);
 
 		end = t->state->out1;	    // NFA_END_COMPOSING
 		ADD_STATE_IF_MATCH(end);
-		break;
+		বিরতি;
 	    }
 
-	    case NFA_NEWL:
-		if (curc == NUL && !rex.reg_line_lbr && REG_MULTI
+	    ক্ষেত্র NFA_NEWL:
+		যদি (curc == NUL && !rex.reg_সারি_lbr && REG_MULTI
 						&& rex.lnum <= rex.reg_maxline)
 		{
 		    go_to_nextline = TRUE;
@@ -6424,53 +6424,53 @@ nfa_regmatch(
 		    add_state = t->state->out;
 		    add_off = -1;
 		}
-		else if (curc == '\n' && rex.reg_line_lbr)
+		অন্যথা যদি (curc == '\n' && rex.reg_সারি_lbr)
 		{
 		    // match \n as if it is an ordinary character
 		    add_state = t->state->out;
 		    add_off = 1;
 		}
-		break;
+		বিরতি;
 
-	    case NFA_START_COLL:
-	    case NFA_START_NEG_COLL:
+	    ক্ষেত্র NFA_START_COLL:
+	    ক্ষেত্র NFA_START_NEG_COLL:
 	      {
 		// What follows is a list of characters, until NFA_END_COLL.
 		// One of them must match or none of them must match.
 		nfa_state_T	*state;
-		int		result_if_matched;
-		int		c1, c2;
+		পূর্ণসংখ্যা		ফলাফল_if_matched;
+		পূর্ণসংখ্যা		c1, c2;
 
 		// Never match EOL. If it's part of the collection it is added
 		// as a separate state with an OR.
-		if (curc == NUL)
-		    break;
+		যদি (curc == NUL)
+		    বিরতি;
 
 		state = t->state->out;
-		result_if_matched = (t->state->c == NFA_START_COLL);
-		for (;;)
+		ফলাফল_if_matched = (t->state->c == NFA_START_COLL);
+		জন্য (;;)
 		{
-		    if (state->c == NFA_COMPOSING)
+		    যদি (state->c == NFA_COMPOSING)
 		    {
 			nfa_state_T *end;
 
-			result = match_composing(t->state->out->out, curc,
+			ফলাফল = match_composing(t->state->out->out, curc,
 									clen);
 
-			if (t->state->out->out1 != NULL
+			যদি (t->state->out->out1 != ফাঁকা
 				&& t->state->out->out1->c == NFA_END_COMPOSING)
 			{
 			    end = t->state->out->out1;
 			    ADD_STATE_IF_MATCH(end);
 			}
-			break;
+			বিরতি;
 		    }
-		    if (state->c == NFA_END_COLL)
+		    যদি (state->c == NFA_END_COLL)
 		    {
-			result = !result_if_matched;
-			break;
+			ফলাফল = !ফলাফল_if_matched;
+			বিরতি;
 		    }
-		    if (state->c == NFA_RANGE_MIN)
+		    যদি (state->c == NFA_RANGE_MIN)
 		    {
 			c1 = state->val;
 			state = state->out; // advance to NFA_RANGE_MAX
@@ -6479,509 +6479,509 @@ nfa_regmatch(
 			fprintf(log_fd, "NFA_RANGE_MIN curc=%d c1=%d c2=%d\n",
 				curc, c1, c2);
 #endif
-			if (curc >= c1 && curc <= c2)
+			যদি (curc >= c1 && curc <= c2)
 			{
-			    result = result_if_matched;
-			    break;
+			    ফলাফল = ফলাফল_if_matched;
+			    বিরতি;
 			}
-			if (rex.reg_ic)
+			যদি (rex.reg_ic)
 			{
-			    int curc_low = MB_CASEFOLD(curc);
-			    int done = FALSE;
+			    পূর্ণসংখ্যা curc_নিচের = MB_CASEFOLD(curc);
+			    পূর্ণসংখ্যা done = FALSE;
 
-			    for ( ; c1 <= c2; ++c1)
-				if (MB_CASEFOLD(c1) == curc_low)
+			    জন্য ( ; c1 <= c2; ++c1)
+				যদি (MB_CASEFOLD(c1) == curc_নিচের)
 				{
-				    result = result_if_matched;
+				    ফলাফল = ফলাফল_if_matched;
 				    done = TRUE;
-				    break;
+				    বিরতি;
 				}
-			    if (done)
-				break;
+			    যদি (done)
+				বিরতি;
 			}
 		    }
-		    else if (state->c < 0 ? check_char_class(state->c, curc)
+		    অন্যথা যদি (state->c < 0 ? check_char_class(state->c, curc)
 			       : (curc == state->c
 				   || (rex.reg_ic && MB_CASEFOLD(curc)
 						    == MB_CASEFOLD(state->c))))
 		    {
-			result = result_if_matched;
-			break;
+			ফলাফল = ফলাফল_if_matched;
+			বিরতি;
 		    }
 		    state = state->out;
 		}
-		if (result)
+		যদি (ফলাফল)
 		{
 		    // next state is in out of the NFA_END_COLL, out1 of
 		    // START points to the END state
 		    add_state = t->state->out1->out;
 		    add_off = clen;
 		}
-		break;
+		বিরতি;
 	      }
 
-	    case NFA_ANY:
+	    ক্ষেত্র NFA_ANY:
 		// Any char except '\0', (end of input) does not match.
-		if (curc > 0)
+		যদি (curc > 0)
 		{
 		    add_state = t->state->out;
 		    add_off = clen;
 		}
-		break;
+		বিরতি;
 
-	    case NFA_ANY_COMPOSING:
+	    ক্ষেত্র NFA_ANY_COMPOSING:
 		// On a composing character skip over it.  Otherwise do
 		// nothing.  Always matches.
-		if (enc_utf8 && utf_iscomposing(curc))
+		যদি (enc_utf8 && utf_iscomposing(curc))
 		{
 		    add_off = clen;
 		}
-		else
+		অন্যথা
 		{
 		    add_here = TRUE;
 		    add_off = 0;
 		}
 		add_state = t->state->out;
-		break;
+		বিরতি;
 
 	    /*
 	     * Character classes like \a for alpha, \d for digit etc.
 	     */
-	    case NFA_IDENT:	//  \i
-		result = vim_isIDc(curc);
+	    ক্ষেত্র NFA_IDENT:	//  \i
+		ফলাফল = vim_isIDc(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_SIDENT:	//  \I
-		result = !VIM_ISDIGIT(curc) && vim_isIDc(curc);
+	    ক্ষেত্র NFA_SIDENT:	//  \I
+		ফলাফল = !VIM_ISDIGIT(curc) && vim_isIDc(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_KWORD:	//  \k
-		result = vim_iswordp_buf(rex.input, rex.reg_buf);
+	    ক্ষেত্র NFA_KWORD:	//  \k
+		ফলাফল = vim_iswordp_buf(rex.প্রবেশ, rex.reg_buf);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_SKWORD:	//  \K
-		result = !VIM_ISDIGIT(curc)
-				     && vim_iswordp_buf(rex.input, rex.reg_buf);
+	    ক্ষেত্র NFA_SKWORD:	//  \K
+		ফলাফল = !VIM_ISDIGIT(curc)
+				     && vim_iswordp_buf(rex.প্রবেশ, rex.reg_buf);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_FNAME:	//  \f
-		result = vim_isfilec(curc);
+	    ক্ষেত্র NFA_FNAME:	//  \f
+		ফলাফল = vim_isfilec(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_SFNAME:	//  \F
-		result = !VIM_ISDIGIT(curc) && vim_isfilec(curc);
+	    ক্ষেত্র NFA_SFNAME:	//  \F
+		ফলাফল = !VIM_ISDIGIT(curc) && vim_isfilec(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_PRINT:	//  \p
-		result = vim_isprintc(PTR2CHAR(rex.input));
+	    ক্ষেত্র NFA_PRINT:	//  \p
+		ফলাফল = vim_isprintc(PTR2CHAR(rex.প্রবেশ));
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_SPRINT:	//  \P
-		result = !VIM_ISDIGIT(curc) && vim_isprintc(PTR2CHAR(rex.input));
+	    ক্ষেত্র NFA_SPRINT:	//  \P
+		ফলাফল = !VIM_ISDIGIT(curc) && vim_isprintc(PTR2CHAR(rex.প্রবেশ));
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_WHITE:	//  \s
-		result = VIM_ISWHITE(curc);
+	    ক্ষেত্র NFA_WHITE:	//  \s
+		ফলাফল = VIM_ISWHITE(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_NWHITE:	//  \S
-		result = curc != NUL && !VIM_ISWHITE(curc);
+	    ক্ষেত্র NFA_NWHITE:	//  \S
+		ফলাফল = curc != NUL && !VIM_ISWHITE(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_DIGIT:	//  \d
-		result = ri_digit(curc);
+	    ক্ষেত্র NFA_DIGIT:	//  \d
+		ফলাফল = ri_digit(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_NDIGIT:	//  \D
-		result = curc != NUL && !ri_digit(curc);
+	    ক্ষেত্র NFA_NDIGIT:	//  \D
+		ফলাফল = curc != NUL && !ri_digit(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_HEX:	//  \x
-		result = ri_hex(curc);
+	    ক্ষেত্র NFA_HEX:	//  \x
+		ফলাফল = ri_hex(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_NHEX:	//  \X
-		result = curc != NUL && !ri_hex(curc);
+	    ক্ষেত্র NFA_NHEX:	//  \X
+		ফলাফল = curc != NUL && !ri_hex(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_OCTAL:	//  \o
-		result = ri_octal(curc);
+	    ক্ষেত্র NFA_OCTAL:	//  \o
+		ফলাফল = ri_octal(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_NOCTAL:	//  \O
-		result = curc != NUL && !ri_octal(curc);
+	    ক্ষেত্র NFA_NOCTAL:	//  \O
+		ফলাফল = curc != NUL && !ri_octal(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_WORD:	//  \w
-		result = ri_word(curc);
+	    ক্ষেত্র NFA_WORD:	//  \w
+		ফলাফল = ri_word(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_NWORD:	//  \W
-		result = curc != NUL && !ri_word(curc);
+	    ক্ষেত্র NFA_NWORD:	//  \W
+		ফলাফল = curc != NUL && !ri_word(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_HEAD:	//  \h
-		result = ri_head(curc);
+	    ক্ষেত্র NFA_শীর্ষ:	//  \h
+		ফলাফল = ri_শীর্ষ(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_NHEAD:	//  \H
-		result = curc != NUL && !ri_head(curc);
+	    ক্ষেত্র NFA_NHEAD:	//  \H
+		ফলাফল = curc != NUL && !ri_শীর্ষ(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_ALPHA:	//  \a
-		result = ri_alpha(curc);
+	    ক্ষেত্র NFA_ALPHA:	//  \a
+		ফলাফল = ri_alpha(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_NALPHA:	//  \A
-		result = curc != NUL && !ri_alpha(curc);
+	    ক্ষেত্র NFA_NALPHA:	//  \A
+		ফলাফল = curc != NUL && !ri_alpha(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_LOWER:	//  \l
-		result = ri_lower(curc);
+	    ক্ষেত্র NFA_LOWER:	//  \l
+		ফলাফল = ri_lower(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_NLOWER:	//  \L
-		result = curc != NUL && !ri_lower(curc);
+	    ক্ষেত্র NFA_NLOWER:	//  \L
+		ফলাফল = curc != NUL && !ri_lower(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_UPPER:	//  \u
-		result = ri_upper(curc);
+	    ক্ষেত্র NFA_UPPER:	//  \u
+		ফলাফল = ri_upper(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_NUPPER:	// \U
-		result = curc != NUL && !ri_upper(curc);
+	    ক্ষেত্র NFA_NUPPER:	// \U
+		ফলাফল = curc != NUL && !ri_upper(curc);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_LOWER_IC:	// [a-z]
-		result = ri_lower(curc) || (rex.reg_ic && ri_upper(curc));
+	    ক্ষেত্র NFA_LOWER_IC:	// [a-z]
+		ফলাফল = ri_lower(curc) || (rex.reg_ic && ri_upper(curc));
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_NLOWER_IC:	// [^a-z]
-		result = curc != NUL
+	    ক্ষেত্র NFA_NLOWER_IC:	// [^a-z]
+		ফলাফল = curc != NUL
 			&& !(ri_lower(curc) || (rex.reg_ic && ri_upper(curc)));
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_UPPER_IC:	// [A-Z]
-		result = ri_upper(curc) || (rex.reg_ic && ri_lower(curc));
+	    ক্ষেত্র NFA_UPPER_IC:	// [A-Z]
+		ফলাফল = ri_upper(curc) || (rex.reg_ic && ri_lower(curc));
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_NUPPER_IC:	// ^[A-Z]
-		result = curc != NUL
+	    ক্ষেত্র NFA_NUPPER_IC:	// ^[A-Z]
+		ফলাফল = curc != NUL
 			&& !(ri_upper(curc) || (rex.reg_ic && ri_lower(curc)));
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 
-	    case NFA_BACKREF1:
-	    case NFA_BACKREF2:
-	    case NFA_BACKREF3:
-	    case NFA_BACKREF4:
-	    case NFA_BACKREF5:
-	    case NFA_BACKREF6:
-	    case NFA_BACKREF7:
-	    case NFA_BACKREF8:
-	    case NFA_BACKREF9:
+	    ক্ষেত্র NFA_BACKREF1:
+	    ক্ষেত্র NFA_BACKREF2:
+	    ক্ষেত্র NFA_BACKREF3:
+	    ক্ষেত্র NFA_BACKREF4:
+	    ক্ষেত্র NFA_BACKREF5:
+	    ক্ষেত্র NFA_BACKREF6:
+	    ক্ষেত্র NFA_BACKREF7:
+	    ক্ষেত্র NFA_BACKREF8:
+	    ক্ষেত্র NFA_BACKREF9:
 #ifdef FEAT_SYN_HL
-	    case NFA_ZREF1:
-	    case NFA_ZREF2:
-	    case NFA_ZREF3:
-	    case NFA_ZREF4:
-	    case NFA_ZREF5:
-	    case NFA_ZREF6:
-	    case NFA_ZREF7:
-	    case NFA_ZREF8:
-	    case NFA_ZREF9:
+	    ক্ষেত্র NFA_ZREF1:
+	    ক্ষেত্র NFA_ZREF2:
+	    ক্ষেত্র NFA_ZREF3:
+	    ক্ষেত্র NFA_ZREF4:
+	    ক্ষেত্র NFA_ZREF5:
+	    ক্ষেত্র NFA_ZREF6:
+	    ক্ষেত্র NFA_ZREF7:
+	    ক্ষেত্র NFA_ZREF8:
+	    ক্ষেত্র NFA_ZREF9:
 #endif
 		// \1 .. \9  \z1 .. \z9
 	      {
-		int subidx;
-		int bytelen;
+		পূর্ণসংখ্যা subidx;
+		পূর্ণসংখ্যা bytelen;
 
 #ifdef FEAT_SYN_HL
-		if (t->state->c >= NFA_BACKREF1 && t->state->c <= NFA_BACKREF9)
+		যদি (t->state->c >= NFA_BACKREF1 && t->state->c <= NFA_BACKREF9)
 #endif
 		{
 		    subidx = t->state->c - NFA_BACKREF1 + 1;
-		    result = match_backref(&t->subs.norm, subidx, &bytelen);
+		    ফলাফল = match_backref(&t->subs.norm, subidx, &bytelen);
 		}
 #ifdef FEAT_SYN_HL
-		else
+		অন্যথা
 		{
 		    subidx = t->state->c - NFA_ZREF1 + 1;
-		    result = match_zref(subidx, &bytelen);
+		    ফলাফল = match_zref(subidx, &bytelen);
 		}
 #endif
 
-		if (result)
+		যদি (ফলাফল)
 		{
-		    if (bytelen == 0)
+		    যদি (bytelen == 0)
 		    {
 			// empty match always works, output of NFA_SKIP to be
 			// used next
 			add_here = TRUE;
 			add_state = t->state->out->out;
 		    }
-		    else if (bytelen <= clen)
+		    অন্যথা যদি (bytelen <= clen)
 		    {
 			// match current character, jump ahead to out of
 			// NFA_SKIP
 			add_state = t->state->out->out;
 			add_off = clen;
 		    }
-		    else
+		    অন্যথা
 		    {
 			// skip over the matched characters, set character
 			// count in NFA_SKIP
 			add_state = t->state->out;
 			add_off = bytelen;
-			add_count = bytelen - clen;
+			add_গুনতি = bytelen - clen;
 		    }
 		}
-		break;
+		বিরতি;
 	      }
-	    case NFA_SKIP:
+	    ক্ষেত্র NFA_SKIP:
 	      // character of previous matching \1 .. \9  or \@>
-	      if (t->count - clen <= 0)
+	      যদি (t->গুনতি - clen <= 0)
 	      {
 		  // end of match, go to what follows
 		  add_state = t->state->out;
 		  add_off = clen;
 	      }
-	      else
+	      অন্যথা
 	      {
 		  // add state again with decremented count
 		  add_state = t->state;
 		  add_off = 0;
-		  add_count = t->count - clen;
+		  add_গুনতি = t->গুনতি - clen;
 	      }
-	      break;
+	      বিরতি;
 
-	    case NFA_LNUM:
-	    case NFA_LNUM_GT:
-	    case NFA_LNUM_LT:
-		result = (REG_MULTI &&
-			nfa_re_num_cmp(t->state->val, t->state->c - NFA_LNUM,
+	    ক্ষেত্র NFA_LNUM:
+	    ক্ষেত্র NFA_LNUM_GT:
+	    ক্ষেত্র NFA_LNUM_LT:
+		ফলাফল = (REG_MULTI &&
+			nfa_re_অঙ্ক_cmp(t->state->val, t->state->c - NFA_LNUM,
 			    (long_u)(rex.lnum + rex.reg_firstlnum)));
-		if (result)
+		যদি (ফলাফল)
 		{
 		    add_here = TRUE;
 		    add_state = t->state->out;
 		}
-		break;
+		বিরতি;
 
-	    case NFA_COL:
-	    case NFA_COL_GT:
-	    case NFA_COL_LT:
-		result = nfa_re_num_cmp(t->state->val, t->state->c - NFA_COL,
-			(long_u)(rex.input - rex.line) + 1);
-		if (result)
+	    ক্ষেত্র NFA_COL:
+	    ক্ষেত্র NFA_COL_GT:
+	    ক্ষেত্র NFA_COL_LT:
+		ফলাফল = nfa_re_অঙ্ক_cmp(t->state->val, t->state->c - NFA_COL,
+			(long_u)(rex.প্রবেশ - rex.সারি) + 1);
+		যদি (ফলাফল)
 		{
 		    add_here = TRUE;
 		    add_state = t->state->out;
 		}
-		break;
+		বিরতি;
 
-	    case NFA_VCOL:
-	    case NFA_VCOL_GT:
-	    case NFA_VCOL_LT:
+	    ক্ষেত্র NFA_VCOL:
+	    ক্ষেত্র NFA_VCOL_GT:
+	    ক্ষেত্র NFA_VCOL_LT:
 		{
-		    int     op = t->state->c - NFA_VCOL;
-		    colnr_T col = (colnr_T)(rex.input - rex.line);
-		    win_T   *wp = rex.reg_win == NULL ? curwin : rex.reg_win;
+		    পূর্ণসংখ্যা     op = t->state->c - NFA_VCOL;
+		    colnr_T col = (colnr_T)(rex.প্রবেশ - rex.সারি);
+		    win_T   *wp = rex.reg_win == ফাঁকা ? curwin : rex.reg_win;
 
 		    // Bail out quickly when there can't be a match, avoid the
 		    // overhead of win_linetabsize() on long lines.
-		    if (op != 1 && col > t->state->val
+		    যদি (op != 1 && col > t->state->val
 			    * (has_mbyte ? MB_MAXBYTES : 1))
-			break;
-		    result = FALSE;
-		    if (op == 1 && col - 1 > t->state->val && col > 100)
+			বিরতি;
+		    ফলাফল = FALSE;
+		    যদি (op == 1 && col - 1 > t->state->val && col > 100)
 		    {
-			int ts = wp->w_buffer->b_p_ts;
+			পূর্ণসংখ্যা ts = wp->w_বাফার->b_p_ts;
 
 			// Guess that a character won't use more columns than
 			// 'tabstop', with a minimum of 4.
-			if (ts < 4)
+			যদি (ts < 4)
 			    ts = 4;
-			result = col > t->state->val * ts;
+			ফলাফল = col > t->state->val * ts;
 		    }
-		    if (!result)
+		    যদি (!ফলাফল)
 		    {
 			linenr_T    lnum = REG_MULTI
 					    ? rex.reg_firstlnum + rex.lnum : 1;
 			long_u	    vcol;
 
-			if (REG_MULTI && (lnum <= 0
-				   || lnum > wp->w_buffer->b_ml.ml_line_count))
+			যদি (REG_MULTI && (lnum <= 0
+				   || lnum > wp->w_বাফার->b_ml.ml_সারি_গুনতি))
 			    lnum = 1;
-			vcol = (long_u)win_linetabsize(wp, lnum, rex.line, col);
-			result = nfa_re_num_cmp(t->state->val, op, vcol + 1);
+			vcol = (long_u)win_linetabsize(wp, lnum, rex.সারি, col);
+			ফলাফল = nfa_re_অঙ্ক_cmp(t->state->val, op, vcol + 1);
 		    }
-		    if (result)
+		    যদি (ফলাফল)
 		    {
 			add_here = TRUE;
 			add_state = t->state->out;
 		    }
 		}
-		break;
+		বিরতি;
 
-	    case NFA_MARK:
-	    case NFA_MARK_GT:
-	    case NFA_MARK_LT:
+	    ক্ষেত্র NFA_MARK:
+	    ক্ষেত্র NFA_MARK_GT:
+	    ক্ষেত্র NFA_MARK_LT:
 	      {
 		pos_T	*pos;
-		size_t	col = REG_MULTI ? rex.input - rex.line : 0;
+		size_t	col = REG_MULTI ? rex.প্রবেশ - rex.সারি : 0;
 
 		pos = getmark_buf(rex.reg_buf, t->state->val, FALSE);
 
 		// Line may have been freed, get it again.
-		if (REG_MULTI)
+		যদি (REG_MULTI)
 		{
-		    rex.line = reg_getline(rex.lnum);
-		    rex.input = rex.line + col;
+		    rex.সারি = reg_getline(rex.lnum);
+		    rex.প্রবেশ = rex.সারি + col;
 		}
 
 		// Compare the mark position to the match position, if the mark
 		// exists and mark is set in reg_buf.
-		if (pos != NULL && pos->lnum > 0)
+		যদি (pos != ফাঁকা && pos->lnum > 0)
 		{
 		    colnr_T pos_col = pos->lnum == rex.lnum + rex.reg_firstlnum
 							  && pos->col == MAXCOL
 				      ? reg_getline_len(pos->lnum - rex.reg_firstlnum)
 				      : pos->col;
 
-		    result = (pos->lnum == rex.lnum + rex.reg_firstlnum
-				? (pos_col == (colnr_T)(rex.input - rex.line)
+		    ফলাফল = (pos->lnum == rex.lnum + rex.reg_firstlnum
+				? (pos_col == (colnr_T)(rex.প্রবেশ - rex.সারি)
 				    ? t->state->c == NFA_MARK
-				    : (pos_col < (colnr_T)(rex.input - rex.line)
+				    : (pos_col < (colnr_T)(rex.প্রবেশ - rex.সারি)
 					? t->state->c == NFA_MARK_GT
 					: t->state->c == NFA_MARK_LT))
 				: (pos->lnum < rex.lnum + rex.reg_firstlnum
 				    ? t->state->c == NFA_MARK_GT
 				    : t->state->c == NFA_MARK_LT));
-		    if (result)
+		    যদি (ফলাফল)
 		    {
 			add_here = TRUE;
 			add_state = t->state->out;
 		    }
 		}
-		break;
+		বিরতি;
 	      }
 
-	    case NFA_CURSOR:
-		result = (rex.reg_win != NULL
+	    ক্ষেত্র NFA_CURSOR:
+		ফলাফল = (rex.reg_win != ফাঁকা
 			&& (rex.lnum + rex.reg_firstlnum
 						 == rex.reg_win->w_cursor.lnum)
-			&& ((colnr_T)(rex.input - rex.line)
+			&& ((colnr_T)(rex.প্রবেশ - rex.সারি)
 						== rex.reg_win->w_cursor.col));
-		if (result)
+		যদি (ফলাফল)
 		{
 		    add_here = TRUE;
 		    add_state = t->state->out;
 		}
-		break;
+		বিরতি;
 
-	    case NFA_VISUAL:
-		result = reg_match_visual();
-		if (result)
+	    ক্ষেত্র NFA_VISUAL:
+		ফলাফল = reg_match_visual();
+		যদি (ফলাফল)
 		{
 		    add_here = TRUE;
 		    add_state = t->state->out;
 		}
-		break;
+		বিরতি;
 
-	    case NFA_MOPEN1:
-	    case NFA_MOPEN2:
-	    case NFA_MOPEN3:
-	    case NFA_MOPEN4:
-	    case NFA_MOPEN5:
-	    case NFA_MOPEN6:
-	    case NFA_MOPEN7:
-	    case NFA_MOPEN8:
-	    case NFA_MOPEN9:
+	    ক্ষেত্র NFA_MOPEN1:
+	    ক্ষেত্র NFA_MOPEN2:
+	    ক্ষেত্র NFA_MOPEN3:
+	    ক্ষেত্র NFA_MOPEN4:
+	    ক্ষেত্র NFA_MOPEN5:
+	    ক্ষেত্র NFA_MOPEN6:
+	    ক্ষেত্র NFA_MOPEN7:
+	    ক্ষেত্র NFA_MOPEN8:
+	    ক্ষেত্র NFA_MOPEN9:
 #ifdef FEAT_SYN_HL
-	    case NFA_ZOPEN:
-	    case NFA_ZOPEN1:
-	    case NFA_ZOPEN2:
-	    case NFA_ZOPEN3:
-	    case NFA_ZOPEN4:
-	    case NFA_ZOPEN5:
-	    case NFA_ZOPEN6:
-	    case NFA_ZOPEN7:
-	    case NFA_ZOPEN8:
-	    case NFA_ZOPEN9:
+	    ক্ষেত্র NFA_ZOPEN:
+	    ক্ষেত্র NFA_ZOPEN1:
+	    ক্ষেত্র NFA_ZOPEN2:
+	    ক্ষেত্র NFA_ZOPEN3:
+	    ক্ষেত্র NFA_ZOPEN4:
+	    ক্ষেত্র NFA_ZOPEN5:
+	    ক্ষেত্র NFA_ZOPEN6:
+	    ক্ষেত্র NFA_ZOPEN7:
+	    ক্ষেত্র NFA_ZOPEN8:
+	    ক্ষেত্র NFA_ZOPEN9:
 #endif
-	    case NFA_NOPEN:
-	    case NFA_ZSTART:
+	    ক্ষেত্র NFA_NOPEN:
+	    ক্ষেত্র NFA_ZSTART:
 		// These states are only added to be able to bail out when
 		// they are added again, nothing is to be done.
-		break;
+		বিরতি;
 
-	    default:	// regular character
+	    পূর্বনির্ধারিত:	// regular character
 	      {
-		int c = t->state->c;
+		পূর্ণসংখ্যা c = t->state->c;
 
 #ifdef DEBUG
-		if (c < 0)
+		যদি (c < 0)
 		    siemsg("Negative state char: %ld", (long)c);
 #endif
-		result = (c == curc);
+		ফলাফল = (c == curc);
 
-		if (!result && rex.reg_ic)
-		    result = MB_CASEFOLD(c) == MB_CASEFOLD(curc);
+		যদি (!ফলাফল && rex.reg_ic)
+		    ফলাফল = MB_CASEFOLD(c) == MB_CASEFOLD(curc);
 		// If rex.reg_icombine is not set only skip over the character
 		// itself.  When it is set skip over composing characters.
-		if (result && enc_utf8 && !rex.reg_icombine)
-		    clen = utf_ptr2len(rex.input);
+		যদি (ফলাফল && enc_utf8 && !rex.reg_icombine)
+		    clen = utf_ptr2len(rex.প্রবেশ);
 		ADD_STATE_IF_MATCH(t->state);
-		break;
+		বিরতি;
 	      }
 
 	    } // switch (t->state->c)
 
-	    if (add_state != NULL)
+	    যদি (add_state != ফাঁকা)
 	    {
 		nfa_pim_T *pim;
 		nfa_pim_T pim_copy;
 
-		if (t->pim.result == NFA_PIM_UNUSED)
-		    pim = NULL;
-		else
+		যদি (t->pim.ফলাফল == NFA_PIM_UNUSED)
+		    pim = ফাঁকা;
+		অন্যথা
 		    pim = &t->pim;
 
 		// Handle the postponed invisible match if the match might end
 		// without advancing and before the end of the line.
-		if (pim != NULL && (clen == 0 || match_follows(add_state, 0)))
+		যদি (pim != ফাঁকা && (clen == 0 || match_follows(add_state, 0)))
 		{
-		    if (pim->result == NFA_PIM_TODO)
+		    যদি (pim->ফলাফল == NFA_PIM_TODO)
 		    {
 #ifdef ENABLE_LOG
 			fprintf(log_fd, "\n");
@@ -6989,12 +6989,12 @@ nfa_regmatch(
 			fprintf(log_fd, "Postponed recursive nfa_regmatch()\n");
 			fprintf(log_fd, "\n");
 #endif
-			result = recursive_regmatch(pim->state, pim,
+			ফলাফল = recursive_regmatch(pim->state, pim,
 				    prog, submatch, m, &listids, &listids_len);
-			pim->result = result ? NFA_PIM_MATCH : NFA_PIM_NOMATCH;
+			pim->ফলাফল = ফলাফল ? NFA_PIM_MATCH : NFA_PIM_NOMATCH;
 			// for \@! and \@<! it is a match when the result is
 			// FALSE
-			if (result != (pim->state->c == NFA_START_INVISIBLE_NEG
+			যদি (ফলাফল != (pim->state->c == NFA_START_INVISIBLE_NEG
 			     || pim->state->c == NFA_START_INVISIBLE_NEG_FIRST
 			     || pim->state->c
 					   == NFA_START_INVISIBLE_BEFORE_NEG
@@ -7004,24 +7004,24 @@ nfa_regmatch(
 			    // Copy submatch info from the recursive call
 			    copy_sub_off(&pim->subs.norm, &m->norm);
 #ifdef FEAT_SYN_HL
-			    if (rex.nfa_has_zsubexpr)
+			    যদি (rex.nfa_has_zsubexpr)
 				copy_sub_off(&pim->subs.synt, &m->synt);
 #endif
 			}
 		    }
-		    else
+		    অন্যথা
 		    {
-			result = (pim->result == NFA_PIM_MATCH);
+			ফলাফল = (pim->ফলাফল == NFA_PIM_MATCH);
 #ifdef ENABLE_LOG
 			fprintf(log_fd, "\n");
-			fprintf(log_fd, "Using previous recursive nfa_regmatch() result, result == %d\n", pim->result);
-			fprintf(log_fd, "MATCH = %s\n", result == TRUE ? "OK" : "FALSE");
+			fprintf(log_fd, "Using previous recursive nfa_regmatch() result, result == %d\n", pim->ফলাফল);
+			fprintf(log_fd, "MATCH = %s\n", ফলাফল == TRUE ? "OK" : "FALSE");
 			fprintf(log_fd, "\n");
 #endif
 		    }
 
 		    // for \@! and \@<! it is a match when result is FALSE
-		    if (result != (pim->state->c == NFA_START_INVISIBLE_NEG
+		    যদি (ফলাফল != (pim->state->c == NFA_START_INVISIBLE_NEG
 			     || pim->state->c == NFA_START_INVISIBLE_NEG_FIRST
 			     || pim->state->c
 					   == NFA_START_INVISIBLE_BEFORE_NEG
@@ -7031,41 +7031,41 @@ nfa_regmatch(
 			// Copy submatch info from the recursive call
 			copy_sub_off(&t->subs.norm, &pim->subs.norm);
 #ifdef FEAT_SYN_HL
-			if (rex.nfa_has_zsubexpr)
+			যদি (rex.nfa_has_zsubexpr)
 			    copy_sub_off(&t->subs.synt, &pim->subs.synt);
 #endif
 		    }
-		    else
+		    অন্যথা
 			// look-behind match failed, don't add the state
-			continue;
+			চালু;
 
 		    // Postponed invisible match was handled, don't add it to
 		    // following states.
-		    pim = NULL;
+		    pim = ফাঁকা;
 		}
 
 		// If "pim" points into l->t it will become invalid when
 		// adding the state causes the list to be reallocated.  Make a
 		// local copy to avoid that.
-		if (pim == &t->pim)
+		যদি (pim == &t->pim)
 		{
 		    copy_pim(&pim_copy, pim);
 		    pim = &pim_copy;
 		}
 
-		if (add_here)
+		যদি (add_here)
 		    r = addstate_here(thislist, add_state, &t->subs,
 								pim, &listidx);
-		else
+		অন্যথা
 		{
 		    r = addstate(nextlist, add_state, &t->subs, pim, add_off, 0);
-		    if (add_count > 0)
-			nextlist->t[nextlist->n - 1].count = add_count;
+		    যদি (add_গুনতি > 0)
+			nextlist->t[nextlist->n - 1].গুনতি = add_গুনতি;
 		}
-		if (r == NULL)
+		যদি (r == ফাঁকা)
 		{
 		    nfa_match = NFA_TOO_EXPENSIVE;
-		    goto theend;
+		    যাও theend;
 		}
 	    }
 
@@ -7079,52 +7079,52 @@ nfa_regmatch(
 	// because recursive calls should only start in the first position.
 	// Unless "nfa_endp" is not NULL, then we match the end position.
 	// Also don't start a match past the first line.
-	if (nfa_match == FALSE
+	যদি (nfa_match == FALSE
 		&& ((toplevel
 			&& rex.lnum == 0
 			&& clen != 0
 			&& (rex.reg_maxcol == 0
-			  || (colnr_T)(rex.input - rex.line) < rex.reg_maxcol))
-		    || (nfa_endp != NULL
+			  || (colnr_T)(rex.প্রবেশ - rex.সারি) < rex.reg_maxcol))
+		    || (nfa_endp != ফাঁকা
 			&& (REG_MULTI
 			    ? (rex.lnum < nfa_endp->se_u.pos.lnum
 			       || (rex.lnum == nfa_endp->se_u.pos.lnum
-				   && (int)(rex.input - rex.line)
+				   && (পূর্ণসংখ্যা)(rex.প্রবেশ - rex.সারি)
 						    < nfa_endp->se_u.pos.col))
-			    : rex.input < nfa_endp->se_u.ptr))))
+			    : rex.প্রবেশ < nfa_endp->se_u.ptr))))
 	{
 #ifdef ENABLE_LOG
 	    fprintf(log_fd, "(---) STARTSTATE\n");
 #endif
 	    // Inline optimized code for addstate() if we know the state is
 	    // the first MOPEN.
-	    if (toplevel)
+	    যদি (toplevel)
 	    {
-		int add = TRUE;
-		int c;
+		পূর্ণসংখ্যা add = TRUE;
+		পূর্ণসংখ্যা c;
 
-		if (prog->regstart != NUL && clen != 0)
+		যদি (prog->regstart != NUL && clen != 0)
 		{
-		    if (nextlist->n == 0)
+		    যদি (nextlist->n == 0)
 		    {
-			colnr_T col = (colnr_T)(rex.input - rex.line) + clen;
+			colnr_T col = (colnr_T)(rex.প্রবেশ - rex.সারি) + clen;
 
 			// Nextlist is empty, we can skip ahead to the
 			// character that must appear at the start.
-			if (skip_to_start(prog->regstart, &col) == FAIL)
-			    break;
+			যদি (skip_to_start(prog->regstart, &col) == FAIL)
+			    বিরতি;
 #ifdef ENABLE_LOG
 			fprintf(log_fd, "  Skipping ahead %d bytes to regstart\n",
-				col - ((colnr_T)(rex.input - rex.line) + clen));
+				col - ((colnr_T)(rex.প্রবেশ - rex.সারি) + clen));
 #endif
-			rex.input = rex.line + col - clen;
+			rex.প্রবেশ = rex.সারি + col - clen;
 		    }
-		    else
+		    অন্যথা
 		    {
 			// Checking if the required start character matches is
 			// cheaper than adding a state that won't match.
-			c = PTR2CHAR(rex.input + clen);
-			if (c != prog->regstart && (!rex.reg_ic
+			c = PTR2CHAR(rex.প্রবেশ + clen);
+			যদি (c != prog->regstart && (!rex.reg_ic
 			     || MB_CASEFOLD(c) != MB_CASEFOLD(prog->regstart)))
 			{
 #ifdef ENABLE_LOG
@@ -7135,55 +7135,55 @@ nfa_regmatch(
 		    }
 		}
 
-		if (add)
+		যদি (add)
 		{
-		    if (REG_MULTI)
+		    যদি (REG_MULTI)
 		    {
 			m->norm.list.multi[0].start_col =
-					 (colnr_T)(rex.input - rex.line) + clen;
+					 (colnr_T)(rex.প্রবেশ - rex.সারি) + clen;
 			m->norm.orig_start_col =
 					       m->norm.list.multi[0].start_col;
 		    }
-		    else
-			m->norm.list.line[0].start = rex.input + clen;
-		    if (addstate(nextlist, start->out, m, NULL, clen, 0) == NULL)
+		    অন্যথা
+			m->norm.list.সারি[0].start = rex.প্রবেশ + clen;
+		    যদি (addstate(nextlist, start->out, m, ফাঁকা, clen, 0) == ফাঁকা)
 		    {
 			nfa_match = NFA_TOO_EXPENSIVE;
-			goto theend;
+			যাও theend;
 		    }
 		}
 	    }
-	    else
+	    অন্যথা
 	    {
-		char_u	    *save_line = rex.line;
-		char_u	    *save_input = rex.input;
+		char_u	    *save_সারি = rex.সারি;
+		char_u	    *save_প্রবেশ = rex.প্রবেশ;
 		linenr_T    save_lnum = rex.lnum;
 
 		// At the end of a line the match can only start on the next
 		// line, use that position instead of the line break.
-		if (REG_MULTI && clen == 0 && nfa_endp != NULL
+		যদি (REG_MULTI && clen == 0 && nfa_endp != ফাঁকা
 					 && rex.lnum < nfa_endp->se_u.pos.lnum)
 		{
-		    char_u  *next_line = reg_getline(rex.lnum + 1);
+		    char_u  *পরবর্তী_সারি = reg_getline(rex.lnum + 1);
 
-		    if (next_line != NULL)
+		    যদি (পরবর্তী_সারি != ফাঁকা)
 		    {
-			rex.line = next_line;
-			rex.input = rex.line;
+			rex.সারি = পরবর্তী_সারি;
+			rex.প্রবেশ = rex.সারি;
 			++rex.lnum;
 		    }
 		}
 
-		r = addstate(nextlist, start, m, NULL, clen, 0);
+		r = addstate(nextlist, start, m, ফাঁকা, clen, 0);
 
-		rex.line = save_line;
-		rex.input = save_input;
+		rex.সারি = save_সারি;
+		rex.প্রবেশ = save_প্রবেশ;
 		rex.lnum = save_lnum;
 
-		if (r == NULL)
+		যদি (r == ফাঁকা)
 		{
 		    nfa_match = NFA_TOO_EXPENSIVE;
-		    goto theend;
+		    যাও theend;
 		}
 	    }
 	}
@@ -7191,9 +7191,9 @@ nfa_regmatch(
 #ifdef ENABLE_LOG
 	fprintf(log_fd, ">>> Thislist had %d states available: ", thislist->n);
 	{
-	    int i;
+	    পূর্ণসংখ্যা i;
 
-	    for (i = 0; i < thislist->n; i++)
+	    জন্য (i = 0; i < thislist->n; i++)
 		fprintf(log_fd, "%d  ", abs(thislist->t[i].state->id));
 	}
 	fprintf(log_fd, "\n");
@@ -7202,39 +7202,39 @@ nfa_regmatch(
 nextchar:
 	// Advance to the next character, or advance to the next line, or
 	// finish.
-	if (clen != 0)
-	    rex.input += clen;
-	else if (go_to_nextline || (nfa_endp != NULL && REG_MULTI
+	যদি (clen != 0)
+	    rex.প্রবেশ += clen;
+	অন্যথা যদি (go_to_nextline || (nfa_endp != ফাঁকা && REG_MULTI
 					&& rex.lnum < nfa_endp->se_u.pos.lnum))
 	    reg_nextline();
-	else
-	    break;
+	অন্যথা
+	    বিরতি;
 
 	// Allow interrupting with CTRL-C.
-	line_breakcheck();
-	if (got_int)
-	    break;
+	সারি_breakcheck();
+	যদি (got_int)
+	    বিরতি;
 #ifdef FEAT_RELTIME
-	if (nfa_did_time_out())
-	    break;
+	যদি (nfa_did_time_out())
+	    বিরতি;
 #endif
     }
 
 #ifdef ENABLE_LOG
-    if (log_fd != stderr)
+    যদি (log_fd != stderr)
 	fclose(log_fd);
-    log_fd = NULL;
+    log_fd = ফাঁকা;
 #endif
 
 theend:
     // Cache list buffers in prog for reuse, or free if prog already has
     // cached buffers (recursive call case).
-    if (prog->listbuf[0] == NULL && list[0].t != NULL && list[1].t != NULL)
+    যদি (prog->listbuf[0] == ফাঁকা && list[0].t != ফাঁকা && list[1].t != ফাঁকা)
     {
 	prog->listbuf[0] = list[0].t;
 	prog->listbuf[1] = list[1].t;
     }
-    else
+    অন্যথা
     {
 	vim_free(list[0].t);
 	vim_free(list[1].t);
@@ -7245,47 +7245,47 @@ theend:
     fclose(debug);
 #endif
 
-    return nfa_match;
+    ফেরত nfa_match;
 }
 
 /*
  * Try match of "prog" with at rex.line["col"].
  * Returns <= 0 for failure, number of lines contained in the match otherwise.
  */
-    static long
+    স্থির long
 nfa_regtry(
     nfa_regprog_T   *prog,
     colnr_T	    col,
-    int		    *timed_out UNUSED)	// flag set on timeout or NULL
+    পূর্ণসংখ্যা		    *timed_out UNUSED)	// flag set on timeout or NULL
 {
-    int		i;
+    পূর্ণসংখ্যা		i;
     regsubs_T	subs, m;
     nfa_state_T	*start = prog->start;
-    int		result;
+    পূর্ণসংখ্যা		ফলাফল;
 #ifdef ENABLE_LOG
     FILE	*f;
 #endif
 
-    rex.input = rex.line + col;
+    rex.প্রবেশ = rex.সারি + col;
 #ifdef FEAT_RELTIME
     nfa_timed_out = timed_out;
 #endif
 
 #ifdef ENABLE_LOG
     f = fopen(NFA_REGEXP_RUN_LOG, "a");
-    if (f != NULL)
+    যদি (f != ফাঁকা)
     {
 	fprintf(f, "\n\n\t=======================================================\n");
 # ifdef DEBUG
-	fprintf(f, "\tRegexp is \"%s\"\n", nfa_regengine.expr);
+	fprintf(f, "\tRegexp is \"%s\"\n", nfa_regengine.রাশিমালা);
 # endif
-	fprintf(f, "\tInput text is \"%s\" \n", rex.input);
+	fprintf(f, "\tInput text is \"%s\" \n", rex.প্রবেশ);
 	fprintf(f, "\t=======================================================\n\n");
 	nfa_print_state(f, start);
 	fprintf(f, "\n\n");
 	fclose(f);
     }
-    else
+    অন্যথা
 	emsg("Could not open temporary log file for writing");
 #endif
 
@@ -7296,16 +7296,16 @@ nfa_regtry(
     clear_sub(&m.synt);
 #endif
 
-    result = nfa_regmatch(prog, start, &subs, &m);
-    if (result == FALSE)
-	return 0;
-    else if (result == NFA_TOO_EXPENSIVE)
-	return result;
+    ফলাফল = nfa_regmatch(prog, start, &subs, &m);
+    যদি (ফলাফল == FALSE)
+	ফেরত 0;
+    অন্যথা যদি (ফলাফল == NFA_TOO_EXPENSIVE)
+	ফেরত ফলাফল;
 
     cleanup_subexpr();
-    if (REG_MULTI)
+    যদি (REG_MULTI)
     {
-	for (i = 0; i < subs.norm.in_use; i++)
+	জন্য (i = 0; i < subs.norm.in_use; i++)
 	{
 	    rex.reg_startpos[i].lnum = subs.norm.list.multi[i].start_lnum;
 	    rex.reg_startpos[i].col = subs.norm.list.multi[i].start_col;
@@ -7313,58 +7313,58 @@ nfa_regtry(
 	    rex.reg_endpos[i].lnum = subs.norm.list.multi[i].end_lnum;
 	    rex.reg_endpos[i].col = subs.norm.list.multi[i].end_col;
 	}
-	if (rex.reg_mmatch != NULL)
+	যদি (rex.reg_mmatch != ফাঁকা)
 	    rex.reg_mmatch->rmm_matchcol = subs.norm.orig_start_col;
 
-	if (rex.reg_startpos[0].lnum < 0)
+	যদি (rex.reg_startpos[0].lnum < 0)
 	{
 	    rex.reg_startpos[0].lnum = 0;
 	    rex.reg_startpos[0].col = col;
 	}
-	if (rex.reg_endpos[0].lnum < 0)
+	যদি (rex.reg_endpos[0].lnum < 0)
 	{
 	    // pattern has a \ze but it didn't match, use current end
 	    rex.reg_endpos[0].lnum = rex.lnum;
-	    rex.reg_endpos[0].col = (int)(rex.input - rex.line);
+	    rex.reg_endpos[0].col = (পূর্ণসংখ্যা)(rex.প্রবেশ - rex.সারি);
 	}
-	else
+	অন্যথা
 	    // Use line number of "\ze".
 	    rex.lnum = rex.reg_endpos[0].lnum;
     }
-    else
+    অন্যথা
     {
-	for (i = 0; i < subs.norm.in_use; i++)
+	জন্য (i = 0; i < subs.norm.in_use; i++)
 	{
-	    rex.reg_startp[i] = subs.norm.list.line[i].start;
-	    rex.reg_endp[i] = subs.norm.list.line[i].end;
+	    rex.reg_startp[i] = subs.norm.list.সারি[i].start;
+	    rex.reg_endp[i] = subs.norm.list.সারি[i].end;
 	}
 
-	if (rex.reg_startp[0] == NULL)
-	    rex.reg_startp[0] = rex.line + col;
-	if (rex.reg_endp[0] == NULL)
-	    rex.reg_endp[0] = rex.input;
+	যদি (rex.reg_startp[0] == ফাঁকা)
+	    rex.reg_startp[0] = rex.সারি + col;
+	যদি (rex.reg_endp[0] == ফাঁকা)
+	    rex.reg_endp[0] = rex.প্রবেশ;
     }
 
 #ifdef FEAT_SYN_HL
     // Package any found \z(...\) matches for export. Default is none.
     unref_extmatch(re_extmatch_out);
-    re_extmatch_out = NULL;
+    re_extmatch_out = ফাঁকা;
 
-    if (prog->reghasz == REX_SET)
+    যদি (prog->reghasz == REX_SET)
     {
 	cleanup_zsubexpr();
 	re_extmatch_out = make_extmatch();
-	if (re_extmatch_out == NULL)
-	    return 0;
+	যদি (re_extmatch_out == ফাঁকা)
+	    ফেরত 0;
 	// Loop over \z1, \z2, etc.  There is no \z0.
-	for (i = 1; i < subs.synt.in_use; i++)
+	জন্য (i = 1; i < subs.synt.in_use; i++)
 	{
-	    if (REG_MULTI)
+	    যদি (REG_MULTI)
 	    {
-		struct multipos *mpos = &subs.synt.list.multi[i];
+		কাঠামো multipos *mpos = &subs.synt.list.multi[i];
 
 		// Only accept single line matches that are valid.
-		if (mpos->start_lnum >= 0
+		যদি (mpos->start_lnum >= 0
 			&& mpos->start_lnum == mpos->end_lnum
 			&& mpos->end_col >= mpos->start_col)
 		    re_extmatch_out->matches[i] =
@@ -7372,11 +7372,11 @@ nfa_regtry(
 							    + mpos->start_col,
 					     mpos->end_col - mpos->start_col);
 	    }
-	    else
+	    অন্যথা
 	    {
-		struct linepos *lpos = &subs.synt.list.line[i];
+		কাঠামো linepos *lpos = &subs.synt.list.সারি[i];
 
-		if (lpos->start != NULL && lpos->end != NULL)
+		যদি (lpos->start != ফাঁকা && lpos->end != ফাঁকা)
 		    re_extmatch_out->matches[i] =
 			    vim_strnsave(lpos->start, lpos->end - lpos->start);
 	    }
@@ -7384,7 +7384,7 @@ nfa_regtry(
     }
 #endif
 
-    return 1 + rex.lnum;
+    ফেরত 1 + rex.lnum;
 }
 
 /*
@@ -7393,25 +7393,25 @@ nfa_regtry(
  *
  * Returns <= 0 for failure, number of lines contained in the match otherwise.
  */
-    static long
+    স্থির long
 nfa_regexec_both(
-    char_u	*line,
+    char_u	*সারি,
     colnr_T	startcol,	// column to start looking for match
-    int		*timed_out)	// flag set on timeout or NULL
+    পূর্ণসংখ্যা		*timed_out)	// flag set on timeout or NULL
 {
     nfa_regprog_T   *prog;
     long	    retval = 0L;
-    int		    i;
+    পূর্ণসংখ্যা		    i;
     colnr_T	    col = startcol;
 
-    if (REG_MULTI)
+    যদি (REG_MULTI)
     {
 	prog = (nfa_regprog_T *)rex.reg_mmatch->regprog;
-	line = reg_getline((linenr_T)0);    // relative to the cursor
+	সারি = reg_getline((linenr_T)0);    // relative to the cursor
 	rex.reg_startpos = rex.reg_mmatch->startpos;
 	rex.reg_endpos = rex.reg_mmatch->endpos;
     }
-    else
+    অন্যথা
     {
 	prog = (nfa_regprog_T *)rex.reg_match->regprog;
 	rex.reg_startp = rex.reg_match->startp;
@@ -7419,23 +7419,23 @@ nfa_regexec_both(
     }
 
     // Be paranoid...
-    if (prog == NULL || line == NULL)
+    যদি (prog == ফাঁকা || সারি == ফাঁকা)
     {
 	iemsg(e_null_argument);
-	goto theend;
+	যাও theend;
     }
 
     // If pattern contains "\c" or "\C": overrule value of rex.reg_ic
-    if (prog->regflags & RF_ICASE)
+    যদি (prog->regflags & RF_ICASE)
 	rex.reg_ic = TRUE;
-    else if (prog->regflags & RF_NOICASE)
+    অন্যথা যদি (prog->regflags & RF_NOICASE)
 	rex.reg_ic = FALSE;
 
     // If pattern contains "\Z" overrule value of rex.reg_icombine
-    if (prog->regflags & RF_ICOMBINE)
+    যদি (prog->regflags & RF_ICOMBINE)
 	rex.reg_icombine = TRUE;
 
-    rex.line = line;
+    rex.সারি = সারি;
     rex.lnum = 0;    // relative to line
 
     rex.nfa_has_zend = prog->has_zend;
@@ -7444,55 +7444,55 @@ nfa_regexec_both(
     rex.nfa_listid = 1;
     rex.nfa_alt_listid = 2;
 #ifdef DEBUG
-    nfa_regengine.expr = prog->pattern;
+    nfa_regengine.রাশিমালা = prog->pattern;
 #endif
 
-    if (prog->reganch && col > 0)
-	return 0L;
+    যদি (prog->reganch && col > 0)
+	ফেরত 0L;
 
     rex.need_clear_subexpr = TRUE;
 #ifdef FEAT_SYN_HL
     // Clear the external match subpointers if necessary.
-    if (prog->reghasz == REX_SET)
+    যদি (prog->reghasz == REX_SET)
     {
 	rex.nfa_has_zsubexpr = TRUE;
 	rex.need_clear_zsubexpr = TRUE;
     }
-    else
+    অন্যথা
     {
 	rex.nfa_has_zsubexpr = FALSE;
 	rex.need_clear_zsubexpr = FALSE;
     }
 #endif
 
-    if (prog->regstart != NUL)
+    যদি (prog->regstart != NUL)
     {
 	// Skip ahead until a character we know the match must start with.
 	// When there is none there is no match.
-	if (skip_to_start(prog->regstart, &col) == FAIL)
-	    return 0L;
+	যদি (skip_to_start(prog->regstart, &col) == FAIL)
+	    ফেরত 0L;
 
 	// If match_text is set it contains the full text that must match.
 	// Nothing else to try. Doesn't handle combining chars well.
-	if (prog->match_text != NULL && *prog->match_text != NUL && !rex.reg_icombine)
+	যদি (prog->match_text != ফাঁকা && *prog->match_text != NUL && !rex.reg_icombine)
 	{
 	    retval = find_match_text(&col, prog->regstart, prog->match_text);
-	    if (REG_MULTI)
+	    যদি (REG_MULTI)
 		rex.reg_mmatch->rmm_matchcol = col;
-	    else
+	    অন্যথা
 		rex.reg_match->rm_matchcol = col;
-	    return retval;
+	    ফেরত retval;
 	}
     }
 
     // If the start column is past the maximum column: no need to try.
-    if (rex.reg_maxcol > 0 && col >= rex.reg_maxcol)
-	goto theend;
+    যদি (rex.reg_maxcol > 0 && col >= rex.reg_maxcol)
+	যাও theend;
 
     // Set the "nstate" used by nfa_regcomp() to zero to trigger an error when
     // it's accidentally used during execution.
     nstate = 0;
-    for (i = 0; i < prog->nstate; ++i)
+    জন্য (i = 0; i < prog->nstate; ++i)
     {
 	prog->state[i].id = i;
 	prog->state[i].lastlist[0] = 0;
@@ -7502,26 +7502,26 @@ nfa_regexec_both(
     retval = nfa_regtry(prog, col, timed_out);
 
 #ifdef DEBUG
-    nfa_regengine.expr = NULL;
+    nfa_regengine.রাশিমালা = ফাঁকা;
 #endif
 
 theend:
-    if (retval > 0)
+    যদি (retval > 0)
     {
 	// Make sure the end is never before the start.  Can happen when \zs and
 	// \ze are used.
-	if (REG_MULTI)
+	যদি (REG_MULTI)
 	{
 	    lpos_T *start = &rex.reg_mmatch->startpos[0];
 	    lpos_T *end = &rex.reg_mmatch->endpos[0];
 
-	    if (end->lnum < start->lnum
+	    যদি (end->lnum < start->lnum
 			|| (end->lnum == start->lnum && end->col < start->col))
 		rex.reg_mmatch->endpos[0] = rex.reg_mmatch->startpos[0];
 	}
-	else
+	অন্যথা
 	{
-	    if (rex.reg_match->endp[0] < rex.reg_match->startp[0])
+	    যদি (rex.reg_match->endp[0] < rex.reg_match->startp[0])
 		rex.reg_match->endp[0] = rex.reg_match->startp[0];
 
 	    // startpos[0] may be set by "\zs", also return the column where
@@ -7530,38 +7530,38 @@ theend:
 	}
     }
 
-    return retval;
+    ফেরত retval;
 }
 
 /*
  * Compile a regular expression into internal code for the NFA matcher.
  * Returns the program in allocated space.  Returns NULL for an error.
  */
-    static regprog_T *
-nfa_regcomp(char_u *expr, int re_flags)
+    স্থির regprog_T *
+nfa_regcomp(char_u *রাশিমালা, পূর্ণসংখ্যা re_flags)
 {
-    nfa_regprog_T	*prog = NULL;
-    size_t		prog_size;
-    int			*postfix;
+    nfa_regprog_T	*prog = ফাঁকা;
+    size_t		prog_আকার;
+    পূর্ণসংখ্যা			*postfix;
 
-    if (expr == NULL)
-	return NULL;
+    যদি (রাশিমালা == ফাঁকা)
+	ফেরত ফাঁকা;
 
 #ifdef DEBUG
-    nfa_regengine.expr = expr;
+    nfa_regengine.রাশিমালা = রাশিমালা;
 #endif
     nfa_re_flags = re_flags;
 
     init_class_tab();
 
-    if (nfa_regcomp_start(expr, re_flags) == FAIL)
-	return NULL;
+    যদি (nfa_regcomp_start(রাশিমালা, re_flags) == FAIL)
+	ফেরত ফাঁকা;
 
     // Build postfix form of the regexp. Needed to build the NFA
     // (and count its size).
     postfix = re2post();
-    if (postfix == NULL)
-	goto fail;	    // Cascaded (syntax?) error
+    যদি (postfix == ফাঁকা)
+	যাও fail;	    // Cascaded (syntax?) error
 
     /*
      * In order to build the NFA, we parse the input regexp twice:
@@ -7572,9 +7572,9 @@ nfa_regcomp(char_u *expr, int re_flags)
     {
 	FILE *f = fopen(NFA_REGEXP_RUN_LOG, "a");
 
-	if (f != NULL)
+	যদি (f != ফাঁকা)
 	{
-	    fprintf(f, "\n*****************************\n\n\n\n\tCompiling regexp \"%s\"... hold on !\n", expr);
+	    fprintf(f, "\n*****************************\n\n\n\n\tCompiling regexp \"%s\"... hold on !\n", রাশিমালা);
 	    fclose(f);
 	}
     }
@@ -7587,22 +7587,22 @@ nfa_regcomp(char_u *expr, int re_flags)
     post2nfa(postfix, post_ptr, TRUE);
 
     // allocate the regprog with space for the compiled regexp
-    prog_size = offsetof(nfa_regprog_T, state) + sizeof(nfa_state_T) * nstate;
-    prog = alloc(prog_size);
-    if (prog == NULL)
-	goto fail;
+    prog_আকার = offsetof(nfa_regprog_T, state) + আকার(nfa_state_T) * nstate;
+    prog = alloc(prog_আকার);
+    যদি (prog == ফাঁকা)
+	যাও fail;
     state_ptr = prog->state;
     prog->re_in_use = FALSE;
-    prog->listbuf[0] = NULL;
-    prog->listbuf[1] = NULL;
+    prog->listbuf[0] = ফাঁকা;
+    prog->listbuf[1] = ফাঁকা;
 
     /*
      * PASS 2
      * Build the NFA
      */
     prog->start = post2nfa(postfix, post_ptr, FALSE);
-    if (prog->start == NULL)
-	goto fail;
+    যদি (prog->start == ফাঁকা)
+	যাও fail;
 
     prog->regflags = regflags;
     prog->engine = &nfa_regengine;
@@ -7618,55 +7618,55 @@ nfa_regcomp(char_u *expr, int re_flags)
     prog->match_text = nfa_get_match_text(prog->start);
 
 #ifdef ENABLE_LOG
-    nfa_postfix_dump(expr, OK);
+    nfa_postfix_dump(রাশিমালা, OK);
     nfa_dump(prog);
 #endif
 #ifdef FEAT_SYN_HL
     // Remember whether this pattern has any \z specials in it.
     prog->reghasz = re_has_z;
 #endif
-    prog->pattern = vim_strsave(expr);
+    prog->pattern = vim_strsave(রাশিমালা);
 #ifdef DEBUG
-    nfa_regengine.expr = NULL;
+    nfa_regengine.রাশিমালা = ফাঁকা;
 #endif
 
 out:
     // The postfix list and fragment stack are reused by the next compilation
     // (and freed in free_regexp_stuff()), but drop ones that grew large for a
     // big pattern to avoid holding much memory.
-    if (post_start_len > NFA_POSTFIX_KEEP)
+    যদি (post_start_len > NFA_POSTFIX_KEEP)
     {
 	VIM_CLEAR(post_start);
 	post_start_len = 0;
     }
-    post_ptr = post_end = NULL;
-    if (nfa_stack_len > NFA_STACK_KEEP)
+    post_ptr = post_end = ফাঁকা;
+    যদি (nfa_স্তূপ_len > NFA_স্তূপ_KEEP)
     {
-	VIM_CLEAR(nfa_stack);
-	nfa_stack_len = 0;
+	VIM_CLEAR(nfa_স্তূপ);
+	nfa_স্তূপ_len = 0;
     }
-    state_ptr = NULL;
-    return (regprog_T *)prog;
+    state_ptr = ফাঁকা;
+    ফেরত (regprog_T *)prog;
 
 fail:
     VIM_CLEAR(prog);
 #ifdef ENABLE_LOG
-    nfa_postfix_dump(expr, FAIL);
+    nfa_postfix_dump(রাশিমালা, FAIL);
 #endif
 #ifdef DEBUG
-    nfa_regengine.expr = NULL;
+    nfa_regengine.রাশিমালা = ফাঁকা;
 #endif
-    goto out;
+    যাও out;
 }
 
 /*
  * Free a compiled regexp program, returned by nfa_regcomp().
  */
-    static void
+    স্থির শূন্য
 nfa_regfree(regprog_T *prog)
 {
-    if (prog == NULL)
-	return;
+    যদি (prog == ফাঁকা)
+	ফেরত;
 
     vim_free(((nfa_regprog_T *)prog)->match_text);
     vim_free(((nfa_regprog_T *)prog)->pattern);
@@ -7683,23 +7683,23 @@ nfa_regfree(regprog_T *prog)
  *
  * Returns <= 0 for failure, number of lines contained in the match otherwise.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 nfa_regexec_nl(
     regmatch_T	*rmp,
-    char_u	*line,	// string to match against
+    char_u	*সারি,	// string to match against
     colnr_T	col,	// column to start looking for match
-    int		line_lbr)
+    পূর্ণসংখ্যা		সারি_lbr)
 {
     rex.reg_match = rmp;
-    rex.reg_mmatch = NULL;
+    rex.reg_mmatch = ফাঁকা;
     rex.reg_maxline = 0;
-    rex.reg_line_lbr = line_lbr;
+    rex.reg_সারি_lbr = সারি_lbr;
     rex.reg_buf = curbuf;
-    rex.reg_win = NULL;
+    rex.reg_win = ফাঁকা;
     rex.reg_ic = rmp->rm_ic;
     rex.reg_icombine = FALSE;
     rex.reg_maxcol = 0;
-    return nfa_regexec_both(line, col, NULL);
+    ফেরত nfa_regexec_both(সারি, col, ফাঁকা);
 }
 
 
@@ -7728,17 +7728,17 @@ nfa_regexec_nl(
  *
  * FIXME if this behavior is not compatible.
  */
-    static long
+    স্থির long
 nfa_regexec_multi(
     regmmatch_T	*rmp,
     win_T	*win,		// window in which to search or NULL
     buf_T	*buf,		// buffer in which to search
     linenr_T	lnum,		// nr of line to start looking for match
     colnr_T	col,		// column to start looking for match
-    int		*timed_out)	// flag set on timeout or NULL
+    পূর্ণসংখ্যা		*timed_out)	// flag set on timeout or NULL
 {
     init_regexec_multi(rmp, win, buf, lnum);
-    return nfa_regexec_both(NULL, col, timed_out);
+    ফেরত nfa_regexec_both(ফাঁকা, col, timed_out);
 }
 
 #ifdef DEBUG

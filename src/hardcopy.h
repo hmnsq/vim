@@ -14,31 +14,31 @@
 #ifndef HARDCOPY_H
 #define HARDCOPY_H
 
-#include "vim.h"
+#অন্তর্ভাব "vim.h"
 
-#if defined(FEAT_PRINTER)
+#যদি defined(FEAT_PRINTER)
 
 # define PRCOLOR_BLACK	(long_u)0
 # define PRCOLOR_WHITE	(long_u)0xFFFFFFL
 
-extern int	prt_curr_italic;
-extern int	prt_curr_bold;
-extern int	prt_curr_underline;
-extern long_u	prt_curr_bg;
-extern long_u	prt_curr_fg;
-extern int	prt_page_count;
+বাহ্যিক পূর্ণসংখ্যা	prt_curr_italic;
+বাহ্যিক পূর্ণসংখ্যা	prt_curr_bold;
+বাহ্যিক পূর্ণসংখ্যা	prt_curr_underline;
+বাহ্যিক long_u	prt_curr_bg;
+বাহ্যিক long_u	prt_curr_fg;
+বাহ্যিক পূর্ণসংখ্যা	prt_page_গুনতি;
 
-# if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
-typedef struct
+# যদি defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+প্রকারলেখ কাঠামো
 {
-    char	*name;
-    double	width; // Width and height in points for portrait
-    double	height;
+    অক্ষর	*name;
+    দ্বিগুণ	width; // Width and height in points for portrait
+    দ্বিগুণ	height;
 } prt_mediasize_T;
 
 #  define PRT_MEDIASIZE_LEN  14
 
-extern prt_mediasize_T prt_mediasize[PRT_MEDIASIZE_LEN];
+বাহ্যিক prt_mediasize_T prt_mediasize[PRT_MEDIASIZE_LEN];
 # endif
 
 #endif

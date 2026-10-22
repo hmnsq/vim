@@ -14,29 +14,29 @@
  * blit pixels ("images" are objects), the behaviour is emulated.
  */
 
-#include "vim.h"
+#অন্তর্ভাব "vim.h"
 
-#if defined(FEAT_IMAGE)
+#যদি defined(FEAT_IMAGE)
 
-struct
+কাঠামো
 {
-    const char *name;
+    ধ্রুবক অক্ষর *name;
 
-    struct
+    কাঠামো
     {
 	// Return OK on success and FAIL on failure
-	int (*init)(image_T *);
-	void (*uninit)(image_T *);
+	পূর্ণসংখ্যা (*init)(image_T *);
+	শূন্য (*uninit)(image_T *);
     } image;
 
-    struct
+    কাঠামো
     {
 	// Return OK on success and FAIL on failure
-	int (*init)(image_placement_T *);
-	void (*uninit)(image_placement_T *);
+	পূর্ণসংখ্যা (*init)(image_placement_T *);
+	শূন্য (*uninit)(image_placement_T *);
 
-	void (*draw)(image_placement_T *);
-	void (*clear)(image_placement_T *);
+	শূন্য (*draw)(image_placement_T *);
+	শূন্য (*clear)(image_placement_T *);
 
 	// If backend blits the image pixels to the screen. Images are not
 	// treated as "objects".
@@ -58,12 +58,12 @@ struct
 # ifdef FEAT_GUI_GTK
 #  ifdef USE_GTK4
 	    .blit = false,
-#  else
+#  অন্যথা
 	    .blit = true,
 #  endif
 # elif FEAT_GUI_MSWIN
 	    .blit = true,
-# else
+# অন্যথা
 	    .blit = false,
 # endif
 	}
@@ -104,37 +104,37 @@ struct
 };
 
 // Current image backend being used
-static image_backend_T image_backend = IMAGE_BACKEND_NONE;
+স্থির image_backend_T image_backend = IMAGE_BACKEND_NONE;
 
-static image_T *images = NULL;
+স্থির image_T *images = ফাঁকা;
 // Sorted from highest zindex to lowest zindex
-static image_placement_T    *placements = NULL;
-static int		    n_placements = 0;
+স্থির image_placement_T    *placements = ফাঁকা;
+স্থির পূর্ণসংখ্যা		    n_placements = 0;
 
-static int shift_top = 0;
-static int shift_bot = 0;
-static int shift = 0;
+স্থির পূর্ণসংখ্যা shift_শীর্ষ = 0;
+স্থির পূর্ণসংখ্যা shift_bot = 0;
+স্থির পূর্ণসংখ্যা shift = 0;
 
 // If > 0, then mark_dirty_region_for_images() will be a no-op
-static int freeze_mark_dirty = 0;
+স্থির পূর্ণসংখ্যা freeze_mark_dirty = 0;
 
-#define FOR_ALL_IMAGES(v) for ((v) = images; (v) != NULL; (v) = (v)->next)
+#define FOR_ALL_IMAGES(v) জন্য ((v) = images; (v) != ফাঁকা; (v) = (v)->পরবর্তী)
 #define FOR_ALL_PLACEMENTS(v) \
-    for ((v) = placements; (v) != NULL; (v) = (v)->next)
+    জন্য ((v) = placements; (v) != ফাঁকা; (v) = (v)->পরবর্তী)
 
 #define IMAGE_FUNC(b, n) (image_backends[b].image.n)
 #define PLACEMENT_FUNC(b, n) (image_backends[b].placement.n)
 
-static void redraw_region(pixman_region32_t *region, bool now, bool restore);
+স্থির শূন্য redraw_region(pixman_region32_t *region, bool now, bool restore);
 
-    void
-init_image_state(void)
+    শূন্য
+init_image_state(শূন্য)
 {
-    (void)update_image_backend();
+    (শূন্য)update_image_backend();
 }
 
-    void
-uninit_image_state(void)
+    শূন্য
+uninit_image_state(শূন্য)
 {
 #ifdef FEAT_IMAGE_SIXEL
     sixel_uninit();
@@ -144,16 +144,16 @@ uninit_image_state(void)
 /*
  * Return true if the there image backend is ready, otherwise emit error.
  */
-    static bool
-backend_available(bool msg)
+    স্থির bool
+backend_available(bool বার্তা)
 {
-    if (image_backend == IMAGE_BACKEND_NONE)
+    যদি (image_backend == IMAGE_BACKEND_NONE)
     {
-	if (msg)
+	যদি (বার্তা)
 	    emsg(_(e_no_image_backend_available));
-	return false;
+	ফেরত false;
     }
-    return true;
+    ফেরত true;
 }
 
 /*
@@ -161,23 +161,23 @@ backend_available(bool msg)
  * failure.
  */
     image_T *
-image_new(uint8_t *data, int width, int height, image_format_T fmt)
+image_new(uint8_t *তথ্য, পূর্ণসংখ্যা width, পূর্ণসংখ্যা height, image_format_T fmt)
 {
     image_T	    *img;
-    static int_u    id;
+    স্থির int_u    id;
 
-    if (!backend_available(true))
-	return NULL;
+    যদি (!backend_available(true))
+	ফেরত ফাঁকা;
 
     img = ALLOC_CLEAR_ONE(image_T);
-    if (img == NULL)
-	return NULL;
+    যদি (img == ফাঁকা)
+	ফেরত ফাঁকা;
 
-    img->data = vim_memsave(data, (size_t)width * height * fmt);
-    if (img->data == NULL)
+    img->তথ্য = vim_memsave(তথ্য, (size_t)width * height * fmt);
+    যদি (img->তথ্য == ফাঁকা)
     {
 	vim_free(img);
-	return NULL;
+	ফেরত ফাঁকা;
     }
 
     img->state = IMAGE_STATE_PRIVATE;
@@ -191,35 +191,35 @@ image_new(uint8_t *data, int width, int height, image_format_T fmt)
 
     img->backend = image_backend;
 
-    if (IMAGE_FUNC(image_backend, init)(img) == FAIL)
+    যদি (IMAGE_FUNC(image_backend, init)(img) == FAIL)
     {
-	vim_free(img->data);
+	vim_free(img->তথ্য);
 	vim_free(img);
-	return NULL;
+	ফেরত ফাঁকা;
     }
 
-    if (images != NULL)
-	images->prev = img;
-    img->next = images;
+    যদি (images != ফাঁকা)
+	images->পূর্ব = img;
+    img->পরবর্তী = images;
     images = img;
 
-    return img;
+    ফেরত img;
 }
 
-    static void
+    স্থির শূন্য
 image_free(image_T *img)
 {
-    if (backend_available(false))
+    যদি (backend_available(false))
 	IMAGE_FUNC(image_backend, uninit)(img);
 
-    if (img->prev != NULL)
-	img->prev->next = img->next;
-    if (img->next != NULL)
-	img->next->prev = img->prev;
-    if (images == img)
-	images = img->next;
+    যদি (img->পূর্ব != ফাঁকা)
+	img->পূর্ব->পরবর্তী = img->পরবর্তী;
+    যদি (img->পরবর্তী != ফাঁকা)
+	img->পরবর্তী->পূর্ব = img->পূর্ব;
+    যদি (images == img)
+	images = img->পরবর্তী;
 
-    vim_free(img->data);
+    vim_free(img->তথ্য);
     vim_free(img);
 }
 
@@ -227,10 +227,10 @@ image_free(image_T *img)
  * Decrement reference count of an image. Be careful to not let the public API
  * be able to directly decrement the refcount of an image multiple times!
  */
-    void
+    শূন্য
 image_unref(image_T *img)
 {
-    if (--img->refcount <= 0)
+    যদি (--img->refcount <= 0)
 	image_free(img);
 }
 
@@ -242,18 +242,18 @@ image_unref(image_T *img)
 image_ref(image_T *img)
 {
     img->refcount++;
-    return img;
+    ফেরত img;
 }
 
 /*
  * Get image width and height in cells, rounding up so that every pixel is
  * covered.
  */
-    void
-image_get_cell_dimensions(image_T *img, int *cw, int *ch)
+    শূন্য
+image_get_cell_dimensions(image_T *img, পূর্ণসংখ্যা *cw, পূর্ণসংখ্যা *ch)
 {
-    int w = PHY2LOG(img->width);
-    int h = PHY2LOG(img->height);
+    পূর্ণসংখ্যা w = PHY2LOG(img->width);
+    পূর্ণসংখ্যা h = PHY2LOG(img->height);
 
     *cw = (w + cell_width - 1) / cell_width;
     *ch = (h + cell_height - 1) / cell_height;
@@ -263,18 +263,18 @@ image_get_cell_dimensions(image_T *img, int *cw, int *ch)
  * Similar, but return the dimensions of all cells that are *fully* covered by
  * pixels. Pixels that are partially covered are not counted.
  */
-    static void
-image_get_cell_dimensions_min(image_T *img, int *cw, int *ch)
+    স্থির শূন্য
+image_get_cell_dimensions_min(image_T *img, পূর্ণসংখ্যা *cw, পূর্ণসংখ্যা *ch)
 {
-    int w = PHY2LOG(img->width);
-    int h = PHY2LOG(img->height);
+    পূর্ণসংখ্যা w = PHY2LOG(img->width);
+    পূর্ণসংখ্যা h = PHY2LOG(img->height);
 
     *cw = w / cell_width;
     *ch = h / cell_height;
 }
 
-    void
-image_get_dimensions(image_T *img, int *w, int *h)
+    শূন্য
+image_get_dimensions(image_T *img, পূর্ণসংখ্যা *w, পূর্ণসংখ্যা *h)
 {
     *w = img->width;
     *h = img->height;
@@ -284,75 +284,75 @@ image_get_dimensions(image_T *img, int *w, int *h)
  * Replace the current image contents with "data". "data" should be the exact
  * same format, width, and height. Return OK on success and FAIL on failure.
  */
-    int
-image_update(image_T *img, uint8_t *data)
+    পূর্ণসংখ্যা
+image_update(image_T *img, uint8_t *তথ্য)
 {
-    int w, h;
+    পূর্ণসংখ্যা w, h;
 
-    if (!backend_available(true) || img->data == NULL)
-	return FAIL;
+    যদি (!backend_available(true) || img->তথ্য == ফাঁকা)
+	ফেরত FAIL;
 
     image_get_dimensions(img, &w, &h);
-    mch_memmove(img->data, data, (size_t)w * h * img->fmt);
+    mch_memmove(img->তথ্য, তথ্য, (size_t)w * h * img->fmt);
 
     IMAGE_FUNC(image_backend, uninit)(img);
 
-    if (IMAGE_FUNC(image_backend, init)(img) == FAIL)
+    যদি (IMAGE_FUNC(image_backend, init)(img) == FAIL)
     {
 	emsg(_(e_out_of_memory));
-	VIM_CLEAR(img->data);
-	return FAIL;
+	VIM_CLEAR(img->তথ্য);
+	ফেরত FAIL;
     }
 
     img->ver++;
     redraw_all_later(UPD_VALID);
-    return OK;
+    ফেরত OK;
 }
 
-    static void
+    স্থির শূন্য
 image_placement_unlink(image_placement_T *place)
 {
-    if (place->prev != NULL)
-	place->prev->next = place->next;
-    if (place->next != NULL)
-	place->next->prev = place->prev;
-    if (placements == place)
-	placements = place->next;
+    যদি (place->পূর্ব != ফাঁকা)
+	place->পূর্ব->পরবর্তী = place->পরবর্তী;
+    যদি (place->পরবর্তী != ফাঁকা)
+	place->পরবর্তী->পূর্ব = place->পূর্ব;
+    যদি (placements == place)
+	placements = place->পরবর্তী;
     n_placements--;
 }
 
-    static void
+    স্থির শূন্য
 image_placement_link(image_placement_T *place)
 {
     image_placement_T *p = placements;
-    image_placement_T *prev = NULL;
+    image_placement_T *পূর্ব = ফাঁকা;
 
     // Add placement *before* the placement with the lower zindex.
-    while (p != NULL)
+    যখন (p != ফাঁকা)
     {
-	if (place->zindex > p->zindex)
-	    break;
-	else if (place->zindex == p->zindex)
+	যদি (place->zindex > p->zindex)
+	    বিরতি;
+	অন্যথা যদি (place->zindex == p->zindex)
 	{
-	    if (place->use > p->use)
-		break;
-	    if (place->gen < p->gen)
-		break;
+	    যদি (place->use > p->use)
+		বিরতি;
+	    যদি (place->gen < p->gen)
+		বিরতি;
 	}
 
-	prev = p;
-	p = p->next;
+	পূর্ব = p;
+	p = p->পরবর্তী;
     }
 
-    place->next = p;
-    place->prev = prev;
+    place->পরবর্তী = p;
+    place->পূর্ব = পূর্ব;
 
-    if (p != NULL)
-	p->prev = place;
+    যদি (p != ফাঁকা)
+	p->পূর্ব = place;
 
-    if (prev != NULL)
-	prev->next = place;
-    else
+    যদি (পূর্ব != ফাঁকা)
+	পূর্ব->পরবর্তী = place;
+    অন্যথা
 	placements = place;
 
     n_placements++;
@@ -381,14 +381,14 @@ image_placement_new(
 	bool			quiet)
 {
     image_placement_T	*place;
-    static int_u	id = 1; // Kitty placements id must be > 1
+    স্থির int_u	id = 1; // Kitty placements id must be > 1
 
-    if (!backend_available(!quiet))
-	return NULL;
+    যদি (!backend_available(!quiet))
+	ফেরত ফাঁকা;
 
     place = ALLOC_CLEAR_ONE(image_placement_T);
-    if (place == NULL)
-	return NULL;
+    যদি (place == ফাঁকা)
+	ফেরত ফাঁকা;
 
     place->id = id;
     id += PLACEMENT_ID_INC; // Allocate 1000 free placement ids to be used to
@@ -400,7 +400,7 @@ image_placement_new(
     place->img = img;
     place->flags = IMAGEPF_DIRTY;
 
-    if (img != NULL)
+    যদি (img != ফাঁকা)
     {
 	place->img_ver = img->ver;
 	place->backend = image_backend;
@@ -413,73 +413,73 @@ image_placement_new(
 	place->crop_box.x2 = place->bounding_box.x2;
 	place->crop_box.y2 = place->bounding_box.y2;
 
-	if (PLACEMENT_FUNC(image_backend, init)(place) == FAIL)
+	যদি (PLACEMENT_FUNC(image_backend, init)(place) == FAIL)
 	{
 	    id -= PLACEMENT_ID_INC;
 	    vim_free(place);
-	    return NULL;
+	    ফেরত ফাঁকা;
 	}
     }
-    else
+    অন্যথা
 	place->backend = IMAGE_BACKEND_NONE;
 
     image_placement_link(place);
 
-    return place;
+    ফেরত place;
 }
 
-    static void
+    স্থির শূন্য
 image_placement_clear_int(image_placement_T *place, bool now)
 {
-    if (backend_available(false) && place->img != NULL)
+    যদি (backend_available(false) && place->img != ফাঁকা)
     {
-	if (place->flags & IMAGEPF_VISIBLE_INIT
+	যদি (place->flags & IMAGEPF_VISIBLE_INIT
 		&& PLACEMENT_FUNC(image_backend, blit))
 	    redraw_region(&place->visible_abs, now, true);
 	PLACEMENT_FUNC(image_backend, clear)(place);
 	place->flags |= IMAGEPF_HIDDEN;
-	if (!now && !updating_screen)
+	যদি (!now && !updating_screen)
 	    redraw_all_later(UPD_VALID);
     }
 }
 
-    void
+    শূন্য
 image_placement_clear(image_placement_T *place)
 {
     image_placement_clear_int(place, updating_screen);
 }
 
-    void
+    শূন্য
 image_placement_free(image_placement_T *place)
 {
-    if (backend_available(false) && place->backend_data != NULL)
+    যদি (backend_available(false) && place->backend_তথ্য != ফাঁকা)
     {
 	image_placement_clear(place);
 	PLACEMENT_FUNC(image_backend, uninit)(place);
     }
 
-    if (place->flags & IMAGEPF_VISIBLE_INIT)
+    যদি (place->flags & IMAGEPF_VISIBLE_INIT)
     {
 	pixman_region32_fini(&place->visible);
 	pixman_region32_fini(&place->visible_abs);
     }
     image_placement_unlink(place);
 
-    if (place->img != NULL)
+    যদি (place->img != ফাঁকা)
 	image_unref(place->img);
     vim_free(place);
 }
 
-    void
-image_placement_set_zindex(image_placement_T *place, int zindex)
+    শূন্য
+image_placement_set_zindex(image_placement_T *place, পূর্ণসংখ্যা zindex)
 {
     // If image was hidden before, must dirty it so it is fully redrawn again.
-    if (place->flags & IMAGEPF_HIDDEN)
+    যদি (place->flags & IMAGEPF_HIDDEN)
 	place->flags |= IMAGEPF_DIRTY;
     place->flags &= ~IMAGEPF_HIDDEN;
 
-    if (place->zindex == zindex)
-	return;
+    যদি (place->zindex == zindex)
+	ফেরত;
     place->zindex = zindex;
     place->flags |= IMAGEPF_DIRTY;
 
@@ -491,30 +491,30 @@ image_placement_set_zindex(image_placement_T *place, int zindex)
 /*
  * Make sure to also update the bounding box!
  */
-    void
-image_placement_set_position(image_placement_T *place, int row, int col)
+    শূন্য
+image_placement_set_position(image_placement_T *place, পূর্ণসংখ্যা row, পূর্ণসংখ্যা col)
 {
-    if (place->flags & IMAGEPF_HIDDEN)
+    যদি (place->flags & IMAGEPF_HIDDEN)
 	place->flags |= IMAGEPF_DIRTY;
     place->flags &= ~IMAGEPF_HIDDEN;
 
-    if (place->row == row && place->col == col)
-	return;
+    যদি (place->row == row && place->col == col)
+	ফেরত;
     place->row = row;
     place->col = col;
     place->flags |= IMAGEPF_DIRTY;
 }
 
-    void
-image_placement_set_crop(image_placement_T *place, int x, int y, int w, int h)
+    শূন্য
+image_placement_set_crop(image_placement_T *place, পূর্ণসংখ্যা x, পূর্ণসংখ্যা y, পূর্ণসংখ্যা w, পূর্ণসংখ্যা h)
 {
-    if (place->flags & IMAGEPF_HIDDEN)
+    যদি (place->flags & IMAGEPF_HIDDEN)
 	place->flags |= IMAGEPF_DIRTY;
     place->flags &= ~IMAGEPF_HIDDEN;
 
-    if (place->crop_box.x1 == x && place->crop_box.y1 == y
+    যদি (place->crop_box.x1 == x && place->crop_box.y1 == y
 	    && place->crop_box.x2 == x + w && place->crop_box.y2 == y + h)
-	return;
+	ফেরত;
 
     place->crop_box.x1 = x;
     place->crop_box.y1 = y;
@@ -524,22 +524,22 @@ image_placement_set_crop(image_placement_T *place, int x, int y, int w, int h)
     place->flags |= IMAGEPF_DIRTY;
 }
 
-    void
+    শূন্য
 image_placement_set_bounding_box(
 	image_placement_T   *place,
-	int		    row,
-	int		    col,
-	int		    row_height,
-	int		    col_width)
+	পূর্ণসংখ্যা		    row,
+	পূর্ণসংখ্যা		    col,
+	পূর্ণসংখ্যা		    row_height,
+	পূর্ণসংখ্যা		    col_width)
 {
-    if (place->flags & IMAGEPF_HIDDEN)
+    যদি (place->flags & IMAGEPF_HIDDEN)
 	place->flags |= IMAGEPF_DIRTY;
     place->flags &= ~IMAGEPF_HIDDEN;
 
-    if (place->bounding_box.x1 == col && place->bounding_box.y1 == row
+    যদি (place->bounding_box.x1 == col && place->bounding_box.y1 == row
 	    && place->bounding_box.x2 == col + col_width
 	    && place->bounding_box.y2 == row + row_height)
-	return;
+	ফেরত;
 
     place->bounding_box.x1 = col;
     place->bounding_box.y1 = row;
@@ -553,20 +553,20 @@ image_placement_set_bounding_box(
  * Enable or disable the image placement. Unlike IMAGEPF_HIDDEN, this is not
  * reset across redraws.
  */
-    void
+    শূন্য
 image_placement_set_enable(image_placement_T *place, bool enable)
 {
     bool old = place->flags & IMAGEPF_ENABLED;
 
-    if (enable && !old)
+    যদি (enable && !old)
 	place->flags |= IMAGEPF_ENABLED;
-    else if (!enable && old)
+    অন্যথা যদি (!enable && old)
     {
 	place->flags &= ~IMAGEPF_ENABLED;
 	image_placement_clear(place);
     }
-    else
-	return;
+    অন্যথা
+	ফেরত;
 
     place->flags |= IMAGEPF_DIRTY;
 }
@@ -575,19 +575,19 @@ image_placement_set_enable(image_placement_T *place, bool enable)
  * Note that the returned crop region (x, y, w, h) is in physical pixels if
  * "physical" is true. Not relevant when using terminal protocols (sixel, KGP).
  */
-    void
+    শূন্য
 image_placement_subrect(
 	image_placement_T   *place,
 	pixman_box32_t	    rect,
-	int		    *row,
-	int		    *col,
-	int		    *x,
-	int		    *y,
-	int		    *w,
-	int		    *h,
+	পূর্ণসংখ্যা		    *row,
+	পূর্ণসংখ্যা		    *col,
+	পূর্ণসংখ্যা		    *x,
+	পূর্ণসংখ্যা		    *y,
+	পূর্ণসংখ্যা		    *w,
+	পূর্ণসংখ্যা		    *h,
 	bool		    physical)
 {
-    int iw, ih;
+    পূর্ণসংখ্যা iw, ih;
 
     image_get_dimensions(place->img, &iw, &ih);
 
@@ -599,14 +599,14 @@ image_placement_subrect(
     *w = (rect.x2 - rect.x1) * cell_width;
     *h = (rect.y2 - rect.y1) * cell_height;
 
-    if (physical)
+    যদি (physical)
     {
 	*x = LOG2PHY(*x);
 	*y = LOG2PHY(*y);
 	*w = LOG2PHY(*w);
 	*h = LOG2PHY(*h);
     }
-    else
+    অন্যথা
     {
 	iw = PHY2LOG(iw);
 	ih = PHY2LOG(ih);
@@ -630,53 +630,53 @@ image_placement_subrect(
  * instead of deferring to next redraw. If "restore" is true, restore the cursor
  * position.
  */
-    static void
+    স্থির শূন্য
 redraw_region(pixman_region32_t *region, bool now, bool restore)
 {
     pixman_box32_t  *rects;
-    int		    n_rects;
-    int		    cur_row = screen_cur_row;
-    int		    cur_col = screen_cur_col;
+    পূর্ণসংখ্যা		    n_rects;
+    পূর্ণসংখ্যা		    cur_row = screen_cur_row;
+    পূর্ণসংখ্যা		    cur_col = screen_cur_col;
 
     rects = pixman_region32_rectangles(region, &n_rects);
-    if (rects == NULL)
-	return;
+    যদি (rects == ফাঁকা)
+	ফেরত;
 
-    for (int i = 0; i < n_rects; i++)
+    জন্য (পূর্ণসংখ্যা i = 0; i < n_rects; i++)
     {
 	pixman_box32_t rect = rects[i];
 
-	if (now)
+	যদি (now)
 	{
 	    // The region may be from before a resize, when the screen was
 	    // bigger.
-	    int height = MIN(rect.y2, screen_Rows) - rect.y1;
-	    int width = MIN(rect.x2, screen_Columns) - rect.x1;
+	    পূর্ণসংখ্যা height = MIN(rect.y2, screen_Rows) - rect.y1;
+	    পূর্ণসংখ্যা width = MIN(rect.x2, screen_Columns) - rect.x1;
 
 	    // Tip: if you want to debug stale pixels appearing, set "inverse"
 	    // of screen_draw_rectangle() to TRUE.
-	    if (height > 0 && width > 0)
+	    যদি (height > 0 && width > 0)
 		screen_draw_rectangle(rect.y1, rect.x1, height, width,
 			FALSE, TRUE);
-	    continue;
+	    চালু;
 	}
 
-	for (int r = rect.y1; r < rect.y2; r++)
+	জন্য (পূর্ণসংখ্যা r = rect.y1; r < rect.y2; r++)
 	{
-	    if (r >= screen_Rows)
-		break;
+	    যদি (r >= screen_Rows)
+		বিরতি;
 
-	    for (int c = rect.x1; c < rect.x2; c++)
+	    জন্য (পূর্ণসংখ্যা c = rect.x1; c < rect.x2; c++)
 	    {
-		if (c >= screen_Columns)
-		    break;
+		যদি (c >= screen_Columns)
+		    বিরতি;
 
-		ScreenAttrs[LineOffset[r] + c] = (sattr_T)-1;
+		ScreenAttrs[সারি_Offset[r] + c] = (sattr_T)-1;
 	    }
 	}
     }
 
-    if (restore)
+    যদি (restore)
 	windgoto(cur_row, cur_col);
 }
 
@@ -684,38 +684,38 @@ redraw_region(pixman_region32_t *region, bool now, bool restore)
  * Draw all image placements to the screen. This should be done after all text
  * have been drawn to the screen, and image placements positioned correctly.
  */
-    void
-draw_image_placements(void)
+    শূন্য
+draw_image_placements(শূন্য)
 {
     image_placement_T	*place;
     pixman_region32_t	subtract_region;    // In cells
     pixman_region32_t	dirty_region;	    // In cells
     image_placement_T	**pending_placements;
-    int			pending_len = -1;
+    পূর্ণসংখ্যা			pending_len = -1;
     // Save current cursor position
-    int			cur_row = screen_cur_row;
-    int			cur_col = screen_cur_col;
+    পূর্ণসংখ্যা			cur_row = screen_cur_row;
+    পূর্ণসংখ্যা			cur_col = screen_cur_col;
 
     // Check if all placements have no backing image. If so, then do nothing
     FOR_ALL_PLACEMENTS(place)
-	if (place->img != NULL)
+	যদি (place->img != ফাঁকা)
 	{
 	    pending_len = 0;
-	    break;
+	    বিরতি;
 	}
 
-    if (pending_len == -1)
-	return;
+    যদি (pending_len == -1)
+	ফেরত;
 
-    if (!backend_available(false))
-	return;
+    যদি (!backend_available(false))
+	ফেরত;
 
-    if (n_placements == 0)
-	return;
+    যদি (n_placements == 0)
+	ফেরত;
 
     pending_placements = ALLOC_CLEAR_MULT(image_placement_T *, n_placements);
-    if (pending_placements == NULL)
-	return;
+    যদি (pending_placements == ফাঁকা)
+	ফেরত;
 
     pixman_region32_init(&subtract_region);
     pixman_region32_init(&dirty_region);
@@ -739,31 +739,31 @@ draw_image_placements(void)
 	pixman_region32_t   image_region;
 	pixman_region32_t   visible_region;
 
-	int x, y;
+	পূর্ণসংখ্যা x, y;
 
-	if (place->flags & IMAGEPF_HIDDEN || !(place->flags & IMAGEPF_ENABLED))
+	যদি (place->flags & IMAGEPF_HIDDEN || !(place->flags & IMAGEPF_ENABLED))
 	    // Don't need to clear image placement for non-blit backends,
 	    // because we call image_placement_clear() every time we don't want
 	    // to see the image. Not sure of the side effects if we also clear
 	    // it here...
-	    continue;
+	    চালু;
 
-	if (img != NULL)
+	যদি (img != ফাঁকা)
 	{
 	    pixman_region32_t	visible_abs;
-	    int			crop_w, crop_h;
+	    পূর্ণসংখ্যা			crop_w, crop_h;
 	    bool		cs_changed;
 	    bool		need_redraw;
 
 	    // Processing changed image data failed, skip this image
-	    if (place->img->data == NULL)
+	    যদি (place->img->তথ্য == ফাঁকা)
 	    {
 		image_placement_clear(place);
-		continue;
+		চালু;
 	    }
 
 	    // Only apply row shift if image is within the shifted region.
-	    if ((place->bounding_box.y1 >= shift_top
+	    যদি ((place->bounding_box.y1 >= shift_শীর্ষ
 			&& place->bounding_box.y2 <= shift_bot)
 		    && place->row_off != shift)
 	    {
@@ -786,7 +786,7 @@ draw_image_placements(void)
 
 	    // Only use parts of the image region within the actual screen.
 	    // "row_off" may offset the image slightly/completely off screen.
-	    if (!pixman_region32_intersect_rect(&image_region, &image_region,
+	    যদি (!pixman_region32_intersect_rect(&image_region, &image_region,
 			0, 0, Columns, Rows)
 		    || !pixman_region32_subtract(&visible_region,
 			&image_region, &subtract_region)
@@ -794,7 +794,7 @@ draw_image_placements(void)
 	    {
 		pixman_region32_fini(&image_region);
 		pixman_region32_fini(&visible_region);
-		continue;
+		চালু;
 	    }
 
 	    pixman_region32_fini(&image_region);
@@ -809,7 +809,7 @@ draw_image_placements(void)
 	    // If cell size changed, then the visible regions are invalid pixel
 	    // wise. This prevents backends such as sixel from using cached
 	    // sequences.
-	    if (cs_changed)
+	    যদি (cs_changed)
 	    {
 		place->cell_width = cell_width;
 		place->cell_height = cell_height;
@@ -823,7 +823,7 @@ draw_image_placements(void)
 			&& !pixman_region32_equal(&visible_region,
 			    &place->visible));
 
-	    if (place->img_ver != img->ver)
+	    যদি (place->img_ver != img->ver)
 	    {
 		// Image data changed
 		need_redraw = true;
@@ -831,22 +831,22 @@ draw_image_placements(void)
 
 		image_placement_clear(place);
 		PLACEMENT_FUNC(image_backend, uninit)(place);
-		if (PLACEMENT_FUNC(image_backend, init)(place) == FAIL)
+		যদি (PLACEMENT_FUNC(image_backend, init)(place) == FAIL)
 		{
 		    emsg(_(e_out_of_memory));
 		    image_unref(place->img);
-		    place->img = NULL;
-		    continue;
+		    place->img = ফাঁকা;
+		    চালু;
 		}
 	    }
 
-	    if (need_redraw)
+	    যদি (need_redraw)
 	    {
-		if (place->flags & IMAGEPF_VISIBLE_INIT)
+		যদি (place->flags & IMAGEPF_VISIBLE_INIT)
 		    pixman_region32_fini(&place->visible);
 		place->visible = visible_region;
 
-		if (PLACEMENT_FUNC(image_backend, blit))
+		যদি (PLACEMENT_FUNC(image_backend, blit))
 		{
 		    // Must redraw the stale regions that will not be composited
 		    // over (for this specific image).
@@ -854,16 +854,16 @@ draw_image_placements(void)
 
 		    pixman_region32_init(&stale_region);
 
-		    if (place->flags & IMAGEPF_VISIBLE_INIT)
+		    যদি (place->flags & IMAGEPF_VISIBLE_INIT)
 		    {
-			(void)pixman_region32_subtract(&stale_region,
+			(শূন্য)pixman_region32_subtract(&stale_region,
 				&place->visible_abs, &visible_abs);
 
 			// Since pixels may be translucent/transparent, we must
 			// redraw the cells behind the image every time, so that
 			// no stale pixels remain from the previous redraw.
-			if (img->fmt == IMAGE_FORMAT_RGBA)
-			    (void)pixman_region32_union(&stale_region,
+			যদি (img->fmt == IMAGE_FORMAT_RGBA)
+			    (শূন্য)pixman_region32_union(&stale_region,
 				    &stale_region, &place->visible_abs);
 		    }
 
@@ -881,10 +881,10 @@ draw_image_placements(void)
 		    //
 		    // Not needed for RGBA images, because we redraw the visible
 		    // region every time anyways.
-		    if (img->fmt != IMAGE_FORMAT_RGBA)
+		    যদি (img->fmt != IMAGE_FORMAT_RGBA)
 		    {
-			int		    min_w, min_h;
-			int		    rect_w, rect_h;
+			পূর্ণসংখ্যা		    min_w, min_h;
+			পূর্ণসংখ্যা		    rect_w, rect_h;
 			pixman_region32_t   min_region;
 
 			image_get_cell_dimensions_min(img, &min_w, &min_h);
@@ -894,30 +894,30 @@ draw_image_placements(void)
 			rect_w = min_w - place->crop_box.x1;
 			rect_h = min_h - place->crop_box.y1;
 
-			if (rect_w > 0 && rect_h > 0)
+			যদি (rect_w > 0 && rect_h > 0)
 			    // pixman_region32_init_rect() expects a non zero
 			    // width and height (otherwise it outputs error
 			    // message).
 			    pixman_region32_init_rect(&min_region,
 				    x, y, rect_w, rect_h);
-			else
+			অন্যথা
 			    pixman_region32_init(&min_region);
 
-			(void)pixman_region32_subtract(&min_region,
+			(শূন্য)pixman_region32_subtract(&min_region,
 				&visible_abs, &min_region);
-			(void)pixman_region32_union(&stale_region,
+			(শূন্য)pixman_region32_union(&stale_region,
 				&stale_region, &min_region);
 			pixman_region32_fini(&min_region);
 		    }
 
-		    if (place->flags & IMAGEPF_VISIBLE_INIT)
+		    যদি (place->flags & IMAGEPF_VISIBLE_INIT)
 			// Also subtract "subtract_region", so we don't
 			// redundantly redraw cells that will have images
 			// painted over them after. Make sure to do this before
 			// we check partially covered cells, since
 			// "subtract_region" may also have partially covered
 			// cells.
-			(void)pixman_region32_subtract(&stale_region,
+			(শূন্য)pixman_region32_subtract(&stale_region,
 				&stale_region, &subtract_region);
 
 		    // Don't redraw now, defer it later
@@ -925,7 +925,7 @@ draw_image_placements(void)
 			    &dirty_region, &stale_region);
 		    pixman_region32_fini(&stale_region);
 		}
-		if (place->flags & IMAGEPF_VISIBLE_INIT)
+		যদি (place->flags & IMAGEPF_VISIBLE_INIT)
 		    pixman_region32_fini(&place->visible_abs);
 		place->visible_abs = visible_abs;
 
@@ -933,7 +933,7 @@ draw_image_placements(void)
 		place->flags |= IMAGEPF_VISIBLE_INIT;
 		place->flags &= ~IMAGEPF_DIRTY;
 	    }
-	    else
+	    অন্যথা
 	    {
 		pixman_region32_fini(&visible_region);
 		pixman_region32_fini(&visible_abs);
@@ -941,8 +941,8 @@ draw_image_placements(void)
 	}
 
 	// If this is last image, no need to union its bounds.
-	if (place->next == NULL)
-	    break;
+	যদি (place->পরবর্তী == ফাঁকা)
+	    বিরতি;
 
 	pixman_region32_union_rect(&subtract_region, &subtract_region,
 		place->bounding_box.x1,
@@ -956,18 +956,18 @@ draw_image_placements(void)
     redraw_region(&dirty_region, true, false);
     freeze_mark_dirty--;
 
-    if (pending_len > 0)
+    যদি (pending_len > 0)
     {
 #ifdef FEAT_GUI
 	// Make sure to flush any output! We write directly to the draw
 	// area/whatever, meaning draw commands outputted before this (as escape
 	// sequences), will still draw over the image surface if we don't flush
 	// now.
-	if (gui.in_use)
+	যদি (gui.in_use)
 	    out_flush();
 #endif
 
-	for (int i = 0; i < pending_len; i++)
+	জন্য (পূর্ণসংখ্যা i = 0; i < pending_len; i++)
 	{
 	    PLACEMENT_FUNC(image_backend, draw)(pending_placements[i]);
 	    pending_placements[i]->flags &= ~IMAGEPF_FORCE;
@@ -989,15 +989,15 @@ draw_image_placements(void)
  * Mark any images that touches the region dirty. Only used for backends that
  * blit pixels.
  */
-    void
-mark_dirty_region_for_images(int row, int col, int row_height, int col_width)
+    শূন্য
+mark_dirty_region_for_images(পূর্ণসংখ্যা row, পূর্ণসংখ্যা col, পূর্ণসংখ্যা row_height, পূর্ণসংখ্যা col_width)
 {
     image_placement_T	*place;
     pixman_box32_t	rect;
 
-    if (freeze_mark_dirty > 0 || !backend_available(false)
+    যদি (freeze_mark_dirty > 0 || !backend_available(false)
 	    || !PLACEMENT_FUNC(image_backend, blit) || n_placements == 0)
-	return;
+	ফেরত;
 
     rect.x1 = col;
     rect.y1 = row;
@@ -1006,24 +1006,24 @@ mark_dirty_region_for_images(int row, int col, int row_height, int col_width)
 
     FOR_ALL_PLACEMENTS(place)
     {
-	if (place->flags & IMAGEPF_HIDDEN)
-	    continue;
-	if (pixman_region32_contains_rectangle(&place->visible_abs, &rect)
+	যদি (place->flags & IMAGEPF_HIDDEN)
+	    চালু;
+	যদি (pixman_region32_contains_rectangle(&place->visible_abs, &rect)
 		== PIXMAN_REGION_OUT)
-	    continue;
+	    চালু;
 
 	place->flags |= IMAGEPF_DIRTY;
     }
 }
 
-    void
-clear_all_image_placements(void)
+    শূন্য
+clear_all_image_placements(শূন্য)
 {
     image_placement_T *place;
 
     FOR_ALL_PLACEMENTS(place)
 	image_placement_clear(place);
-    if (!updating_screen)
+    যদি (!updating_screen)
 	redraw_all_later(UPD_VALID);
 }
 
@@ -1031,10 +1031,10 @@ clear_all_image_placements(void)
  * Used for screen_ins_lines() and screen_del_lines(), because they directly
  * shift rows. Note that this does not queue a screen redraw.
  */
-    void
-shift_image_placements(int top, int bot, int amount)
+    শূন্য
+shift_image_placements(পূর্ণসংখ্যা শীর্ষ_2, পূর্ণসংখ্যা bot, পূর্ণসংখ্যা amount)
 {
-    shift_top = top;
+    shift_শীর্ষ = শীর্ষ_2;
     shift_bot = bot;
     shift += amount;
 }
@@ -1043,21 +1043,21 @@ shift_image_placements(int top, int bot, int amount)
  * Called when screen is cleared, as update_screen() may go to clearing the
  * screen instead of inserting lines using screen_ins_lines().
  */
-    void
-shift_reset_image_placements(void)
+    শূন্য
+shift_reset_image_placements(শূন্য)
 {
     shift = 0;
 }
 
-    static image_T *
+    স্থির image_T *
 find_image(int_u id)
 {
     image_T *img;
 
     FOR_ALL_IMAGES(img)
-	if (img->state == IMAGE_STATE_PUBLIC && img->id == id)
-	    return img;
-    return NULL;
+	যদি (img->state == IMAGE_STATE_PUBLIC && img->id == id)
+	    ফেরত img;
+    ফেরত ফাঁকা;
 }
 
 /*
@@ -1068,63 +1068,63 @@ find_image(int_u id)
 add_image(dict_T *dict, image_T *existing, bool find)
 {
     dictitem_T	    *di;
-    blob_T	    *data;
+    blob_T	    *তথ্য;
     varnumber_T     w, h;
     varnumber_T     n_pixels;
     image_format_T  fmt;
 
-    if (find && dict_has_key(dict, "id"))
+    যদি (find && dict_has_চাবি(dict, "id"))
     {
-	image_T *img = find_image((int_u)dict_get_number(dict, "id"));
+	image_T *img = find_image((int_u)dict_get_সংখ্যা(dict, "id"));
 
-	if (img == NULL)
-	    return NULL;
-	return image_ref(img);
+	যদি (img == ফাঁকা)
+	    ফেরত ফাঁকা;
+	ফেরত image_ref(img);
     }
 
     di = dict_find(dict, (char_u *)"data", -1);
-    w = dict_get_number(dict, "width");
-    h = dict_get_number(dict, "height");
+    w = dict_get_সংখ্যা(dict, "width");
+    h = dict_get_সংখ্যা(dict, "height");
 
-    if (di == NULL || di->di_tv.v_type != VAR_BLOB || w <= 0 || h <= 0)
+    যদি (di == ফাঁকা || di->di_tv.v_type != VAR_BLOB || w <= 0 || h <= 0)
     {
 	emsg(_(e_invalid_argument));
-	return NULL;
+	ফেরত ফাঁকা;
     }
 
     // Check for overflow
     n_pixels = w * h;
-    if (w > INT_MAX || h > INT_MAX || n_pixels > INT_MAX)
+    যদি (w > INT_MAX || h > INT_MAX || n_pixels > INT_MAX)
     {
 	emsg(_(e_invalid_image_dimensions));
-	return NULL;
+	ফেরত ফাঁকা;
     }
 
-    data = di->di_tv.vval.v_blob;
+    তথ্য = di->di_tv.vval.v_blob;
 
-    if (blob_len(data) == n_pixels * 3)
+    যদি (blob_len(তথ্য) == n_pixels * 3)
 	fmt = IMAGE_FORMAT_RGB;
-    else if (blob_len(data) == n_pixels * 4)
+    অন্যথা যদি (blob_len(তথ্য) == n_pixels * 4)
 	fmt = IMAGE_FORMAT_RGBA;
-    else
+    অন্যথা
     {
-	semsg(_(e_invalid_value_for_argument_str_str), "data",
+	semsg(_(e_invalid_মান_for_argument_str_str), "data",
 		"data length must equal width*height*3 or width*height*4");
-	return NULL;
+	ফেরত ফাঁকা;
     }
 
-    if (existing != NULL)
+    যদি (existing != ফাঁকা)
     {
-	if (existing->width == w && existing->height == h
+	যদি (existing->width == w && existing->height == h
 		&& existing->fmt == fmt)
 	{
-	    if (image_update(existing, data->bv_ga.ga_data) == FAIL)
-		return NULL;
-	    return existing;
+	    যদি (image_update(existing, তথ্য->bv_ga.ga_তথ্য) == FAIL)
+		ফেরত ফাঁকা;
+	    ফেরত existing;
 	}
     }
 
-    return image_new(data->bv_ga.ga_data, w, h, fmt);
+    ফেরত image_new(তথ্য->bv_ga.ga_তথ্য, w, h, fmt);
 }
 
 /*
@@ -1136,117 +1136,117 @@ get_image_info(image_T *img)
 {
     dict_T	*dict;
     blob_T	*blob;
-    int		w, h;
+    পূর্ণসংখ্যা		w, h;
     dictitem_T	*di;
 
-    if (img->data == NULL)
-	return NULL;
+    যদি (img->তথ্য == ফাঁকা)
+	ফেরত ফাঁকা;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return NULL;
+    যদি (dict == ফাঁকা)
+	ফেরত ফাঁকা;
 
     blob = blob_alloc();
-    if (blob == NULL)
+    যদি (blob == ফাঁকা)
     {
 	dict_unref(dict);
-	return NULL;
+	ফেরত ফাঁকা;
     }
 
     image_get_dimensions(img, &w, &h);
-    (void)ga_concat_bytes(&blob->bv_ga, (char *)img->data,
+    (শূন্য)ga_concat_bytes(&blob->bv_ga, (অক্ষর *)img->তথ্য,
 	    (size_t)w * h * img->fmt);
 
     di = dictitem_alloc((char_u *)"data");
 
-    if (di != NULL)
+    যদি (di != ফাঁকা)
     {
 	di->di_tv.v_type = VAR_BLOB;
 	di->di_tv.vval.v_blob = blob;
     }
-    if (di == NULL || dict_add(dict, di) == FAIL)
+    যদি (di == ফাঁকা || dict_add(dict, di) == FAIL)
     {
-	if (di != NULL)
+	যদি (di != ফাঁকা)
 	    dictitem_free(di);
 	dict_unref(dict);
 	// No need to unref blob, dictitem_free() will do that.
-	return NULL;
+	ফেরত ফাঁকা;
     }
 
-    if (img->state == IMAGE_STATE_PUBLIC)
-	dict_add_number(dict, "id", img->id);
-    dict_add_number(dict, "width", img->width);
-    dict_add_number(dict, "height", img->height);
-    dict_add_number(dict, "alpha", img->fmt == IMAGE_FORMAT_RGBA);
+    যদি (img->state == IMAGE_STATE_PUBLIC)
+	dict_add_সংখ্যা(dict, "id", img->id);
+    dict_add_সংখ্যা(dict, "width", img->width);
+    dict_add_সংখ্যা(dict, "height", img->height);
+    dict_add_সংখ্যা(dict, "alpha", img->fmt == IMAGE_FORMAT_RGBA);
     dict_add_string(dict, "format",
 	    (char_u *)(img->fmt == IMAGE_FORMAT_RGB ? "rgb" : "rgba"));
 
     blob->bv_refcount = 1;
 
-    return dict;
+    ফেরত dict;
 }
 
-    static int
+    স্থির পূর্ণসংখ্যা
 match_imageprotocol(image_backend_T *backend)
 {
-    int		    len = (int)STRLEN(p_ipc) + 1;
+    পূর্ণসংখ্যা		    len = (পূর্ণসংখ্যা)STRLEN(p_ipc) + 1;
     char_u	    *buf = alloc(len);
     char_u	    *p = p_ipc;
-    int		    ret = FAIL;
+    পূর্ণসংখ্যা		    ret = FAIL;
     image_backend_T res = IMAGE_BACKEND_NONE;
     bool	    got = false;
 
-    if (buf == NULL)
-	return FAIL;
+    যদি (buf == ফাঁকা)
+	ফেরত FAIL;
 
-    while (*p != NUL)
+    যখন (*p != NUL)
     {
 	char_u		*colon;
 	regmatch_T	regmatch;
 	image_backend_T prot = IMAGE_BACKEND_NONE;
 
 	// Isolate one comma separated item.
-	(void)copy_option_part(&p, buf, len, ",");
+	(শূন্য)copy_option_part(&p, buf, len, ",");
 
 	colon = vim_strchr(buf, ':');
-	if (colon == NULL || colon == buf || colon[1] == NUL)
-	    goto exit;
+	যদি (colon == ফাঁকা || colon == buf || colon[1] == NUL)
+	    যাও exit;
 
 	*colon = NUL;
 
 	// Note: Keep this in sync with p_ipc_protocol_values.
-	if (STRCMP(colon + 1, "none") == 0)
+	যদি (STRCMP(colon + 1, "none") == 0)
 	    prot = IMAGE_BACKEND_NONE;
-	else if (STRCMP(colon + 1, "kitty") == 0)
+	অন্যথা যদি (STRCMP(colon + 1, "kitty") == 0)
 	{
 #ifdef FEAT_IMAGE_KITTY
 	    prot = IMAGE_BACKEND_KITTY;
 #endif
 	}
-	else if (STRCMP(colon + 1, "sixel") == 0)
+	অন্যথা যদি (STRCMP(colon + 1, "sixel") == 0)
 	{
 #ifdef FEAT_IMAGE_SIXEL
 	    prot = IMAGE_BACKEND_SIXEL;
 #endif
 	}
-	else
-	    goto exit;
+	অন্যথা
+	    যাও exit;
 
-	if (got)
-	    continue;
+	যদি (got)
+	    চালু;
 
 	CLEAR_FIELD(regmatch);
 	regmatch.rm_ic = TRUE;
 	regmatch.regprog = vim_regcomp(buf, RE_MAGIC);
 
-	if (regmatch.regprog == NULL)
-	    goto exit;
+	যদি (regmatch.regprog == ফাঁকা)
+	    যাও exit;
 
-	bool match = T_NAME != NULL
+	bool match = T_NAME != ফাঁকা
 	    && vim_regexec(&regmatch, T_NAME, (colnr_T)0);
 
 	vim_regfree(regmatch.regprog);
-	if (match)
+	যদি (match)
 	{
 	    // Keep going to catch any errors
 	    res = prot;
@@ -1258,15 +1258,15 @@ match_imageprotocol(image_backend_T *backend)
     *backend = res;
 exit:
     vim_free(buf);
-    return ret;
+    ফেরত ret;
 }
 
 /*
  * Update the current image backend to use depending on 'imageprotocol' and if
  * GUI is being used. Returns OK on success and FAIL on failure.
  */
-    int
-update_image_backend(void)
+    পূর্ণসংখ্যা
+update_image_backend(শূন্য)
 {
     image_backend_T new;
 
@@ -1274,43 +1274,43 @@ update_image_backend(void)
     image_placement_T	*place;
 
     // Always process 'imageprotocol' option to check for errors
-    if (match_imageprotocol(&new) == FAIL)
-	return FAIL;
+    যদি (match_imageprotocol(&new) == FAIL)
+	ফেরত FAIL;
 
 #ifdef FEAT_IMAGE_GUI
-    if (gui.in_use)
+    যদি (gui.in_use)
 	new = IMAGE_BACKEND_GUI;
 #endif
 
-    if (image_backend == new)
-	return OK;
+    যদি (image_backend == new)
+	ফেরত OK;
 
     // Must uninit the backends of every image/placement, then init the new
     // backend for each.
     FOR_ALL_IMAGES(img)
     {
-	if (image_backend != IMAGE_BACKEND_NONE && img->data != NULL
-		&& img->backend_data != NULL)
+	যদি (image_backend != IMAGE_BACKEND_NONE && img->তথ্য != ফাঁকা
+		&& img->backend_তথ্য != ফাঁকা)
 	    IMAGE_FUNC(image_backend, uninit)(img);
-	img->backend_data = NULL;
-	if (new != IMAGE_BACKEND_NONE)
+	img->backend_তথ্য = ফাঁকা;
+	যদি (new != IMAGE_BACKEND_NONE)
 	{
-	    if (IMAGE_FUNC(new, init)(img) == FAIL)
-		goto fail;
+	    যদি (IMAGE_FUNC(new, init)(img) == FAIL)
+		যাও fail;
 	    img->backend = new;
 	}
     }
     FOR_ALL_PLACEMENTS(place)
     {
 	image_placement_clear(place);
-	if (image_backend != IMAGE_BACKEND_NONE
-		&& place->img != NULL && place->backend_data != NULL)
+	যদি (image_backend != IMAGE_BACKEND_NONE
+		&& place->img != ফাঁকা && place->backend_তথ্য != ফাঁকা)
 	    PLACEMENT_FUNC(image_backend, uninit)(place);
-	place->backend_data = NULL;
-	if (new != IMAGE_BACKEND_NONE && place->img != NULL)
+	place->backend_তথ্য = ফাঁকা;
+	যদি (new != IMAGE_BACKEND_NONE && place->img != ফাঁকা)
 	{
-	    if (PLACEMENT_FUNC(new, init)(place) == FAIL)
-		goto fail;
+	    যদি (PLACEMENT_FUNC(new, init)(place) == FAIL)
+		যাও fail;
 	    place->backend = new;
 	}
     }
@@ -1318,16 +1318,16 @@ update_image_backend(void)
     redraw_all_later(UPD_VALID);
     image_backend = new;
 
-    if (new == IMAGE_BACKEND_NONE)
+    যদি (new == IMAGE_BACKEND_NONE)
 	set_vim_var_string(VV_IMAGEBACKEND, (char_u *)"none", -1);
-    else
+    অন্যথা
 	set_vim_var_string(VV_IMAGEBACKEND,
 		(char_u *)image_backends[image_backend].name, -1);
 
-    return OK;
+    ফেরত OK;
 fail:
     FOR_ALL_IMAGES(img)
-	if (img->backend != IMAGE_BACKEND_NONE)
+	যদি (img->backend != IMAGE_BACKEND_NONE)
 	{
 	    IMAGE_FUNC(img->backend, uninit)(img);
 	    img->backend = IMAGE_BACKEND_NONE;
@@ -1335,7 +1335,7 @@ fail:
 
     FOR_ALL_PLACEMENTS(place)
     {
-	if (place->img != NULL && place->backend != IMAGE_BACKEND_NONE)
+	যদি (place->img != ফাঁকা && place->backend != IMAGE_BACKEND_NONE)
 	{
 	    image_placement_clear(place);
 	    PLACEMENT_FUNC(place->backend, uninit)(place);
@@ -1348,81 +1348,81 @@ fail:
     image_backend = IMAGE_BACKEND_NONE;
     set_vim_var_string(VV_IMAGEBACKEND, (char_u *)"none", -1);
     emsg(_(e_changing_image_backend_failed));
-    return FAIL;
+    ফেরত FAIL;
 }
 
-    void
+    শূন্য
 f_image_add(typval_T *argvars, typval_T *rettv)
 {
     dict_T  *dict;
     image_T *img;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL)
-	return;
+    যদি (check_for_dict_arg(argvars, 0) == FAIL)
+	ফেরত;
 
     dict = argvars[0].vval.v_dict;
 
-    img = add_image(dict, NULL, false);
-    if (img != NULL)
+    img = add_image(dict, ফাঁকা, false);
+    যদি (img != ফাঁকা)
 	img->state = IMAGE_STATE_PUBLIC;
 
-    rettv->v_type = VAR_NUMBER;
-    rettv->vval.v_number = img == NULL ? (varnumber_T)-1 : img->id;
+    rettv->v_type = VAR_সংখ্যা;
+    rettv->vval.v_সংখ্যা = img == ফাঁকা ? (varnumber_T)-1 : img->id;
 }
 
-    void
+    শূন্য
 f_image_discard(typval_T *argvars, typval_T *rettv UNUSED)
 {
     image_T *img;
 
-    if (check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    যদি (check_for_সংখ্যা_arg(argvars, 0) == FAIL)
+	ফেরত;
 
-    img = find_image((int_u)argvars[0].vval.v_number);
+    img = find_image((int_u)argvars[0].vval.v_সংখ্যা);
 
-    if (img != NULL)
+    যদি (img != ফাঁকা)
     {
 	img->state = IMAGE_STATE_PRIVATE;
 	image_unref(img);
     }
-    else
-	semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_number);
+    অন্যথা
+	semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_সংখ্যা);
 }
 
-    void
+    শূন্য
 f_image_info(typval_T *argvars, typval_T *rettv)
 {
     image_T *img;
     dict_T  *dict;
 
-    if (rettv_list_alloc(rettv) == FAIL
-	    || check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    যদি (rettv_list_alloc(rettv) == FAIL
+	    || check_for_opt_সংখ্যা_arg(argvars, 0) == FAIL)
+	ফেরত;
 
-    if (argvars[0].v_type == VAR_NUMBER)
+    যদি (argvars[0].v_type == VAR_সংখ্যা)
     {
-	img = find_image((int_u)argvars[0].vval.v_number);
-	if (img == NULL)
+	img = find_image((int_u)argvars[0].vval.v_সংখ্যা);
+	যদি (img == ফাঁকা)
 	{
-	    semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_number);
-	    return;
+	    semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_সংখ্যা);
+	    ফেরত;
 	}
 	dict = get_image_info(img);
-	if (dict != NULL && list_append_dict(rettv->vval.v_list, dict) == FAIL)
+	যদি (dict != ফাঁকা && list_append_dict(rettv->vval.v_list, dict) == FAIL)
 	    dict_unref(dict);
-	return;
+	ফেরত;
     }
 
     FOR_ALL_IMAGES(img)
     {
-	if (img->state == IMAGE_STATE_PRIVATE)
-	    continue;
+	যদি (img->state == IMAGE_STATE_PRIVATE)
+	    চালু;
 	dict = get_image_info(img);
-	if (dict == NULL
+	যদি (dict == ফাঁকা
 		|| list_append_dict(rettv->vval.v_list, dict) == FAIL)
 	{
 	    dict_unref(dict);	// NULL-safe
-	    return;
+	    ফেরত;
 	}
     }
 }

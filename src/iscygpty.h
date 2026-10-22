@@ -31,9 +31,9 @@
 #define _ISCYGPTY_H
 
 #ifdef _WIN32
-int is_cygpty(int fd);
-int is_cygpty_used(void);
-#else
+পূর্ণসংখ্যা is_cygpty(পূর্ণসংখ্যা fd);
+পূর্ণসংখ্যা is_cygpty_used(শূন্য);
+#অন্যথা
 # define is_cygpty(fd)		0
 # define is_cygpty_used()	0
 #endif

@@ -10,26 +10,26 @@
 
 // TERMLIB: Terminal independent database.
 
-#include "vim.h"
-#include "termlib.pro"
+#অন্তর্ভাব "vim.h"
+#অন্তর্ভাব "termlib.pro"
 
-#if !defined(AMIGA) && !defined(VMS)
+#যদি !defined(AMIGA) && !defined(VMS)
 # include <sgtty.h>
 #endif
 
-static int  getent(char *, char *, FILE *, int);
-static int  nextent(char *, FILE *, int);
-static int  _match(char *, char *);
-static char *_addfmt(char *, char *, int);
-static char *_find(char *, char *);
+স্থির পূর্ণসংখ্যা  getent(অক্ষর *, অক্ষর *, FILE *, পূর্ণসংখ্যা);
+স্থির পূর্ণসংখ্যা  nextent(অক্ষর *, FILE *, পূর্ণসংখ্যা);
+স্থির পূর্ণসংখ্যা  _match(অক্ষর *, অক্ষর *);
+স্থির অক্ষর *_addfmt(অক্ষর *, অক্ষর *, পূর্ণসংখ্যা);
+স্থির অক্ষর *_find(অক্ষর *, অক্ষর *);
 
 /*
  * Global variables for termlib
  */
 
-char	*tent;		      // Pointer to terminal entry, set by tgetent
-char	PC = 0;		      // Pad character, default NULL
-char	*UP = 0, *BC = 0;     // Pointers to UP and BC strings from database
+অক্ষর	*tent;		      // Pointer to terminal entry, set by tgetent
+অক্ষর	PC = 0;		      // Pad character, default NULL
+অক্ষর	*UP = 0, *BC = 0;     // Pointers to UP and BC strings from database
 short	ospeed;		      // Baud rate (1-16, 1=300, 16=19200), as in stty
 
 /*
@@ -56,151 +56,151 @@ short	ospeed;		      // Baud rate (1-16, 1=300, 16=19200), as in stty
 #ifndef TERMCAPFILE
 # ifdef AMIGA
 #  define TERMCAPFILE "s:termcap"
-# else
+# অন্যথা
 #  ifdef VMS
 #   define TERMCAPFILE "VIMRUNTIME:termcap"
-#  else
+#  অন্যথা
 #   define TERMCAPFILE "/etc/termcap"
 #  endif
 # endif
 #endif
 
-    int
+    পূর্ণসংখ্যা
 tgetent(
-    char    *tbuf,		// Buffer to hold termcap entry, TBUFSZ bytes max
-    char    *term)		// Name of terminal
+    অক্ষর    *tbuf,		// Buffer to hold termcap entry, TBUFSZ bytes max
+    অক্ষর    *term)		// Name of terminal
 {
-    char    tcbuf[32];		// Temp buffer to handle
-    char    *tcptr = tcbuf;	// extended entries
-    char    *tcap = TERMCAPFILE; // Default termcap file
-    char    *tmp;
+    অক্ষর    tcbuf[32];		// Temp buffer to handle
+    অক্ষর    *tcptr = tcbuf;	// extended entries
+    অক্ষর    *tcap = TERMCAPFILE; // Default termcap file
+    অক্ষর    *tmp;
     FILE    *termcap;
-    int	    retval = 0;
-    int	    len;
+    পূর্ণসংখ্যা	    retval = 0;
+    পূর্ণসংখ্যা	    len;
 
-    if ((tmp = (char *)mch_getenv((char_u *)"TERMCAP")) != NULL)
+    যদি ((tmp = (অক্ষর *)mch_getenv((char_u *)"TERMCAP")) != ফাঁকা)
     {
-	if (*tmp == '/')		// TERMCAP = name of termcap file
+	যদি (*tmp == '/')		// TERMCAP = name of termcap file
 	{
 	    tcap = tmp ;
-#if defined(AMIGA)
+#যদি defined(AMIGA)
 	    // Convert /usr/share/lib/termcap to usr:share/lib/termcap
 	    tcap++;
 	    tmp = strchr(tcap, '/');
-	    if (tmp)
+	    যদি (tmp)
 		*tmp = ':';
 #endif
 	}
-	else				// TERMCAP = termcap entry itself
+	অন্যথা				// TERMCAP = termcap entry itself
 	{
-	    int tlen = strlen(term);
+	    পূর্ণসংখ্যা tlen = strlen(term);
 
-	    while (*tmp && *tmp != ':')		// Check if TERM matches
+	    যখন (*tmp && *tmp != ':')		// Check if TERM matches
 	    {
-		char *nexttmp;
+		অক্ষর *nexttmp;
 
-		while (*tmp == '|')
+		যখন (*tmp == '|')
 		    tmp++;
 		nexttmp  = _find(tmp, ":|");	// Rhialto
-		if (tmp+tlen == nexttmp && _match(tmp, term) == tlen)
+		যদি (tmp+tlen == nexttmp && _match(tmp, term) == tlen)
 		{
 		    vim_strncpy(tbuf, tmp, TBUFSZ - 1);
 		    tent = tbuf;
-		    return 1;
+		    ফেরত 1;
 		}
-		else
+		অন্যথা
 		    tmp = nexttmp;
 	    }
 	}
     }
-    if (!(termcap = mch_fopen(tcap, "r")))
+    যদি (!(termcap = mch_fopen(tcap, "r")))
     {
 	vim_strncpy(tbuf, tcap, TBUFSZ - 1);
-	return -1;
+	ফেরত -1;
     }
 
     len = 0;
-    while (getent(tbuf + len, term, termcap, TBUFSZ - len))
+    যখন (getent(tbuf + len, term, termcap, TBUFSZ - len))
     {
 	tcptr = tcbuf;				// Rhialto
-	if ((term = tgetstr("tc", &tcptr)))	// extended entry
+	যদি ((term = tgetstr("tc", &tcptr)))	// extended entry
 	{
 	    rewind(termcap);
 	    len = strlen(tbuf);
 	}
-	else
+	অন্যথা
 	{
 	    retval = 1;
 	    tent = tbuf;	// reset it back to the beginning
-	    break;
+	    বিরতি;
 	}
     }
     fclose(termcap);
-    return retval;
+    ফেরত retval;
 }
 
-    static int
-getent(char *tbuf, char *term, FILE *termcap, int buflen)
+    স্থির পূর্ণসংখ্যা
+getent(অক্ষর *tbuf, অক্ষর *term, FILE *termcap, পূর্ণসংখ্যা buflen)
 {
-    char    *tptr;
-    int	    tlen = strlen(term);
+    অক্ষর    *tptr;
+    পূর্ণসংখ্যা	    tlen = strlen(term);
 
-    while (nextent(tbuf, termcap, buflen))	// For each possible entry
+    যখন (nextent(tbuf, termcap, buflen))	// For each possible entry
     {
 	tptr = tbuf;
-	while (*tptr && *tptr != ':')		// : terminates name field
+	যখন (*tptr && *tptr != ':')		// : terminates name field
 	{
-	    char    *nexttptr;
+	    অক্ষর    *nexttptr;
 
-	    while (*tptr == '|')		// | separates names
+	    যখন (*tptr == '|')		// | separates names
 		tptr++;
 	    nexttptr = _find(tptr, ":|");	// Rhialto
-	    if (tptr + tlen == nexttptr &&
+	    যদি (tptr + tlen == nexttptr &&
 		_match(tptr, term) == tlen)	// FOUND!
 	    {
 		tent = tbuf;
-		return 1;
+		ফেরত 1;
 	    }
-	    else				// Look for next name
+	    অন্যথা				// Look for next name
 		tptr = nexttptr;
 	}
     }
-    return 0;
+    ফেরত 0;
 }
 
 /*
  * Read 1 entry from TERMCAP file.
  */
-    static int
-nextent(char *tbuf, FILE *termcap, int buflen)
+    স্থির পূর্ণসংখ্যা
+nextent(অক্ষর *tbuf, FILE *termcap, পূর্ণসংখ্যা buflen)
 {
-    char *lbuf = tbuf;				// lbuf=line buffer
+    অক্ষর *lbuf = tbuf;				// lbuf=line buffer
 				// read lines straight into buffer
 
-    while (lbuf < tbuf+buflen &&		// There's room and
-	  fgets(lbuf, (int)(tbuf+buflen-lbuf), termcap)) // another line
+    যখন (lbuf < tbuf+buflen &&		// There's room and
+	  fgets(lbuf, (পূর্ণসংখ্যা)(tbuf+buflen-lbuf), termcap)) // another line
     {
-	int llen = strlen(lbuf);
+	পূর্ণসংখ্যা llen = strlen(lbuf);
 
-	if (*lbuf == '#')			// eat comments
-	    continue;
-	if (lbuf[-1] == ':' &&			// and whitespace
+	যদি (*lbuf == '#')			// eat comments
+	    চালু;
+	যদি (lbuf[-1] == ':' &&			// and whitespace
 	    lbuf[0] == '\t' &&
 	    lbuf[1] == ':')
 	{
 	    STRMOVE(lbuf, lbuf + 2);
 	    llen -= 2;
 	}
-	if (lbuf[llen-2] == '\\')		// and continuations
+	যদি (lbuf[llen-2] == '\\')		// and continuations
 	    lbuf += llen-2;
-	else
+	অন্যথা
 	{
 	    lbuf[llen-1]=0;			// no continuation, return
-	    return 1;
+	    ফেরত 1;
 	}
     }
 
-    return 0;					// ran into end of file
+    ফেরত 0;					// ran into end of file
 }
 
 /*
@@ -214,12 +214,12 @@ nextent(char *tbuf, FILE *termcap, int buflen)
  * Returned values: 1 for success, 0 for failure.
  */
 
-    int
-tgetflag(char *id)
+    পূর্ণসংখ্যা
+tgetflag(অক্ষর *id)
 {
-    char    buf[256], *ptr = buf;
+    অক্ষর    buf[256], *ptr = buf;
 
-    return tgetstr(id, &ptr) ? 1 : 0;
+    ফেরত tgetstr(id, &ptr) ? 1 : 0;
 }
 
 /*
@@ -232,16 +232,16 @@ tgetflag(char *id)
  * Returned values: -1 for failure, else numerical value.
  */
 
-    int
-tgetnum(char *id)
+    পূর্ণসংখ্যা
+tgetnum(অক্ষর *id)
 {
-    char *ptr, buf[256];
+    অক্ষর *ptr, buf[256];
     ptr = buf;
 
-    if (tgetstr(id, &ptr))
-	return atoi(buf);
-    else
-	return 0;
+    যদি (tgetstr(id, &ptr))
+	ফেরত atoi(buf);
+    অন্যথা
+	ফেরত 0;
 }
 
 /*
@@ -271,92 +271,92 @@ tgetnum(char *id)
  *
  */
 
-    char *
-tgetstr(char *id, char **buf)
+    অক্ষর *
+tgetstr(অক্ষর *id, অক্ষর **buf)
 {
-    int		len = strlen(id);
-    char	*tmp=tent;
-    char	*hold;
-    int		i;
+    পূর্ণসংখ্যা		len = strlen(id);
+    অক্ষর	*tmp=tent;
+    অক্ষর	*hold;
+    পূর্ণসংখ্যা		i;
 
-    do
+    করো
     {
 	tmp = _find(tmp, ":");			// For each field
-	while (*tmp == ':')			// skip empty fields
+	যখন (*tmp == ':')			// skip empty fields
 	    tmp++;
-	if (!*tmp)
-	    break;
+	যদি (!*tmp)
+	    বিরতি;
 
-	if (_match(id, tmp) == len)
+	যদি (_match(id, tmp) == len)
 	{
 	    tmp += len;				// find '=' '@' or '#'
-	    if (*tmp == '@')			// :xx@: entry for tc
-		return 0;			// deleted entry
+	    যদি (*tmp == '@')			// :xx@: entry for tc
+		ফেরত 0;			// deleted entry
 	    hold= *buf;
-	    while (*++tmp && *tmp != ':')	// not at end of field
+	    যখন (*++tmp && *tmp != ':')	// not at end of field
 		{
-		switch(*tmp)
+		নির্বাচন(*tmp)
 		{
-		case '\\':			// Expand escapes here
-		    switch(*++tmp)
+		ক্ষেত্র '\\':			// Expand escapes here
+		    নির্বাচন(*++tmp)
 		    {
-		    case 0:			// ignore backslashes
+		    ক্ষেত্র 0:			// ignore backslashes
 			tmp--;			// at end of entry
-			break;			// shouldn't happen
-		    case 'e':
-		    case 'E':			// ESC
+			বিরতি;			// shouldn't happen
+		    ক্ষেত্র 'e':
+		    ক্ষেত্র 'E':			// ESC
 			*(*buf)++ = ESC;
-			break;
-		    case 'n':			// \n
+			বিরতি;
+		    ক্ষেত্র 'n':			// \n
 			*(*buf)++ = '\n';
-			break;
-		    case 'r':			// \r
+			বিরতি;
+		    ক্ষেত্র 'r':			// \r
 			*(*buf)++ = '\r';
-			break;
-		    case 't':			// \t
+			বিরতি;
+		    ক্ষেত্র 't':			// \t
 			*(*buf)++ = '\t';
-			break;
-		    case 'b':			// \b
+			বিরতি;
+		    ক্ষেত্র 'b':			// \b
 			*(*buf)++ = '\b';
-			break;
-		    case 'f':			// \f
+			বিরতি;
+		    ক্ষেত্র 'f':			// \f
 			*(*buf)++ = '\f';
-			break;
-		    case '0':			// \nnn
-		    case '1':
-		    case '2':
-		    case '3':
-		    case '4':
-		    case '5':
-		    case '6':
-		    case '7':
-		    case '8':
-		    case '9':
+			বিরতি;
+		    ক্ষেত্র '0':			// \nnn
+		    ক্ষেত্র '1':
+		    ক্ষেত্র '2':
+		    ক্ষেত্র '3':
+		    ক্ষেত্র '4':
+		    ক্ষেত্র '5':
+		    ক্ষেত্র '6':
+		    ক্ষেত্র '7':
+		    ক্ষেত্র '8':
+		    ক্ষেত্র '9':
 			**buf = 0;
 			    // get up to three digits
-			for (i = 0; i < 3 && VIM_ISDIGIT(*tmp); ++i)
+			জন্য (i = 0; i < 3 && VIM_ISDIGIT(*tmp); ++i)
 			    **buf = **buf * 8 + *tmp++ - '0';
 			(*buf)++;
 			tmp--;
-			break;
-		    default:			// \x, for all other x
+			বিরতি;
+		    পূর্বনির্ধারিত:			// \x, for all other x
 			*(*buf)++= *tmp;
 		    }
-		    break;
-		case '^':			// control characters
+		    বিরতি;
+		ক্ষেত্র '^':			// control characters
 		    ++tmp;
 		    *(*buf)++ = Ctrl_chr(*tmp);
-		    break;
-		default:
+		    বিরতি;
+		পূর্বনির্ধারিত:
 		    *(*buf)++ = *tmp;
 		}
 	    }
 	    *(*buf)++ = 0;
-	    return hold;
+	    ফেরত hold;
 	}
-    } while (*tmp);
+    } যখন (*tmp);
 
-    return 0;
+    ফেরত 0;
 }
 
 /*
@@ -385,132 +385,132 @@ tgetstr(char *id, char **buf)
  *	%D	 reverse coding (x-2*(x%16)), no output.
  */
 
-    char *
+    অক্ষর *
 tgoto(
-    char    *cm,				// cm string, from termcap
-    int	    col,				// column, x position
-    int	    line)				// line, y position
+    অক্ষর    *cm,				// cm string, from termcap
+    পূর্ণসংখ্যা	    col,				// column, x position
+    পূর্ণসংখ্যা	    সারি)				// line, y position
 {
-    char    gx, gy,				// x, y
+    অক্ষর    gx, gy,				// x, y
 	*ptr,					// pointer in 'cm'
 	reverse = 0,				// reverse flag
 	*bufp,					// pointer in returned string
 	addup = 0,				// add upline
 	addbak = 0,				// add backup
 	c;
-    static char buffer[32];
+    স্থির অক্ষর বাফার[32];
 
-    if (!cm)
-	return "OOPS";				// Kludge, but standard
+    যদি (!cm)
+	ফেরত "OOPS";				// Kludge, but standard
 
-    bufp = buffer;
+    bufp = বাফার;
     ptr = cm;
 
-    while (*ptr)
+    যখন (*ptr)
     {
-	if ((c = *ptr++) != '%')		// normal char
+	যদি ((c = *ptr++) != '%')		// normal char
 	{
 	    *bufp++ = c;
 	}
-	else
+	অন্যথা
 	{				// % escape
-	    switch(c = *ptr++)
+	    নির্বাচন(c = *ptr++)
 	    {
-	    case 'd':				// decimal
-		bufp = _addfmt(bufp, "%d", line);
-		line = col;
-		break;
-	    case '2':				// 2 digit decimal
-		bufp = _addfmt(bufp, "%02d", line);
-		line = col;
-		break;
-	    case '3':				// 3 digit decimal
-		bufp = _addfmt(bufp, "%03d", line);
-		line = col;
-		break;
-	    case '>':				// %>xy: if >x, add y
+	    ক্ষেত্র 'd':				// decimal
+		bufp = _addfmt(bufp, "%d", সারি);
+		সারি = col;
+		বিরতি;
+	    ক্ষেত্র '2':				// 2 digit decimal
+		bufp = _addfmt(bufp, "%02d", সারি);
+		সারি = col;
+		বিরতি;
+	    ক্ষেত্র '3':				// 3 digit decimal
+		bufp = _addfmt(bufp, "%03d", সারি);
+		সারি = col;
+		বিরতি;
+	    ক্ষেত্র '>':				// %>xy: if >x, add y
 		gx = *ptr++;
 		gy = *ptr++;
-		if (col>gx) col += gy;
-		if (line>gx) line += gy;
-		break;
-	    case '+':				// %+c: add c
-		line += *ptr++;
-	    case '.':				// print x/y
-		if (line == '\t' ||		// these are
-		   line == '\n' ||		// chars that
-		   line == '\004' ||		// UNIX hates
-		   line == '\0')
+		যদি (col>gx) col += gy;
+		যদি (সারি>gx) সারি += gy;
+		বিরতি;
+	    ক্ষেত্র '+':				// %+c: add c
+		সারি += *ptr++;
+	    ক্ষেত্র '.':				// print x/y
+		যদি (সারি == '\t' ||		// these are
+		   সারি == '\n' ||		// chars that
+		   সারি == '\004' ||		// UNIX hates
+		   সারি == '\0')
 		{
-		    line++;			// so go to next pos
-		    if (reverse == (line == col))
+		    সারি++;			// so go to next pos
+		    যদি (reverse == (সারি == col))
 			addup=1;		// and mark UP
-		    else
+		    অন্যথা
 			addbak=1;		// or BC
 		}
-		*bufp++=line;
-		line = col;
-		break;
-	    case 'r':				// r: reverse
-		gx = line;
-		line = col;
+		*bufp++=সারি;
+		সারি = col;
+		বিরতি;
+	    ক্ষেত্র 'r':				// r: reverse
+		gx = সারি;
+		সারি = col;
 		col = gx;
 		reverse = 1;
-		break;
-	    case 'i':			// increment (1-origin screen)
+		বিরতি;
+	    ক্ষেত্র 'i':			// increment (1-origin screen)
 		col++;
-		line++;
-		break;
-	    case '%':				// %%=% literally
+		সারি++;
+		বিরতি;
+	    ক্ষেত্র '%':				// %%=% literally
 		*bufp++='%';
-		break;
-	    case 'n':				// magic DM2500 code
-		line ^= 0140;
+		বিরতি;
+	    ক্ষেত্র 'n':				// magic DM2500 code
+		সারি ^= 0140;
 		col ^= 0140;
-		break;
-	    case 'B':				// bcd encoding
-		line = line/10<<4+line%10;
+		বিরতি;
+	    ক্ষেত্র 'B':				// bcd encoding
+		সারি = সারি/10<<4+সারি%10;
 		col = col/10<<4+col%10;
-		break;
-	    case 'D':				// magic Delta Data code
-		line = line-2*(line&15);
+		বিরতি;
+	    ক্ষেত্র 'D':				// magic Delta Data code
+		সারি = সারি-2*(সারি&15);
 		col = col-2*(col&15);
-		break;
-	    default:				// Unknown escape
-		return "OOPS";
+		বিরতি;
+	    পূর্বনির্ধারিত:				// Unknown escape
+		ফেরত "OOPS";
 	    }
 	}
     }
 
-    if (addup)					// add upline
-	if (UP)
+    যদি (addup)					// add upline
+	যদি (UP)
 	{
 	    ptr=UP;
-	    while (VIM_ISDIGIT(*ptr) || *ptr == '.')
+	    যখন (VIM_ISDIGIT(*ptr) || *ptr == '.')
 		ptr++;
-	    if (*ptr == '*')
+	    যদি (*ptr == '*')
 		ptr++;
-	    while (*ptr)
+	    যখন (*ptr)
 		*bufp++ = *ptr++;
 	}
 
-    if (addbak)					// add backspace
-	if (BC)
+    যদি (addbak)					// add backspace
+	যদি (BC)
 	{
 	    ptr=BC;
-	    while (VIM_ISDIGIT(*ptr) || *ptr == '.')
+	    যখন (VIM_ISDIGIT(*ptr) || *ptr == '.')
 		ptr++;
-	    if (*ptr == '*')
+	    যদি (*ptr == '*')
 		ptr++;
-	    while (*ptr)
+	    যখন (*ptr)
 		*bufp++ = *ptr++;
 	}
-	else
+	অন্যথা
 	    *bufp++='\b';
 
     *bufp = 0;
 
-    return(buffer);
+    ফেরত(বাফার);
 }
 
 /*
@@ -539,49 +539,49 @@ long _bauds[16]={
     600,    1200,   1800,   2400,
     4800,   9600,   19200,  19200 };
 
-    int
+    পূর্ণসংখ্যা
 tputs(
-    char *cp,				// string to print
-    int affcnt,				// Number of lines affected
-    void (*outc)(unsigned int))		// routine to output 1 character
+    অক্ষর *cp,				// string to print
+    পূর্ণসংখ্যা affcnt,				// Number of lines affected
+    শূন্য (*outc)(unsigned পূর্ণসংখ্যা))		// routine to output 1 character
 {
     long    frac,			// 10^(#digits after decimal point)
-	counter,			// digits
-	atol(const char *);
+	গণক,			// digits
+	atol(ধ্রুবক অক্ষর *);
 
-    if (VIM_ISDIGIT(*cp))
+    যদি (VIM_ISDIGIT(*cp))
     {
-	counter = 0;
+	গণক = 0;
 	frac = 1000;
-	while (VIM_ISDIGIT(*cp))
-	    counter = counter * 10L + (long)(*cp++ - '0');
-	if (*cp == '.')
-	    while (VIM_ISDIGIT(*++cp))
+	যখন (VIM_ISDIGIT(*cp))
+	    গণক = গণক * 10L + (long)(*cp++ - '0');
+	যদি (*cp == '.')
+	    যখন (VIM_ISDIGIT(*++cp))
 	    {
-		counter = counter * 10L + (long)(*cp++ - '0');
+		গণক = গণক * 10L + (long)(*cp++ - '0');
 		frac = frac * 10;
 	    }
-	if (*cp!='*')			// multiply by affected lines
+	যদি (*cp!='*')			// multiply by affected lines
 	{
-	    if (affcnt>1) affcnt = 1;
+	    যদি (affcnt>1) affcnt = 1;
 	}
-	else
+	অন্যথা
 	    cp++;
 
 	// Calculate number of characters for padding counter/frac ms delay
-	if (ospeed)
-	    counter = (counter * _bauds[ospeed] * (long)affcnt) / frac;
+	যদি (ospeed)
+	    গণক = (গণক * _bauds[ospeed] * (long)affcnt) / frac;
 
-	while (*cp)			// output string
+	যখন (*cp)			// output string
 	    (*outc)(*cp++);
-	if (ospeed)
-	    while (counter--)		// followed by pad characters
+	যদি (ospeed)
+	    যখন (গণক--)		// followed by pad characters
 		(*outc)(PC);
     }
-    else
-	while (*cp)
+    অন্যথা
+	যখন (*cp)
 	    (*outc)(*cp++);
-    return 0;
+    ফেরত 0;
 }
 
 /*
@@ -590,45 +590,45 @@ tputs(
  * Purpose: Utility routines for TERMLIB functions.
  * Returns length of text common to s1 and s2.
  */
-    static int
-_match(char *s1, char *s2)
+    স্থির পূর্ণসংখ্যা
+_match(অক্ষর *s1, অক্ষর *s2)
 {
-    int i = 0;
+    পূর্ণসংখ্যা i = 0;
 
-    while (s1[i] && s1[i] == s2[i])
+    যখন (s1[i] && s1[i] == s2[i])
 	i++;
 
-    return i;
+    ফেরত i;
 }
 
 /*
  * finds next c in s that's a member of set, returns pointer
  */
-    static char *
-_find(char *s, char *set)
+    স্থির অক্ষর *
+_find(অক্ষর *s, অক্ষর *set)
 {
-    for (; *s; s++)
+    জন্য (; *s; s++)
     {
-	char	*ptr = set;
+	অক্ষর	*ptr = set;
 
-	while (*ptr && *s != *ptr)
+	যখন (*ptr && *s != *ptr)
 	    ptr++;
 
-	if (*ptr)
-	    return s;
+	যদি (*ptr)
+	    ফেরত s;
     }
 
-    return s;
+    ফেরত s;
 }
 
 /*
  * add val to buf according to format fmt
  */
-    static char *
-_addfmt(char *buf, char *fmt, int val)
+    স্থির অক্ষর *
+_addfmt(অক্ষর *buf, অক্ষর *fmt, পূর্ণসংখ্যা val)
 {
     sprintf(buf, fmt, val);
-    while (*buf)
+    যখন (*buf)
 	buf++;
-    return buf;
+    ফেরত buf;
 }

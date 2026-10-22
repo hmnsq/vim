@@ -28,9 +28,9 @@
  * Stand-Alone	- unicode form-B isolated
  */
 
-#include "vim.h"
+#অন্তর্ভাব "vim.h"
 
-#if defined(FEAT_ARABIC)
+#যদি defined(FEAT_ARABIC)
 
 // Unicode values for Arabic characters.
 #define a_HAMZA				0x0621
@@ -98,7 +98,7 @@
 #define a_s_LAM_ALEF			0xfefb
 #define a_f_LAM_ALEF			0xfefc
 
-static struct achar {
+স্থির কাঠামো achar {
     unsigned c;
     unsigned isolated;
     unsigned initial;
@@ -167,153 +167,153 @@ static struct achar {
  * Find the struct achar pointer to the given Arabic char.
  * Returns NULL if not found.
  */
-    static struct achar *
-find_achar(int c)
+    স্থির কাঠামো achar *
+find_achar(পূর্ণসংখ্যা c)
 {
-    int h, m, l;
+    পূর্ণসংখ্যা h, m, l;
 
     // using binary search to find c
-    h = ARRAY_LENGTH(achars);
+    h = ARRAY_দৈর্ঘ্য(achars);
     l = 0;
-    while (l < h)
+    যখন (l < h)
     {
 	m = (h + l) / 2;
-	if (achars[m].c == (unsigned)c)
-	    return &achars[m];
-	if ((unsigned)c < achars[m].c)
+	যদি (achars[m].c == (unsigned)c)
+	    ফেরত &achars[m];
+	যদি ((unsigned)c < achars[m].c)
 	    h = m;
-	else
+	অন্যথা
 	    l = m + 1;
     }
-    return NULL;
+    ফেরত ফাঁকা;
 }
 
 /*
  * Change shape - from Combination (2 char) to an Isolated
  */
-    static int
-chg_c_laa2i(int hid_c)
+    স্থির পূর্ণসংখ্যা
+chg_c_laa2i(পূর্ণসংখ্যা hid_c)
 {
-    int tempc;
+    পূর্ণসংখ্যা tempc;
 
-    switch (hid_c)
+    নির্বাচন (hid_c)
     {
-	case a_ALEF_MADDA:
+	ক্ষেত্র a_ALEF_MADDA:
 	    tempc = a_s_LAM_ALEF_MADDA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_ABOVE:
+	    বিরতি;
+	ক্ষেত্র a_ALEF_HAMZA_ABOVE:
 	    tempc = a_s_LAM_ALEF_HAMZA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_BELOW:
+	    বিরতি;
+	ক্ষেত্র a_ALEF_HAMZA_BELOW:
 	    tempc = a_s_LAM_ALEF_HAMZA_BELOW;
-	    break;
-	case a_ALEF:
+	    বিরতি;
+	ক্ষেত্র a_ALEF:
 	    tempc = a_s_LAM_ALEF;
-	    break;
-	default:
+	    বিরতি;
+	পূর্বনির্ধারিত:
 	    tempc = 0;
     }
 
-    return tempc;
+    ফেরত tempc;
 }
 
 /*
  * Change shape - from Combination-Isolated to Final
  */
-    static int
-chg_c_laa2f(int hid_c)
+    স্থির পূর্ণসংখ্যা
+chg_c_laa2f(পূর্ণসংখ্যা hid_c)
 {
-    int tempc;
+    পূর্ণসংখ্যা tempc;
 
-    switch (hid_c)
+    নির্বাচন (hid_c)
     {
-	case a_ALEF_MADDA:
+	ক্ষেত্র a_ALEF_MADDA:
 	    tempc = a_f_LAM_ALEF_MADDA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_ABOVE:
+	    বিরতি;
+	ক্ষেত্র a_ALEF_HAMZA_ABOVE:
 	    tempc = a_f_LAM_ALEF_HAMZA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_BELOW:
+	    বিরতি;
+	ক্ষেত্র a_ALEF_HAMZA_BELOW:
 	    tempc = a_f_LAM_ALEF_HAMZA_BELOW;
-	    break;
-	case a_ALEF:
+	    বিরতি;
+	ক্ষেত্র a_ALEF:
 	    tempc = a_f_LAM_ALEF;
-	    break;
-	default:
+	    বিরতি;
+	পূর্বনির্ধারিত:
 	    tempc = 0;
     }
 
-    return tempc;
+    ফেরত tempc;
 }
 
 /*
  * Returns whether it is possible to join the given letters
  */
-    static int
-can_join(int c1, int c2)
+    স্থির পূর্ণসংখ্যা
+can_join(পূর্ণসংখ্যা c1, পূর্ণসংখ্যা c2)
 {
-    struct achar *a1 = find_achar(c1);
-    struct achar *a2 = find_achar(c2);
+    কাঠামো achar *a1 = find_achar(c1);
+    কাঠামো achar *a2 = find_achar(c2);
 
-    return a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
+    ফেরত a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
 }
 
 /*
  * Check whether we are dealing with a character that could be regarded as an
  * Arabic combining character, need to check the character before this.
  */
-    int
-arabic_maycombine(int two)
+    পূর্ণসংখ্যা
+arabic_maycombine(পূর্ণসংখ্যা two)
 {
-    if (p_arshape && !p_tbidi)
-	return (two == a_ALEF_MADDA
+    যদি (p_arshape && !p_tbidi)
+	ফেরত (two == a_ALEF_MADDA
 		    || two == a_ALEF_HAMZA_ABOVE
 		    || two == a_ALEF_HAMZA_BELOW
 		    || two == a_ALEF);
-    return FALSE;
+    ফেরত FALSE;
 }
 
 /*
  * Check whether we are dealing with Arabic combining characters.
  * Note: these are NOT really composing characters!
  */
-    int
+    পূর্ণসংখ্যা
 arabic_combine(
-    int		one,	    // first character
-    int		two)	    // character just after "one"
+    পূর্ণসংখ্যা		one,	    // first character
+    পূর্ণসংখ্যা		two)	    // character just after "one"
 {
-    if (one == a_LAM)
-	return arabic_maycombine(two);
-    return FALSE;
+    যদি (one == a_LAM)
+	ফেরত arabic_maycombine(two);
+    ফেরত FALSE;
 }
 
 /*
  * A_is_iso returns true if 'c' is an Arabic ISO-8859-6 character
  *		(alphabet/number/punctuation)
  */
-    static int
-A_is_iso(int c)
+    স্থির পূর্ণসংখ্যা
+A_is_iso(পূর্ণসংখ্যা c)
 {
-    return find_achar(c) != NULL;
+    ফেরত find_achar(c) != ফাঁকা;
 }
 
 /*
  * A_is_ok returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  */
-    static int
-A_is_ok(int c)
+    স্থির পূর্ণসংখ্যা
+A_is_ok(পূর্ণসংখ্যা c)
 {
-    return (A_is_iso(c) || c == a_BYTE_ORDER_MARK);
+    ফেরত (A_is_iso(c) || c == a_BYTE_ORDER_MARK);
 }
 
 /*
  * A_is_valid returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  *		with some exceptions/exclusions
  */
-    static int
-A_is_valid(int c)
+    স্থির পূর্ণসংখ্যা
+A_is_valid(পূর্ণসংখ্যা c)
 {
-    return (A_is_ok(c) && c != a_HAMZA);
+    ফেরত (A_is_ok(c) && c != a_HAMZA);
 }
 
 /*
@@ -325,63 +325,63 @@ A_is_valid(int c)
  *		     (not shaped)
  * in:     "next_c"  is the next character (not shaped).
  */
-    int
+    পূর্ণসংখ্যা
 arabic_shape(
-    int		c,
-    int		*ccp,
-    int		*c1p,
-    int		prev_c,
-    int		prev_c1,
-    int		next_c)
+    পূর্ণসংখ্যা		c,
+    পূর্ণসংখ্যা		*ccp,
+    পূর্ণসংখ্যা		*c1p,
+    পূর্ণসংখ্যা		পূর্ব_c,
+    পূর্ণসংখ্যা		পূর্ব_c1,
+    পূর্ণসংখ্যা		পরবর্তী_c)
 {
-    int		curr_c;
-    int		curr_laa;
-    int		prev_laa;
+    পূর্ণসংখ্যা		curr_c;
+    পূর্ণসংখ্যা		curr_laa;
+    পূর্ণসংখ্যা		পূর্ব_laa;
 
     // Deal only with Arabic characters, pass back all others
-    if (!A_is_ok(c))
-	return c;
+    যদি (!A_is_ok(c))
+	ফেরত c;
 
     curr_laa = arabic_combine(c, *c1p);
-    prev_laa = arabic_combine(prev_c, prev_c1);
+    পূর্ব_laa = arabic_combine(পূর্ব_c, পূর্ব_c1);
 
-    if (curr_laa)
+    যদি (curr_laa)
     {
-	if (A_is_valid(prev_c) && can_join(prev_c, a_LAM) && !prev_laa)
+	যদি (A_is_valid(পূর্ব_c) && can_join(পূর্ব_c, a_LAM) && !পূর্ব_laa)
 	    curr_c = chg_c_laa2f(*c1p);
-	else
+	অন্যথা
 	    curr_c = chg_c_laa2i(*c1p);
 
 	// Remove the composing character
 	*c1p = 0;
     }
-    else
+    অন্যথা
     {
-	struct achar *curr_a = find_achar(c);
-	int backward_combine = !prev_laa && can_join(prev_c, c);
-	int forward_combine = can_join(c, next_c);
+	কাঠামো achar *curr_a = find_achar(c);
+	পূর্ণসংখ্যা backward_combine = !পূর্ব_laa && can_join(পূর্ব_c, c);
+	পূর্ণসংখ্যা forward_combine = can_join(c, পরবর্তী_c);
 
-	if (backward_combine)
+	যদি (backward_combine)
 	{
-	    if (forward_combine)
+	    যদি (forward_combine)
 		curr_c = curr_a->medial;
-	    else
+	    অন্যথা
 		curr_c = curr_a->final;
 	}
-	else
+	অন্যথা
 	{
-	    if (forward_combine)
+	    যদি (forward_combine)
 		curr_c = curr_a->initial;
-	    else
+	    অন্যথা
 		curr_c = curr_a->isolated;
 	}
     }
 
     // Character missing from the table means using original character.
-    if (curr_c == NUL)
+    যদি (curr_c == NUL)
 	curr_c = c;
 
-    if (curr_c != c && ccp != NULL)
+    যদি (curr_c != c && ccp != ফাঁকা)
     {
 	char_u buf[MB_MAXBYTES + 1];
 
@@ -391,6 +391,6 @@ arabic_shape(
     }
 
     // Return the shaped character
-    return curr_c;
+    ফেরত curr_c;
 }
 #endif // FEAT_ARABIC

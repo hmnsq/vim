@@ -20,25 +20,25 @@
  *
  */
 
-#include "xinclude.h"
+#অন্তর্ভাব "xinclude.h"
 
 
-static int xdl_emit_record(xdfile_t *xdf, long ri, char const *pre, xdemitcb_t *ecb)
+স্থির পূর্ণসংখ্যা xdl_emit_record(xdfile_t *xdf, long ri, অক্ষর ধ্রুবক *pre, xdemitcb_t *ecb)
 {
 	xrecord_t *rec = &xdf->recs[ri];
 
-	if (xdl_emit_diffrec(rec->ptr, rec->size, pre, (long)strlen(pre), ecb) < 0)
-		return -1;
+	যদি (xdl_emit_diffrec(rec->ptr, rec->আকার_2, pre, (long)strlen(pre), ecb) < 0)
+		ফেরত -1;
 
-	return 0;
+	ফেরত 0;
 }
 
 #define signed_add_overflows(a, b) \
     ((b) > LONG_MAX - (a))
 
-static long saturating_add(long a, long b)
+স্থির long saturating_add(long a, long b)
 {
-	return signed_add_overflows(a, b) ? LONG_MAX : a + b;
+	ফেরত signed_add_overflows(a, b) ? LONG_MAX : a + b;
 }
 
 #undef signed_add_overflows
@@ -48,7 +48,7 @@ static long saturating_add(long a, long b)
  * inside the differential hunk according to the specified configuration.
  * Also advance xscr if the first changes must be discarded.
  */
-xdchange_t *xdl_get_hunk(xdchange_t **xscr, xdemitconf_t const *xecfg)
+xdchange_t *xdl_get_hunk(xdchange_t **xscr, xdemitconf_t ধ্রুবক *xecfg)
 {
 	xdchange_t *xch, *xchp, *lxch;
 	long max_common = saturating_add(saturating_add(xecfg->ctxlen,
@@ -58,155 +58,155 @@ xdchange_t *xdl_get_hunk(xdchange_t **xscr, xdemitconf_t const *xecfg)
 	long ignored = 0; /* number of ignored blank lines */
 
 	/* remove ignorable changes that are too far before other changes */
-	for (xchp = *xscr; xchp && xchp->ignore; xchp = xchp->next) {
-		xch = xchp->next;
+	জন্য (xchp = *xscr; xchp && xchp->ignore; xchp = xchp->পরবর্তী) {
+		xch = xchp->পরবর্তী;
 
-		if (xch == NULL ||
+		যদি (xch == ফাঁকা ||
 		    xch->i1 - (xchp->i1 + xchp->chg1) >= max_ignorable)
 			*xscr = xch;
 	}
 
-	if (!*xscr)
-		return NULL;
+	যদি (!*xscr)
+		ফেরত ফাঁকা;
 
 	lxch = *xscr;
 
-	for (xchp = *xscr, xch = xchp->next; xch; xchp = xch, xch = xch->next) {
+	জন্য (xchp = *xscr, xch = xchp->পরবর্তী; xch; xchp = xch, xch = xch->পরবর্তী) {
 		long distance = xch->i1 - (xchp->i1 + xchp->chg1);
-		if (distance > max_common)
-			break;
+		যদি (distance > max_common)
+			বিরতি;
 
-		if (distance < max_ignorable && (!xch->ignore || lxch == xchp)) {
+		যদি (distance < max_ignorable && (!xch->ignore || lxch == xchp)) {
 			lxch = xch;
 			ignored = 0;
-		} else if (distance < max_ignorable && xch->ignore) {
+		} অন্যথা যদি (distance < max_ignorable && xch->ignore) {
 			ignored += xch->chg2;
-		} else if (lxch != xchp &&
+		} অন্যথা যদি (lxch != xchp &&
 			   xch->i1 + ignored - (lxch->i1 + lxch->chg1) > max_common) {
-			break;
-		} else if (!xch->ignore) {
+			বিরতি;
+		} অন্যথা যদি (!xch->ignore) {
 			lxch = xch;
 			ignored = 0;
-		} else {
+		} অন্যথা {
 			ignored += xch->chg2;
 		}
 	}
 
-	return lxch;
+	ফেরত lxch;
 }
 
 
-#if 0
-static long def_ff(const char *rec, long len, char *buf, long sz)
+#যদি 0
+স্থির long def_ff(ধ্রুবক অক্ষর *rec, long len, অক্ষর *buf, long sz)
 {
-	if (len > 0 &&
-			(isalpha((unsigned char)*rec) || /* identifier? */
+	যদি (len > 0 &&
+			(isalpha((unsigned অক্ষর)*rec) || /* identifier? */
 			 *rec == '_' || /* also identifier? */
 			 *rec == '$')) { /* identifiers from VMS and other esoterico */
-		if (len > sz)
+		যদি (len > sz)
 			len = sz;
-		while (0 < len && isspace((unsigned char)rec[len - 1]))
+		যখন (0 < len && isspace((unsigned অক্ষর)rec[len - 1]))
 			len--;
 		memcpy(buf, rec, len);
-		return len;
+		ফেরত len;
 	}
-	return -1;
+	ফেরত -1;
 }
 #endif
 
-#if 0
-static long match_func_rec(xdfile_t *xdf, xdemitconf_t const *xecfg, long ri,
-			   char *buf, long sz)
+#যদি 0
+স্থির long match_func_rec(xdfile_t *xdf, xdemitconf_t ধ্রুবক *xecfg, long ri,
+			   অক্ষর *buf, long sz)
 {
 	xrecord_t *rec = &xdf->recs[ri];
 
-	if (!xecfg->find_func)
-		return def_ff(rec->ptr, rec->size, buf, sz);
-	return xecfg->find_func(rec->ptr, rec->size, buf, sz, xecfg->find_func_priv);
+	যদি (!xecfg->find_func)
+		ফেরত def_ff(rec->ptr, rec->আকার_2, buf, sz);
+	ফেরত xecfg->find_func(rec->ptr, rec->আকার_2, buf, sz, xecfg->find_func_priv);
 }
 #endif
 
-#if 0
-static int is_func_rec(xdfile_t *xdf, xdemitconf_t const *xecfg, long ri)
+#যদি 0
+স্থির পূর্ণসংখ্যা is_func_rec(xdfile_t *xdf, xdemitconf_t ধ্রুবক *xecfg, long ri)
 {
-	char dummy[1];
-	return match_func_rec(xdf, xecfg, ri, dummy, sizeof(dummy)) >= 0;
+	অক্ষর dummy[1];
+	ফেরত match_func_rec(xdf, xecfg, ri, dummy, আকার(dummy)) >= 0;
 }
 #endif
 
-struct func_line {
+কাঠামো func_সারি {
 	long len;
-	char buf[80];
+	অক্ষর buf[80];
 };
 
-#if 0
-static long get_func_line(xdfenv_t *xe, xdemitconf_t const *xecfg,
-			  struct func_line *func_line, long start, long limit)
+#যদি 0
+স্থির long get_func_সারি(xdfenv_t *xe, xdemitconf_t ধ্রুবক *xecfg,
+			  কাঠামো func_সারি *func_সারি, long start, long limit)
 {
-	long l, size, step = (start > limit) ? -1 : 1;
-	char *buf, dummy[1];
+	long l, আকার_2, step = (start > limit) ? -1 : 1;
+	অক্ষর *buf, dummy[1];
 
-	buf = func_line ? func_line->buf : dummy;
-	size = func_line ? sizeof(func_line->buf) : sizeof(dummy);
+	buf = func_সারি ? func_সারি->buf : dummy;
+	আকার_2 = func_সারি ? আকার(func_সারি->buf) : আকার(dummy);
 
-	for (l = start; l != limit && 0 <= l && l < xe->xdf1.nrec; l += step) {
-		long len = match_func_rec(&xe->xdf1, xecfg, l, buf, size);
-		if (len >= 0) {
-			if (func_line)
-				func_line->len = len;
-			return l;
+	জন্য (l = start; l != limit && 0 <= l && l < xe->xdf1.nrec; l += step) {
+		long len = match_func_rec(&xe->xdf1, xecfg, l, buf, আকার_2);
+		যদি (len >= 0) {
+			যদি (func_সারি)
+				func_সারি->len = len;
+			ফেরত l;
 		}
 	}
-	return -1;
+	ফেরত -1;
 }
 #endif
 
-#if 0
-static int is_empty_rec(xdfile_t *xdf, long ri)
+#যদি 0
+স্থির পূর্ণসংখ্যা is_empty_rec(xdfile_t *xdf, long ri)
 {
 	xrecord_t *rec = &xdf->recs[ri];
 	long i = 0;
 
-	for (; i < rec->size && XDL_ISSPACE(rec->ptr[i]); i++);
+	জন্য (; i < rec->আকার_2 && XDL_ISSPACE(rec->ptr[i]); i++);
 
-	return i == rec->size;
+	ফেরত i == rec->আকার_2;
 }
 #endif
 
-int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
-		  xdemitconf_t const *xecfg) {
+পূর্ণসংখ্যা xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
+		  xdemitconf_t ধ্রুবক *xecfg) {
 	long s1, s2, e1, e2, lctx;
 	xdchange_t *xch, *xche;
-#if 0
+#যদি 0
 	long funclineprev = -1;
 #endif
-	struct func_line func_line;
+	কাঠামো func_সারি func_সারি;
 
-	func_line.len = 0;
+	func_সারি.len = 0;
 
-	for (xch = xscr; xch; xch = xche->next) {
+	জন্য (xch = xscr; xch; xch = xche->পরবর্তী) {
 		xche = xdl_get_hunk(&xch, xecfg);
-		if (!xch)
-			break;
+		যদি (!xch)
+			বিরতি;
 
 		s1 = XDL_MAX(xch->i1 - xecfg->ctxlen, 0);
 		s2 = XDL_MAX(xch->i2 - xecfg->ctxlen, 0);
 
-#if 0
-		if (xecfg->flags & XDL_EMIT_FUNCCONTEXT) {
+#যদি 0
+		যদি (xecfg->flags & XDL_EMIT_FUNCCONTEXT) {
 			long fs1, i1 = xch->i1;
 
 			/* Appended chunk? */
-			if (i1 >= xe->xdf1.nrec) {
+			যদি (i1 >= xe->xdf1.nrec) {
 				long i2 = xch->i2;
 
 				/*
 				 * We don't need additional context if
 				 * a whole function was added.
 				 */
-				while (i2 < xe->xdf2.nrec) {
-					if (is_func_rec(&xe->xdf2, xecfg, i2))
-						goto post_context_calculation;
+				যখন (i2 < xe->xdf2.nrec) {
+					যদি (is_func_rec(&xe->xdf2, xecfg, i2))
+						যাও post_context_calculation;
 					i2++;
 				}
 
@@ -217,13 +217,13 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 				i1 = xe->xdf1.nrec - 1;
 			}
 
-			fs1 = get_func_line(xe, xecfg, NULL, i1, -1);
-			while (fs1 > 0 && !is_empty_rec(&xe->xdf1, fs1 - 1) &&
+			fs1 = get_func_সারি(xe, xecfg, ফাঁকা, i1, -1);
+			যখন (fs1 > 0 && !is_empty_rec(&xe->xdf1, fs1 - 1) &&
 			       !is_func_rec(&xe->xdf1, xecfg, fs1 - 1))
 				fs1--;
-			if (fs1 < 0)
+			যদি (fs1 < 0)
 				fs1 = 0;
-			if (fs1 < s1) {
+			যদি (fs1 < s1) {
 				s2 = XDL_MAX(s2 - (s1 - fs1), 0);
 				s1 = fs1;
 
@@ -231,15 +231,15 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 				 * Did we extend context upwards into an
 				 * ignored change?
 				 */
-				while (xchp != xch &&
+				যখন (xchp != xch &&
 				       xchp->i1 + xchp->chg1 <= s1 &&
 				       xchp->i2 + xchp->chg2 <= s2)
-					xchp = xchp->next;
+					xchp = xchp->পরবর্তী;
 
 				/* If so, show it after all. */
-				if (xchp != xch) {
+				যদি (xchp != xch) {
 					xch = xchp;
-					goto pre_context_calculation;
+					যাও pre_context_calculation;
 				}
 			}
 		}
@@ -253,16 +253,16 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 		e1 = xche->i1 + xche->chg1 + lctx;
 		e2 = xche->i2 + xche->chg2 + lctx;
 
-#if 0
-		if (xecfg->flags & XDL_EMIT_FUNCCONTEXT) {
-			long fe1 = get_func_line(xe, xecfg, NULL,
+#যদি 0
+		যদি (xecfg->flags & XDL_EMIT_FUNCCONTEXT) {
+			long fe1 = get_func_সারি(xe, xecfg, ফাঁকা,
 						 xche->i1 + xche->chg1,
 						 xe->xdf1.nrec);
-			while (fe1 > 0 && is_empty_rec(&xe->xdf1, fe1 - 1))
+			যখন (fe1 > 0 && is_empty_rec(&xe->xdf1, fe1 - 1))
 				fe1--;
-			if (fe1 < 0)
+			যদি (fe1 < 0)
 				fe1 = xe->xdf1.nrec;
-			if (fe1 > e1) {
+			যদি (fe1 > e1) {
 				e2 = XDL_MIN(e2 + (fe1 - e1), xe->xdf2.nrec);
 				e1 = fe1;
 			}
@@ -272,13 +272,13 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 			 * in the current hunk and start over to find
 			 * its new end.
 			 */
-			if (xche->next) {
-				long l = XDL_MIN(xche->next->i1,
+			যদি (xche->পরবর্তী) {
+				long l = XDL_MIN(xche->পরবর্তী->i1,
 						 xe->xdf1.nrec - 1);
-				if (l - xecfg->ctxlen <= e1 ||
-				    get_func_line(xe, xecfg, NULL, l, e1) < 0) {
-					xche = xche->next;
-					goto post_context_calculation;
+				যদি (l - xecfg->ctxlen <= e1 ||
+				    get_func_সারি(xe, xecfg, ফাঁকা, l, e1) < 0) {
+					xche = xche->পরবর্তী;
+					যাও post_context_calculation;
 				}
 			}
 		}
@@ -288,49 +288,49 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 		 * Emit current hunk header.
 		 */
 
-#if 0
-		if (xecfg->flags & XDL_EMIT_FUNCNAMES) {
-			get_func_line(xe, xecfg, &func_line,
+#যদি 0
+		যদি (xecfg->flags & XDL_EMIT_FUNCNAMES) {
+			get_func_সারি(xe, xecfg, &func_সারি,
 				      s1 - 1, funclineprev);
 			funclineprev = s1 - 1;
 		}
 #endif
-		if (!(xecfg->flags & XDL_EMIT_NO_HUNK_HDR) &&
+		যদি (!(xecfg->flags & XDL_EMIT_NO_HUNK_HDR) &&
 		    xdl_emit_hunk_hdr(s1 + 1, e1 - s1, s2 + 1, e2 - s2,
-				      func_line.buf, func_line.len, ecb) < 0)
-			return -1;
+				      func_সারি.buf, func_সারি.len, ecb) < 0)
+			ফেরত -1;
 
 		/*
 		 * Emit pre-context.
 		 */
-		for (; s2 < xch->i2; s2++)
-			if (xdl_emit_record(&xe->xdf2, s2, " ", ecb) < 0)
-				return -1;
+		জন্য (; s2 < xch->i2; s2++)
+			যদি (xdl_emit_record(&xe->xdf2, s2, " ", ecb) < 0)
+				ফেরত -1;
 
-		for (s1 = xch->i1, s2 = xch->i2;; xch = xch->next) {
+		জন্য (s1 = xch->i1, s2 = xch->i2;; xch = xch->পরবর্তী) {
 			/*
 			 * Merge previous with current change atom.
 			 */
-			for (; s1 < xch->i1 && s2 < xch->i2; s1++, s2++)
-				if (xdl_emit_record(&xe->xdf2, s2, " ", ecb) < 0)
-					return -1;
+			জন্য (; s1 < xch->i1 && s2 < xch->i2; s1++, s2++)
+				যদি (xdl_emit_record(&xe->xdf2, s2, " ", ecb) < 0)
+					ফেরত -1;
 
 			/*
 			 * Removes lines from the first file.
 			 */
-			for (s1 = xch->i1; s1 < xch->i1 + xch->chg1; s1++)
-				if (xdl_emit_record(&xe->xdf1, s1, "-", ecb) < 0)
-					return -1;
+			জন্য (s1 = xch->i1; s1 < xch->i1 + xch->chg1; s1++)
+				যদি (xdl_emit_record(&xe->xdf1, s1, "-", ecb) < 0)
+					ফেরত -1;
 
 			/*
 			 * Adds lines from the second file.
 			 */
-			for (s2 = xch->i2; s2 < xch->i2 + xch->chg2; s2++)
-				if (xdl_emit_record(&xe->xdf2, s2, "+", ecb) < 0)
-					return -1;
+			জন্য (s2 = xch->i2; s2 < xch->i2 + xch->chg2; s2++)
+				যদি (xdl_emit_record(&xe->xdf2, s2, "+", ecb) < 0)
+					ফেরত -1;
 
-			if (xch == xche)
-				break;
+			যদি (xch == xche)
+				বিরতি;
 			s1 = xch->i1 + xch->chg1;
 			s2 = xch->i2 + xch->chg2;
 		}
@@ -338,10 +338,10 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 		/*
 		 * Emit post-context.
 		 */
-		for (s2 = xche->i2 + xche->chg2; s2 < e2; s2++)
-			if (xdl_emit_record(&xe->xdf2, s2, " ", ecb) < 0)
-				return -1;
+		জন্য (s2 = xche->i2 + xche->chg2; s2 < e2; s2++)
+			যদি (xdl_emit_record(&xe->xdf2, s2, " ", ecb) < 0)
+				ফেরত -1;
 	}
 
-	return 0;
+	ফেরত 0;
 }

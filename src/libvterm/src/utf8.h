@@ -2,46 +2,46 @@
  *
  * http://www.leonerd.org.uk/code/libtermkey/
  */
-unsigned int utf8_seqlen(long codepoint);
+unsigned পূর্ণসংখ্যা utf8_seqlen(long codepoint);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE unsigned int utf8_seqlen(long codepoint)
+#যদি defined(DEFINE_INLINES) || USE_INLINE
+INLINE unsigned পূর্ণসংখ্যা utf8_seqlen(long codepoint)
 {
-  if(codepoint < 0x0000080) return 1;
-  if(codepoint < 0x0000800) return 2;
-  if(codepoint < 0x0010000) return 3;
-  if(codepoint < 0x0200000) return 4;
-  if(codepoint < 0x4000000) return 5;
-  return 6;
+  যদি(codepoint < 0x0000080) ফেরত 1;
+  যদি(codepoint < 0x0000800) ফেরত 2;
+  যদি(codepoint < 0x0010000) ফেরত 3;
+  যদি(codepoint < 0x0200000) ফেরত 4;
+  যদি(codepoint < 0x4000000) ফেরত 5;
+  ফেরত 6;
 }
 #endif
 
 /* Does NOT NUL-terminate the buffer */
-int fill_utf8(long codepoint, char *str);
+পূর্ণসংখ্যা fill_utf8(long codepoint, অক্ষর *str);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE int fill_utf8(long codepoint, char *str)
+#যদি defined(DEFINE_INLINES) || USE_INLINE
+INLINE পূর্ণসংখ্যা fill_utf8(long codepoint, অক্ষর *str)
 {
-  int nbytes = utf8_seqlen(codepoint);
+  পূর্ণসংখ্যা nbytes = utf8_seqlen(codepoint);
 
   // This is easier done backwards
-  int b = nbytes;
-  while(b > 1) {
+  পূর্ণসংখ্যা b = nbytes;
+  যখন(b > 1) {
     b--;
     str[b] = 0x80 | (codepoint & 0x3f);
     codepoint >>= 6;
   }
 
-  switch(nbytes) {
-    case 1: str[0] =        (codepoint & 0x7f); break;
-    case 2: str[0] = 0xc0 | (codepoint & 0x1f); break;
-    case 3: str[0] = 0xe0 | (codepoint & 0x0f); break;
-    case 4: str[0] = 0xf0 | (codepoint & 0x07); break;
-    case 5: str[0] = 0xf8 | (codepoint & 0x03); break;
-    case 6: str[0] = 0xfc | (codepoint & 0x01); break;
+  নির্বাচন(nbytes) {
+    ক্ষেত্র 1: str[0] =        (codepoint & 0x7f); বিরতি;
+    ক্ষেত্র 2: str[0] = 0xc0 | (codepoint & 0x1f); বিরতি;
+    ক্ষেত্র 3: str[0] = 0xe0 | (codepoint & 0x0f); বিরতি;
+    ক্ষেত্র 4: str[0] = 0xf0 | (codepoint & 0x07); বিরতি;
+    ক্ষেত্র 5: str[0] = 0xf8 | (codepoint & 0x03); বিরতি;
+    ক্ষেত্র 6: str[0] = 0xfc | (codepoint & 0x01); বিরতি;
   }
 
-  return nbytes;
+  ফেরত nbytes;
 }
 #endif
 /* end copy */

@@ -11,10 +11,10 @@
  *
  */
 
-#include "vim.h"
-#include "version.h"
+#অন্তর্ভাব "vim.h"
+#অন্তর্ভাব "version.h"
 
-#if (defined(FEAT_CLIENTSERVER) && defined(FEAT_X11))
+#যদি (defined(FEAT_CLIENTSERVER) && defined(FEAT_X11))
 
 # ifdef FEAT_X11
 #  include <X11/Intrinsic.h>
@@ -62,18 +62,18 @@
  * It's unlikely, but possible.
  */
 
-typedef struct PendingCommand
+প্রকারলেখ কাঠামো PendingCommand
 {
-    int	    serial;	// Serial number expected in result.
-    int	    code;	// Result Code. 0 is OK
-    char_u  *result;	// String result for command (malloc'ed).
+    পূর্ণসংখ্যা	    serial;	// Serial number expected in result.
+    পূর্ণসংখ্যা	    code;	// Result Code. 0 is OK
+    char_u  *ফলাফল;	// String result for command (malloc'ed).
 			// NULL means command still pending.
-    struct PendingCommand *nextPtr;
+    কাঠামো PendingCommand *পরবর্তী_Ptr;
 			// Next in list of all outstanding commands.
 			// NULL means end of list.
 } PendingCommand;
 
-static PendingCommand *pendingCommands = NULL;
+স্থির PendingCommand *pendingCommands = ফাঁকা;
 				// List of all commands currently
 				// being waited for.
 
@@ -157,111 +157,111 @@ static PendingCommand *pendingCommands = NULL;
  * this module:
  */
 
-# define MAX_PROP_WORDS 100000
+# define MAX_PROP_শব্দগুলি 100000
 
-struct ServerReply
+কাঠামো ServerReply
 {
     Window  id;
     garray_T strings;
 };
-static garray_T serverReply = { 0, 0, 0, 0, 0 };
-enum ServerReplyOp { SROP_Find, SROP_Add, SROP_Delete };
+স্থির garray_T serverReply = { 0, 0, 0, 0, 0 };
+গণনা ServerReplyOp { SROP_Find, SROP_Add, SROP_Delete };
 
-typedef int (*EndCond)(void *);
+প্রকারলেখ পূর্ণসংখ্যা (*EndCond)(শূন্য *);
 
-struct x_cmdqueue
+কাঠামো x_cmdqueue
 {
     char_u		*propInfo;
     long_u		len;
-    struct x_cmdqueue	*next;
-    struct x_cmdqueue	*prev;
+    কাঠামো x_cmdqueue	*পরবর্তী;
+    কাঠামো x_cmdqueue	*পূর্ব;
 };
 
-typedef struct x_cmdqueue x_queue_T;
+প্রকারলেখ কাঠামো x_cmdqueue x_queue_T;
 
 // dummy node, header for circular queue
-static x_queue_T head = {NULL, 0, NULL, NULL};
+স্থির x_queue_T শীর্ষ = {ফাঁকা, 0, ফাঁকা, ফাঁকা};
 
 /*
  * Forward declarations for procedures defined later in this file:
  */
 
-static Window	LookupName(Display *dpy, char_u *name, int delete, char_u **loose);
-static int	SendInit(Display *dpy);
-static int	DoRegisterName(Display *dpy, char_u *name);
-static void	DeleteAnyLingerer(Display *dpy, Window w);
-static int	GetRegProp(Display *dpy, char_u **regPropp, long_u *numItemsp, int domsg);
-static int	WaitForPend(void *p);
-static int	WindowValid(Display *dpy, Window w);
-static void	ServerWait(Display *dpy, Window w, EndCond endCond, void *endData, int localLoop, int seconds);
-static int	AppendPropCarefully(Display *display, Window window, Atom property, char_u *value, int length);
-static int	x_error_check(Display *dpy, XErrorEvent *error_event);
-static int	IsSerialName(char_u *name);
-static void	save_in_queue(char_u *buf, long_u len);
-static void	server_parse_message(Display *dpy, char_u *propInfo, long_u numItems);
+স্থির Window	LookupName(Display *dpy, char_u *name, পূর্ণসংখ্যা delete, char_u **loose);
+স্থির পূর্ণসংখ্যা	SendInit(Display *dpy);
+স্থির পূর্ণসংখ্যা	DoRegisterName(Display *dpy, char_u *name);
+স্থির শূন্য	DeleteAnyLingerer(Display *dpy, Window w);
+স্থির পূর্ণসংখ্যা	GetRegProp(Display *dpy, char_u **regPropp, long_u *অঙ্ক_Itemsp, পূর্ণসংখ্যা domsg);
+স্থির পূর্ণসংখ্যা	WaitForPend(শূন্য *p);
+স্থির পূর্ণসংখ্যা	WindowValid(Display *dpy, Window w);
+স্থির শূন্য	ServerWait(Display *dpy, Window w, EndCond endCond, শূন্য *end_তথ্য, পূর্ণসংখ্যা localLoop, পূর্ণসংখ্যা seconds);
+স্থির পূর্ণসংখ্যা	AppendPropCarefully(Display *display, Window window, Atom property, char_u *মান, পূর্ণসংখ্যা দৈর্ঘ্য);
+স্থির পূর্ণসংখ্যা	x_error_check(Display *dpy, XErrorEvent *error_event);
+স্থির পূর্ণসংখ্যা	IsSerialName(char_u *name);
+স্থির শূন্য	save_in_queue(char_u *buf, long_u len);
+স্থির শূন্য	server_parse_message(Display *dpy, char_u *propInfo, long_u অঙ্ক_বস্তুসমূহ);
 
 // Private variables for the "server" functionality
-static Atom	registryProperty = None;
-static Atom	vimProperty = None;
-static int	got_x_error = FALSE;
+স্থির Atom	registryProperty = None;
+স্থির Atom	vimProperty = None;
+স্থির পূর্ণসংখ্যা	got_x_error = FALSE;
 
-static char_u	*empty_prop = (char_u *)"";	// empty GetRegProp() result
+স্থির char_u	*empty_prop = (char_u *)"";	// empty GetRegProp() result
 
 /*
  * Associate an ASCII name with Vim.  Try real hard to get a unique one.
  * Returns FAIL or OK.
  */
-    int
+    পূর্ণসংখ্যা
 serverRegisterName(
     Display	*dpy,		// display to register with
     char_u	*name)		// the name that will be used as a base
 {
-    int		i;
-    int		res;
-    char_u	*p = NULL;
+    পূর্ণসংখ্যা		i;
+    পূর্ণসংখ্যা		res;
+    char_u	*p = ফাঁকা;
 
     res = DoRegisterName(dpy, name);
-    if (res >= 0)
-	return OK;
+    যদি (res >= 0)
+	ফেরত OK;
 
     i = 1;
-    do
+    করো
     {
-	if (res < -1 || i >= 1000)
+	যদি (res < -1 || i >= 1000)
 	{
-	    msg_attr(_("Unable to register a command server name"),
+	    বার্তা_attr(_("Unable to register a command server name"),
 		    HL_ATTR(HLF_W));
-	    return FAIL;
+	    ফেরত FAIL;
 	}
-	if (p == NULL)
+	যদি (p == ফাঁকা)
 	    p = alloc(STRLEN(name) + 10);
-	if (p == NULL)
+	যদি (p == ফাঁকা)
 	{
 	    res = -10;
-	    continue;
+	    চালু;
 	}
-	sprintf((char *)p, "%s%d", name, i++);
+	sprintf((অক্ষর *)p, "%s%d", name, i++);
 	res = DoRegisterName(dpy, p);
     }
-    while (res < 0)
+    যখন (res < 0)
 	;
     vim_free(p);
 
-    return OK;
+    ফেরত OK;
 }
 
-    static int
+    স্থির পূর্ণসংখ্যা
 DoRegisterName(Display *dpy, char_u *name)
 {
     Window	w;
     XErrorHandler old_handler;
-# define MAX_NAME_LENGTH 100
-    char_u	propInfo[MAX_NAME_LENGTH + 20];
+# define MAX_NAME_দৈর্ঘ্য 100
+    char_u	propInfo[MAX_NAME_দৈর্ঘ্য + 20];
 
-    if (commProperty == None)
+    যদি (commProperty == None)
     {
-	if (SendInit(dpy) < 0)
-	    return -2;
+	যদি (SendInit(dpy) < 0)
+	    ফেরত -2;
     }
 
     /*
@@ -272,12 +272,12 @@ DoRegisterName(Display *dpy, char_u *name)
      * server!
      */
     XGrabServer(dpy);
-    w = LookupName(dpy, name, FALSE, NULL);
-    if (w != (Window)0)
+    w = LookupName(dpy, name, FALSE, ফাঁকা);
+    যদি (w != (Window)0)
     {
 	Status		status;
-	int		dummyInt;
-	unsigned int	dummyUns;
+	পূর্ণসংখ্যা		dummyInt;
+	unsigned পূর্ণসংখ্যা	dummyUns;
 	Window		dummyWin;
 
 	/*
@@ -290,70 +290,70 @@ DoRegisterName(Display *dpy, char_u *name)
 	old_handler = XSetErrorHandler(x_error_check);
 	status = XGetGeometry(dpy, w, &dummyWin, &dummyInt, &dummyInt,
 				  &dummyUns, &dummyUns, &dummyUns, &dummyUns);
-	(void)XSetErrorHandler(old_handler);
-	if (status != Success && w != commWindow)
+	(শূন্য)XSetErrorHandler(old_handler);
+	যদি (status != Success && w != commWindow)
 	{
 	    XUngrabServer(dpy);
 	    XFlush(dpy);
-	    return -1;
+	    ফেরত -1;
 	}
-	(void)LookupName(dpy, name, /*delete=*/TRUE, NULL);
+	(শূন্য)LookupName(dpy, name, /*delete=*/TRUE, ফাঁকা);
     }
-    sprintf((char *)propInfo, "%x %.*s", (int_u)commWindow,
-						       MAX_NAME_LENGTH, name);
+    sprintf((অক্ষর *)propInfo, "%x %.*s", (int_u)commWindow,
+						       MAX_NAME_দৈর্ঘ্য, name);
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
-    XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty, XA_STRING, 8,
+    XChangeProperty(dpy, মূল_Window(dpy, 0), registryProperty, XA_STRING, 8,
 		    PropModeAppend, propInfo, STRLEN(propInfo) + 1);
     XUngrabServer(dpy);
     XSync(dpy, False);
-    (void)XSetErrorHandler(old_handler);
+    (শূন্য)XSetErrorHandler(old_handler);
 
-    if (!got_x_error)
+    যদি (!got_x_error)
     {
 	size_t	namelen;
 
 	namelen = STRLEN(name);
 # ifdef FEAT_EVAL
-	set_vim_var_string(VV_SEND_SERVER, name, (int)namelen);
+	set_vim_var_string(VV_SEND_SERVER, name, (পূর্ণসংখ্যা)namelen);
 # endif
 	serverName = vim_strnsave(name, namelen);
 	need_maketitle = TRUE;
-	return 0;
+	ফেরত 0;
     }
-    return -2;
+    ফেরত -2;
 }
 
-# if defined(FEAT_GUI)
+# যদি defined(FEAT_GUI)
 /*
  * Clean out new ID from registry and set it as comm win.
  * Change any registered window ID.
  */
-    void
+    শূন্য
 serverChangeRegisteredWindow(
     Display	*dpy,		// Display to register with
     Window	newwin)		// Re-register to this ID
 {
-    char_u	propInfo[MAX_NAME_LENGTH + 20];
+    char_u	propInfo[MAX_NAME_দৈর্ঘ্য + 20];
 
     commWindow = newwin;
 
     // Always call SendInit() here, to make sure commWindow is marked as a Vim
     // window.
-    if (SendInit(dpy) < 0)
-	return;
+    যদি (SendInit(dpy) < 0)
+	ফেরত;
 
     // WARNING: Do not step through this while debugging, it will hangup the X
     // server!
     XGrabServer(dpy);
     DeleteAnyLingerer(dpy, newwin);
-    if (serverName != NULL)
+    যদি (serverName != ফাঁকা)
     {
 	// Reinsert name if it was already registered
-	(void)LookupName(dpy, serverName, /*delete=*/TRUE, NULL);
-	sprintf((char *)propInfo, "%x %.*s",
-		(int_u)newwin, MAX_NAME_LENGTH, serverName);
-	XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty, XA_STRING, 8,
+	(শূন্য)LookupName(dpy, serverName, /*delete=*/TRUE, ফাঁকা);
+	sprintf((অক্ষর *)propInfo, "%x %.*s",
+		(int_u)newwin, MAX_NAME_দৈর্ঘ্য, serverName);
+	XChangeProperty(dpy, মূল_Window(dpy, 0), registryProperty, XA_STRING, 8,
 			PropModeAppend, (char_u *)propInfo,
 			STRLEN(propInfo) + 1);
     }
@@ -365,43 +365,43 @@ serverChangeRegisteredWindow(
  * Send to an instance of Vim via the X display.
  * Returns 0 for OK, negative for an error.
  */
-    int
+    পূর্ণসংখ্যা
 serverSendToVim(
     Display	*dpy,			// Where to send.
     char_u	*name,			// Where to send.
     char_u	*cmd,			// What to send.
-    char_u	**result,		// Result of eval'ed expression
+    char_u	**ফলাফল,		// Result of eval'ed expression
     Window	*server,		// Actual ID of receiving app
-    Bool	asExpr,			// Interpret as keystrokes or expr ?
-    int		timeout,		// seconds to wait or zero
+    Bool	as_রাশিমালা,			// Interpret as keystrokes or expr ?
+    পূর্ণসংখ্যা		timeout,		// seconds to wait or zero
     Bool	localLoop,		// Throw away everything but result
-    int		silent)			// don't complain about no server
+    পূর্ণসংখ্যা		silent)			// don't complain about no server
 {
     Window	    w;
     char_u	    *property;
-    int		    length;
-    int		    res;
-    static int	    serial = 0;	// Running count of sent commands.
+    পূর্ণসংখ্যা		    দৈর্ঘ্য;
+    পূর্ণসংখ্যা		    res;
+    স্থির পূর্ণসংখ্যা	    serial = 0;	// Running count of sent commands.
 				// Used to give each command a
 				// different serial number.
     PendingCommand  pending;
-    char_u	    *loosename = NULL;
+    char_u	    *loosename = ফাঁকা;
 
-    if (result != NULL)
-	*result = NULL;
-    if (name == NULL || *name == NUL)
+    যদি (ফলাফল != ফাঁকা)
+	*ফলাফল = ফাঁকা;
+    যদি (name == ফাঁকা || *name == NUL)
 	name = (char_u *)"GVIM";    // use a default name
 
-    if (commProperty == None && dpy != NULL && SendInit(dpy) < 0)
-	return -1;
+    যদি (commProperty == None && dpy != ফাঁকা && SendInit(dpy) < 0)
+	ফেরত -1;
 
-# if defined(FEAT_EVAL)
-    ch_log(NULL, "serverSendToVim(%s, %s)", name, cmd);
+# যদি defined(FEAT_EVAL)
+    ch_log(ফাঁকা, "serverSendToVim(%s, %s)", name, cmd);
 # endif
 
     // Execute locally if no display or target is ourselves
-    if (dpy == NULL || (serverName != NULL && STRICMP(name, serverName) == 0))
-	return sendToLocalVim(cmd, asExpr, result);
+    যদি (dpy == ফাঁকা || (serverName != ফাঁকা && STRICMP(name, serverName) == 0))
+	ফেরত sendToLocalVim(cmd, as_রাশিমালা, ফলাফল);
 
     /*
      * Bind the server name to a communication window.
@@ -411,31 +411,31 @@ serverSendToVim(
      *
      * Delete any lingering names from dead editors.
      */
-    while (TRUE)
+    যখন (TRUE)
     {
 	w = LookupName(dpy, name, FALSE, &loosename);
 	// Check that the window is hot
-	if (w != None)
+	যদি (w != None)
 	{
-	    if (!WindowValid(dpy, w))
+	    যদি (!WindowValid(dpy, w))
 	    {
 		LookupName(dpy, loosename ? loosename : name,
-			   /*DELETE=*/TRUE, NULL);
+			   /*DELETE=*/TRUE, ফাঁকা);
 		VIM_CLEAR(loosename);
-		continue;
+		চালু;
 	    }
 	}
-	break;
+	বিরতি;
     }
-    if (w == None)
+    যদি (w == None)
     {
-	if (!silent)
+	যদি (!silent)
 	    semsg(_(e_no_registered_server_named_str), name);
-	return -1;
+	ফেরত -1;
     }
-    else if (loosename != NULL)
+    অন্যথা যদি (loosename != ফাঁকা)
 	name = loosename;
-    if (server != NULL)
+    যদি (server != ফাঁকা)
 	*server = w;
 
     /*
@@ -443,30 +443,30 @@ serverSendToVim(
      * comm window in the communication window.
      * Length must be computed exactly!
      */
-    length = STRLEN(name) + STRLEN(p_enc) + STRLEN(cmd) + 14;
-    property = alloc(length + 30);
+    দৈর্ঘ্য = STRLEN(name) + STRLEN(p_enc) + STRLEN(cmd) + 14;
+    property = alloc(দৈর্ঘ্য + 30);
 
-    sprintf((char *)property, "%c%c%c-n %s%c-E %s%c-s %s",
-		      0, asExpr ? 'c' : 'k', 0, name, 0, p_enc, 0, cmd);
-    if (name == loosename)
+    sprintf((অক্ষর *)property, "%c%c%c-n %s%c-E %s%c-s %s",
+		      0, as_রাশিমালা ? 'c' : 'k', 0, name, 0, p_enc, 0, cmd);
+    যদি (name == loosename)
 	vim_free(loosename);
     // Add a back reference to our comm window
     serial++;
-    sprintf((char *)property + length, "%c-r %x %d",
+    sprintf((অক্ষর *)property + দৈর্ঘ্য, "%c-r %x %d",
 						0, (int_u)commWindow, serial);
     // Add length of what "-r %x %d" resulted in, skipping the NUL.
-    length += STRLEN(property + length + 1) + 1;
+    দৈর্ঘ্য += STRLEN(property + দৈর্ঘ্য + 1) + 1;
 
-    res = AppendPropCarefully(dpy, w, commProperty, property, length + 1);
+    res = AppendPropCarefully(dpy, w, commProperty, property, দৈর্ঘ্য + 1);
     vim_free(property);
-    if (res < 0)
+    যদি (res < 0)
     {
 	emsg(_(e_failed_to_send_command_to_destination_program));
-	return -1;
+	ফেরত -1;
     }
 
-    if (!asExpr) // There is no answer for this - Keys are sent async
-	return 0;
+    যদি (!as_রাশিমালা) // There is no answer for this - Keys are sent async
+	ফেরত 0;
 
     /*
      * Register the fact that we're waiting for a command to
@@ -475,8 +475,8 @@ serverSendToVim(
      */
     pending.serial = serial;
     pending.code = 0;
-    pending.result = NULL;
-    pending.nextPtr = pendingCommands;
+    pending.ফলাফল = ফাঁকা;
+    pending.পরবর্তী_Ptr = pendingCommands;
     pendingCommands = &pending;
 
     ServerWait(dpy, w, WaitForPend, &pending, localLoop,
@@ -486,79 +486,79 @@ serverSendToVim(
      * Unregister the information about the pending command
      * and return the result.
      */
-    if (pendingCommands == &pending)
-	pendingCommands = pending.nextPtr;
-    else
+    যদি (pendingCommands == &pending)
+	pendingCommands = pending.পরবর্তী_Ptr;
+    অন্যথা
     {
 	PendingCommand *pcPtr;
 
-	for (pcPtr = pendingCommands; pcPtr != NULL; pcPtr = pcPtr->nextPtr)
-	    if (pcPtr->nextPtr == &pending)
+	জন্য (pcPtr = pendingCommands; pcPtr != ফাঁকা; pcPtr = pcPtr->পরবর্তী_Ptr)
+	    যদি (pcPtr->পরবর্তী_Ptr == &pending)
 	    {
-		pcPtr->nextPtr = pending.nextPtr;
-		break;
+		pcPtr->পরবর্তী_Ptr = pending.পরবর্তী_Ptr;
+		বিরতি;
 	    }
     }
 
-# if defined(FEAT_EVAL)
-    ch_log(NULL, "serverSendToVim() result: %s",
-	    pending.result == NULL ? "NULL" : (char *)pending.result);
+# যদি defined(FEAT_EVAL)
+    ch_log(ফাঁকা, "serverSendToVim() result: %s",
+	    pending.ফলাফল == ফাঁকা ? "NULL" : (অক্ষর *)pending.ফলাফল);
 # endif
-    if (result != NULL)
-	*result = pending.result;
-    else
-	vim_free(pending.result);
+    যদি (ফলাফল != ফাঁকা)
+	*ফলাফল = pending.ফলাফল;
+    অন্যথা
+	vim_free(pending.ফলাফল);
 
-    return pending.code == 0 ? 0 : -1;
+    ফেরত pending.code == 0 ? 0 : -1;
 }
 
-    static int
-WaitForPend(void *p)
+    স্থির পূর্ণসংখ্যা
+WaitForPend(শূন্য *p)
 {
     PendingCommand *pending = (PendingCommand *) p;
-    return pending->result != NULL;
+    ফেরত pending->ফলাফল != ফাঁকা;
 }
 
 /*
  * Return TRUE if window "w" exists and has a "Vim" property on it.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 WindowValid(Display *dpy, Window w)
 {
     XErrorHandler   old_handler;
     Atom	    *plist;
-    int		    numProp;
-    int		    i;
+    পূর্ণসংখ্যা		    অঙ্ক_Prop;
+    পূর্ণসংখ্যা		    i;
 
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = 0;
-    plist = XListProperties(dpy, w, &numProp);
+    plist = XListProperties(dpy, w, &অঙ্ক_Prop);
     XSync(dpy, False);
     XSetErrorHandler(old_handler);
-    if (plist == NULL || got_x_error)
-	return FALSE;
+    যদি (plist == ফাঁকা || got_x_error)
+	ফেরত FALSE;
 
-    for (i = 0; i < numProp; i++)
-	if (plist[i] == vimProperty)
+    জন্য (i = 0; i < অঙ্ক_Prop; i++)
+	যদি (plist[i] == vimProperty)
 	{
 	    XFree(plist);
-	    return TRUE;
+	    ফেরত TRUE;
 	}
     XFree(plist);
-    return FALSE;
+    ফেরত FALSE;
 }
 
 /*
  * Enter a loop processing X events & polling chars until we see a result
  */
-    static void
+    স্থির শূন্য
 ServerWait(
     Display	*dpy,
     Window	w,
     EndCond	endCond,
-    void	*endData,
-    int		localLoop,
-    int		seconds)
+    শূন্য	*end_তথ্য,
+    পূর্ণসংখ্যা		localLoop,
+    পূর্ণসংখ্যা		seconds)
 {
     time_t	    start;
     time_t	    now;
@@ -570,54 +570,54 @@ ServerWait(
     fd_set	    fds;
 
     FD_ZERO(&fds);
-    FD_SET(ConnectionNumber(dpy), &fds);
-# else
-    struct pollfd   fds;
+    FD_SET(Connection_সংখ্যা(dpy), &fds);
+# অন্যথা
+    কাঠামো pollfd   fds;
 
-    fds.fd = ConnectionNumber(dpy);
+    fds.fd = Connection_সংখ্যা(dpy);
     fds.events = POLLIN;
 # endif
 
     time(&start);
-    while (TRUE)
+    যখন (TRUE)
     {
-	while (XCheckWindowEvent(dpy, commWindow, PropertyChangeMask, &event))
+	যখন (XCheckWindowEvent(dpy, commWindow, PropertyChangeMask, &event))
 	    serverEventProc(dpy, &event, 1);
 	server_parse_messages();
 
-	if (endCond(endData) != 0)
-	    break;
-	if (!WindowValid(dpy, w))
-	    break;
+	যদি (endCond(end_তথ্য) != 0)
+	    বিরতি;
+	যদি (!WindowValid(dpy, w))
+	    বিরতি;
 	time(&now);
-	if (seconds >= 0 && (now - start) >= seconds)
-	    break;
+	যদি (seconds >= 0 && (now - start) >= seconds)
+	    বিরতি;
 
 # ifdef FEAT_TIMERS
 	check_due_timer();
 # endif
 
 	// Just look out for the answer without calling back into Vim
-	if (localLoop)
+	যদি (localLoop)
 	{
 # ifdef HAVE_SELECT
-	    struct timeval  tv;
+	    কাঠামো timeval  tv;
 
 	    // Set the time every call, select() may change it to the remaining
 	    // time.
 	    tv.tv_sec = 0;
 	    tv.tv_usec =  SEND_MSEC_POLL * 1000;
-	    if (select(FD_SETSIZE, &fds, NULL, NULL, &tv) < 0)
-		break;
-# else
-	    if (poll(&fds, 1, SEND_MSEC_POLL) < 0)
-		break;
+	    যদি (select(FD_SETSIZE, &fds, ফাঁকা, ফাঁকা, &tv) < 0)
+		বিরতি;
+# অন্যথা
+	    যদি (poll(&fds, 1, SEND_MSEC_POLL) < 0)
+		বিরতি;
 # endif
 	}
-	else
+	অন্যথা
 	{
-	    if (got_int)
-		break;
+	    যদি (got_int)
+		বিরতি;
 	    ui_delay((long)UI_MSEC_DELAY, TRUE);
 	    ui_breakcheck();
 	}
@@ -637,88 +637,88 @@ serverGetVimNames(Display *dpy)
     char_u	*regProp;
     char_u	*entry;
     char_u	*p;
-    long_u	numItems;
+    long_u	অঙ্ক_বস্তুসমূহ;
     int_u	w;
     list_T	*list;
 
-    if (registryProperty == None)
+    যদি (registryProperty == None)
     {
-	if (SendInit(dpy) < 0)
-	    return NULL;
+	যদি (SendInit(dpy) < 0)
+	    ফেরত ফাঁকা;
     }
 
     list = list_alloc();
-    if (list == NULL)
-	return NULL;
+    যদি (list == ফাঁকা)
+	ফেরত ফাঁকা;
 
     /*
      * Read the registry property.
      */
-    if (GetRegProp(dpy, &regProp, &numItems, TRUE) == FAIL)
-	return NULL;
+    যদি (GetRegProp(dpy, &regProp, &অঙ্ক_বস্তুসমূহ, TRUE) == FAIL)
+	ফেরত ফাঁকা;
 
     /*
      * Scan all of the names out of the property.
      */
-    for (p = regProp; (long_u)(p - regProp) < numItems; p++)
+    জন্য (p = regProp; (long_u)(p - regProp) < অঙ্ক_বস্তুসমূহ; p++)
     {
 	entry = p;
-	while (*p != 0 && !SAFE_isspace(*p))
+	যখন (*p != 0 && !SAFE_isspace(*p))
 	    p++;
-	if (*p != 0)
+	যদি (*p != 0)
 	{
 	    w = None;
-	    sscanf((char *)entry, "%x", &w);
-	    if (WindowValid(dpy, (Window)w))
+	    sscanf((অক্ষর *)entry, "%x", &w);
+	    যদি (WindowValid(dpy, (Window)w))
 		list_append_string(list, p + 1, -1);
-	    while (*p != 0)
+	    যখন (*p != 0)
 		p++;
 	}
     }
-    if (regProp != empty_prop)
+    যদি (regProp != empty_prop)
 	XFree(regProp);
-    return list;
+    ফেরত list;
 }
 
 /////////////////////////////////////////////////////////////
 // Reply stuff
 
-    static struct ServerReply *
-ServerReplyFind(Window w, enum ServerReplyOp op)
+    স্থির কাঠামো ServerReply *
+ServerReplyFind(Window w, গণনা ServerReplyOp op)
 {
-    struct ServerReply *p;
-    struct ServerReply e;
-    int		i;
+    কাঠামো ServerReply *p;
+    কাঠামো ServerReply e;
+    পূর্ণসংখ্যা		i;
 
-    p = (struct ServerReply *) serverReply.ga_data;
-    for (i = 0; i < serverReply.ga_len; i++, p++)
-	if (p->id == w)
-	    break;
-    if (i >= serverReply.ga_len)
-	p = NULL;
+    p = (কাঠামো ServerReply *) serverReply.ga_তথ্য;
+    জন্য (i = 0; i < serverReply.ga_len; i++, p++)
+	যদি (p->id == w)
+	    বিরতি;
+    যদি (i >= serverReply.ga_len)
+	p = ফাঁকা;
 
-    if (p == NULL && op == SROP_Add)
+    যদি (p == ফাঁকা && op == SROP_Add)
     {
-	if (serverReply.ga_growsize == 0)
-	    ga_init2(&serverReply, sizeof(struct ServerReply), 1);
-	if (ga_grow(&serverReply, 1) == OK)
+	যদি (serverReply.ga_growsize == 0)
+	    ga_init2(&serverReply, আকার(কাঠামো ServerReply), 1);
+	যদি (ga_grow(&serverReply, 1) == OK)
 	{
-	    p = ((struct ServerReply *) serverReply.ga_data)
+	    p = ((কাঠামো ServerReply *) serverReply.ga_তথ্য)
 		+ serverReply.ga_len;
 	    e.id = w;
 	    ga_init2(&e.strings, 1, 100);
-	    mch_memmove(p, &e, sizeof(e));
+	    mch_memmove(p, &e, আকার(e));
 	    serverReply.ga_len++;
 	}
     }
-    else if (p != NULL && op == SROP_Delete)
+    অন্যথা যদি (p != ফাঁকা && op == SROP_Delete)
     {
 	ga_clear(&p->strings);
-	mch_memmove(p, p + 1, (serverReply.ga_len - i - 1) * sizeof(*p));
+	mch_memmove(p, p + 1, (serverReply.ga_len - i - 1) * আকার(*p));
 	serverReply.ga_len--;
     }
 
-    return p;
+    ফেরত p;
 }
 
 /*
@@ -730,54 +730,54 @@ serverStrToWin(char_u *str)
 {
     unsigned  id = None;
 
-    sscanf((char *)str, "0x%x", &id);
-    if (id == None)
+    sscanf((অক্ষর *)str, "0x%x", &id);
+    যদি (id == None)
 	semsg(_(e_invalid_server_id_used_str), str);
 
-    return (Window)id;
+    ফেরত (Window)id;
 }
 
 /*
  * Send a reply string (notification) to client with id "name".
  * Return -1 if the window is invalid.
  */
-    int
+    পূর্ণসংখ্যা
 serverSendReply(char_u *name, char_u *str)
 {
     char_u	*property;
-    int		length;
-    int		res;
+    পূর্ণসংখ্যা		দৈর্ঘ্য;
+    পূর্ণসংখ্যা		res;
     Display	*dpy = X_DISPLAY;
     Window	win = serverStrToWin(name);
 
-    if (commProperty == None)
+    যদি (commProperty == None)
     {
-	if (SendInit(dpy) < 0)
-	    return -2;
+	যদি (SendInit(dpy) < 0)
+	    ফেরত -2;
     }
-    if (!WindowValid(dpy, win))
-	return -1;
+    যদি (!WindowValid(dpy, win))
+	ফেরত -1;
 
-    length = STRLEN(p_enc) + STRLEN(str) + 14;
-    if ((property = alloc(length + 30)) == NULL)
-	return -1;
+    দৈর্ঘ্য = STRLEN(p_enc) + STRLEN(str) + 14;
+    যদি ((property = alloc(দৈর্ঘ্য + 30)) == ফাঁকা)
+	ফেরত -1;
 
-    sprintf((char *)property, "%cn%c-E %s%c-n %s%c-w %x",
-	    0, 0, p_enc, 0, str, 0, (unsigned int)commWindow);
+    sprintf((অক্ষর *)property, "%cn%c-E %s%c-n %s%c-w %x",
+	    0, 0, p_enc, 0, str, 0, (unsigned পূর্ণসংখ্যা)commWindow);
     // Add length of what "%x" resulted in.
-    length += STRLEN(property + length);
-    res = AppendPropCarefully(dpy, win, commProperty, property, length + 1);
+    দৈর্ঘ্য += STRLEN(property + দৈর্ঘ্য);
+    res = AppendPropCarefully(dpy, win, commProperty, property, দৈর্ঘ্য + 1);
     vim_free(property);
 
-    return res;
+    ফেরত res;
 }
 
-    static int
-WaitForReply(void *p)
+    স্থির পূর্ণসংখ্যা
+WaitForReply(শূন্য *p)
 {
     Window  *w = (Window *) p;
 
-    return ServerReplyFind(*w, SROP_Find) != NULL;
+    ফেরত ServerReplyFind(*w, SROP_Find) != ফাঁকা;
 }
 
 /*
@@ -786,60 +786,60 @@ WaitForReply(void *p)
  * Return 0 and the allocated string in "*str" when a reply is available.
  * Return -1 if the window becomes invalid while waiting.
  */
-    int
+    পূর্ণসংখ্যা
 serverReadReply(
     Display	*dpy,
     Window	win,
     char_u	**str,
-    int		localLoop,
-    int		timeout)
+    পূর্ণসংখ্যা		localLoop,
+    পূর্ণসংখ্যা		timeout)
 {
-    int		len;
+    পূর্ণসংখ্যা		len;
     char_u	*s;
-    struct	ServerReply *p;
+    কাঠামো	ServerReply *p;
 
     ServerWait(dpy, win, WaitForReply, &win, localLoop,
 						   timeout > 0 ? timeout : -1);
 
-    if ((p = ServerReplyFind(win, SROP_Find)) != NULL && p->strings.ga_len > 0)
+    যদি ((p = ServerReplyFind(win, SROP_Find)) != ফাঁকা && p->strings.ga_len > 0)
     {
-	*str = vim_strsave(p->strings.ga_data);
+	*str = vim_strsave(p->strings.ga_তথ্য);
 	len = STRLEN(*str) + 1;
-	if (len < p->strings.ga_len)
+	যদি (len < p->strings.ga_len)
 	{
-	    s = (char_u *) p->strings.ga_data;
+	    s = (char_u *) p->strings.ga_তথ্য;
 	    mch_memmove(s, s + len, p->strings.ga_len - len);
 	    p->strings.ga_len -= len;
 	}
-	else
+	অন্যথা
 	{
 	    // Last string read.  Remove from list
 	    ga_clear(&p->strings);
 	    ServerReplyFind(win, SROP_Delete);
 	}
-	return 0;
+	ফেরত 0;
     }
-    return -1;
+    ফেরত -1;
 }
 
 /*
  * Check for replies from id (win).
  * Return TRUE and a non-malloc'ed string if there is.  Else return FALSE.
  */
-    int
+    পূর্ণসংখ্যা
 serverPeekReply(Display *dpy, Window win, char_u **str)
 {
-    struct ServerReply *p;
+    কাঠামো ServerReply *p;
 
-    if ((p = ServerReplyFind(win, SROP_Find)) != NULL && p->strings.ga_len > 0)
+    যদি ((p = ServerReplyFind(win, SROP_Find)) != ফাঁকা && p->strings.ga_len > 0)
     {
-	if (str != NULL)
-	    *str = p->strings.ga_data;
-	return 1;
+	যদি (str != ফাঁকা)
+	    *str = p->strings.ga_তথ্য;
+	ফেরত 1;
     }
-    if (!WindowValid(dpy, win))
-	return -1;
-    return 0;
+    যদি (!WindowValid(dpy, win))
+	ফেরত -1;
+    ফেরত 0;
 }
 
 
@@ -847,7 +847,7 @@ serverPeekReply(Display *dpy, Window win, char_u **str)
  * Initialize the communication channels for sending commands and receiving
  * results.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 SendInit(Display *dpy)
 {
     XErrorHandler old_handler;
@@ -859,20 +859,20 @@ SendInit(Display *dpy)
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
 
-    if (commProperty == None)
+    যদি (commProperty == None)
 	commProperty = XInternAtom(dpy, "Comm", False);
-    if (vimProperty == None)
+    যদি (vimProperty == None)
 	vimProperty = XInternAtom(dpy, "Vim", False);
-    if (registryProperty == None)
+    যদি (registryProperty == None)
 	registryProperty = XInternAtom(dpy, "VimRegistry", False);
 
-    if (commWindow == None)
+    যদি (commWindow == None)
     {
-	commWindow = XCreateSimpleWindow(dpy, XDefaultRootWindow(dpy),
+	commWindow = XCreateSimpleWindow(dpy, XDefault_মূল_Window(dpy),
 				getpid(), 0, 10, 10, 0,
 				WhitePixel(dpy, DefaultScreen(dpy)),
 				WhitePixel(dpy, DefaultScreen(dpy)));
-	XSelectInput(dpy, commWindow, PropertyChangeMask);
+	XSelect_প্রবেশ(dpy, commWindow, PropertyChangeMask);
 	// WARNING: Do not step through this while debugging, it will hangup
 	// the X server!
 	XGrabServer(dpy);
@@ -883,12 +883,12 @@ SendInit(Display *dpy)
     // Make window recognizable as a vim window
     XChangeProperty(dpy, commWindow, vimProperty, XA_STRING,
 		    8, PropModeReplace, (char_u *)VIM_VERSION_SHORT,
-			(int)STRLEN_LITERAL(VIM_VERSION_SHORT) + 1);
+			(পূর্ণসংখ্যা)STRLEN_LITERAL(VIM_VERSION_SHORT) + 1);
 
     XSync(dpy, False);
-    (void)XSetErrorHandler(old_handler);
+    (শূন্য)XSetErrorHandler(old_handler);
 
-    return got_x_error ? -1 : 0;
+    ফেরত got_x_error ? -1 : 0;
 }
 
 /*
@@ -903,61 +903,61 @@ SendInit(Display *dpy)
  *	If "delete" is non-zero, then if the named server is found it is
  *	removed from the registry property.
  */
-    static Window
+    স্থির Window
 LookupName(
     Display	*dpy,	    // Display whose registry to check.
     char_u	*name,	    // Name of a server.
-    int		delete,	    // If non-zero, delete info about name.
+    পূর্ণসংখ্যা		delete,	    // If non-zero, delete info about name.
     char_u	**loose)    // Do another search matching -999 if not found
 			    // Return result here if a match is found
 {
     char_u	*regProp, *entry;
     char_u	*p;
-    long_u	numItems;
-    int_u	returnValue;
+    long_u	অঙ্ক_বস্তুসমূহ;
+    int_u	return_মান;
 
     /*
      * Read the registry property.
      */
-    if (GetRegProp(dpy, &regProp, &numItems, FALSE) == FAIL)
-	return 0;
+    যদি (GetRegProp(dpy, &regProp, &অঙ্ক_বস্তুসমূহ, FALSE) == FAIL)
+	ফেরত 0;
 
     /*
      * Scan the property for the desired name.
      */
-    returnValue = (int_u)None;
-    entry = NULL;	// Not needed, but eliminates compiler warning.
-    for (p = regProp; (long_u)(p - regProp) < numItems; )
+    return_মান = (int_u)None;
+    entry = ফাঁকা;	// Not needed, but eliminates compiler warning.
+    জন্য (p = regProp; (long_u)(p - regProp) < অঙ্ক_বস্তুসমূহ; )
     {
 	entry = p;
-	while (*p != 0 && !SAFE_isspace(*p))
+	যখন (*p != 0 && !SAFE_isspace(*p))
 	    p++;
-	if (*p != 0 && STRICMP(name, p + 1) == 0)
+	যদি (*p != 0 && STRICMP(name, p + 1) == 0)
 	{
-	    sscanf((char *)entry, "%x", &returnValue);
-	    break;
+	    sscanf((অক্ষর *)entry, "%x", &return_মান);
+	    বিরতি;
 	}
-	while (*p != 0)
+	যখন (*p != 0)
 	    p++;
 	p++;
     }
 
-    if (loose != NULL && returnValue == (int_u)None && !IsSerialName(name))
+    যদি (loose != ফাঁকা && return_মান == (int_u)None && !IsSerialName(name))
     {
-	for (p = regProp; (long_u)(p - regProp) < numItems; )
+	জন্য (p = regProp; (long_u)(p - regProp) < অঙ্ক_বস্তুসমূহ; )
 	{
 	    entry = p;
-	    while (*p != 0 && !SAFE_isspace(*p))
+	    যখন (*p != 0 && !SAFE_isspace(*p))
 		p++;
-	    if (*p != 0 && IsSerialName(p + 1)
+	    যদি (*p != 0 && IsSerialName(p + 1)
 		    && STRNICMP(name, p + 1, STRLEN(name)) == 0)
 	    {
-		if (sscanf((char *)entry, "%x", &returnValue) == 1
-			&& returnValue != (int_u)None)
+		যদি (sscanf((অক্ষর *)entry, "%x", &return_মান) == 1
+			&& return_মান != (int_u)None)
 		    *loose = vim_strsave(p + 1);
-		break;
+		বিরতি;
 	    }
-	    while (*p != 0)
+	    যখন (*p != 0)
 		p++;
 	    p++;
 	}
@@ -968,25 +968,25 @@ LookupName(
      * remainder of the registry property to overlay the deleted
      * info, then rewrite the property).
      */
-    if (delete && returnValue != (int_u)None)
+    যদি (delete && return_মান != (int_u)None)
     {
-	int count;
+	পূর্ণসংখ্যা গুনতি;
 
-	while (*p != 0)
+	যখন (*p != 0)
 	    p++;
 	p++;
-	count = numItems - (p - regProp);
-	if (count > 0)
-	    mch_memmove(entry, p, count);
-	XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty, XA_STRING,
+	গুনতি = অঙ্ক_বস্তুসমূহ - (p - regProp);
+	যদি (গুনতি > 0)
+	    mch_memmove(entry, p, গুনতি);
+	XChangeProperty(dpy, মূল_Window(dpy, 0), registryProperty, XA_STRING,
 			8, PropModeReplace, regProp,
-			(int)(numItems - (p - entry)));
+			(পূর্ণসংখ্যা)(অঙ্ক_বস্তুসমূহ - (p - entry)));
 	XSync(dpy, False);
     }
 
-    if (regProp != empty_prop)
+    যদি (regProp != empty_prop)
 	XFree(regProp);
-    return (Window)returnValue;
+    ফেরত (Window)return_মান;
 }
 
 /*
@@ -998,59 +998,59 @@ LookupName(
  * 2. We get that id for our commWindow but only want to send, not register.
  * 3. The window will mistakenly be regarded valid because of own commWindow
  */
-    static void
+    স্থির শূন্য
 DeleteAnyLingerer(
     Display	*dpy,	// Display whose registry to check.
     Window	win)	// Window to remove
 {
-    char_u	*regProp, *entry = NULL;
+    char_u	*regProp, *entry = ফাঁকা;
     char_u	*p;
-    long_u	numItems;
+    long_u	অঙ্ক_বস্তুসমূহ;
     int_u	wwin;
 
     /*
      * Read the registry property.
      */
-    if (GetRegProp(dpy, &regProp, &numItems, FALSE) == FAIL)
-	return;
+    যদি (GetRegProp(dpy, &regProp, &অঙ্ক_বস্তুসমূহ, FALSE) == FAIL)
+	ফেরত;
 
     // Scan the property for the window id.
-    for (p = regProp; (long_u)(p - regProp) < numItems; )
+    জন্য (p = regProp; (long_u)(p - regProp) < অঙ্ক_বস্তুসমূহ; )
     {
-	if (*p != 0)
+	যদি (*p != 0)
 	{
-	    sscanf((char *)p, "%x", &wwin);
-	    if ((Window)wwin == win)
+	    sscanf((অক্ষর *)p, "%x", &wwin);
+	    যদি ((Window)wwin == win)
 	    {
-		int lastHalf;
+		পূর্ণসংখ্যা lastHalf;
 
 		// Copy down the remainder to delete entry
 		entry = p;
-		while (*p != 0)
+		যখন (*p != 0)
 		    p++;
 		p++;
-		lastHalf = numItems - (p - regProp);
-		if (lastHalf > 0)
+		lastHalf = অঙ্ক_বস্তুসমূহ - (p - regProp);
+		যদি (lastHalf > 0)
 		    mch_memmove(entry, p, lastHalf);
-		numItems = (entry - regProp) + lastHalf;
+		অঙ্ক_বস্তুসমূহ = (entry - regProp) + lastHalf;
 		p = entry;
-		continue;
+		চালু;
 	    }
 	}
-	while (*p != 0)
+	যখন (*p != 0)
 	    p++;
 	p++;
     }
 
-    if (entry != NULL)
+    যদি (entry != ফাঁকা)
     {
-	XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty,
+	XChangeProperty(dpy, মূল_Window(dpy, 0), registryProperty,
 			XA_STRING, 8, PropModeReplace, regProp,
-			(int)(p - regProp));
+			(পূর্ণসংখ্যা)(p - regProp));
 	XSync(dpy, False);
     }
 
-    if (regProp != empty_prop)
+    যদি (regProp != empty_prop)
 	XFree(regProp);
 }
 
@@ -1060,52 +1060,52 @@ DeleteAnyLingerer(
  * exist yet.
  * Return OK when successful.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 GetRegProp(
     Display	*dpy,
     char_u	**regPropp,
-    long_u	*numItemsp,
-    int		domsg)		// When TRUE give error message.
+    long_u	*অঙ্ক_Itemsp,
+    পূর্ণসংখ্যা		domsg)		// When TRUE give error message.
 {
-    int		result, actualFormat;
+    পূর্ণসংখ্যা		ফলাফল, actualFormat;
     long_u	bytesAfter;
     Atom	actualType;
     XErrorHandler old_handler;
 
-    *regPropp = NULL;
+    *regPropp = ফাঁকা;
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
 
-    result = XGetWindowProperty(dpy, RootWindow(dpy, 0), registryProperty, 0L,
-				(long)MAX_PROP_WORDS, False,
+    ফলাফল = XGetWindowProperty(dpy, মূল_Window(dpy, 0), registryProperty, 0L,
+				(long)MAX_PROP_শব্দগুলি, False,
 				XA_STRING, &actualType,
-				&actualFormat, numItemsp, &bytesAfter,
+				&actualFormat, অঙ্ক_Itemsp, &bytesAfter,
 				regPropp);
 
     XSync(dpy, FALSE);
-    (void)XSetErrorHandler(old_handler);
-    if (got_x_error)
-	return FAIL;
+    (শূন্য)XSetErrorHandler(old_handler);
+    যদি (got_x_error)
+	ফেরত FAIL;
 
-    if (actualType == None)
+    যদি (actualType == None)
     {
 	// No prop yet. Logically equal to the empty list
-	*numItemsp = 0;
+	*অঙ্ক_Itemsp = 0;
 	*regPropp = empty_prop;
-	return OK;
+	ফেরত OK;
     }
 
     // If the property is improperly formed, then delete it.
-    if (result != Success || actualFormat != 8 || actualType != XA_STRING)
+    যদি (ফলাফল != Success || actualFormat != 8 || actualType != XA_STRING)
     {
-	if (*regPropp != NULL)
+	যদি (*regPropp != ফাঁকা)
 	    XFree(*regPropp);
-	XDeleteProperty(dpy, RootWindow(dpy, 0), registryProperty);
-	if (domsg)
+	XDeleteProperty(dpy, মূল_Window(dpy, 0), registryProperty);
+	যদি (domsg)
 	    emsg(_(e_vim_instance_registry_property_is_badly_formed_deleted));
-	return FAIL;
+	ফেরত FAIL;
     }
-    return OK;
+    ফেরত OK;
 }
 
 
@@ -1117,92 +1117,92 @@ GetRegProp(
  * unintended behavior and should only be used for code that blocks for a
  * response.
  */
-    void
+    শূন্য
 serverEventProc(
     Display	*dpy,
     XEvent	*eventPtr,	// Information about event.
-    int		immediate)	// Run event immediately. Should mostly be 0.
+    পূর্ণসংখ্যা		immediate)	// Run event immediately. Should mostly be 0.
 {
     char_u	*propInfo;
-    int		result, actualFormat;
-    long_u	numItems, bytesAfter;
+    পূর্ণসংখ্যা		ফলাফল, actualFormat;
+    long_u	অঙ্ক_বস্তুসমূহ, bytesAfter;
     Atom	actualType;
 
-    if (eventPtr != NULL)
+    যদি (eventPtr != ফাঁকা)
     {
-	if (eventPtr->xproperty.atom != commProperty
-		|| eventPtr->xproperty.state != PropertyNewValue)
-	    return;
+	যদি (eventPtr->xproperty.atom != commProperty
+		|| eventPtr->xproperty.state != Property_New_মান)
+	    ফেরত;
     }
 
     /*
      * Read the comm property and delete it.
      */
-    propInfo = NULL;
-    result = XGetWindowProperty(dpy, commWindow, commProperty, 0L,
-				(long)MAX_PROP_WORDS, True,
+    propInfo = ফাঁকা;
+    ফলাফল = XGetWindowProperty(dpy, commWindow, commProperty, 0L,
+				(long)MAX_PROP_শব্দগুলি, True,
 				XA_STRING, &actualType,
-				&actualFormat, &numItems, &bytesAfter,
+				&actualFormat, &অঙ্ক_বস্তুসমূহ, &bytesAfter,
 				&propInfo);
 
     // If the property doesn't exist or is improperly formed then ignore it.
-    if (result != Success || actualType != XA_STRING || actualFormat != 8)
+    যদি (ফলাফল != Success || actualType != XA_STRING || actualFormat != 8)
     {
-	if (propInfo != NULL)
+	যদি (propInfo != ফাঁকা)
 	    XFree(propInfo);
-	return;
+	ফেরত;
     }
-    if (immediate)
-	server_parse_message(dpy, propInfo, numItems);
-    else
-	save_in_queue(propInfo, numItems);
+    যদি (immediate)
+	server_parse_message(dpy, propInfo, অঙ্ক_বস্তুসমূহ);
+    অন্যথা
+	save_in_queue(propInfo, অঙ্ক_বস্তুসমূহ);
 }
 
 /*
  * Saves x clientserver commands in a queue so that they can be called when
  * vim is idle.
  */
-    static void
+    স্থির শূন্য
 save_in_queue(char_u *propInfo, long_u len)
 {
-    x_queue_T *node;
+    x_queue_T *গ্রন্থি;
 
-    node = ALLOC_ONE(x_queue_T);
-    if (node == NULL)
-	return;	    // out of memory
-    node->propInfo = propInfo;
-    node->len = len;
+    গ্রন্থি = ALLOC_ONE(x_queue_T);
+    যদি (গ্রন্থি == ফাঁকা)
+	ফেরত;	    // out of memory
+    গ্রন্থি->propInfo = propInfo;
+    গ্রন্থি->len = len;
 
-    if (head.next == NULL)   // initialize circular queue
+    যদি (শীর্ষ.পরবর্তী == ফাঁকা)   // initialize circular queue
     {
-	head.next = &head;
-	head.prev = &head;
+	শীর্ষ.পরবর্তী = &শীর্ষ;
+	শীর্ষ.পূর্ব = &শীর্ষ;
     }
 
     // insert node at tail of queue
-    node->next = &head;
-    node->prev = head.prev;
-    head.prev->next = node;
-    head.prev = node;
+    গ্রন্থি->পরবর্তী = &শীর্ষ;
+    গ্রন্থি->পূর্ব = শীর্ষ.পূর্ব;
+    শীর্ষ.পূর্ব->পরবর্তী = গ্রন্থি;
+    শীর্ষ.পূর্ব = গ্রন্থি;
 }
 
 /*
  * Parses queued clientserver messages.
  */
-    void
-server_parse_messages(void)
+    শূন্য
+server_parse_messages(শূন্য)
 {
-    x_queue_T	*node;
+    x_queue_T	*গ্রন্থি;
 
-    if (!X_DISPLAY)
-	return; // cannot happen?
-    while (head.next != NULL && head.next != &head)
+    যদি (!X_DISPLAY)
+	ফেরত; // cannot happen?
+    যখন (শীর্ষ.পরবর্তী != ফাঁকা && শীর্ষ.পরবর্তী != &শীর্ষ)
     {
-	node = head.next;
-	head.next = node->next;
-	node->next->prev = node->prev;
-	server_parse_message(X_DISPLAY, node->propInfo, node->len);
-	vim_free(node);
+	গ্রন্থি = শীর্ষ.পরবর্তী;
+	শীর্ষ.পরবর্তী = গ্রন্থি->পরবর্তী;
+	গ্রন্থি->পরবর্তী->পূর্ব = গ্রন্থি->পূর্ব;
+	server_parse_message(X_DISPLAY, গ্রন্থি->propInfo, গ্রন্থি->len);
+	vim_free(গ্রন্থি);
     }
 }
 
@@ -1210,10 +1210,10 @@ server_parse_messages(void)
  * Returns a non-zero value if there are clientserver messages waiting
  * int the queue.
  */
-    int
-server_waiting(void)
+    পূর্ণসংখ্যা
+server_waiting(শূন্য)
 {
-    return head.next != NULL && head.next != &head;
+    ফেরত শীর্ষ.পরবর্তী != ফাঁকা && শীর্ষ.পরবর্তী != &শীর্ষ;
 }
 
 /*
@@ -1221,18 +1221,18 @@ server_waiting(void)
  * commands.
  * "propInfo" will be freed.
  */
-    static void
+    স্থির শূন্য
 server_parse_message(
     Display	*dpy,
     char_u	*propInfo, // A string containing 0 or more X commands
-    long_u	numItems)  // The size of propInfo in bytes.
+    long_u	অঙ্ক_বস্তুসমূহ)  // The size of propInfo in bytes.
 {
     char_u	*p;
-    int		code;
+    পূর্ণসংখ্যা		code;
     char_u	*tofree;
 
-# if defined(FEAT_EVAL)
-    ch_log(NULL, "server_parse_message() numItems: %ld", numItems);
+# যদি defined(FEAT_EVAL)
+    ch_log(ফাঁকা, "server_parse_message() numItems: %ld", অঙ্ক_বস্তুসমূহ);
 # endif
 
     /*
@@ -1240,7 +1240,7 @@ server_parse_message(
      * one time;  each iteration through the outer loop handles a
      * single command or result.
      */
-    for (p = propInfo; (long_u)(p - propInfo) < numItems; )
+    জন্য (p = propInfo; (long_u)(p - propInfo) < অঙ্ক_বস্তুসমূহ; )
     {
 	/*
 	 * Ignore leading NULs; each command or result starts with a
@@ -1248,17 +1248,17 @@ server_parse_message(
 	 * is, we'll be able to tell that a new command/result is
 	 * starting.
 	 */
-	if (*p == 0)
+	যদি (*p == 0)
 	{
 	    p++;
-	    continue;
+	    চালু;
 	}
 
-	if ((*p == 'c' || *p == 'k') && p[1] == 0)
+	যদি ((*p == 'c' || *p == 'k') && p[1] == 0)
 	{
 	    Window	resWindow;
 	    char_u	*name, *script, *serial, *end;
-	    Bool	asKeys = *p == 'k';
+	    Bool	as_চাবিগুলি = *p == 'k';
 	    char_u	*enc;
 
 	    /*
@@ -1268,80 +1268,80 @@ server_parse_message(
 	     * like an option.
 	     */
 	    p += 2;
-	    name = NULL;
+	    name = ফাঁকা;
 	    resWindow = None;
 	    serial = (char_u *)"";
-	    script = NULL;
-	    enc = NULL;
-	    while ((long_u)(p - propInfo) < numItems && *p == '-')
+	    script = ফাঁকা;
+	    enc = ফাঁকা;
+	    যখন ((long_u)(p - propInfo) < অঙ্ক_বস্তুসমূহ && *p == '-')
 	    {
-# if defined(FEAT_EVAL)
-		ch_log(NULL, "server_parse_message() item: %c, %s", p[-2], p);
+# যদি defined(FEAT_EVAL)
+		ch_log(ফাঁকা, "server_parse_message() item: %c, %s", p[-2], p);
 # endif
-		switch (p[1])
+		নির্বাচন (p[1])
 		{
-		    case 'r':
+		    ক্ষেত্র 'r':
 			end = skipwhite(p + 2);
 			resWindow = 0;
-			while (vim_isxdigit(*end))
+			যখন (vim_isxdigit(*end))
 			{
 			    resWindow = 16 * resWindow + (long_u)hex2nr(*end);
 			    ++end;
 			}
-			if (end == p + 2 || *end != ' ')
+			যদি (end == p + 2 || *end != ' ')
 			    resWindow = None;
-			else
+			অন্যথা
 			{
 			    p = serial = end + 1;
 			    clientWindow = resWindow; // Remember in global
 			}
-			break;
-		    case 'n':
-			if (p[2] == ' ')
+			বিরতি;
+		    ক্ষেত্র 'n':
+			যদি (p[2] == ' ')
 			    name = p + 3;
-			break;
-		    case 's':
-			if (p[2] == ' ')
+			বিরতি;
+		    ক্ষেত্র 's':
+			যদি (p[2] == ' ')
 			    script = p + 3;
-			break;
-		    case 'E':
-			if (p[2] == ' ')
+			বিরতি;
+		    ক্ষেত্র 'E':
+			যদি (p[2] == ' ')
 			    enc = p + 3;
-			break;
+			বিরতি;
 		}
-		while (*p != 0)
+		যখন (*p != 0)
 		    p++;
 		p++;
 	    }
 
-	    if (script == NULL || name == NULL)
-		continue;
+	    যদি (script == ফাঁকা || name == ফাঁকা)
+		চালু;
 
-	    if (serverName != NULL && STRICMP(name, serverName) == 0)
+	    যদি (serverName != ফাঁকা && STRICMP(name, serverName) == 0)
 	    {
 		script = serverConvert(enc, script, &tofree);
-		if (asKeys)
-		    server_to_input_buf(script);
-		else
+		যদি (as_চাবিগুলি)
+		    server_to_প্রবেশ_buf(script);
+		অন্যথা
 		{
 		    char_u      *res;
 
-		    res = eval_client_expr_to_string(script);
-		    if (resWindow != None)
+		    res = eval_client_রাশিমালা_to_string(script);
+		    যদি (resWindow != None)
 		    {
 			garray_T    reply;
 
 			// Initialize the result property.
 			ga_init2(&reply, 1, 100);
-			(void)ga_grow(&reply, 50 + STRLEN(p_enc) + STRLEN(serial));
-			sprintf(reply.ga_data, "%cr%c-E %s%c-s %s%c-r ",
+			(শূন্য)ga_grow(&reply, 50 + STRLEN(p_enc) + STRLEN(serial));
+			sprintf(reply.ga_তথ্য, "%cr%c-E %s%c-s %s%c-r ",
 						   0, 0, p_enc, 0, serial, 0);
 			reply.ga_len = 14 + STRLEN(p_enc) + STRLEN(serial);
 
 			// Evaluate the expression and return the result.
-			if (res != NULL)
+			যদি (res != ফাঁকা)
 			    ga_concat(&reply, res);
-			else
+			অন্যথা
 			{
 			    ga_concat(&reply,
 				   (char_u *)_(e_invalid_expression_received));
@@ -1349,8 +1349,8 @@ server_parse_message(
 			    GA_CONCAT_LITERAL(&reply, "-c 1");
 			}
 			ga_append(&reply, NUL);
-			(void)AppendPropCarefully(dpy, resWindow, commProperty,
-						 reply.ga_data, reply.ga_len);
+			(শূন্য)AppendPropCarefully(dpy, resWindow, commProperty,
+						 reply.ga_তথ্য, reply.ga_len);
 			ga_clear(&reply);
 		    }
 		    vim_free(res);
@@ -1358,9 +1358,9 @@ server_parse_message(
 		vim_free(tofree);
 	    }
 	}
-	else if (*p == 'r' && p[1] == 0)
+	অন্যথা যদি (*p == 'r' && p[1] == 0)
 	{
-	    int		    serial, gotSerial;
+	    পূর্ণসংখ্যা		    serial, gotSerial;
 	    char_u	    *res;
 	    PendingCommand  *pcPtr;
 	    char_u	    *enc;
@@ -1374,60 +1374,60 @@ server_parse_message(
 	    gotSerial = 0;
 	    res = (char_u *)"";
 	    code = 0;
-	    enc = NULL;
-	    while ((long_u)(p - propInfo) < numItems && *p == '-')
+	    enc = ফাঁকা;
+	    যখন ((long_u)(p - propInfo) < অঙ্ক_বস্তুসমূহ && *p == '-')
 	    {
-		switch (p[1])
+		নির্বাচন (p[1])
 		{
-		    case 'r':
-			if (p[2] == ' ')
+		    ক্ষেত্র 'r':
+			যদি (p[2] == ' ')
 			    res = p + 3;
-			break;
-		    case 'E':
-			if (p[2] == ' ')
+			বিরতি;
+		    ক্ষেত্র 'E':
+			যদি (p[2] == ' ')
 			    enc = p + 3;
-			break;
-		    case 's':
-			if (sscanf((char *)p + 2, " %d", &serial) == 1)
+			বিরতি;
+		    ক্ষেত্র 's':
+			যদি (sscanf((অক্ষর *)p + 2, " %d", &serial) == 1)
 			    gotSerial = 1;
-			break;
-		    case 'c':
-			if (sscanf((char *)p + 2, " %d", &code) != 1)
+			বিরতি;
+		    ক্ষেত্র 'c':
+			যদি (sscanf((অক্ষর *)p + 2, " %d", &code) != 1)
 			    code = 0;
-			break;
+			বিরতি;
 		}
-		while (*p != 0)
+		যখন (*p != 0)
 		    p++;
 		p++;
 	    }
 
-	    if (!gotSerial)
-		continue;
+	    যদি (!gotSerial)
+		চালু;
 
 	    /*
 	     * Give the result information to anyone who's
 	     * waiting for it.
 	     */
-	    for (pcPtr = pendingCommands; pcPtr != NULL; pcPtr = pcPtr->nextPtr)
+	    জন্য (pcPtr = pendingCommands; pcPtr != ফাঁকা; pcPtr = pcPtr->পরবর্তী_Ptr)
 	    {
-		if (serial != pcPtr->serial || pcPtr->result != NULL)
-		    continue;
+		যদি (serial != pcPtr->serial || pcPtr->ফলাফল != ফাঁকা)
+		    চালু;
 
 		pcPtr->code = code;
 		res = serverConvert(enc, res, &tofree);
-		if (tofree == NULL)
+		যদি (tofree == ফাঁকা)
 		    res = vim_strsave(res);
-		pcPtr->result = res;
-		break;
+		pcPtr->ফলাফল = res;
+		বিরতি;
 	    }
 	}
-	else if (*p == 'n' && p[1] == 0)
+	অন্যথা যদি (*p == 'n' && p[1] == 0)
 	{
 	    Window	win = 0;
-	    unsigned int u;
-	    int		gotWindow;
+	    unsigned পূর্ণসংখ্যা u;
+	    পূর্ণসংখ্যা		gotWindow;
 	    char_u	*str;
-	    struct	ServerReply *r;
+	    কাঠামো	ServerReply *r;
 	    char_u	*enc;
 
 	    /*
@@ -1437,36 +1437,36 @@ server_parse_message(
 	    p += 2;
 	    gotWindow = 0;
 	    str = (char_u *)"";
-	    enc = NULL;
-	    while ((long_u)(p - propInfo) < numItems && *p == '-')
+	    enc = ফাঁকা;
+	    যখন ((long_u)(p - propInfo) < অঙ্ক_বস্তুসমূহ && *p == '-')
 	    {
-		switch (p[1])
+		নির্বাচন (p[1])
 		{
-		    case 'n':
-			if (p[2] == ' ')
+		    ক্ষেত্র 'n':
+			যদি (p[2] == ' ')
 			    str = p + 3;
-			break;
-		    case 'E':
-			if (p[2] == ' ')
+			বিরতি;
+		    ক্ষেত্র 'E':
+			যদি (p[2] == ' ')
 			    enc = p + 3;
-			break;
-		    case 'w':
-			if (sscanf((char *)p + 2, " %x", &u) == 1)
+			বিরতি;
+		    ক্ষেত্র 'w':
+			যদি (sscanf((অক্ষর *)p + 2, " %x", &u) == 1)
 			{
 			    win = u;
 			    gotWindow = 1;
 			}
-			break;
+			বিরতি;
 		}
-		while (*p != 0)
+		যখন (*p != 0)
 		    p++;
 		p++;
 	    }
 
-	    if (!gotWindow)
-		continue;
+	    যদি (!gotWindow)
+		চালু;
 	    str = serverConvert(enc, str, &tofree);
-	    if ((r = ServerReplyFind(win, SROP_Add)) != NULL)
+	    যদি ((r = ServerReplyFind(win, SROP_Add)) != ফাঁকা)
 	    {
 		ga_concat(&(r->strings), str);
 		ga_append(&(r->strings), NUL);
@@ -1474,12 +1474,12 @@ server_parse_message(
 	    {
 		char_u	winstr[30];
 
-		sprintf((char *)winstr, "0x%x", (unsigned int)win);
+		sprintf((অক্ষর *)winstr, "0x%x", (unsigned পূর্ণসংখ্যা)win);
 		apply_autocmds(EVENT_REMOTEREPLY, winstr, str, TRUE, curbuf);
 	    }
 	    vim_free(tofree);
 	}
-	else
+	অন্যথা
 	{
 	    /*
 	     * Didn't recognize this thing.  Just skip through the next
@@ -1487,7 +1487,7 @@ server_parse_message(
 	     * Even if we get an 'r'(eply) we will throw it away as we
 	     * never specify (and thus expect) one
 	     */
-	    while (*p != 0)
+	    যখন (*p != 0)
 		p++;
 	    p++;
 	}
@@ -1501,45 +1501,45 @@ server_parse_message(
  * than having Xlib panic.
  * Return: 0 for OK, -1 for error
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 AppendPropCarefully(
     Display	*dpy,		// Display on which to operate.
     Window	window,		// Window whose property is to be modified.
     Atom	property,	// Name of property.
-    char_u	*value,		// Characters  to append to property.
-    int		length)		// How much to append
+    char_u	*মান,		// Characters  to append to property.
+    পূর্ণসংখ্যা		দৈর্ঘ্য)		// How much to append
 {
     XErrorHandler old_handler;
 
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
     XChangeProperty(dpy, window, property, XA_STRING, 8,
-					       PropModeAppend, value, length);
+					       PropModeAppend, মান, দৈর্ঘ্য);
     XSync(dpy, False);
-    (void) XSetErrorHandler(old_handler);
-    return got_x_error ? -1 : 0;
+    (শূন্য) XSetErrorHandler(old_handler);
+    ফেরত got_x_error ? -1 : 0;
 }
 
 
 /*
  * Another X Error handler, just used to check for errors.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 x_error_check(Display *dpy UNUSED, XErrorEvent *error_event UNUSED)
 {
     got_x_error = TRUE;
-    return 0;
+    ফেরত 0;
 }
 
 /*
  * Check if "str" looks like it had a serial number appended.
  * Actually just checks if the name ends in a digit.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 IsSerialName(char_u *str)
 {
-    int len = STRLEN(str);
+    পূর্ণসংখ্যা len = STRLEN(str);
 
-    return (len > 1 && vim_isdigit(str[len - 1]));
+    ফেরত (len > 1 && vim_isdigit(str[len - 1]));
 }
 #endif	// FEAT_CLIENTSERVER

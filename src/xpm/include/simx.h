@@ -39,7 +39,7 @@
 
 #ifdef FOR_MSW
 
-#include "windows.h"			/* MS windows GDI types */
+#অন্তর্ভাব "windows.h"			/* MS windows GDI types */
 
 /*
  * minimal portability layer between ansi and KR C
@@ -47,49 +47,49 @@
 /* this comes from xpm.h, and is here again, to avoid complicated
     includes, since this is included from xpm.h */
 /* these defines get undefed at the end of this file */
-#if __STDC__ || defined(__cplusplus) || defined(c_plusplus)
+#যদি __STDC__ || defined(__cplusplus) || defined(c_plusplus)
  /* ANSI || C++ */
-#define FUNC(f, t, p) extern t f p
-#define LFUNC(f, t, p) static t f p
-#else /* k&R */
-#define FUNC(f, t, p) extern t f()
-#define LFUNC(f, t, p) static t f()
+#define FUNC(f, t, p) বাহ্যিক t f p
+#define LFUNC(f, t, p) স্থির t f p
+#অন্যথা /* k&R */
+#define FUNC(f, t, p) বাহ্যিক t f()
+#define LFUNC(f, t, p) স্থির t f()
 #endif
 
 
-FUNC(boundCheckingMalloc, void *, (long s));
-FUNC(boundCheckingCalloc, void *, (long num, long s));
-FUNC(boundCheckingRealloc, void *, (void *p, long s));
+FUNC(boundCheckingMalloc, শূন্য *, (long s));
+FUNC(boundCheckingCalloc, শূন্য *, (long অঙ্ক, long s));
+FUNC(boundCheckingRealloc, শূন্য *, (শূন্য *p, long s));
 
 /* define MSW types for X window types,
    I don't know much about MSW, but the following defines do the job */
 
-typedef HDC Display;			/* this should be similar */
-typedef void *Screen;			/* not used */
-typedef void *Visual;			/* not used yet, is for GRAY, COLOR,
+প্রকারলেখ HDC Display;			/* this should be similar */
+প্রকারলেখ শূন্য *Screen;			/* not used */
+প্রকারলেখ শূন্য *Visual;			/* not used yet, is for GRAY, COLOR,
 					 * MONO */
 
-typedef void *Colormap;			/* should be COLORPALETTE, not done
+প্রকারলেখ শূন্য *Colormap;			/* should be COLORPALETTE, not done
 					 * yet */
 
-typedef COLORREF Pixel;
+প্রকারলেখ COLORREF Pixel;
 
 #define PIXEL_ALREADY_TYPEDEFED		/* to let xpm.h know about it */
 
-typedef struct {
+প্রকারলেখ কাঠামো {
     Pixel pixel;
     BYTE red, green, blue;
 }      XColor;
 
-typedef struct {
+প্রকারলেখ কাঠামো {
     HBITMAP bitmap;
-    unsigned int width;
-    unsigned int height;
-    unsigned int depth;
+    unsigned পূর্ণসংখ্যা width;
+    unsigned পূর্ণসংখ্যা height;
+    unsigned পূর্ণসংখ্যা depth;
 }      XImage;
 
-#if defined(__cplusplus) || defined(c_plusplus)
-extern "C" {
+#যদি defined(__cplusplus) || defined(c_plusplus)
+বাহ্যিক "C" {
 #endif
 /* some replacements for X... functions */
 
@@ -97,26 +97,26 @@ extern "C" {
     FUNC(XDefaultVisual, Visual *, (Display *display, Screen *screen));
     FUNC(XDefaultScreen, Screen *, (Display *d));
     FUNC(XDefaultColormap, Colormap *, (Display *display, Screen *screen));
-    FUNC(XDefaultDepth, int, (Display *d, Screen *s));
+    FUNC(XDefaultDepth, পূর্ণসংখ্যা, (Display *d, Screen *s));
 
 /* color related */
-    FUNC(XParseColor, int, (Display *, Colormap *, char *, XColor *));
-    FUNC(XAllocColor, int, (Display *, Colormap *, XColor *));
-    FUNC(XQueryColors, void, (Display *display, Colormap *colormap,
-			      XColor *xcolors, int ncolors));
-    FUNC(XFreeColors, int, (Display *d, Colormap cmap,
+    FUNC(XParseColor, পূর্ণসংখ্যা, (Display *, Colormap *, অক্ষর *, XColor *));
+    FUNC(XAllocColor, পূর্ণসংখ্যা, (Display *, Colormap *, XColor *));
+    FUNC(XQueryColors, শূন্য, (Display *display, Colormap *colormap,
+			      XColor *xcolors, পূর্ণসংখ্যা ncolors));
+    FUNC(XFreeColors, পূর্ণসংখ্যা, (Display *d, Colormap cmap,
 			    unsigned long pixels[],
-			    int npixels, unsigned long planes));
+			    পূর্ণসংখ্যা npixels, unsigned long planes));
 /* XImage */
-    FUNC(XCreateImage, XImage *, (Display *, Visual *, int depth, int format,
-				  int x, int y, int width, int height,
-				  int pad, int foo));
+    FUNC(XCreateImage, XImage *, (Display *, Visual *, পূর্ণসংখ্যা depth, পূর্ণসংখ্যা format,
+				  পূর্ণসংখ্যা x, পূর্ণসংখ্যা y, পূর্ণসংখ্যা width, পূর্ণসংখ্যা height,
+				  পূর্ণসংখ্যা pad, পূর্ণসংখ্যা foo));
 
 /* free and destroy bitmap */
-    FUNC(XDestroyImage, void /* ? */ , (XImage *));
+    FUNC(XDestroyImage, শূন্য /* ? */ , (XImage *));
 /* free only, bitmap remains */
-    FUNC(XImageFree, void, (XImage *));
-#if defined(__cplusplus) || defined(c_plusplus)
+    FUNC(XImageFree, শূন্য, (XImage *));
+#যদি defined(__cplusplus) || defined(c_plusplus)
 } /* end of extern "C" */
 #endif /* cplusplus */
 
@@ -128,7 +128,7 @@ extern "C" {
 #define False 0
 #endif
 #ifndef Bool
-typedef BOOL Bool;		/* take MSW bool */
+প্রকারলেখ BOOL Bool;		/* take MSW bool */
 #endif
 /* make these local here, simx.c gets the same from xpm.h */
 #undef LFUNC

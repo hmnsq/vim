@@ -11,25 +11,25 @@
  * list.c: List support and container (List, Dict, Blob) functions.
  */
 
-#include "vim.h"
+#অন্তর্ভাব "vim.h"
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 
 // List heads for garbage collection.
-static list_T		*first_list = NULL;	// list of all lists
+স্থির list_T		*first_list = ফাঁকা;	// list of all lists
 
 #define FOR_ALL_WATCHERS(l, lw) \
-    for ((lw) = (l)->lv_watch; (lw) != NULL; (lw) = (lw)->lw_next)
+    জন্য ((lw) = (l)->lv_watch; (lw) != ফাঁকা; (lw) = (lw)->lw_পরবর্তী)
 
-static void list_free_item(list_T *l, listitem_T *item);
+স্থির শূন্য list_free_item(list_T *l, listitem_T *item);
 
 /*
  * Add a watcher to a list.
  */
-    void
+    শূন্য
 list_add_watch(list_T *l, listwatch_T *lw)
 {
-    lw->lw_next = l->lv_watch;
+    lw->lw_পরবর্তী = l->lv_watch;
     l->lv_watch = lw;
 }
 
@@ -37,7 +37,7 @@ list_add_watch(list_T *l, listwatch_T *lw)
  * Remove a watcher from a list.
  * No warning when it isn't found...
  */
-    void
+    শূন্য
 list_rem_watch(list_T *l, listwatch_T *lwrem)
 {
     listwatch_T	*lw, **lwp;
@@ -45,12 +45,12 @@ list_rem_watch(list_T *l, listwatch_T *lwrem)
     lwp = &l->lv_watch;
     FOR_ALL_WATCHERS(l, lw)
     {
-	if (lw == lwrem)
+	যদি (lw == lwrem)
 	{
-	    *lwp = lw->lw_next;
-	    break;
+	    *lwp = lw->lw_পরবর্তী;
+	    বিরতি;
 	}
-	lwp = &lw->lw_next;
+	lwp = &lw->lw_পরবর্তী;
     }
 }
 
@@ -58,24 +58,24 @@ list_rem_watch(list_T *l, listwatch_T *lwrem)
  * Just before removing an item from a list: advance watchers to the next
  * item.
  */
-    static void
+    স্থির শূন্য
 list_fix_watch(list_T *l, listitem_T *item)
 {
     listwatch_T	*lw;
 
     FOR_ALL_WATCHERS(l, lw)
-	if (lw->lw_item == item)
-	    lw->lw_item = item->li_next;
+	যদি (lw->lw_item == item)
+	    lw->lw_item = item->li_পরবর্তী;
 }
 
-    static void
+    স্থির শূন্য
 list_init(list_T *l)
 {
     // Prepend the list to the list of lists for garbage collection.
-    if (first_list != NULL)
-	first_list->lv_used_prev = l;
-    l->lv_used_prev = NULL;
-    l->lv_used_next = first_list;
+    যদি (first_list != ফাঁকা)
+	first_list->lv_used_পূর্ব = l;
+    l->lv_used_পূর্ব = ফাঁকা;
+    l->lv_used_পরবর্তী = first_list;
     first_list = l;
 }
 
@@ -84,14 +84,14 @@ list_init(list_T *l)
  * Caller should take care of the reference count.
  */
     list_T *
-list_alloc(void)
+list_alloc(শূন্য)
 {
     list_T  *l;
 
     l = ALLOC_CLEAR_ONE(list_T);
-    if (l != NULL)
+    যদি (l != ফাঁকা)
 	list_init(l);
-    return l;
+    ফেরত l;
 }
 
 /*
@@ -101,10 +101,10 @@ list_alloc(void)
 list_alloc_id(alloc_id_T id UNUSED)
 {
 #ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(sizeof(list_T)))
-	return NULL;
+    যদি (alloc_fail_id == id && alloc_does_fail(আকার(list_T)))
+	ফেরত ফাঁকা;
 #endif
-    return (list_alloc());
+    ফেরত (list_alloc());
 }
 
 /*
@@ -114,43 +114,43 @@ list_alloc_id(alloc_id_T id UNUSED)
  * Next list_set_item() must be called for each item.
  */
     list_T *
-list_alloc_with_items(int count)
+list_alloc_with_বস্তুসমূহ(পূর্ণসংখ্যা গুনতি)
 {
     list_T	*l;
 
-    if (count > 0
-	    && (size_t)count > (SIZE_MAX - sizeof(list_T)) / sizeof(listitem_T))
-	return NULL;
-    l = (list_T *)alloc_clear(sizeof(list_T) + count * sizeof(listitem_T));
-    if (l == NULL)
-	return NULL;
+    যদি (গুনতি > 0
+	    && (size_t)গুনতি > (আকার_MAX - আকার(list_T)) / আকার(listitem_T))
+	ফেরত ফাঁকা;
+    l = (list_T *)alloc_clear(আকার(list_T) + গুনতি * আকার(listitem_T));
+    যদি (l == ফাঁকা)
+	ফেরত ফাঁকা;
 
     list_init(l);
 
-    if (count <= 0)
-	return l;
+    যদি (গুনতি <= 0)
+	ফেরত l;
 
     listitem_T	*li = (listitem_T *)(l + 1);
-    int		i;
+    পূর্ণসংখ্যা		i;
 
-    l->lv_len = count;
-    l->lv_with_items = count;
+    l->lv_len = গুনতি;
+    l->lv_with_বস্তুসমূহ = গুনতি;
     l->lv_first = li;
-    l->lv_u.mat.lv_last = li + count - 1;
-    for (i = 0; i < count; ++i)
+    l->lv_u.mat.lv_last = li + গুনতি - 1;
+    জন্য (i = 0; i < গুনতি; ++i)
     {
-	if (i == 0)
-	    li->li_prev = NULL;
-	else
-	    li->li_prev = li - 1;
-	if (i == count - 1)
-	    li->li_next = NULL;
-	else
-	    li->li_next = li + 1;
+	যদি (i == 0)
+	    li->li_পূর্ব = ফাঁকা;
+	অন্যথা
+	    li->li_পূর্ব = li - 1;
+	যদি (i == গুনতি - 1)
+	    li->li_পরবর্তী = ফাঁকা;
+	অন্যথা
+	    li->li_পরবর্তী = li + 1;
 	++li;
     }
 
-    return l;
+    ফেরত l;
 }
 
 /*
@@ -158,8 +158,8 @@ list_alloc_with_items(int count)
  * The contents of "tv" is moved into the list item.
  * Each item must be set exactly once.
  */
-    void
-list_set_item(list_T *l, int idx, typval_T *tv)
+    শূন্য
+list_set_item(list_T *l, পূর্ণসংখ্যা idx, typval_T *tv)
 {
     listitem_T	*li = (listitem_T *)(l + 1) + idx;
 
@@ -170,42 +170,42 @@ list_set_item(list_T *l, int idx, typval_T *tv)
  * Allocate an empty list for a return value, with reference count set.
  * Returns OK or FAIL.
  */
-    int
+    পূর্ণসংখ্যা
 rettv_list_alloc(typval_T *rettv)
 {
     list_T	*l = list_alloc();
 
-    if (l == NULL)
-	return FAIL;
+    যদি (l == ফাঁকা)
+	ফেরত FAIL;
 
     rettv->v_lock = 0;
     rettv_list_set(rettv, l);
-    return OK;
+    ফেরত OK;
 }
 
 /*
  * Same as rettv_list_alloc() but uses an allocation id for testing.
  */
-    int
+    পূর্ণসংখ্যা
 rettv_list_alloc_id(typval_T *rettv, alloc_id_T id UNUSED)
 {
 #ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(sizeof(list_T)))
-	return FAIL;
+    যদি (alloc_fail_id == id && alloc_does_fail(আকার(list_T)))
+	ফেরত FAIL;
 #endif
-    return rettv_list_alloc(rettv);
+    ফেরত rettv_list_alloc(rettv);
 }
 
 
 /*
  * Set a list as the return value.  Increments the reference count.
  */
-    void
+    শূন্য
 rettv_list_set(typval_T *rettv, list_T *l)
 {
     rettv->v_type = VAR_LIST;
     rettv->vval.v_list = l;
-    if (l != NULL)
+    যদি (l != ফাঁকা)
 	++l->lv_refcount;
 }
 
@@ -213,10 +213,10 @@ rettv_list_set(typval_T *rettv, list_T *l)
  * Unreference a list: decrement the reference count and free it when it
  * becomes zero.
  */
-    void
+    শূন্য
 list_unref(list_T *l)
 {
-    if (l != NULL && --l->lv_refcount <= 0)
+    যদি (l != ফাঁকা && --l->lv_refcount <= 0)
 	list_free(l);
 }
 
@@ -224,16 +224,16 @@ list_unref(list_T *l)
  * Free a list, including all non-container items it points to.
  * Ignores the reference count.
  */
-    static void
+    স্থির শূন্য
 list_free_contents(list_T *l)
 {
     listitem_T *item;
 
-    if (l->lv_first != &range_list_item)
-	for (item = l->lv_first; item != NULL; item = l->lv_first)
+    যদি (l->lv_first != &range_list_item)
+	জন্য (item = l->lv_first; item != ফাঁকা; item = l->lv_first)
 	{
 	    // Remove the item before deleting it.
-	    l->lv_first = item->li_next;
+	    l->lv_first = item->li_পরবর্তী;
 	    clear_tv(&item->li_tv);
 	    list_free_item(l, item);
 	}
@@ -244,15 +244,15 @@ list_free_contents(list_T *l)
  * But don't free a list that has a watcher (used in a for loop), these
  * are not referenced anywhere.
  */
-    int
-list_free_nonref(int copyID)
+    পূর্ণসংখ্যা
+list_free_nonref(পূর্ণসংখ্যা copyID)
 {
     list_T	*ll;
-    int		did_free = FALSE;
+    পূর্ণসংখ্যা		did_free = FALSE;
 
-    for (ll = first_list; ll != NULL; ll = ll->lv_used_next)
-	if ((ll->lv_copyID & COPYID_MASK) != (copyID & COPYID_MASK)
-						      && ll->lv_watch == NULL)
+    জন্য (ll = first_list; ll != ফাঁকা; ll = ll->lv_used_পরবর্তী)
+	যদি ((ll->lv_copyID & COPYID_MASK) != (copyID & COPYID_MASK)
+						      && ll->lv_watch == ফাঁকা)
 	{
 	    // Free the List and ordinary items it contains, but don't recurse
 	    // into Lists and Dictionaries, they will be in the list of dicts
@@ -260,34 +260,34 @@ list_free_nonref(int copyID)
 	    list_free_contents(ll);
 	    did_free = TRUE;
 	}
-    return did_free;
+    ফেরত did_free;
 }
 
-    static void
+    স্থির শূন্য
 list_free_list(list_T  *l)
 {
     // Remove the list from the list of lists for garbage collection.
-    if (l->lv_used_prev == NULL)
-	first_list = l->lv_used_next;
-    else
-	l->lv_used_prev->lv_used_next = l->lv_used_next;
-    if (l->lv_used_next != NULL)
-	l->lv_used_next->lv_used_prev = l->lv_used_prev;
+    যদি (l->lv_used_পূর্ব == ফাঁকা)
+	first_list = l->lv_used_পরবর্তী;
+    অন্যথা
+	l->lv_used_পূর্ব->lv_used_পরবর্তী = l->lv_used_পরবর্তী;
+    যদি (l->lv_used_পরবর্তী != ফাঁকা)
+	l->lv_used_পরবর্তী->lv_used_পূর্ব = l->lv_used_পূর্ব;
 
     free_type(l->lv_type);
     vim_free(l);
 }
 
-    void
-list_free_items(int copyID)
+    শূন্য
+list_free_বস্তুসমূহ(পূর্ণসংখ্যা copyID)
 {
-    list_T	*ll, *ll_next;
+    list_T	*ll, *ll_পরবর্তী;
 
-    for (ll = first_list; ll != NULL; ll = ll_next)
+    জন্য (ll = first_list; ll != ফাঁকা; ll = ll_পরবর্তী)
     {
-	ll_next = ll->lv_used_next;
-	if ((ll->lv_copyID & COPYID_MASK) != (copyID & COPYID_MASK)
-						      && ll->lv_watch == NULL)
+	ll_পরবর্তী = ll->lv_used_পরবর্তী;
+	যদি ((ll->lv_copyID & COPYID_MASK) != (copyID & COPYID_MASK)
+						      && ll->lv_watch == ফাঁকা)
 	{
 	    // Free the List and ordinary items it contains, but don't recurse
 	    // into Lists and Dictionaries, they will be in the list of dicts
@@ -297,11 +297,11 @@ list_free_items(int copyID)
     }
 }
 
-    void
+    শূন্য
 list_free(list_T *l)
 {
-    if (in_free_unref_items)
-	return;
+    যদি (in_free_unref_বস্তুসমূহ)
+	ফেরত;
 
     list_free_contents(l);
     list_free_list(l);
@@ -312,20 +312,20 @@ list_free(list_T *l)
  * It is not initialized, don't forget to set v_lock.
  */
     listitem_T *
-listitem_alloc(void)
+listitem_alloc(শূন্য)
 {
-    return ALLOC_ONE(listitem_T);
+    ফেরত ALLOC_ONE(listitem_T);
 }
 
 /*
  * Free a list item, unless it was allocated together with the list itself.
  * Does not clear the value.  Does not notify watchers.
  */
-    static void
+    স্থির শূন্য
 list_free_item(list_T *l, listitem_T *item)
 {
-    if (l->lv_with_items == 0 || item < (listitem_T *)l
-			   || item >= (listitem_T *)(l + 1) + l->lv_with_items)
+    যদি (l->lv_with_বস্তুসমূহ == 0 || item < (listitem_T *)l
+			   || item >= (listitem_T *)(l + 1) + l->lv_with_বস্তুসমূহ)
 	vim_free(item);
 }
 
@@ -333,7 +333,7 @@ list_free_item(list_T *l, listitem_T *item)
  * Free a list item, unless it was allocated together with the list itself.
  * Also clears the value.  Does not notify watchers.
  */
-    void
+    শূন্য
 listitem_free(list_T *l, listitem_T *item)
 {
     clear_tv(&item->li_tv);
@@ -343,7 +343,7 @@ listitem_free(list_T *l, listitem_T *item)
 /*
  * Remove a list item from a List and free it.  Also clears the value.
  */
-    void
+    শূন্য
 listitem_remove(list_T *l, listitem_T *item)
 {
     vimlist_remove(l, item, item);
@@ -356,41 +356,41 @@ listitem_remove(list_T *l, listitem_T *item)
     long
 list_len(list_T *l)
 {
-    if (l == NULL)
-	return 0L;
-    return l->lv_len;
+    যদি (l == ফাঁকা)
+	ফেরত 0L;
+    ফেরত l->lv_len;
 }
 
 /*
  * Return TRUE when two lists have exactly the same values.
  */
-    int
+    পূর্ণসংখ্যা
 list_equal(
     list_T	*l1,
     list_T	*l2,
-    int		ic)	// ignore case for strings
+    পূর্ণসংখ্যা		ic)	// ignore case for strings
 {
     listitem_T	*item1, *item2;
 
-    if (l1 == l2)
-	return TRUE;
-    if (list_len(l1) != list_len(l2))
-	return FALSE;
-    if (list_len(l1) == 0)
+    যদি (l1 == l2)
+	ফেরত TRUE;
+    যদি (list_len(l1) != list_len(l2))
+	ফেরত FALSE;
+    যদি (list_len(l1) == 0)
 	// empty and NULL list are considered equal
-	return TRUE;
-    if (l1 == NULL || l2 == NULL)
-	return FALSE;
+	ফেরত TRUE;
+    যদি (l1 == ফাঁকা || l2 == ফাঁকা)
+	ফেরত FALSE;
 
     CHECK_LIST_MATERIALIZE(l1);
     CHECK_LIST_MATERIALIZE(l2);
 
-    for (item1 = l1->lv_first, item2 = l2->lv_first;
-	    item1 != NULL && item2 != NULL;
-			       item1 = item1->li_next, item2 = item2->li_next)
-	if (!tv_equal(&item1->li_tv, &item2->li_tv, ic))
-	    return FALSE;
-    return item1 == NULL && item2 == NULL;
+    জন্য (item1 = l1->lv_first, item2 = l2->lv_first;
+	    item1 != ফাঁকা && item2 != ফাঁকা;
+			       item1 = item1->li_পরবর্তী, item2 = item2->li_পরবর্তী)
+	যদি (!tv_equal(&item1->li_tv, &item2->li_tv, ic))
+	    ফেরত FALSE;
+    ফেরত item1 == ফাঁকা && item2 == ফাঁকা;
 }
 
 /*
@@ -404,54 +404,54 @@ list_find(list_T *l, long n)
     listitem_T	*item;
     long	idx;
 
-    if (l == NULL)
-	return NULL;
+    যদি (l == ফাঁকা)
+	ফেরত ফাঁকা;
 
     // Negative index is relative to the end.
-    if (n < 0)
+    যদি (n < 0)
 	n = l->lv_len + n;
 
     // Check for index out of range.
-    if (n < 0 || n >= l->lv_len)
-	return NULL;
+    যদি (n < 0 || n >= l->lv_len)
+	ফেরত ফাঁকা;
 
     CHECK_LIST_MATERIALIZE(l);
 
     // range_list_materialize may reset l->lv_len
-    if (n >= l->lv_len)
-	return NULL;
+    যদি (n >= l->lv_len)
+	ফেরত ফাঁকা;
 
     // When there is a cached index may start search from there.
-    if (l->lv_u.mat.lv_idx_item != NULL)
+    যদি (l->lv_u.mat.lv_idx_item != ফাঁকা)
     {
-	if (n < l->lv_u.mat.lv_idx / 2)
+	যদি (n < l->lv_u.mat.lv_idx / 2)
 	{
 	    // closest to the start of the list
 	    item = l->lv_first;
 	    idx = 0;
 	}
-	else if (n > (l->lv_u.mat.lv_idx + l->lv_len) / 2)
+	অন্যথা যদি (n > (l->lv_u.mat.lv_idx + l->lv_len) / 2)
 	{
 	    // closest to the end of the list
 	    item = l->lv_u.mat.lv_last;
 	    idx = l->lv_len - 1;
 	}
-	else
+	অন্যথা
 	{
 	    // closest to the cached index
 	    item = l->lv_u.mat.lv_idx_item;
 	    idx = l->lv_u.mat.lv_idx;
 	}
     }
-    else
+    অন্যথা
     {
-	if (n < l->lv_len / 2)
+	যদি (n < l->lv_len / 2)
 	{
 	    // closest to the start of the list
 	    item = l->lv_first;
 	    idx = 0;
 	}
-	else
+	অন্যথা
 	{
 	    // closest to the end of the list
 	    item = l->lv_u.mat.lv_last;
@@ -459,16 +459,16 @@ list_find(list_T *l, long n)
 	}
     }
 
-    while (n > idx)
+    যখন (n > idx)
     {
 	// search forward
-	item = item->li_next;
+	item = item->li_পরবর্তী;
 	++idx;
     }
-    while (n < idx)
+    যখন (n < idx)
     {
 	// search backward
-	item = item->li_prev;
+	item = item->li_পূর্ব;
 	--idx;
     }
 
@@ -476,7 +476,7 @@ list_find(list_T *l, long n)
     l->lv_u.mat.lv_idx = idx;
     l->lv_u.mat.lv_idx_item = item;
 
-    return item;
+    ফেরত item;
 }
 
 /*
@@ -486,38 +486,38 @@ list_find(list_T *l, long n)
 list_find_nr(
     list_T	*l,
     long	idx,
-    int		*errorp)	// set to TRUE when something wrong
+    পূর্ণসংখ্যা		*errorp)	// set to TRUE when something wrong
 {
     listitem_T	*li;
 
-    if (l != NULL && l->lv_first == &range_list_item)
+    যদি (l != ফাঁকা && l->lv_first == &range_list_item)
     {
 	long	    n = idx;
 
 	// not materialized range() list: compute the value.
 	// Negative index is relative to the end.
-	if (n < 0)
+	যদি (n < 0)
 	    n = l->lv_len + n;
 
 	// Check for index out of range.
-	if (n < 0 || n >= l->lv_len)
+	যদি (n < 0 || n >= l->lv_len)
 	{
-	    if (errorp != NULL)
+	    যদি (errorp != ফাঁকা)
 		*errorp = TRUE;
-	    return -1L;
+	    ফেরত -1L;
 	}
 
-	return l->lv_u.nonmat.lv_start + n * l->lv_u.nonmat.lv_stride;
+	ফেরত l->lv_u.nonmat.lv_start + n * l->lv_u.nonmat.lv_stride;
     }
 
     li = list_find(l, idx);
-    if (li == NULL)
+    যদি (li == ফাঁকা)
     {
-	if (errorp != NULL)
+	যদি (errorp != ফাঁকা)
 	    *errorp = TRUE;
-	return -1L;
+	ফেরত -1L;
     }
-    return (long)tv_get_number_chk(&li->li_tv, errorp);
+    ফেরত (long)tv_get_সংখ্যা_chk(&li->li_tv, errorp);
 }
 
 /*
@@ -529,12 +529,12 @@ list_find_str(list_T *l, long idx)
     listitem_T	*li;
 
     li = list_find(l, idx - 1);
-    if (li == NULL)
+    যদি (li == ফাঁকা)
     {
-	semsg(_(e_list_index_out_of_range_nr), idx);
-	return NULL;
+	semsg(_(e_list_সূচক_out_of_range_nr), idx);
+	ফেরত ফাঁকা;
     }
-    return tv_get_string(&li->li_tv);
+    ফেরত tv_get_string(&li->li_tv);
 }
 
 /*
@@ -542,19 +542,19 @@ list_find_str(list_T *l, long idx)
  * zero and set "idx" to zero.  Used for first index of a range.
  */
     listitem_T *
-list_find_index(list_T *l, long *idx)
+list_find_সূচক(list_T *l, long *idx)
 {
     listitem_T *li = list_find(l, *idx);
 
-    if (li != NULL)
-	return li;
+    যদি (li != ফাঁকা)
+	ফেরত li;
 
-    if (*idx < 0)
+    যদি (*idx < 0)
     {
 	*idx = 0;
 	li = list_find(l, *idx);
     }
-    return li;
+    ফেরত li;
 }
 
 /*
@@ -567,113 +567,113 @@ list_idx_of_item(list_T *l, listitem_T *item)
     long	idx = 0;
     listitem_T	*li;
 
-    if (l == NULL)
-	return -1;
+    যদি (l == ফাঁকা)
+	ফেরত -1;
     CHECK_LIST_MATERIALIZE(l);
     idx = 0;
-    for (li = l->lv_first; li != NULL && li != item; li = li->li_next)
+    জন্য (li = l->lv_first; li != ফাঁকা && li != item; li = li->li_পরবর্তী)
 	++idx;
-    if (li == NULL)
-	return -1;
-    return idx;
+    যদি (li == ফাঁকা)
+	ফেরত -1;
+    ফেরত idx;
 }
 
 /*
  * Append item "item" to the end of list "l".
  */
-    void
+    শূন্য
 list_append(list_T *l, listitem_T *item)
 {
     CHECK_LIST_MATERIALIZE(l);
-    if (l->lv_u.mat.lv_last == NULL)
+    যদি (l->lv_u.mat.lv_last == ফাঁকা)
     {
 	// empty list
 	l->lv_first = item;
-	item->li_prev = NULL;
+	item->li_পূর্ব = ফাঁকা;
     }
-    else
+    অন্যথা
     {
-	l->lv_u.mat.lv_last->li_next = item;
-	item->li_prev = l->lv_u.mat.lv_last;
+	l->lv_u.mat.lv_last->li_পরবর্তী = item;
+	item->li_পূর্ব = l->lv_u.mat.lv_last;
     }
     l->lv_u.mat.lv_last = item;
     ++l->lv_len;
-    item->li_next = NULL;
+    item->li_পরবর্তী = ফাঁকা;
 }
 
 /*
  * Append typval_T "tv" to the end of list "l".  "tv" is copied.
  * Return FAIL when out of memory or the type is wrong.
  */
-    int
+    পূর্ণসংখ্যা
 list_append_tv(list_T *l, typval_T *tv)
 {
     listitem_T	*li;
 
-    if (l->lv_type != NULL && l->lv_type->tt_member != NULL
+    যদি (l->lv_type != ফাঁকা && l->lv_type->tt_member != ফাঁকা
 		&& check_typval_arg_type(l->lv_type->tt_member, tv,
-							      NULL, 0) == FAIL)
-	return FAIL;
+							      ফাঁকা, 0) == FAIL)
+	ফেরত FAIL;
     li = listitem_alloc();
-    if (li == NULL)
-	return FAIL;
+    যদি (li == ফাঁকা)
+	ফেরত FAIL;
     copy_tv(tv, &li->li_tv);
     list_append(l, li);
-    return OK;
+    ফেরত OK;
 }
 
 /*
  * As list_append_tv() but move the value instead of copying it.
  * Return FAIL when out of memory.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 list_append_tv_move(list_T *l, typval_T *tv)
 {
     listitem_T	*li = listitem_alloc();
 
-    if (li == NULL)
-	return FAIL;
+    যদি (li == ফাঁকা)
+	ফেরত FAIL;
     li->li_tv = *tv;
     list_append(l, li);
-    return OK;
+    ফেরত OK;
 }
 
 /*
  * Add a dictionary to a list.  Used by getqflist().
  * Return FAIL when out of memory.
  */
-    int
+    পূর্ণসংখ্যা
 list_append_dict(list_T *list, dict_T *dict)
 {
     listitem_T	*li = listitem_alloc();
 
-    if (li == NULL)
-	return FAIL;
+    যদি (li == ফাঁকা)
+	ফেরত FAIL;
     li->li_tv.v_type = VAR_DICT;
     li->li_tv.v_lock = 0;
     li->li_tv.vval.v_dict = dict;
     list_append(list, li);
     ++dict->dv_refcount;
-    return OK;
+    ফেরত OK;
 }
 
 /*
  * Append list2 to list1.
  * Return FAIL when out of memory.
  */
-    int
+    পূর্ণসংখ্যা
 list_append_list(list_T *list1, list_T *list2)
 {
     listitem_T	*li = listitem_alloc();
 
-    if (li == NULL)
-	return FAIL;
+    যদি (li == ফাঁকা)
+	ফেরত FAIL;
     li->li_tv.v_type = VAR_LIST;
     li->li_tv.v_lock = 0;
     li->li_tv.vval.v_list = list2;
     list_append(list1, li);
     ++list2->lv_refcount;
-    return OK;
+    ফেরত OK;
 }
 
 /*
@@ -681,41 +681,41 @@ list_append_list(list_T *list1, list_T *list2)
  * When "len" >= 0 use "str[len]".
  * Returns FAIL when out of memory.
  */
-    int
-list_append_string(list_T *l, char_u *str, int len)
+    পূর্ণসংখ্যা
+list_append_string(list_T *l, char_u *str, পূর্ণসংখ্যা len)
 {
     listitem_T *li = listitem_alloc();
 
-    if (li == NULL)
-	return FAIL;
+    যদি (li == ফাঁকা)
+	ফেরত FAIL;
     list_append(l, li);
     li->li_tv.v_type = VAR_STRING;
     li->li_tv.v_lock = 0;
-    if (str == NULL)
-	li->li_tv.vval.v_string = NULL;
-    else if ((li->li_tv.vval.v_string = (len >= 0 ? vim_strnsave(str, len)
-						 : vim_strsave(str))) == NULL)
-	return FAIL;
-    return OK;
+    যদি (str == ফাঁকা)
+	li->li_tv.vval.v_string = ফাঁকা;
+    অন্যথা যদি ((li->li_tv.vval.v_string = (len >= 0 ? vim_strnsave(str, len)
+						 : vim_strsave(str))) == ফাঁকা)
+	ফেরত FAIL;
+    ফেরত OK;
 }
 
 /*
  * Append "n" to list "l".
  * Returns FAIL when out of memory.
  */
-    int
-list_append_number(list_T *l, varnumber_T n)
+    পূর্ণসংখ্যা
+list_append_সংখ্যা(list_T *l, varnumber_T n)
 {
     listitem_T	*li;
 
     li = listitem_alloc();
-    if (li == NULL)
-	return FAIL;
-    li->li_tv.v_type = VAR_NUMBER;
+    যদি (li == ফাঁকা)
+	ফেরত FAIL;
+    li->li_tv.v_type = VAR_সংখ্যা;
     li->li_tv.v_lock = 0;
-    li->li_tv.vval.v_number = n;
+    li->li_tv.vval.v_সংখ্যা = n;
     list_append(l, li);
-    return OK;
+    ফেরত OK;
 }
 
 /*
@@ -723,46 +723,46 @@ list_append_number(list_T *l, varnumber_T n)
  * If "item" is NULL append at the end.
  * Return FAIL when out of memory or the type is wrong.
  */
-    int
-list_insert_tv(list_T *l, typval_T *tv, listitem_T *item)
+    পূর্ণসংখ্যা
+list_ঢোকাও_tv(list_T *l, typval_T *tv, listitem_T *item)
 {
     listitem_T	*ni;
 
-    if (l->lv_type != NULL && l->lv_type->tt_member != NULL
+    যদি (l->lv_type != ফাঁকা && l->lv_type->tt_member != ফাঁকা
 		&& check_typval_arg_type(l->lv_type->tt_member, tv,
-							      NULL, 0) == FAIL)
-	return FAIL;
+							      ফাঁকা, 0) == FAIL)
+	ফেরত FAIL;
     ni = listitem_alloc();
-    if (ni == NULL)
-	return FAIL;
+    যদি (ni == ফাঁকা)
+	ফেরত FAIL;
     copy_tv(tv, &ni->li_tv);
-    list_insert(l, ni, item);
-    return OK;
+    list_ঢোকাও(l, ni, item);
+    ফেরত OK;
 }
 
-    void
-list_insert(list_T *l, listitem_T *ni, listitem_T *item)
+    শূন্য
+list_ঢোকাও(list_T *l, listitem_T *ni, listitem_T *item)
 {
     CHECK_LIST_MATERIALIZE(l);
-    if (item == NULL)
+    যদি (item == ফাঁকা)
 	// Append new item at end of list.
 	list_append(l, ni);
-    else
+    অন্যথা
     {
 	// Insert new item before existing item.
-	ni->li_prev = item->li_prev;
-	ni->li_next = item;
-	if (item->li_prev == NULL)
+	ni->li_পূর্ব = item->li_পূর্ব;
+	ni->li_পরবর্তী = item;
+	যদি (item->li_পূর্ব == ফাঁকা)
 	{
 	    l->lv_first = ni;
 	    ++l->lv_u.mat.lv_idx;
 	}
-	else
+	অন্যথা
 	{
-	    item->li_prev->li_next = ni;
-	    l->lv_u.mat.lv_idx_item = NULL;
+	    item->li_পূর্ব->li_পরবর্তী = ni;
+	    l->lv_u.mat.lv_idx_item = ফাঁকা;
 	}
-	item->li_prev = ni;
+	item->li_পূর্ব = ni;
 	++l->lv_len;
     }
 }
@@ -772,58 +772,58 @@ list_insert(list_T *l, listitem_T *ni, listitem_T *item)
  * adding a new element to a List in Vim9script by using the current list
  * length as the index.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 list_append_new_item(list_T *l)
 {
     typval_T	tv;
 
-    if (l->lv_type != NULL && l->lv_type->tt_member != NULL)
+    যদি (l->lv_type != ফাঁকা && l->lv_type->tt_member != ফাঁকা)
 	tv.v_type = l->lv_type->tt_member->tt_type;
-    else
-	tv.v_type = VAR_NUMBER;
+    অন্যথা
+	tv.v_type = VAR_সংখ্যা;
     tv.v_lock = 0;
 
-    switch (tv.v_type)
+    নির্বাচন (tv.v_type)
     {
-	case VAR_BOOL: tv.vval.v_number = VVAL_FALSE; break;
-	case VAR_SPECIAL: tv.vval.v_number = 0; break;
-	case VAR_NUMBER: tv.vval.v_number = 0; break;
-	case VAR_FLOAT: tv.vval.v_float = 0; break;
-	case VAR_STRING: tv.vval.v_string = NULL; break;
-	case VAR_BLOB: tv.vval.v_blob = blob_alloc(); break;
-	case VAR_FUNC: tv.vval.v_string = NULL; break;
-	case VAR_PARTIAL: tv.vval.v_partial = NULL; break;
-	case VAR_LIST: tv.vval.v_list = list_alloc(); break;
-	case VAR_DICT: tv.vval.v_dict = dict_alloc(); break;
+	ক্ষেত্র VAR_BOOL: tv.vval.v_সংখ্যা = VVAL_FALSE; বিরতি;
+	ক্ষেত্র VAR_SPECIAL: tv.vval.v_সংখ্যা = 0; বিরতি;
+	ক্ষেত্র VAR_সংখ্যা: tv.vval.v_সংখ্যা = 0; বিরতি;
+	ক্ষেত্র VAR_FLOAT: tv.vval.v_float = 0; বিরতি;
+	ক্ষেত্র VAR_STRING: tv.vval.v_string = ফাঁকা; বিরতি;
+	ক্ষেত্র VAR_BLOB: tv.vval.v_blob = blob_alloc(); বিরতি;
+	ক্ষেত্র VAR_FUNC: tv.vval.v_string = ফাঁকা; বিরতি;
+	ক্ষেত্র VAR_PARTIAL: tv.vval.v_partial = ফাঁকা; বিরতি;
+	ক্ষেত্র VAR_LIST: tv.vval.v_list = list_alloc(); বিরতি;
+	ক্ষেত্র VAR_DICT: tv.vval.v_dict = dict_alloc(); বিরতি;
 #ifdef FEAT_JOB_CHANNEL
-	case VAR_JOB: tv.vval.v_job = NULL; break;
-	case VAR_CHANNEL: tv.vval.v_channel = NULL; break;
+	ক্ষেত্র VAR_JOB: tv.vval.v_job = ফাঁকা; বিরতি;
+	ক্ষেত্র VAR_CHANNEL: tv.vval.v_channel = ফাঁকা; বিরতি;
 #endif
-	case VAR_CLASS:
-	    if (l->lv_type != NULL && l->lv_type->tt_member != NULL)
+	ক্ষেত্র VAR_CLASS:
+	    যদি (l->lv_type != ফাঁকা && l->lv_type->tt_member != ফাঁকা)
 		tv.vval.v_class = l->lv_type->tt_member->tt_class;
-	    else
-		tv.vval.v_class = NULL;
-	    break;
-	case VAR_OBJECT:
-	    if (l->lv_type != NULL && l->lv_type->tt_member != NULL)
+	    অন্যথা
+		tv.vval.v_class = ফাঁকা;
+	    বিরতি;
+	ক্ষেত্র VAR_OBJECT:
+	    যদি (l->lv_type != ফাঁকা && l->lv_type->tt_member != ফাঁকা)
 		tv.vval.v_object =
 		    alloc_object(l->lv_type->tt_member->tt_class);
-	    else
-		tv.vval.v_object = NULL;
-	    break;
-	case VAR_TYPEALIAS: tv.vval.v_typealias = NULL; break;
-	case VAR_TUPLE: tv.vval.v_tuple = tuple_alloc(); break;
-	default:
-	    tv.v_type = VAR_NUMBER;
-	    tv.vval.v_number = 0;
-	    break;
+	    অন্যথা
+		tv.vval.v_object = ফাঁকা;
+	    বিরতি;
+	ক্ষেত্র VAR_TYPEALIAS: tv.vval.v_typealias = ফাঁকা; বিরতি;
+	ক্ষেত্র VAR_TUPLE: tv.vval.v_tuple = tuple_alloc(); বিরতি;
+	পূর্বনির্ধারিত:
+	    tv.v_type = VAR_সংখ্যা;
+	    tv.vval.v_সংখ্যা = 0;
+	    বিরতি;
     }
 
-    if (l->lv_type != NULL && l->lv_type->tt_member != NULL)
+    যদি (l->lv_type != ফাঁকা && l->lv_type->tt_member != ফাঁকা)
 	set_tv_type(&tv, l->lv_type->tt_member);
 
-    return list_append_tv(l, &tv);
+    ফেরত list_append_tv(l, &tv);
 }
 
 /*
@@ -832,29 +832,29 @@ list_append_new_item(list_T *l)
  * Return NULL if there is no such item.
  */
     listitem_T *
-check_range_index_one(list_T *l, long *n1, int can_append, int quiet)
+check_range_সূচক_one(list_T *l, long *n1, পূর্ণসংখ্যা can_append, পূর্ণসংখ্যা quiet)
 {
     long	orig_n1 = *n1;
-    listitem_T	*li = list_find_index(l, n1);
+    listitem_T	*li = list_find_সূচক(l, n1);
 
-    if (li != NULL)
-	return li;
+    যদি (li != ফাঁকা)
+	ফেরত li;
 
     // Vim9: Allow for adding an item at the end.
-    if (can_append && in_vim9script()
+    যদি (can_append && in_vim9script()
 	    && *n1 == l->lv_len && l->lv_lock == 0)
     {
-	if (list_append_new_item(l) == FAIL)
-	    return NULL;
-	li = list_find_index(l, n1);
+	যদি (list_append_new_item(l) == FAIL)
+	    ফেরত ফাঁকা;
+	li = list_find_সূচক(l, n1);
     }
-    if (li == NULL)
+    যদি (li == ফাঁকা)
     {
-	if (!quiet)
-	    semsg(_(e_list_index_out_of_range_nr), orig_n1);
-	return NULL;
+	যদি (!quiet)
+	    semsg(_(e_list_সূচক_out_of_range_nr), orig_n1);
+	ফেরত ফাঁকা;
     }
-    return li;
+    ফেরত li;
 }
 
 /*
@@ -863,37 +863,37 @@ check_range_index_one(list_T *l, long *n1, int can_append, int quiet)
  * "li1" is the item for item "n1".
  * Return OK or FAIL.
  */
-    int
-check_range_index_two(
+    পূর্ণসংখ্যা
+check_range_সূচক_two(
 	list_T	    *l,
 	long	    *n1,
 	listitem_T  *li1,
 	long	    *n2,
-	int	    quiet)
+	পূর্ণসংখ্যা	    quiet)
 {
-    if (*n2 < 0)
+    যদি (*n2 < 0)
     {
 	listitem_T	*ni = list_find(l, *n2);
 
-	if (ni == NULL)
+	যদি (ni == ফাঁকা)
 	{
-	    if (!quiet)
-		semsg(_(e_list_index_out_of_range_nr), *n2);
-	    return FAIL;
+	    যদি (!quiet)
+		semsg(_(e_list_সূচক_out_of_range_nr), *n2);
+	    ফেরত FAIL;
 	}
 	*n2 = list_idx_of_item(l, ni);
     }
 
     // Check that n2 isn't before n1.
-    if (*n1 < 0)
+    যদি (*n1 < 0)
 	*n1 = list_idx_of_item(l, li1);
-    if (*n2 < *n1)
+    যদি (*n2 < *n1)
     {
-	if (!quiet)
-	    semsg(_(e_list_index_out_of_range_nr), *n2);
-	return FAIL;
+	যদি (!quiet)
+	    semsg(_(e_list_সূচক_out_of_range_nr), *n2);
+	ফেরত FAIL;
     }
-    return OK;
+    ফেরত OK;
 }
 
 /*
@@ -905,85 +905,85 @@ check_range_index_two(
  * "varname" is used for error messages.
  * Returns OK or FAIL.
  */
-    int
+    পূর্ণসংখ্যা
 list_assign_range(
 	list_T	    *dest,
 	list_T	    *src,
 	long	    idx1_arg,
 	long	    idx2,
-	int	    empty_idx2,
+	পূর্ণসংখ্যা	    empty_idx2,
 	char_u	    *op,
 	char_u	    *varname)
 {
     listitem_T	*src_li;
     listitem_T	*dest_li;
     long	idx1 = idx1_arg;
-    listitem_T	*first_li = list_find_index(dest, &idx1);
+    listitem_T	*first_li = list_find_সূচক(dest, &idx1);
     long	idx;
-    type_T	*member_type = NULL;
+    type_T	*member_type = ফাঁকা;
 
     // Check whether any of the list items is locked before making any changes.
     idx = idx1;
     dest_li = first_li;
-    for (src_li = src->lv_first; src_li != NULL && dest_li != NULL; )
+    জন্য (src_li = src->lv_first; src_li != ফাঁকা && dest_li != ফাঁকা; )
     {
-	if (value_check_lock(dest_li->li_tv.v_lock, varname, FALSE))
-	    return FAIL;
-	src_li = src_li->li_next;
-	if (src_li == NULL || (!empty_idx2 && idx2 == idx))
-	    break;
-	dest_li = dest_li->li_next;
+	যদি (মান_check_lock(dest_li->li_tv.v_lock, varname, FALSE))
+	    ফেরত FAIL;
+	src_li = src_li->li_পরবর্তী;
+	যদি (src_li == ফাঁকা || (!empty_idx2 && idx2 == idx))
+	    বিরতি;
+	dest_li = dest_li->li_পরবর্তী;
 	++idx;
     }
 
-    if (in_vim9script() && dest->lv_type != NULL
-					   && dest->lv_type->tt_member != NULL)
+    যদি (in_vim9script() && dest->lv_type != ফাঁকা
+					   && dest->lv_type->tt_member != ফাঁকা)
 	member_type = dest->lv_type->tt_member;
 
     // Assign the List values to the list items.
     idx = idx1;
     dest_li = first_li;
-    for (src_li = src->lv_first; src_li != NULL; )
+    জন্য (src_li = src->lv_first; src_li != ফাঁকা; )
     {
-	if (op != NULL && *op != '=')
+	যদি (op != ফাঁকা && *op != '=')
 	    tv_op(&dest_li->li_tv, &src_li->li_tv, op);
-	else
+	অন্যথা
 	{
-	    if (member_type != NULL
+	    যদি (member_type != ফাঁকা
 		    && check_typval_arg_type(member_type, &src_li->li_tv,
-							      NULL, 0) == FAIL)
-		return FAIL;
+							      ফাঁকা, 0) == FAIL)
+		ফেরত FAIL;
 	    clear_tv(&dest_li->li_tv);
 	    copy_tv(&src_li->li_tv, &dest_li->li_tv);
 	}
-	src_li = src_li->li_next;
-	if (src_li == NULL || (!empty_idx2 && idx2 == idx))
-	    break;
-	if (dest_li->li_next == NULL)
+	src_li = src_li->li_পরবর্তী;
+	যদি (src_li == ফাঁকা || (!empty_idx2 && idx2 == idx))
+	    বিরতি;
+	যদি (dest_li->li_পরবর্তী == ফাঁকা)
 	{
 	    // Need to add an empty item.
-	    if (list_append_number(dest, 0) == FAIL)
+	    যদি (list_append_সংখ্যা(dest, 0) == FAIL)
 	    {
-		src_li = NULL;
-		break;
+		src_li = ফাঁকা;
+		বিরতি;
 	    }
 	}
-	dest_li = dest_li->li_next;
+	dest_li = dest_li->li_পরবর্তী;
 	++idx;
     }
-    if (src_li != NULL)
+    যদি (src_li != ফাঁকা)
     {
-	emsg(_(e_list_value_has_more_items_than_targets));
-	return FAIL;
+	emsg(_(e_list_মান_has_more_বস্তুসমূহ_than_targets));
+	ফেরত FAIL;
     }
-    if (empty_idx2
-	    ? (dest_li != NULL && dest_li->li_next != NULL)
+    যদি (empty_idx2
+	    ? (dest_li != ফাঁকা && dest_li->li_পরবর্তী != ফাঁকা)
 	    : idx != idx2)
     {
-	emsg(_(e_list_value_does_not_have_enough_items));
-	return FAIL;
+	emsg(_(e_list_মান_does_not_have_enough_বস্তুসমূহ));
+	ফেরত FAIL;
     }
-    return OK;
+    ফেরত OK;
 }
 
 /*
@@ -992,130 +992,130 @@ list_assign_range(
  * It does nothing if "maxdepth" is 0.
  * Returns FAIL when out of memory.
  */
-    static void
+    স্থির শূন্য
 list_flatten(list_T *list, listitem_T *first, long maxitems, long maxdepth)
 {
     listitem_T	*item;
-    int		done = 0;
+    পূর্ণসংখ্যা		done = 0;
 
-    if (maxdepth == 0)
-	return;
+    যদি (maxdepth == 0)
+	ফেরত;
     CHECK_LIST_MATERIALIZE(list);
-    if (first == NULL)
+    যদি (first == ফাঁকা)
 	item = list->lv_first;
-    else
+    অন্যথা
 	item = first;
 
-    while (item != NULL && done < maxitems)
+    যখন (item != ফাঁকা && done < maxitems)
     {
-	listitem_T	*next = item->li_next;
+	listitem_T	*পরবর্তী = item->li_পরবর্তী;
 
 	fast_breakcheck();
-	if (got_int)
-	    return;
+	যদি (got_int)
+	    ফেরত;
 
-	if (item->li_tv.v_type == VAR_LIST)
+	যদি (item->li_tv.v_type == VAR_LIST)
 	{
 	    list_T	*itemlist = item->li_tv.vval.v_list;
 
 	    vimlist_remove(list, item, item);
-	    if (list_extend(list, itemlist, next) == FAIL)
+	    যদি (list_extend(list, itemlist, পরবর্তী) == FAIL)
 	    {
 		list_free_item(list, item);
-		return;
+		ফেরত;
 	    }
 
-	    if (maxdepth > 0)
-		list_flatten(list, item->li_prev == NULL
-				     ? list->lv_first : item->li_prev->li_next,
+	    যদি (maxdepth > 0)
+		list_flatten(list, item->li_পূর্ব == ফাঁকা
+				     ? list->lv_first : item->li_পূর্ব->li_পরবর্তী,
 				itemlist->lv_len, maxdepth - 1);
 	    clear_tv(&item->li_tv);
 	    list_free_item(list, item);
 	}
 
 	++done;
-	item = next;
+	item = পরবর্তী;
     }
 }
 
 /*
  * "flatten()" and "flattennew()" functions
  */
-    static void
-flatten_common(typval_T *argvars, typval_T *rettv, int make_copy)
+    স্থির শূন্য
+flatten_common(typval_T *argvars, typval_T *rettv, পূর্ণসংখ্যা make_copy)
 {
     list_T  *l;
     long    maxdepth;
-    int	    error = FALSE;
+    পূর্ণসংখ্যা	    error = FALSE;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_list_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_সংখ্যা_arg(argvars, 1) == FAIL))
+	ফেরত;
 
-    if (argvars[0].v_type != VAR_LIST)
+    যদি (argvars[0].v_type != VAR_LIST)
     {
 	semsg(_(e_argument_of_str_must_be_list), "flatten()");
-	return;
+	ফেরত;
     }
 
-    if (argvars[1].v_type == VAR_UNKNOWN)
+    যদি (argvars[1].v_type == VAR_UNKNOWN)
 	maxdepth = 999999;
-    else
+    অন্যথা
     {
-	maxdepth = (long)tv_get_number_chk(&argvars[1], &error);
-	if (error)
-	    return;
-	if (maxdepth < 0)
+	maxdepth = (long)tv_get_সংখ্যা_chk(&argvars[1], &error);
+	যদি (error)
+	    ফেরত;
+	যদি (maxdepth < 0)
 	{
-	    emsg(_(e_maxdepth_must_be_non_negative_number));
-	    return;
+	    emsg(_(e_maxdepth_must_be_non_negative_সংখ্যা));
+	    ফেরত;
 	}
     }
 
     l = argvars[0].vval.v_list;
     rettv->v_type = VAR_LIST;
     rettv->vval.v_list = l;
-    if (l == NULL)
-	return;
+    যদি (l == ফাঁকা)
+	ফেরত;
 
-    if (make_copy)
+    যদি (make_copy)
     {
 	l = list_copy(l, FALSE, TRUE, get_copyID());
 	rettv->vval.v_list = l;
-	if (l == NULL)
-	    return;
+	যদি (l == ফাঁকা)
+	    ফেরত;
 	// The type will change.
 	free_type(l->lv_type);
-	l->lv_type = NULL;
+	l->lv_type = ফাঁকা;
     }
-    else
+    অন্যথা
     {
-	if (value_check_lock(l->lv_lock,
+	যদি (মান_check_lock(l->lv_lock,
 				     (char_u *)N_("flatten() argument"), TRUE))
-	    return;
+	    ফেরত;
 	++l->lv_refcount;
     }
 
-    list_flatten(l, NULL, l->lv_len, maxdepth);
+    list_flatten(l, ফাঁকা, l->lv_len, maxdepth);
 }
 
 /*
  * "flatten(list[, {maxdepth}])" function
  */
-    void
+    শূন্য
 f_flatten(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script())
+    যদি (in_vim9script())
 	emsg(_(e_cannot_use_flatten_in_vim9_script));
-    else
+    অন্যথা
 	flatten_common(argvars, rettv, FALSE);
 }
 
 /*
  * "flattennew(list[, {maxdepth}])" function
  */
-    void
+    শূন্য
 f_flattennew(typval_T *argvars, typval_T *rettv)
 {
     flatten_common(argvars, rettv, TRUE);
@@ -1125,34 +1125,34 @@ f_flattennew(typval_T *argvars, typval_T *rettv)
  * "items(list)" function
  * Caller must have already checked that argvars[0] is a List.
  */
-    void
+    শূন্য
 list2items(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l = argvars[0].vval.v_list;
     listitem_T	*li;
     varnumber_T	idx;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
-    if (l == NULL)
-	return;  // null list behaves like an empty list
+    যদি (rettv_list_alloc(rettv) == FAIL)
+	ফেরত;
+    যদি (l == ফাঁকা)
+	ফেরত;  // null list behaves like an empty list
 
     // TODO: would be more efficient to not materialize the argument
     CHECK_LIST_MATERIALIZE(l);
-    for (idx = 0, li = l->lv_first; li != NULL; li = li->li_next, ++idx)
+    জন্য (idx = 0, li = l->lv_first; li != ফাঁকা; li = li->li_পরবর্তী, ++idx)
     {
 	list_T	    *l2 = list_alloc();
 
-	if (l2 == NULL)
-	    break;
-	if (list_append_list(rettv->vval.v_list, l2) == FAIL)
+	যদি (l2 == ফাঁকা)
+	    বিরতি;
+	যদি (list_append_list(rettv->vval.v_list, l2) == FAIL)
 	{
 	    list_free(l2);
-	    break;
+	    বিরতি;
 	}
-	if (list_append_number(l2, idx) == FAIL
+	যদি (list_append_সংখ্যা(l2, idx) == FAIL
 		|| list_append_tv(l2, &li->li_tv) == FAIL)
-	    break;
+	    বিরতি;
     }
 }
 
@@ -1160,35 +1160,35 @@ list2items(typval_T *argvars, typval_T *rettv)
  * "items(string)" function
  * Caller must have already checked that argvars[0] is a String.
  */
-    void
+    শূন্য
 string2items(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p = argvars[0].vval.v_string;
     varnumber_T idx;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
-    if (p == NULL)
-	return;  // null string behaves like an empty string
+    যদি (rettv_list_alloc(rettv) == FAIL)
+	ফেরত;
+    যদি (p == ফাঁকা)
+	ফেরত;  // null string behaves like an empty string
 
-    for (idx = 0; *p != NUL; ++idx)
+    জন্য (idx = 0; *p != NUL; ++idx)
     {
-	int	    len = mb_ptr2len(p);
+	পূর্ণসংখ্যা	    len = mb_ptr2len(p);
 	list_T	    *l2;
 
-	if (len == 0)
-	    break;
+	যদি (len == 0)
+	    বিরতি;
 	l2 = list_alloc();
-	if (l2 == NULL)
-	    break;
-	if (list_append_list(rettv->vval.v_list, l2) == FAIL)
+	যদি (l2 == ফাঁকা)
+	    বিরতি;
+	যদি (list_append_list(rettv->vval.v_list, l2) == FAIL)
 	{
 	    list_free(l2);
-	    break;
+	    বিরতি;
 	}
-	if (list_append_number(l2, idx) == FAIL
+	যদি (list_append_সংখ্যা(l2, idx) == FAIL
 		|| list_append_string(l2, p, len) == FAIL)
-	    break;
+	    বিরতি;
 	p += len;
     }
 }
@@ -1198,16 +1198,16 @@ string2items(typval_T *argvars, typval_T *rettv)
  * If "bef" is NULL append at the end, otherwise insert before this item.
  * Returns FAIL when out of memory.
  */
-    int
+    পূর্ণসংখ্যা
 list_extend(list_T *l1, list_T *l2, listitem_T *bef)
 {
     listitem_T	*item;
-    int		todo;
-    listitem_T	*bef_prev;
+    পূর্ণসংখ্যা		todo;
+    listitem_T	*bef_পূর্ব;
 
     // NULL list is equivalent to an empty list: nothing to do.
-    if (l2 == NULL || l2->lv_len == 0)
-	return OK;
+    যদি (l2 == ফাঁকা || l2->lv_len == 0)
+	ফেরত OK;
 
     todo = l2->lv_len;
     CHECK_LIST_MATERIALIZE(l1);
@@ -1216,56 +1216,56 @@ list_extend(list_T *l1, list_T *l2, listitem_T *bef)
     // When exending a list with itself, at some point we run into the item
     // that was before "bef" and need to skip over the already inserted items
     // to "bef".
-    bef_prev = bef == NULL ? NULL : bef->li_prev;
+    bef_পূর্ব = bef == ফাঁকা ? ফাঁকা : bef->li_পূর্ব;
 
     // We also quit the loop when we have inserted the original item count of
     // the list, avoid a hang when we extend a list with itself.
-    for (item = l2->lv_first; item != NULL && --todo >= 0;
-				 item = item == bef_prev ? bef : item->li_next)
-	if (list_insert_tv(l1, &item->li_tv, bef) == FAIL)
-	    return FAIL;
-    return OK;
+    জন্য (item = l2->lv_first; item != ফাঁকা && --todo >= 0;
+				 item = item == bef_পূর্ব ? bef : item->li_পরবর্তী)
+	যদি (list_ঢোকাও_tv(l1, &item->li_tv, bef) == FAIL)
+	    ফেরত FAIL;
+    ফেরত OK;
 }
 
 /*
  * Concatenate lists "l1" and "l2" into a new list, stored in "tv".
  * Return FAIL when out of memory.
  */
-    int
+    পূর্ণসংখ্যা
 list_concat(list_T *l1, list_T *l2, typval_T *tv)
 {
     list_T	*l;
-    int		len1 = l1 == NULL ? 0 : l1->lv_len;
-    int		len2 = l2 == NULL ? 0 : l2->lv_len;
+    পূর্ণসংখ্যা		len1 = l1 == ফাঁকা ? 0 : l1->lv_len;
+    পূর্ণসংখ্যা		len2 = l2 == ফাঁকা ? 0 : l2->lv_len;
     long	totallen = (long)len1 + (long)len2;
-    int		i;
+    পূর্ণসংখ্যা		i;
     listitem_T	*item;
 
-    if (totallen == 0)
+    যদি (totallen == 0)
     {
 	l = list_alloc();
-	if (l == NULL)
-	    return FAIL;
+	যদি (l == ফাঁকা)
+	    ফেরত FAIL;
 	++l->lv_refcount;
 	tv->v_type = VAR_LIST;
 	tv->v_lock = 0;
 	tv->vval.v_list = l;
-	return OK;
+	ফেরত OK;
     }
-    if (totallen > INT_MAX)
-	return FAIL;
+    যদি (totallen > INT_MAX)
+	ফেরত FAIL;
 
     // allocate all items at once for efficiency
-    l = list_alloc_with_items((int)totallen);
-    if (l == NULL)
-	return FAIL;
+    l = list_alloc_with_বস্তুসমূহ((পূর্ণসংখ্যা)totallen);
+    যদি (l == ফাঁকা)
+	ফেরত FAIL;
 
     i = 0;
-    if (len1 > 0)
+    যদি (len1 > 0)
     {
 	CHECK_LIST_MATERIALIZE(l1);
-	for (item = l1->lv_first; item != NULL && !got_int;
-		item = item->li_next)
+	জন্য (item = l1->lv_first; item != ফাঁকা && !got_int;
+		item = item->li_পরবর্তী)
 	{
 	    typval_T new_tv;
 
@@ -1273,11 +1273,11 @@ list_concat(list_T *l1, list_T *l2, typval_T *tv)
 	    list_set_item(l, i++, &new_tv);
 	}
     }
-    if (len2 > 0)
+    যদি (len2 > 0)
     {
 	CHECK_LIST_MATERIALIZE(l2);
-	for (item = l2->lv_first; item != NULL && !got_int;
-		item = item->li_next)
+	জন্য (item = l2->lv_first; item != ফাঁকা && !got_int;
+		item = item->li_পরবর্তী)
 	{
 	    typval_T new_tv;
 
@@ -1290,7 +1290,7 @@ list_concat(list_T *l1, list_T *l2, typval_T *tv)
     tv->v_type = VAR_LIST;
     tv->v_lock = 0;
     tv->vval.v_list = l;
-    return OK;
+    ফেরত OK;
 }
 
     list_T *
@@ -1298,114 +1298,114 @@ list_slice(list_T *ol, long n1, long n2)
 {
     listitem_T	*item;
     list_T	*l;
-    long	count;
+    long	গুনতি;
     long	idx;
 
-    if (n2 < n1)
-	return list_alloc();
-    if (n1 > INT_MAX - (n2 - n1) - 1)
-	return NULL;
-    count = n2 - n1 + 1;
+    যদি (n2 < n1)
+	ফেরত list_alloc();
+    যদি (n1 > INT_MAX - (n2 - n1) - 1)
+	ফেরত ফাঁকা;
+    গুনতি = n2 - n1 + 1;
 
     // The length is known, so allocate the list and all items at once.
-    l = list_alloc_with_items((int)count);
-    if (l == NULL)
-	return NULL;
+    l = list_alloc_with_বস্তুসমূহ((পূর্ণসংখ্যা)গুনতি);
+    যদি (l == ফাঁকা)
+	ফেরত ফাঁকা;
 
     item = list_find(ol, n1);
-    for (idx = 0; idx < count; ++idx)
+    জন্য (idx = 0; idx < গুনতি; ++idx)
     {
 	typval_T	new_tv;
 
 	// "item" is NULL when materializing "ol" stopped early.
-	if (item == NULL)
+	যদি (item == ফাঁকা)
 	{
 	    list_free(l);
-	    return NULL;
+	    ফেরত ফাঁকা;
 	}
 
 	copy_tv(&item->li_tv, &new_tv);
-	list_set_item(l, (int)idx, &new_tv);
-	item = item->li_next;
+	list_set_item(l, (পূর্ণসংখ্যা)idx, &new_tv);
+	item = item->li_পরবর্তী;
     }
-    return l;
+    ফেরত l;
 }
 
-    int
-list_slice_or_index(
+    পূর্ণসংখ্যা
+list_slice_or_সূচক(
 	    list_T	*list,
-	    int		range,
+	    পূর্ণসংখ্যা		range,
 	    varnumber_T	n1_arg,
 	    varnumber_T	n2_arg,
-	    int		exclusive,
+	    পূর্ণসংখ্যা		exclusive,
 	    typval_T	*rettv,
-	    int		verbose)
+	    পূর্ণসংখ্যা		verbose)
 {
     long	len = list_len(list);
     varnumber_T	n1 = n1_arg;
     varnumber_T	n2 = n2_arg;
     typval_T	var1;
 
-    if (n1 < 0)
+    যদি (n1 < 0)
 	n1 = len + n1;
-    if (n1 < 0 || n1 >= len)
+    যদি (n1 < 0 || n1 >= len)
     {
 	// For a range we allow invalid values and for legacy script return an
 	// empty list, for Vim9 script start at the first item.
 	// A list index out of range is an error.
-	if (!range)
+	যদি (!range)
 	{
-	    if (verbose)
-		semsg(_(e_list_index_out_of_range_nr), (long)n1_arg);
-	    return FAIL;
+	    যদি (verbose)
+		semsg(_(e_list_সূচক_out_of_range_nr), (long)n1_arg);
+	    ফেরত FAIL;
 	}
-	if (in_vim9script())
+	যদি (in_vim9script())
 	    n1 = n1 < 0 ? 0 : len;
-	else
+	অন্যথা
 	    n1 = len;
     }
-    if (range)
+    যদি (range)
     {
 	list_T	*l;
 
-	if (n2 < 0)
+	যদি (n2 < 0)
 	    n2 = len + n2;
-	else if (n2 >= len)
+	অন্যথা যদি (n2 >= len)
 	    n2 = len - (exclusive ? 0 : 1);
-	if (exclusive)
+	যদি (exclusive)
 	    --n2;
-	if (n2 < 0 || n2 + 1 < n1)
+	যদি (n2 < 0 || n2 + 1 < n1)
 	    n2 = -1;
 	l = list_slice(list, n1, n2);
-	if (l == NULL)
-	    return FAIL;
+	যদি (l == ফাঁকা)
+	    ফেরত FAIL;
 	clear_tv(rettv);
 	rettv_list_set(rettv, l);
     }
-    else
+    অন্যথা
     {
 	// copy the item to "var1" to avoid that freeing the list makes it
 	// invalid.
-	long index = n1;
-	listitem_T *li = check_range_index_one(list, &index, TRUE, TRUE);
-	if (li == NULL)
-	    return FAIL;
+	long সূচক = n1;
+	listitem_T *li = check_range_সূচক_one(list, &সূচক, TRUE, TRUE);
+	যদি (li == ফাঁকা)
+	    ফেরত FAIL;
 	copy_tv(&li->li_tv, &var1);
 
 	// If "var1" is a List and the List item type is not set, then set it
 	// from the declared list item type.
-	if (in_vim9script() && var1.v_type == VAR_LIST
-					&& var1.vval.v_list != NULL
-					&& var1.vval.v_list->lv_type == NULL)
+	যদি (in_vim9script() && var1.v_type == VAR_LIST
+					&& var1.vval.v_list != ফাঁকা
+					&& var1.vval.v_list->lv_type == ফাঁকা)
 	{
-	    if (list->lv_type != NULL && list->lv_type->tt_member != NULL)
+	    যদি (list->lv_type != ফাঁকা && list->lv_type->tt_member != ফাঁকা)
 		set_tv_type(&var1, list->lv_type->tt_member);
 	}
 
 	clear_tv(rettv);
 	*rettv = var1;
     }
-    return OK;
+    ফেরত OK;
 }
 
 /*
@@ -1415,54 +1415,54 @@ list_slice_or_index(
  * Returns NULL when out of memory.
  */
     list_T *
-list_copy(list_T *orig, int deep, int top, int copyID)
+list_copy(list_T *orig, পূর্ণসংখ্যা deep, পূর্ণসংখ্যা শীর্ষ_2, পূর্ণসংখ্যা copyID)
 {
     list_T	*copy;
     listitem_T	*item;
-    int		idx = 0;
+    পূর্ণসংখ্যা		idx = 0;
 
-    if (orig == NULL)
-	return NULL;
+    যদি (orig == ফাঁকা)
+	ফেরত ফাঁকা;
 
     // The length is known, so allocate the list and all items at once.
     CHECK_LIST_MATERIALIZE(orig);
-    copy = list_alloc_with_items(orig->lv_len);
-    if (copy == NULL)
-	return NULL;
+    copy = list_alloc_with_বস্তুসমূহ(orig->lv_len);
+    যদি (copy == ফাঁকা)
+	ফেরত ফাঁকা;
 
-    if (orig->lv_type == NULL || top || deep)
-	copy->lv_type = NULL;
-    else
+    যদি (orig->lv_type == ফাঁকা || শীর্ষ_2 || deep)
+	copy->lv_type = ফাঁকা;
+    অন্যথা
 	copy->lv_type = alloc_type(orig->lv_type);
-    if (copyID != 0)
+    যদি (copyID != 0)
     {
 	// Do this before adding the items, because one of the items may
 	// refer back to this list.
 	orig->lv_copyID = copyID;
 	orig->lv_copylist = copy;
     }
-    for (item = orig->lv_first; item != NULL && !got_int;
-	    item = item->li_next)
+    জন্য (item = orig->lv_first; item != ফাঁকা && !got_int;
+	    item = item->li_পরবর্তী)
     {
 	typval_T	new_tv;
 
-	if (deep)
+	যদি (deep)
 	{
-	    if (item_copy(&item->li_tv, &new_tv, deep, FALSE, copyID) == FAIL)
-		break;
+	    যদি (item_copy(&item->li_tv, &new_tv, deep, FALSE, copyID) == FAIL)
+		বিরতি;
 	}
-	else
+	অন্যথা
 	    copy_tv(&item->li_tv, &new_tv);
 	list_set_item(copy, idx++, &new_tv);
     }
     ++copy->lv_refcount;
-    if (item != NULL)
+    যদি (item != ফাঁকা)
     {
 	list_unref(copy);
-	copy = NULL;
+	copy = ফাঁকা;
     }
 
-    return copy;
+    ফেরত copy;
 }
 
 /*
@@ -1471,7 +1471,7 @@ list_copy(list_T *orig, int deep, int top, int copyID)
  * This used to be called list_remove, but that conflicts with a Sun header
  * file.
  */
-    void
+    শূন্য
 vimlist_remove(list_T *l, listitem_T *item, listitem_T *item2)
 {
     listitem_T	*ip;
@@ -1479,23 +1479,23 @@ vimlist_remove(list_T *l, listitem_T *item, listitem_T *item2)
     CHECK_LIST_MATERIALIZE(l);
 
     // notify watchers
-    for (ip = item; ip != NULL; ip = ip->li_next)
+    জন্য (ip = item; ip != ফাঁকা; ip = ip->li_পরবর্তী)
     {
 	--l->lv_len;
 	list_fix_watch(l, ip);
-	if (ip == item2)
-	    break;
+	যদি (ip == item2)
+	    বিরতি;
     }
 
-    if (item2->li_next == NULL)
-	l->lv_u.mat.lv_last = item->li_prev;
-    else
-	item2->li_next->li_prev = item->li_prev;
-    if (item->li_prev == NULL)
-	l->lv_first = item2->li_next;
-    else
-	item->li_prev->li_next = item2->li_next;
-    l->lv_u.mat.lv_idx_item = NULL;
+    যদি (item2->li_পরবর্তী == ফাঁকা)
+	l->lv_u.mat.lv_last = item->li_পূর্ব;
+    অন্যথা
+	item2->li_পরবর্তী->li_পূর্ব = item->li_পূর্ব;
+    যদি (item->li_পূর্ব == ফাঁকা)
+	l->lv_first = item2->li_পরবর্তী;
+    অন্যথা
+	item->li_পূর্ব->li_পরবর্তী = item2->li_পরবর্তী;
+    l->lv_u.mat.lv_idx_item = ফাঁকা;
 }
 
 /*
@@ -1503,46 +1503,46 @@ vimlist_remove(list_T *l, listitem_T *item, listitem_T *item2)
  * May return NULL.
  */
     char_u *
-list2string(typval_T *tv, int copyID, int restore_copyID)
+list2string(typval_T *tv, পূর্ণসংখ্যা copyID, পূর্ণসংখ্যা restore_copyID)
 {
     garray_T	ga;
 
-    if (tv->vval.v_list == NULL)
-	return NULL;
-    ga_init2(&ga, sizeof(char), 80);
+    যদি (tv->vval.v_list == ফাঁকা)
+	ফেরত ফাঁকা;
+    ga_init2(&ga, আকার(অক্ষর), 80);
     ga_append(&ga, '[');
     CHECK_LIST_MATERIALIZE(tv->vval.v_list);
-    if (list_join(&ga, tv->vval.v_list, (char_u *)", ",
+    যদি (list_join(&ga, tv->vval.v_list, (char_u *)", ",
 				       FALSE, restore_copyID, copyID) == FAIL)
     {
-	vim_free(ga.ga_data);
-	return NULL;
+	vim_free(ga.ga_তথ্য);
+	ফেরত ফাঁকা;
     }
     ga_append(&ga, ']');
     ga_append(&ga, NUL);
-    return (char_u *)ga.ga_data;
+    ফেরত (char_u *)ga.ga_তথ্য;
 }
 
-typedef struct join_S {
+প্রকারলেখ কাঠামো join_S {
     string_T	s;
     char_u	*tofree;
 } join_T;
 
-    static int
+    স্থির পূর্ণসংখ্যা
 list_join_inner(
     garray_T	*gap,		// to store the result in
     list_T	*l,
     char_u	*sep,
-    int		echo_style,
-    int		restore_copyID,
-    int		copyID,
+    পূর্ণসংখ্যা		echo_style,
+    পূর্ণসংখ্যা		restore_copyID,
+    পূর্ণসংখ্যা		copyID,
     garray_T	*join_gap)	// to keep each list item string
 {
-    int		i;
+    পূর্ণসংখ্যা		i;
     join_T	*p;
     long	sumlen = 0;
-    int		first = TRUE;
-    int		prev_lock;
+    পূর্ণসংখ্যা		first = TRUE;
+    পূর্ণসংখ্যা		পূর্ব_lock;
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
     listitem_T	*item;
@@ -1553,65 +1553,65 @@ list_join_inner(
     CHECK_LIST_MATERIALIZE(l);
     // Lock the list, the string() method of an object item could remove the
     // item the loop is standing on.
-    prev_lock = l->lv_lock;
-    if (l->lv_lock == 0)
+    পূর্ব_lock = l->lv_lock;
+    যদি (l->lv_lock == 0)
 	l->lv_lock = VAR_LOCKED;
-    for (item = l->lv_first; item != NULL && !got_int; item = item->li_next)
+    জন্য (item = l->lv_first; item != ফাঁকা && !got_int; item = item->li_পরবর্তী)
     {
 	s.string = echo_string_core(&item->li_tv, &tofree, numbuf, copyID,
 				      echo_style, restore_copyID, !echo_style);
-	if (s.string == NULL)
+	যদি (s.string == ফাঁকা)
 	{
-	    l->lv_lock = prev_lock;
-	    return FAIL;
+	    l->lv_lock = পূর্ব_lock;
+	    ফেরত FAIL;
 	}
 
-	s.length = STRLEN(s.string);
-	sumlen += (long)s.length;
+	s.দৈর্ঘ্য = STRLEN(s.string);
+	sumlen += (long)s.দৈর্ঘ্য;
 
-	(void)ga_grow(join_gap, 1);
-	p = ((join_T *)join_gap->ga_data) + (join_gap->ga_len++);
-	if (tofree != NULL || s.string != numbuf)
+	(শূন্য)ga_grow(join_gap, 1);
+	p = ((join_T *)join_gap->ga_তথ্য) + (join_gap->ga_len++);
+	যদি (tofree != ফাঁকা || s.string != numbuf)
 	{
 	    p->s.string = s.string;
-	    p->s.length = s.length;
+	    p->s.দৈর্ঘ্য = s.দৈর্ঘ্য;
 	    p->tofree = tofree;
 	}
-	else
+	অন্যথা
 	{
-	    p->s.string = vim_strnsave(s.string, s.length);
-	    p->s.length = s.length;
+	    p->s.string = vim_strnsave(s.string, s.দৈর্ঘ্য);
+	    p->s.দৈর্ঘ্য = s.দৈর্ঘ্য;
 	    p->tofree = p->s.string;
 	}
 
-	line_breakcheck();
-	if (did_echo_string_emsg)  // recursion error, bail out
-	    break;
+	সারি_breakcheck();
+	যদি (did_echo_string_emsg)  // recursion error, bail out
+	    বিরতি;
     }
-    l->lv_lock = prev_lock;
+    l->lv_lock = পূর্ব_lock;
 
     // Allocate result buffer with its total size, avoid re-allocation and
     // multiple copy operations.  Add 2 for a tailing ']' and NUL.
     seplen = STRLEN(sep);
-    if (join_gap->ga_len >= 2)
+    যদি (join_gap->ga_len >= 2)
 	sumlen += (long)seplen * (join_gap->ga_len - 1);
-    if (sumlen > INT_MAX - 2 || ga_grow(gap, (int)sumlen + 2) == FAIL)
-	return FAIL;
+    যদি (sumlen > INT_MAX - 2 || ga_grow(gap, (পূর্ণসংখ্যা)sumlen + 2) == FAIL)
+	ফেরত FAIL;
 
-    for (i = 0; i < join_gap->ga_len && !got_int; ++i)
+    জন্য (i = 0; i < join_gap->ga_len && !got_int; ++i)
     {
-	if (first)
+	যদি (first)
 	    first = FALSE;
-	else
+	অন্যথা
 	    ga_concat_len(gap, sep, seplen);
-	p = ((join_T *)join_gap->ga_data) + i;
+	p = ((join_T *)join_gap->ga_তথ্য) + i;
 
-	if (p->s.string != NULL)
-	    ga_concat_len(gap, p->s.string, p->s.length);
-	line_breakcheck();
+	যদি (p->s.string != ফাঁকা)
+	    ga_concat_len(gap, p->s.string, p->s.দৈর্ঘ্য);
+	সারি_breakcheck();
     }
 
-    return OK;
+    ফেরত OK;
 }
 
 /*
@@ -1619,45 +1619,45 @@ list_join_inner(
  * When "echo_style" is TRUE use String as echoed, otherwise as inside a List.
  * Return FAIL or OK.
  */
-    int
+    পূর্ণসংখ্যা
 list_join(
     garray_T	*gap,
     list_T	*l,
     char_u	*sep,
-    int		echo_style,
-    int		restore_copyID,
-    int		copyID)
+    পূর্ণসংখ্যা		echo_style,
+    পূর্ণসংখ্যা		restore_copyID,
+    পূর্ণসংখ্যা		copyID)
 {
     garray_T	join_ga;
-    int		retval;
+    পূর্ণসংখ্যা		retval;
     join_T	*p;
-    int		i;
+    পূর্ণসংখ্যা		i;
 
-    if (l->lv_len < 1)
-	return OK; // nothing to do
-    ga_init2(&join_ga, sizeof(join_T), l->lv_len);
+    যদি (l->lv_len < 1)
+	ফেরত OK; // nothing to do
+    ga_init2(&join_ga, আকার(join_T), l->lv_len);
     retval = list_join_inner(gap, l, sep, echo_style, restore_copyID,
 							    copyID, &join_ga);
 
-    if (join_ga.ga_data == NULL)
-	return retval;
+    যদি (join_ga.ga_তথ্য == ফাঁকা)
+	ফেরত retval;
 
     // Dispose each item in join_ga.
-    p = (join_T *)join_ga.ga_data;
-    for (i = 0; i < join_ga.ga_len; ++i)
+    p = (join_T *)join_ga.ga_তথ্য;
+    জন্য (i = 0; i < join_ga.ga_len; ++i)
     {
 	vim_free(p->tofree);
 	++p;
     }
     ga_clear(&join_ga);
 
-    return retval;
+    ফেরত retval;
 }
 
 /*
  * "join()" function
  */
-    void
+    শূন্য
 f_join(typval_T *argvars, typval_T *rettv)
 {
     garray_T	ga;
@@ -1665,32 +1665,32 @@ f_join(typval_T *argvars, typval_T *rettv)
 
     rettv->v_type = VAR_STRING;
 
-    if (check_for_list_or_tuple_arg(argvars, 0) == FAIL
+    যদি (check_for_list_or_tuple_arg(argvars, 0) == FAIL
 	    || check_for_opt_string_arg(argvars, 1) == FAIL)
-	return;
+	ফেরত;
 
-    if ((argvars[0].v_type == VAR_LIST && argvars[0].vval.v_list == NULL)
+    যদি ((argvars[0].v_type == VAR_LIST && argvars[0].vval.v_list == ফাঁকা)
 	    || (argvars[0].v_type == VAR_TUPLE
-		&& argvars[0].vval.v_tuple == NULL))
-	return;
+		&& argvars[0].vval.v_tuple == ফাঁকা))
+	ফেরত;
 
-    if (argvars[1].v_type == VAR_UNKNOWN)
+    যদি (argvars[1].v_type == VAR_UNKNOWN)
 	sep = (char_u *)" ";
-    else
+    অন্যথা
 	sep = tv_get_string_chk(&argvars[1]);
 
-    if (sep != NULL)
+    যদি (sep != ফাঁকা)
     {
-	ga_init2(&ga, sizeof(char), 80);
-	if (argvars[0].v_type == VAR_LIST)
+	ga_init2(&ga, আকার(অক্ষর), 80);
+	যদি (argvars[0].v_type == VAR_LIST)
 	    list_join(&ga, argvars[0].vval.v_list, sep, TRUE, FALSE, 0);
-	else
+	অন্যথা
 	    tuple_join(&ga, argvars[0].vval.v_tuple, sep, TRUE, FALSE, 0);
 	ga_append(&ga, NUL);
-	rettv->vval.v_string = (char_u *)ga.ga_data;
+	rettv->vval.v_string = (char_u *)ga.ga_তথ্য;
     }
-    else
-	rettv->vval.v_string = NULL;
+    অন্যথা
+	rettv->vval.v_string = ফাঁকা;
 }
 
 /*
@@ -1698,59 +1698,59 @@ f_join(typval_T *argvars, typval_T *rettv)
  * "*arg" points to the "[".
  * Return OK or FAIL.
  */
-    int
-eval_list(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int do_error)
+    পূর্ণসংখ্যা
+eval_list(char_u **arg, typval_T *rettv, evalarg_T *evalarg, পূর্ণসংখ্যা do_error)
 {
-    int		evaluate = evalarg == NULL ? FALSE
+    পূর্ণসংখ্যা		evaluate = evalarg == ফাঁকা ? FALSE
 					 : evalarg->eval_flags & EVAL_EVALUATE;
-    list_T	*l = NULL;
+    list_T	*l = ফাঁকা;
     typval_T	tv;
     listitem_T	*item;
-    int		vim9script = in_vim9script();
-    int		had_comma;
+    পূর্ণসংখ্যা		vim9script = in_vim9script();
+    পূর্ণসংখ্যা		had_comma;
 
-    if (evaluate)
+    যদি (evaluate)
     {
 	l = list_alloc();
-	if (l == NULL)
-	    return FAIL;
+	যদি (l == ফাঁকা)
+	    ফেরত FAIL;
     }
 
     *arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-    while (**arg != ']' && **arg != NUL)
+    যখন (**arg != ']' && **arg != NUL)
     {
-	if (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
-	    goto failret;
-	if (check_typval_is_value(&tv) == FAIL)
+	যদি (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
+	    যাও failret;
+	যদি (check_typval_is_মান(&tv) == FAIL)
 	{
-	    if (evaluate)
+	    যদি (evaluate)
 		clear_tv(&tv);
-	    goto failret;
+	    যাও failret;
 	}
-	if (evaluate)
+	যদি (evaluate)
 	{
 	    item = listitem_alloc();
-	    if (item != NULL)
+	    যদি (item != ফাঁকা)
 	    {
 		item->li_tv = tv;
 		item->li_tv.v_lock = 0;
 		list_append(l, item);
 	    }
-	    else
+	    অন্যথা
 		clear_tv(&tv);
 	}
 	// Legacy Vim script allowed a space before the comma.
-	if (!vim9script)
+	যদি (!vim9script)
 	    *arg = skipwhite(*arg);
 
 	// the comma must come after the value
 	had_comma = **arg == ',';
-	if (had_comma)
+	যদি (had_comma)
 	{
-	    if (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ']')
+	    যদি (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ']')
 	    {
 		semsg(_(e_white_space_required_after_str_str), ",", *arg);
-		goto failret;
+		যাও failret;
 	    }
 	    *arg = skipwhite(*arg + 1);
 	}
@@ -1758,183 +1758,183 @@ eval_list(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int do_error)
 	// The "]" can be on the next line.  But a double quoted string may
 	// follow, not a comment.
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg == ']')
-	    break;
+	যদি (**arg == ']')
+	    বিরতি;
 
-	if (!had_comma)
+	যদি (!had_comma)
 	{
-	    if (do_error)
+	    যদি (do_error)
 	    {
-		if (**arg == ',')
+		যদি (**arg == ',')
 		    semsg(_(e_no_white_space_allowed_before_str_str),
 								    ",", *arg);
-		else
+		অন্যথা
 		    semsg(_(e_missing_comma_in_list_str), *arg);
 	    }
-	    goto failret;
+	    যাও failret;
 	}
     }
 
-    if (**arg != ']')
+    যদি (**arg != ']')
     {
-	if (do_error)
+	যদি (do_error)
 	    semsg(_(e_missing_end_of_list_rsb_str), *arg);
 failret:
-	if (evaluate)
+	যদি (evaluate)
 	    list_free(l);
-	return FAIL;
+	ফেরত FAIL;
     }
 
     *arg += 1;
-    if (evaluate)
+    যদি (evaluate)
 	rettv_list_set(rettv, l);
 
-    return OK;
+    ফেরত OK;
 }
 
 /*
  * Write "list" of strings to file "fd".
  */
-    int
-write_list(FILE *fd, list_T *list, int binary)
+    পূর্ণসংখ্যা
+write_list(FILE *fd, list_T *list, পূর্ণসংখ্যা দ্বিমিক)
 {
     listitem_T	*li;
-    int		c;
-    int		ret = OK;
+    পূর্ণসংখ্যা		c;
+    পূর্ণসংখ্যা		ret = OK;
     char_u	*s;
 
     CHECK_LIST_MATERIALIZE(list);
-    FOR_ALL_LIST_ITEMS(list, li)
+    FOR_ALL_LIST_বস্তুসমূহ(list, li)
     {
-	for (s = tv_get_string(&li->li_tv); *s != NUL; ++s)
+	জন্য (s = tv_get_string(&li->li_tv); *s != NUL; ++s)
 	{
-	    if (*s == '\n')
+	    যদি (*s == '\n')
 		c = putc(NUL, fd);
-	    else
+	    অন্যথা
 		c = putc(*s, fd);
-	    if (c == EOF)
+	    যদি (c == EOF)
 	    {
 		ret = FAIL;
-		break;
+		বিরতি;
 	    }
 	}
-	if (!binary || li->li_next != NULL)
-	    if (putc('\n', fd) == EOF)
+	যদি (!দ্বিমিক || li->li_পরবর্তী != ফাঁকা)
+	    যদি (putc('\n', fd) == EOF)
 	    {
 		ret = FAIL;
-		break;
+		বিরতি;
 	    }
-	if (ret == FAIL)
+	যদি (ret == FAIL)
 	{
 	    emsg(_(e_error_while_writing));
-	    break;
+	    বিরতি;
 	}
     }
-    return ret;
+    ফেরত ret;
 }
 
 /*
  * Initialize a static list with 10 items.
  */
-    void
+    শূন্য
 init_static_list(staticList10_T *sl)
 {
     list_T  *l = &sl->sl_list;
-    int	    i;
+    পূর্ণসংখ্যা	    i;
 
     CLEAR_POINTER(sl);
-    l->lv_first = &sl->sl_items[0];
-    l->lv_u.mat.lv_last = &sl->sl_items[9];
+    l->lv_first = &sl->sl_বস্তুসমূহ[0];
+    l->lv_u.mat.lv_last = &sl->sl_বস্তুসমূহ[9];
     l->lv_refcount = DO_NOT_FREE_CNT;
     l->lv_lock = VAR_FIXED;
     sl->sl_list.lv_len = 10;
 
-    for (i = 0; i < 10; ++i)
+    জন্য (i = 0; i < 10; ++i)
     {
-	listitem_T *li = &sl->sl_items[i];
+	listitem_T *li = &sl->sl_বস্তুসমূহ[i];
 
-	if (i == 0)
-	    li->li_prev = NULL;
-	else
-	    li->li_prev = li - 1;
-	if (i == 9)
-	    li->li_next = NULL;
-	else
-	    li->li_next = li + 1;
+	যদি (i == 0)
+	    li->li_পূর্ব = ফাঁকা;
+	অন্যথা
+	    li->li_পূর্ব = li - 1;
+	যদি (i == 9)
+	    li->li_পরবর্তী = ফাঁকা;
+	অন্যথা
+	    li->li_পরবর্তী = li + 1;
     }
 }
 
 /*
  * "list2str()" function
  */
-    void
+    শূন্য
 f_list2str(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l;
     listitem_T	*li;
     garray_T	ga;
-    int		utf8 = FALSE;
+    পূর্ণসংখ্যা		utf8 = FALSE;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ফাঁকা;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_list_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	ফেরত;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    যদি (check_for_list_arg(argvars, 0) == FAIL)
+	ফেরত;
 
     l = argvars[0].vval.v_list;
-    if (l == NULL)
-	return;  // empty list results in empty string
+    যদি (l == ফাঁকা)
+	ফেরত;  // empty list results in empty string
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	utf8 = (int)tv_get_bool_chk(&argvars[1], NULL);
+    যদি (argvars[1].v_type != VAR_UNKNOWN)
+	utf8 = (পূর্ণসংখ্যা)tv_get_bool_chk(&argvars[1], ফাঁকা);
 
     CHECK_LIST_MATERIALIZE(l);
     ga_init2(&ga, 1, 80);
-    if (has_mbyte || utf8)
+    যদি (has_mbyte || utf8)
     {
 	char_u	buf[MB_MAXBYTES + 1];
-	int	(*char2bytes)(int, char_u *);
+	পূর্ণসংখ্যা	(*char2bytes)(পূর্ণসংখ্যা, char_u *);
 
-	if (utf8 || enc_utf8)
+	যদি (utf8 || enc_utf8)
 	    char2bytes = utf_char2bytes;
-	else
+	অন্যথা
 	    char2bytes = mb_char2bytes;
 
-	FOR_ALL_LIST_ITEMS(l, li)
+	FOR_ALL_LIST_বস্তুসমূহ(l, li)
 	{
 	    size_t  buflen;
 
-	    buflen = (size_t)(*char2bytes)(tv_get_number(&li->li_tv), buf);
+	    buflen = (size_t)(*char2bytes)(tv_get_সংখ্যা(&li->li_tv), buf);
 	    buf[buflen] = NUL;
 	    ga_concat_len(&ga, buf, buflen);
 	}
 	ga_append(&ga, NUL);
     }
-    else
+    অন্যথা
     {
 	long len = (long)list_len(l) + 1;
 
-	if (len <= INT_MAX && ga_grow(&ga, (int)len) == OK)
+	যদি (len <= INT_MAX && ga_grow(&ga, (পূর্ণসংখ্যা)len) == OK)
 	{
-	    FOR_ALL_LIST_ITEMS(l, li)
-		ga_append(&ga, tv_get_number(&li->li_tv));
+	    FOR_ALL_LIST_বস্তুসমূহ(l, li)
+		ga_append(&ga, tv_get_সংখ্যা(&li->li_tv));
 	    ga_append(&ga, NUL);
 	}
     }
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = ga.ga_data;
+    rettv->vval.v_string = ga.ga_তথ্য;
 }
 
 /*
  * "list2tuple()" function
  */
-    void
+    শূন্য
 f_list2tuple(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l;
@@ -1942,49 +1942,49 @@ f_list2tuple(typval_T *argvars, typval_T *rettv)
     tuple_T	*tuple;
 
     rettv->v_type = VAR_TUPLE;
-    rettv->vval.v_tuple = NULL;
+    rettv->vval.v_tuple = ফাঁকা;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    যদি (check_for_list_arg(argvars, 0) == FAIL)
+	ফেরত;
 
     l = argvars[0].vval.v_list;
-    if (l == NULL)
-	return;  // empty list results in empty tuple
+    যদি (l == ফাঁকা)
+	ফেরত;  // empty list results in empty tuple
 
     CHECK_LIST_MATERIALIZE(l);
 
-    if (rettv_tuple_set_with_items(rettv, list_len(l)) == FAIL)
-	return;
+    যদি (rettv_tuple_set_with_বস্তুসমূহ(rettv, list_len(l)) == FAIL)
+	ফেরত;
 
     tuple = rettv->vval.v_tuple;
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_বস্তুসমূহ(l, li)
     {
 	copy_tv(&li->li_tv, TUPLE_ITEM(tuple, TUPLE_LEN(tuple)));
-	tuple->tv_items.ga_len++;
+	tuple->tv_বস্তুসমূহ.ga_len++;
     }
 }
 
 /*
  * "tuple2list()" function
  */
-    void
+    শূন্য
 f_tuple2list(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l;
     tuple_T	*tuple;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    যদি (rettv_list_alloc(rettv) == FAIL)
+	ফেরত;
 
-    if (check_for_tuple_arg(argvars, 0) == FAIL)
-	return;
+    যদি (check_for_tuple_arg(argvars, 0) == FAIL)
+	ফেরত;
 
     tuple = argvars[0].vval.v_tuple;
-    if (tuple == NULL)
-	return;  // empty tuple results in empty list
+    যদি (tuple == ফাঁকা)
+	ফেরত;  // empty tuple results in empty list
 
     l = rettv->vval.v_list;
-    for (int i = 0; i < tuple_len(tuple); i++)
+    জন্য (পূর্ণসংখ্যা i = 0; i < tuple_len(tuple); i++)
 	list_append_tv(l, TUPLE_ITEM(tuple, i));
 }
 
@@ -1992,142 +1992,142 @@ f_tuple2list(typval_T *argvars, typval_T *rettv)
  * Remove item argvars[1] from List argvars[0]. If argvars[2] is supplied, then
  * remove the range of items from argvars[1] to argvars[2] (inclusive).
  */
-    static void
+    স্থির শূন্য
 list_remove(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg)
 {
     list_T	*l;
     listitem_T	*item, *item2;
     listitem_T	*li;
-    int		error = FALSE;
+    পূর্ণসংখ্যা		error = FALSE;
     long	idx;
     long	end;
-    int		cnt = 0;
+    পূর্ণসংখ্যা		cnt = 0;
     list_T	*rl;
 
-    if ((l = argvars[0].vval.v_list) == NULL
-			     || value_check_lock(l->lv_lock, arg_errmsg, TRUE))
-	return;
+    যদি ((l = argvars[0].vval.v_list) == ফাঁকা
+			     || মান_check_lock(l->lv_lock, arg_errmsg, TRUE))
+	ফেরত;
 
-    idx = (long)tv_get_number_chk(&argvars[1], &error);
-    if (error)
-	return;		// type error: do nothing, errmsg already given
+    idx = (long)tv_get_সংখ্যা_chk(&argvars[1], &error);
+    যদি (error)
+	ফেরত;		// type error: do nothing, errmsg already given
 
-    if ((item = list_find(l, idx)) == NULL)
+    যদি ((item = list_find(l, idx)) == ফাঁকা)
     {
-	semsg(_(e_list_index_out_of_range_nr), idx);
-	return;
+	semsg(_(e_list_সূচক_out_of_range_nr), idx);
+	ফেরত;
     }
 
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    যদি (argvars[2].v_type == VAR_UNKNOWN)
     {
 	// Remove one item, return its value.
 	vimlist_remove(l, item, item);
 	*rettv = item->li_tv;
 	list_free_item(l, item);
-	return;
+	ফেরত;
     }
 
     // Remove range of items, return list with values.
-    end = (long)tv_get_number_chk(&argvars[2], &error);
-    if (error)
-	return;		// type error: do nothing
+    end = (long)tv_get_সংখ্যা_chk(&argvars[2], &error);
+    যদি (error)
+	ফেরত;		// type error: do nothing
 
-    if ((item2 = list_find(l, end)) == NULL)
+    যদি ((item2 = list_find(l, end)) == ফাঁকা)
     {
-	semsg(_(e_list_index_out_of_range_nr), end);
-	return;
+	semsg(_(e_list_সূচক_out_of_range_nr), end);
+	ফেরত;
     }
 
-    for (li = item; li != NULL; li = li->li_next)
+    জন্য (li = item; li != ফাঁকা; li = li->li_পরবর্তী)
     {
 	++cnt;
-	if (li == item2)
-	    break;
+	যদি (li == item2)
+	    বিরতি;
     }
-    if (li == NULL)  // didn't find "item2" after "item"
+    যদি (li == ফাঁকা)  // didn't find "item2" after "item"
     {
 	emsg(_(e_invalid_range));
-	return;
+	ফেরত;
     }
 
     vimlist_remove(l, item, item2);
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    যদি (rettv_list_alloc(rettv) == FAIL)
+	ফেরত;
 
     rl = rettv->vval.v_list;
 
-    if (l->lv_with_items > 0)
+    যদি (l->lv_with_বস্তুসমূহ > 0)
     {
 	// need to copy the list items and move the value
-	while (item != NULL)
+	যখন (item != ফাঁকা)
 	{
 	    li = listitem_alloc();
-	    if (li == NULL)
-		return;
+	    যদি (li == ফাঁকা)
+		ফেরত;
 	    li->li_tv = item->li_tv;
 	    init_tv(&item->li_tv);
 	    list_append(rl, li);
-	    if (item == item2)
-		break;
-	    item = item->li_next;
+	    যদি (item == item2)
+		বিরতি;
+	    item = item->li_পরবর্তী;
 	}
     }
-    else
+    অন্যথা
     {
 	rl->lv_first = item;
 	rl->lv_u.mat.lv_last = item2;
-	item->li_prev = NULL;
-	item2->li_next = NULL;
+	item->li_পূর্ব = ফাঁকা;
+	item2->li_পরবর্তী = ফাঁকা;
 	rl->lv_len = cnt;
     }
 }
 
-static int item_compare(const void *s1, const void *s2);
-static int item_compare2(const void *s1, const void *s2);
+স্থির পূর্ণসংখ্যা item_compare(ধ্রুবক শূন্য *s1, ধ্রুবক শূন্য *s2);
+স্থির পূর্ণসংখ্যা item_compare2(ধ্রুবক শূন্য *s1, ধ্রুবক শূন্য *s2);
 
 // struct used in the array that's given to qsort()
-typedef struct
+প্রকারলেখ কাঠামো
 {
     listitem_T	*item;
-    int		idx;
+    পূর্ণসংখ্যা		idx;
     // Sort key precomputed once per item for the numeric compare modes.
     // Only valid when sortinfo->item_compare_keys_ready is set (the sort()
     // path); uniq() passes a bare listitem_T pointer and must not read this.
-    union {
+    সংঘ {
 	varnumber_T	inum;	// for "N"
-	double		fnum;	// for "n" and "f"
-    } key;
+	দ্বিগুণ		fnum;	// for "n" and "f"
+    } চাবি;
 } sortItem_T;
 
 // struct storing information about current sort
-typedef struct
+প্রকারলেখ কাঠামো
 {
-    int		item_compare_ic;
-    int		item_compare_lc;
-    int		item_compare_numeric;
-    int		item_compare_numbers;
-    int		item_compare_float;
+    পূর্ণসংখ্যা		item_compare_ic;
+    পূর্ণসংখ্যা		item_compare_lc;
+    পূর্ণসংখ্যা		item_compare_numeric;
+    পূর্ণসংখ্যা		item_compare_numbers;
+    পূর্ণসংখ্যা		item_compare_float;
     char_u	*item_compare_func;
     partial_T	*item_compare_partial;
     dict_T	*item_compare_selfdict;
-    int		item_compare_func_err;
-    int		item_compare_keep_zero;
-    int		item_compare_keys_ready;  // ptrs[].key is precomputed
+    পূর্ণসংখ্যা		item_compare_func_err;
+    পূর্ণসংখ্যা		item_compare_keep_zero;
+    পূর্ণসংখ্যা		item_compare_চাবিগুলি_ready;  // ptrs[].key is precomputed
 } sortinfo_T;
-static sortinfo_T	*sortinfo = NULL;
+স্থির sortinfo_T	*sortinfo = ফাঁকা;
 #define ITEM_COMPARE_FAIL 999
 
 /*
  * Compare functions for f_sort() and f_uniq() below.
  */
-    static int
-item_compare(const void *s1, const void *s2)
+    স্থির পূর্ণসংখ্যা
+item_compare(ধ্রুবক শূন্য *s1, ধ্রুবক শূন্য *s2)
 {
     sortItem_T  *si1, *si2;
     typval_T	*tv1, *tv2;
     char_u	*p1, *p2;
-    char_u	*tofree1 = NULL, *tofree2 = NULL;
-    int		res;
+    char_u	*tofree1 = ফাঁকা, *tofree2 = ফাঁকা;
+    পূর্ণসংখ্যা		res;
     char_u	numbuf1[NUMBUFLEN];
     char_u	numbuf2[NUMBUFLEN];
 
@@ -2136,109 +2136,109 @@ item_compare(const void *s1, const void *s2)
     tv1 = &si1->item->li_tv;
     tv2 = &si2->item->li_tv;
 
-    if (sortinfo->item_compare_numbers)
+    যদি (sortinfo->item_compare_numbers)
     {
-	varnumber_T	v1 = sortinfo->item_compare_keys_ready
-					? si1->key.inum : tv_to_number(tv1);
-	varnumber_T	v2 = sortinfo->item_compare_keys_ready
-					? si2->key.inum : tv_to_number(tv2);
+	varnumber_T	v1 = sortinfo->item_compare_চাবিগুলি_ready
+					? si1->চাবি.inum : tv_to_সংখ্যা(tv1);
+	varnumber_T	v2 = sortinfo->item_compare_চাবিগুলি_ready
+					? si2->চাবি.inum : tv_to_সংখ্যা(tv2);
 
-	return v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
+	ফেরত v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
     }
 
-    if (sortinfo->item_compare_float)
+    যদি (sortinfo->item_compare_float)
     {
-	float_T	v1 = sortinfo->item_compare_keys_ready
-					? si1->key.fnum : tv_get_float(tv1);
-	float_T	v2 = sortinfo->item_compare_keys_ready
-					? si2->key.fnum : tv_get_float(tv2);
+	float_T	v1 = sortinfo->item_compare_চাবিগুলি_ready
+					? si1->চাবি.fnum : tv_get_float(tv1);
+	float_T	v2 = sortinfo->item_compare_চাবিগুলি_ready
+					? si2->চাবি.fnum : tv_get_float(tv2);
 
-	return v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
+	ফেরত v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
     }
 
-    if (sortinfo->item_compare_numeric && sortinfo->item_compare_keys_ready)
+    যদি (sortinfo->item_compare_numeric && sortinfo->item_compare_চাবিগুলি_ready)
     {
-	double	n1 = si1->key.fnum;
-	double	n2 = si2->key.fnum;
+	দ্বিগুণ	n1 = si1->চাবি.fnum;
+	দ্বিগুণ	n2 = si2->চাবি.fnum;
 
 	res = n1 == n2 ? 0 : n1 > n2 ? 1 : -1;
-	if (res == 0 && !sortinfo->item_compare_keep_zero)
+	যদি (res == 0 && !sortinfo->item_compare_keep_zero)
 	    res = si1->idx > si2->idx ? 1 : -1;
-	return res;
+	ফেরত res;
     }
 
     // tv2string() puts quotes around a string and allocates memory.  Don't do
     // that for string variables. Use a single quote when comparing with a
     // non-string to do what the docs promise.
-    if (tv1->v_type == VAR_STRING)
+    যদি (tv1->v_type == VAR_STRING)
     {
-	if (tv2->v_type != VAR_STRING || sortinfo->item_compare_numeric)
+	যদি (tv2->v_type != VAR_STRING || sortinfo->item_compare_numeric)
 	    p1 = (char_u *)"'";
-	else
+	অন্যথা
 	    p1 = tv1->vval.v_string;
     }
-    else
+    অন্যথা
 	p1 = tv2string(tv1, &tofree1, numbuf1, 0);
-    if (tv2->v_type == VAR_STRING)
+    যদি (tv2->v_type == VAR_STRING)
     {
-	if (tv1->v_type != VAR_STRING || sortinfo->item_compare_numeric)
+	যদি (tv1->v_type != VAR_STRING || sortinfo->item_compare_numeric)
 	    p2 = (char_u *)"'";
-	else
+	অন্যথা
 	    p2 = tv2->vval.v_string;
     }
-    else
+    অন্যথা
 	p2 = tv2string(tv2, &tofree2, numbuf2, 0);
-    if (p1 == NULL)
+    যদি (p1 == ফাঁকা)
 	p1 = (char_u *)"";
-    if (p2 == NULL)
+    যদি (p2 == ফাঁকা)
 	p2 = (char_u *)"";
-    if (!sortinfo->item_compare_numeric)
+    যদি (!sortinfo->item_compare_numeric)
     {
-	if (sortinfo->item_compare_lc)
-	    res = strcoll((char *)p1, (char *)p2);
-	else
+	যদি (sortinfo->item_compare_lc)
+	    res = strcoll((অক্ষর *)p1, (অক্ষর *)p2);
+	অন্যথা
 	    res = sortinfo->item_compare_ic ? STRICMP(p1, p2): STRCMP(p1, p2);
     }
-    else
+    অন্যথা
     {
-	double n1, n2;
-	n1 = strtod((char *)p1, (char **)&p1);
-	n2 = strtod((char *)p2, (char **)&p2);
+	দ্বিগুণ n1, n2;
+	n1 = strtod((অক্ষর *)p1, (অক্ষর **)&p1);
+	n2 = strtod((অক্ষর *)p2, (অক্ষর **)&p2);
 	res = n1 == n2 ? 0 : n1 > n2 ? 1 : -1;
     }
 
     // When the result would be zero, compare the item indexes.  Makes the
     // sort stable.
-    if (res == 0 && !sortinfo->item_compare_keep_zero)
+    যদি (res == 0 && !sortinfo->item_compare_keep_zero)
 	res = si1->idx > si2->idx ? 1 : -1;
 
     vim_free(tofree1);
     vim_free(tofree2);
-    return res;
+    ফেরত res;
 }
 
-    static int
-item_compare2(const void *s1, const void *s2)
+    স্থির পূর্ণসংখ্যা
+item_compare2(ধ্রুবক শূন্য *s1, ধ্রুবক শূন্য *s2)
 {
     sortItem_T  *si1, *si2;
-    int		res;
+    পূর্ণসংখ্যা		res;
     typval_T	rettv;
     typval_T	argv[3];
     char_u	*func_name;
     partial_T	*partial = sortinfo->item_compare_partial;
     funcexe_T	funcexe;
-    int		did_emsg_before = did_emsg;
+    পূর্ণসংখ্যা		did_emsg_before = did_emsg;
 
     // shortcut after failure in previous call; compare all items equal
-    if (sortinfo->item_compare_func_err)
-	return 0;
+    যদি (sortinfo->item_compare_func_err)
+	ফেরত 0;
 
     si1 = (sortItem_T *)s1;
     si2 = (sortItem_T *)s2;
 
-    if (partial == NULL)
+    যদি (partial == ফাঁকা)
 	func_name = sortinfo->item_compare_func;
-    else
+    অন্যথা
 	func_name = partial_name(partial);
 
     // Copy the values.  This is needed to be able to set v_lock to VAR_FIXED
@@ -2255,74 +2255,74 @@ item_compare2(const void *s1, const void *s2)
     clear_tv(&argv[0]);
     clear_tv(&argv[1]);
 
-    if (res == FAIL || did_emsg > did_emsg_before)
+    যদি (res == FAIL || did_emsg > did_emsg_before)
 	res = ITEM_COMPARE_FAIL;
-    else
+    অন্যথা
     {
 	varnumber_T	n;
 
-	n = tv_get_number_chk(&rettv, &sortinfo->item_compare_func_err);
+	n = tv_get_সংখ্যা_chk(&rettv, &sortinfo->item_compare_func_err);
 	res = (n > 0) ? 1 : (n < 0) ? -1 : 0;
     }
-    if (sortinfo->item_compare_func_err)
+    যদি (sortinfo->item_compare_func_err)
 	res = ITEM_COMPARE_FAIL;  // return value has wrong type
     clear_tv(&rettv);
 
     // When the result would be zero, compare the pointers themselves.  Makes
     // the sort stable.
-    if (res == 0 && !sortinfo->item_compare_keep_zero)
+    যদি (res == 0 && !sortinfo->item_compare_keep_zero)
 	res = si1->idx > si2->idx ? 1 : -1;
 
-    return res;
+    ফেরত res;
 }
 
 /*
  * Precompute the numeric sort key of each item.  Only for the builtin numeric
  * compare modes; each key is computed exactly as item_compare() would have.
  */
-    static void
-sort_compute_keys(sortItem_T *ptrs, long len, sortinfo_T *info)
+    স্থির শূন্য
+sort_compute_চাবিগুলি(sortItem_T *ptrs, long len, sortinfo_T *info)
 {
     long	i;
 
-    if (info->item_compare_numbers)
+    যদি (info->item_compare_numbers)
     {
-	for (i = 0; i < len; ++i)
-	    ptrs[i].key.inum = tv_to_number(&ptrs[i].item->li_tv);
+	জন্য (i = 0; i < len; ++i)
+	    ptrs[i].চাবি.inum = tv_to_সংখ্যা(&ptrs[i].item->li_tv);
     }
-    else if (info->item_compare_float)
+    অন্যথা যদি (info->item_compare_float)
     {
-	for (i = 0; i < len; ++i)
-	    ptrs[i].key.fnum = tv_get_float(&ptrs[i].item->li_tv);
+	জন্য (i = 0; i < len; ++i)
+	    ptrs[i].চাবি.fnum = tv_get_float(&ptrs[i].item->li_tv);
     }
-    else // info->item_compare_numeric
+    অন্যথা // info->item_compare_numeric
     {
-	for (i = 0; i < len; ++i)
+	জন্য (i = 0; i < len; ++i)
 	{
 	    typval_T	*tv = &ptrs[i].item->li_tv;
 
 	    // A string is compared as a single quote in numeric mode, which
 	    // strtod() reads as 0.
-	    if (tv->v_type == VAR_STRING)
-		ptrs[i].key.fnum = 0.0;
-	    else
+	    যদি (tv->v_type == VAR_STRING)
+		ptrs[i].চাবি.fnum = 0.0;
+	    অন্যথা
 	    {
 		char_u	numbuf[NUMBUFLEN];
-		char_u	*tofree = NULL;
+		char_u	*tofree = ফাঁকা;
 		char_u	*p = tv2string(tv, &tofree, numbuf, 0);
 
-		ptrs[i].key.fnum = p == NULL ? 0.0 : strtod((char *)p, NULL);
+		ptrs[i].চাবি.fnum = p == ফাঁকা ? 0.0 : strtod((অক্ষর *)p, ফাঁকা);
 		vim_free(tofree);
 	    }
 	}
     }
-    info->item_compare_keys_ready = TRUE;
+    info->item_compare_চাবিগুলি_ready = TRUE;
 }
 
 /*
  * sort() List "l"
  */
-    static void
+    স্থির শূন্য
 do_sort(list_T *l, sortinfo_T *info)
 {
     long	len;
@@ -2334,11 +2334,11 @@ do_sort(list_T *l, sortinfo_T *info)
 
     // Make an array with each entry pointing to an item in the List.
     ptrs = ALLOC_MULT(sortItem_T, len);
-    if (ptrs == NULL)
-	return;
+    যদি (ptrs == ফাঁকা)
+	ফেরত;
 
     // sort(): ptrs will be the list to sort
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_বস্তুসমূহ(l, li)
     {
 	ptrs[i].item = li;
 	ptrs[i].idx = i;
@@ -2347,33 +2347,33 @@ do_sort(list_T *l, sortinfo_T *info)
 
     info->item_compare_func_err = FALSE;
     info->item_compare_keep_zero = FALSE;
-    info->item_compare_keys_ready = FALSE;
+    info->item_compare_চাবিগুলি_ready = FALSE;
 
-    if (info->item_compare_func == NULL && info->item_compare_partial == NULL
+    যদি (info->item_compare_func == ফাঁকা && info->item_compare_partial == ফাঁকা
 	    && (info->item_compare_numbers || info->item_compare_float
 						|| info->item_compare_numeric))
-	sort_compute_keys(ptrs, len, info);
+	sort_compute_চাবিগুলি(ptrs, len, info);
     // test the compare function
-    if ((info->item_compare_func != NULL
-		|| info->item_compare_partial != NULL)
-	    && item_compare2((void *)&ptrs[0], (void *)&ptrs[1])
+    যদি ((info->item_compare_func != ফাঁকা
+		|| info->item_compare_partial != ফাঁকা)
+	    && item_compare2((শূন্য *)&ptrs[0], (শূন্য *)&ptrs[1])
 	    == ITEM_COMPARE_FAIL)
 	emsg(_(e_sort_compare_function_failed));
-    else
+    অন্যথা
     {
 	// Sort the array with item pointers.
-	qsort((void *)ptrs, (size_t)len, sizeof(sortItem_T),
-		info->item_compare_func == NULL
-		&& info->item_compare_partial == NULL
+	qsort((শূন্য *)ptrs, (size_t)len, আকার(sortItem_T),
+		info->item_compare_func == ফাঁকা
+		&& info->item_compare_partial == ফাঁকা
 		? item_compare : item_compare2);
 
-	if (!info->item_compare_func_err)
+	যদি (!info->item_compare_func_err)
 	{
 	    // Clear the List and append the items in sorted order.
 	    l->lv_first = l->lv_u.mat.lv_last
-		= l->lv_u.mat.lv_idx_item = NULL;
+		= l->lv_u.mat.lv_idx_item = ফাঁকা;
 	    l->lv_len = 0;
-	    for (i = 0; i < len; ++i)
+	    জন্য (i = 0; i < len; ++i)
 		list_append(l, ptrs[i].item);
 	}
     }
@@ -2384,51 +2384,51 @@ do_sort(list_T *l, sortinfo_T *info)
 /*
  * uniq() List "l"
  */
-    static void
+    স্থির শূন্য
 do_uniq(list_T *l, sortinfo_T *info)
 {
     long	len;
     sortItem_T	*ptrs;
     long	i = 0;
     listitem_T	*li;
-    int	(*item_compare_func_ptr)(const void *, const void *);
+    পূর্ণসংখ্যা	(*item_compare_func_ptr)(ধ্রুবক শূন্য *, ধ্রুবক শূন্য *);
 
     len = list_len(l);
 
     // Make an array with each entry pointing to an item in the List.
     ptrs = ALLOC_MULT(sortItem_T, len);
-    if (ptrs == NULL)
-	return;
+    যদি (ptrs == ফাঁকা)
+	ফেরত;
 
     // f_uniq(): ptrs will be a stack of items to remove
     info->item_compare_func_err = FALSE;
     info->item_compare_keep_zero = TRUE;
-    item_compare_func_ptr = info->item_compare_func != NULL
-	|| info->item_compare_partial != NULL
+    item_compare_func_ptr = info->item_compare_func != ফাঁকা
+	|| info->item_compare_partial != ফাঁকা
 	? item_compare2 : item_compare;
 
-    for (li = l->lv_first; li != NULL && li->li_next != NULL;
-	    li = li->li_next)
+    জন্য (li = l->lv_first; li != ফাঁকা && li->li_পরবর্তী != ফাঁকা;
+	    li = li->li_পরবর্তী)
     {
-	if (item_compare_func_ptr((void *)&li, (void *)&li->li_next)
+	যদি (item_compare_func_ptr((শূন্য *)&li, (শূন্য *)&li->li_পরবর্তী)
 		== 0)
 	    ptrs[i++].item = li;
-	if (info->item_compare_func_err)
+	যদি (info->item_compare_func_err)
 	{
 	    emsg(_(e_uniq_compare_function_failed));
-	    break;
+	    বিরতি;
 	}
     }
 
-    if (!info->item_compare_func_err)
+    যদি (!info->item_compare_func_err)
     {
-	while (--i >= 0)
+	যখন (--i >= 0)
 	{
-	    li = ptrs[i].item->li_next;
-	    ptrs[i].item->li_next = li->li_next;
-	    if (li->li_next != NULL)
-		li->li_next->li_prev = ptrs[i].item;
-	    else
+	    li = ptrs[i].item->li_পরবর্তী;
+	    ptrs[i].item->li_পরবর্তী = li->li_পরবর্তী;
+	    যদি (li->li_পরবর্তী != ফাঁকা)
+		li->li_পরবর্তী->li_পূর্ব = ptrs[i].item;
+	    অন্যথা
 		l->lv_u.mat.lv_last = ptrs[i].item;
 	    list_fix_watch(l, li);
 	    listitem_free(l, li);
@@ -2443,7 +2443,7 @@ do_uniq(list_T *l, sortinfo_T *info)
  * Parse the optional arguments supplied to the sort() or uniq() function and
  * return the values in "info".
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 parse_sort_uniq_args(typval_T *argvars, sortinfo_T *info)
 {
     info->item_compare_ic = FALSE;
@@ -2451,110 +2451,110 @@ parse_sort_uniq_args(typval_T *argvars, sortinfo_T *info)
     info->item_compare_numeric = FALSE;
     info->item_compare_numbers = FALSE;
     info->item_compare_float = FALSE;
-    info->item_compare_func = NULL;
-    info->item_compare_partial = NULL;
-    info->item_compare_selfdict = NULL;
-    info->item_compare_keys_ready = FALSE;
+    info->item_compare_func = ফাঁকা;
+    info->item_compare_partial = ফাঁকা;
+    info->item_compare_selfdict = ফাঁকা;
+    info->item_compare_চাবিগুলি_ready = FALSE;
 
-    if (argvars[1].v_type == VAR_UNKNOWN)
-	return OK;
+    যদি (argvars[1].v_type == VAR_UNKNOWN)
+	ফেরত OK;
 
     // optional second argument: {func}
-    if (argvars[1].v_type == VAR_FUNC)
+    যদি (argvars[1].v_type == VAR_FUNC)
 	info->item_compare_func = argvars[1].vval.v_string;
-    else if (argvars[1].v_type == VAR_PARTIAL)
+    অন্যথা যদি (argvars[1].v_type == VAR_PARTIAL)
 	info->item_compare_partial = argvars[1].vval.v_partial;
-    else
+    অন্যথা
     {
-	int	    error = FALSE;
-	int	    nr = 0;
+	পূর্ণসংখ্যা	    error = FALSE;
+	পূর্ণসংখ্যা	    nr = 0;
 
-	if (argvars[1].v_type == VAR_NUMBER)
+	যদি (argvars[1].v_type == VAR_সংখ্যা)
 	{
-	    nr = tv_get_number_chk(&argvars[1], &error);
-	    if (error)
-		return FAIL;
-	    if (nr == 1)
+	    nr = tv_get_সংখ্যা_chk(&argvars[1], &error);
+	    যদি (error)
+		ফেরত FAIL;
+	    যদি (nr == 1)
 		info->item_compare_ic = TRUE;
 	}
-	if (nr != 1)
+	যদি (nr != 1)
 	{
-	    if (argvars[1].v_type != VAR_NUMBER)
+	    যদি (argvars[1].v_type != VAR_সংখ্যা)
 		info->item_compare_func = tv_get_string(&argvars[1]);
-	    else if (nr != 0)
+	    অন্যথা যদি (nr != 0)
 	    {
 		emsg(_(e_invalid_argument));
-		return FAIL;
+		ফেরত FAIL;
 	    }
 	}
-	if (info->item_compare_func != NULL)
+	যদি (info->item_compare_func != ফাঁকা)
 	{
-	    if (*info->item_compare_func == NUL)
+	    যদি (*info->item_compare_func == NUL)
 	    {
 		// empty string means default sort
-		info->item_compare_func = NULL;
+		info->item_compare_func = ফাঁকা;
 	    }
-	    else if (STRCMP(info->item_compare_func, "n") == 0)
+	    অন্যথা যদি (STRCMP(info->item_compare_func, "n") == 0)
 	    {
-		info->item_compare_func = NULL;
+		info->item_compare_func = ফাঁকা;
 		info->item_compare_numeric = TRUE;
 	    }
-	    else if (STRCMP(info->item_compare_func, "N") == 0)
+	    অন্যথা যদি (STRCMP(info->item_compare_func, "N") == 0)
 	    {
-		info->item_compare_func = NULL;
+		info->item_compare_func = ফাঁকা;
 		info->item_compare_numbers = TRUE;
 	    }
-	    else if (STRCMP(info->item_compare_func, "f") == 0)
+	    অন্যথা যদি (STRCMP(info->item_compare_func, "f") == 0)
 	    {
-		info->item_compare_func = NULL;
+		info->item_compare_func = ফাঁকা;
 		info->item_compare_float = TRUE;
 	    }
-	    else if (STRCMP(info->item_compare_func, "i") == 0)
+	    অন্যথা যদি (STRCMP(info->item_compare_func, "i") == 0)
 	    {
-		info->item_compare_func = NULL;
+		info->item_compare_func = ফাঁকা;
 		info->item_compare_ic = TRUE;
 	    }
-	    else if (STRCMP(info->item_compare_func, "l") == 0)
+	    অন্যথা যদি (STRCMP(info->item_compare_func, "l") == 0)
 	    {
-		info->item_compare_func = NULL;
+		info->item_compare_func = ফাঁকা;
 		info->item_compare_lc = TRUE;
 	    }
 	}
     }
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    যদি (argvars[2].v_type != VAR_UNKNOWN)
     {
 	// optional third argument: {dict}
-	if (check_for_dict_arg(argvars, 2) == FAIL)
-	    return FAIL;
+	যদি (check_for_dict_arg(argvars, 2) == FAIL)
+	    ফেরত FAIL;
 	info->item_compare_selfdict = argvars[2].vval.v_dict;
     }
 
-    return OK;
+    ফেরত OK;
 }
 
 /*
  * "sort()" or "uniq()" function
  */
-    static void
-do_sort_uniq(typval_T *argvars, typval_T *rettv, int sort)
+    স্থির শূন্য
+do_sort_uniq(typval_T *argvars, typval_T *rettv, পূর্ণসংখ্যা sort)
 {
     list_T	*l;
     sortinfo_T	*old_sortinfo;
     sortinfo_T	info;
     long	len;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_list_arg(argvars, 0) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && (check_for_string_or_func_arg(argvars, 1) == FAIL
 			      || check_for_opt_dict_arg(argvars, 2) == FAIL))))
-	return;
+	ফেরত;
 
-    if (argvars[0].v_type != VAR_LIST)
+    যদি (argvars[0].v_type != VAR_LIST)
     {
 	semsg(_(e_argument_of_str_must_be_list), sort ? "sort()" : "uniq()");
-	return;
+	ফেরত;
     }
 
     // Pointer to current info struct used in compare function. Save and
@@ -2563,25 +2563,25 @@ do_sort_uniq(typval_T *argvars, typval_T *rettv, int sort)
     sortinfo = &info;
 
     l = argvars[0].vval.v_list;
-    if (l != NULL && value_check_lock(l->lv_lock,
+    যদি (l != ফাঁকা && মান_check_lock(l->lv_lock,
 		(char_u *)(sort ? N_("sort() argument") : N_("uniq() argument")),
 		TRUE))
-	goto theend;
+	যাও theend;
     rettv_list_set(rettv, l);
-    if (l == NULL)
-	goto theend;
+    যদি (l == ফাঁকা)
+	যাও theend;
     CHECK_LIST_MATERIALIZE(l);
 
     len = list_len(l);
-    if (len <= 1)
-	goto theend;	// short list sorts pretty quickly
+    যদি (len <= 1)
+	যাও theend;	// short list sorts pretty quickly
 
-    if (parse_sort_uniq_args(argvars, &info) == FAIL)
-	goto theend;
+    যদি (parse_sort_uniq_args(argvars, &info) == FAIL)
+	যাও theend;
 
-    if (sort)
+    যদি (sort)
 	do_sort(l, &info);
-    else
+    অন্যথা
 	do_uniq(l, &info);
 
 theend:
@@ -2591,7 +2591,7 @@ theend:
 /*
  * "sort({list})" function
  */
-    void
+    শূন্য
 f_sort(typval_T *argvars, typval_T *rettv)
 {
     do_sort_uniq(argvars, rettv, TRUE);
@@ -2600,7 +2600,7 @@ f_sort(typval_T *argvars, typval_T *rettv)
 /*
  * "uniq({list})" function
  */
-    void
+    শূন্য
 f_uniq(typval_T *argvars, typval_T *rettv)
 {
     do_sort_uniq(argvars, rettv, FALSE);
@@ -2610,221 +2610,221 @@ f_uniq(typval_T *argvars, typval_T *rettv)
  * Handle one item for map(), filter(), foreach().
  * Sets v:val to "tv".  Caller must set v:key.
  */
-    int
+    পূর্ণসংখ্যা
 filter_map_one(
 	typval_T	*tv,	    // original value
-	typval_T	*expr,	    // callback
+	typval_T	*রাশিমালা,	    // callback
 	filtermap_T	filtermap,
 	funccall_T	*fc,	    // from eval_expr_get_funccal()
 	typval_T	*newtv,	    // for map() and mapnew(): new value
-	int		*remp)	    // for filter(): remove flag
+	পূর্ণসংখ্যা		*remp)	    // for filter(): remove flag
 {
     typval_T	argv[3];
-    int		retval = FAIL;
+    পূর্ণসংখ্যা		retval = FAIL;
 
     copy_tv(tv, get_vim_var_tv(VV_VAL));
 
     newtv->v_type = VAR_UNKNOWN;
-    if (filtermap == FILTERMAP_FOREACH && expr->v_type == VAR_STRING)
+    যদি (filtermap == FILTERMAP_FOREACH && রাশিমালা->v_type == VAR_STRING)
     {
 	// foreach() is not limited to an expression
-	do_cmdline_cmd(expr->vval.v_string);
-	if (!did_emsg)
+	do_cmdline_cmd(রাশিমালা->vval.v_string);
+	যদি (!did_emsg)
 	    retval = OK;
-	goto theend;
+	যাও theend;
     }
 
-    argv[0] = *get_vim_var_tv(VV_KEY);
+    argv[0] = *get_vim_var_tv(VV_চাবি);
     argv[1] = *get_vim_var_tv(VV_VAL);
-    if (eval_expr_typval(expr, FALSE, argv, 2, fc, newtv) == FAIL)
-	goto theend;
-    if (filtermap == FILTERMAP_FILTER)
+    যদি (eval_রাশিমালা_typval(রাশিমালা, FALSE, argv, 2, fc, newtv) == FAIL)
+	যাও theend;
+    যদি (filtermap == FILTERMAP_FILTER)
     {
-	int	    error = FALSE;
+	পূর্ণসংখ্যা	    error = FALSE;
 
 	// filter(): when expr is zero remove the item
-	if (in_vim9script())
+	যদি (in_vim9script())
 	    *remp = !tv_get_bool_chk(newtv, &error);
-	else
-	    *remp = (tv_get_number_chk(newtv, &error) == 0);
+	অন্যথা
+	    *remp = (tv_get_সংখ্যা_chk(newtv, &error) == 0);
 	clear_tv(newtv);
 	// On type error, nothing has been removed; return FAIL to stop the
 	// loop.  The error message was given by tv_get_number_chk().
-	if (error)
-	    goto theend;
+	যদি (error)
+	    যাও theend;
     }
-    else if (filtermap == FILTERMAP_FOREACH)
+    অন্যথা যদি (filtermap == FILTERMAP_FOREACH)
 	clear_tv(newtv);
     retval = OK;
 theend:
     clear_tv(get_vim_var_tv(VV_VAL));
-    return retval;
+    ফেরত retval;
 }
 
 /*
  * Implementation of map(), filter(), foreach() for a List.  Apply "expr" to
  * every item in List "l" and return the result in "rettv".
  */
-    static void
+    স্থির শূন্য
 list_filter_map(
 	list_T		*l,
 	filtermap_T	filtermap,
 	type_T		*argtype,
-	char		*func_name,
+	অক্ষর		*func_name,
 	char_u		*arg_errmsg,
-	typval_T	*expr,
+	typval_T	*রাশিমালা,
 	typval_T	*rettv)
 {
-    int		prev_lock;
-    list_T	*l_ret = NULL;
-    int		idx = 0;
-    int		rem;
+    পূর্ণসংখ্যা		পূর্ব_lock;
+    list_T	*l_ret = ফাঁকা;
+    পূর্ণসংখ্যা		idx = 0;
+    পূর্ণসংখ্যা		rem;
     listitem_T	*li, *nli;
     typval_T	newtv;
     funccall_T	*fc;
 
-    if (filtermap == FILTERMAP_MAPNEW)
+    যদি (filtermap == FILTERMAP_MAPNEW)
     {
 	rettv->v_type = VAR_LIST;
-	rettv->vval.v_list = NULL;
+	rettv->vval.v_list = ফাঁকা;
     }
-    if (l == NULL || (filtermap == FILTERMAP_FILTER
-			    && value_check_lock(l->lv_lock, arg_errmsg, TRUE)))
-	return;
+    যদি (l == ফাঁকা || (filtermap == FILTERMAP_FILTER
+			    && মান_check_lock(l->lv_lock, arg_errmsg, TRUE)))
+	ফেরত;
 
-    prev_lock = l->lv_lock;
+    পূর্ব_lock = l->lv_lock;
 
-    if (filtermap == FILTERMAP_MAPNEW)
+    যদি (filtermap == FILTERMAP_MAPNEW)
     {
-	if (rettv_list_alloc(rettv) == FAIL)
-	    return;
+	যদি (rettv_list_alloc(rettv) == FAIL)
+	    ফেরত;
 	l_ret = rettv->vval.v_list;
     }
     // set_vim_var_nr() doesn't set the type
-    set_vim_var_type(VV_KEY, VAR_NUMBER);
+    set_vim_var_type(VV_চাবি, VAR_সংখ্যা);
 
-    if (l->lv_lock == 0)
+    যদি (l->lv_lock == 0)
 	l->lv_lock = VAR_LOCKED;
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, &newtv);
+    fc = eval_রাশিমালা_get_funccal(রাশিমালা, &newtv);
 
-    if (l->lv_first == &range_list_item)
+    যদি (l->lv_first == &range_list_item)
     {
 	varnumber_T	val = l->lv_u.nonmat.lv_start;
-	int		len = l->lv_len;
-	int		stride = l->lv_u.nonmat.lv_stride;
+	পূর্ণসংখ্যা		len = l->lv_len;
+	পূর্ণসংখ্যা		stride = l->lv_u.nonmat.lv_stride;
 
 	// List from range(): loop over the numbers
 	// NOTE: foreach() returns the range_list_item
-	if (filtermap != FILTERMAP_MAPNEW && filtermap != FILTERMAP_FOREACH)
+	যদি (filtermap != FILTERMAP_MAPNEW && filtermap != FILTERMAP_FOREACH)
 	{
-	    l->lv_first = NULL;
-	    l->lv_u.mat.lv_last = NULL;
+	    l->lv_first = ফাঁকা;
+	    l->lv_u.mat.lv_last = ফাঁকা;
 	    l->lv_len = 0;
-	    l->lv_u.mat.lv_idx_item = NULL;
+	    l->lv_u.mat.lv_idx_item = ফাঁকা;
 	}
 
-	for (idx = 0; idx < len; ++idx)
+	জন্য (idx = 0; idx < len; ++idx)
 	{
 	    typval_T tv;
 
-	    tv.v_type = VAR_NUMBER;
+	    tv.v_type = VAR_সংখ্যা;
 	    tv.v_lock = 0;
-	    tv.vval.v_number = val;
-	    set_vim_var_nr(VV_KEY, idx);
-	    if (filter_map_one(&tv, expr, filtermap, fc, &newtv, &rem) == FAIL)
-		break;
-	    if (did_emsg)
+	    tv.vval.v_সংখ্যা = val;
+	    set_vim_var_nr(VV_চাবি, idx);
+	    যদি (filter_map_one(&tv, রাশিমালা, filtermap, fc, &newtv, &rem) == FAIL)
+		বিরতি;
+	    যদি (did_emsg)
 	    {
 		clear_tv(&newtv);
-		break;
+		বিরতি;
 	    }
-	    if (filtermap != FILTERMAP_FOREACH)
+	    যদি (filtermap != FILTERMAP_FOREACH)
 	    {
-		if (filtermap != FILTERMAP_FILTER)
+		যদি (filtermap != FILTERMAP_FILTER)
 		{
-		    if (filtermap == FILTERMAP_MAP && argtype != NULL
+		    যদি (filtermap == FILTERMAP_MAP && argtype != ফাঁকা
 			&& check_typval_arg_type(
 						 argtype->tt_member, &newtv,
 						 func_name, 0) == FAIL)
 		    {
 			clear_tv(&newtv);
-			break;
+			বিরতি;
 		    }
 		    // map(), mapnew(): always append the new value to the
 		    // list
-		    if (list_append_tv_move(filtermap == FILTERMAP_MAP
+		    যদি (list_append_tv_move(filtermap == FILTERMAP_MAP
 					    ? l : l_ret, &newtv) == FAIL)
-			break;
+			বিরতি;
 		}
-		else if (!rem)
+		অন্যথা যদি (!rem)
 		{
 		    // filter(): append the list item value when not rem
-		    if (list_append_tv_move(l, &tv) == FAIL)
-			break;
+		    যদি (list_append_tv_move(l, &tv) == FAIL)
+			বিরতি;
 		}
 	    }
 
 	    val += stride;
 	}
     }
-    else
+    অন্যথা
     {
 	// Materialized list: loop over the items
-	for (li = l->lv_first; li != NULL; li = nli)
+	জন্য (li = l->lv_first; li != ফাঁকা; li = nli)
 	{
-	    if (filtermap == FILTERMAP_MAP && value_check_lock(
+	    যদি (filtermap == FILTERMAP_MAP && মান_check_lock(
 			li->li_tv.v_lock, arg_errmsg, TRUE))
-		break;
-	    nli = li->li_next;
-	    set_vim_var_nr(VV_KEY, idx);
-	    if (filter_map_one(&li->li_tv, expr, filtermap, fc,
+		বিরতি;
+	    nli = li->li_পরবর্তী;
+	    set_vim_var_nr(VV_চাবি, idx);
+	    যদি (filter_map_one(&li->li_tv, রাশিমালা, filtermap, fc,
 							 &newtv, &rem) == FAIL)
-		break;
-	    if (did_emsg)
+		বিরতি;
+	    যদি (did_emsg)
 	    {
 		clear_tv(&newtv);
-		break;
+		বিরতি;
 	    }
-	    if (filtermap == FILTERMAP_MAP)
+	    যদি (filtermap == FILTERMAP_MAP)
 	    {
-		if (argtype != NULL && check_typval_arg_type(
+		যদি (argtype != ফাঁকা && check_typval_arg_type(
 			    argtype->tt_member, &newtv, func_name, 0) == FAIL)
 		{
 		    clear_tv(&newtv);
-		    break;
+		    বিরতি;
 		}
 		// map(): replace the list item value
 		clear_tv(&li->li_tv);
 		newtv.v_lock = 0;
 		li->li_tv = newtv;
 	    }
-	    else if (filtermap == FILTERMAP_MAPNEW)
+	    অন্যথা যদি (filtermap == FILTERMAP_MAPNEW)
 	    {
 		// mapnew(): append the list item value
-		if (list_append_tv_move(l_ret, &newtv) == FAIL)
-		    break;
+		যদি (list_append_tv_move(l_ret, &newtv) == FAIL)
+		    বিরতি;
 	    }
-	    else if (filtermap == FILTERMAP_FILTER && rem)
+	    অন্যথা যদি (filtermap == FILTERMAP_FILTER && rem)
 		    listitem_remove(l, li);
 	    ++idx;
 	}
     }
 
-    l->lv_lock = prev_lock;
-    if (fc != NULL)
+    l->lv_lock = পূর্ব_lock;
+    যদি (fc != ফাঁকা)
 	remove_funccal();
 }
 
 /*
  * Implementation of map(), filter() and foreach().
  */
-    static void
+    স্থির শূন্য
 filter_map(typval_T *argvars, typval_T *rettv, filtermap_T filtermap)
 {
-    typval_T	*expr;
-    char	*func_name = filtermap == FILTERMAP_MAP ? "map()"
+    typval_T	*রাশিমালা;
+    অক্ষর	*func_name = filtermap == FILTERMAP_MAP ? "map()"
 				  : filtermap == FILTERMAP_MAPNEW ? "mapnew()"
 				  : filtermap == FILTERMAP_FILTER ? "filter()"
 				  : "foreach()";
@@ -2835,84 +2835,84 @@ filter_map(typval_T *argvars, typval_T *rettv, filtermap_T filtermap)
 				       : filtermap == FILTERMAP_FILTER
 						      ? N_("filter() argument")
 						   : N_("foreach() argument"));
-    int		save_did_emsg;
-    type_T	*type = NULL;
+    পূর্ণসংখ্যা		save_did_emsg;
+    type_T	*type = ফাঁকা;
 
     // map(), filter(), foreach() return the first argument, also on failure.
-    if (filtermap != FILTERMAP_MAPNEW && argvars[0].v_type != VAR_STRING)
+    যদি (filtermap != FILTERMAP_MAPNEW && argvars[0].v_type != VAR_STRING)
 	copy_tv(&argvars[0], rettv);
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_list_tuple_dict_blob_or_string_arg(argvars, 0)
 								== FAIL))
-	return;
+	ফেরত;
 
-    if (argvars[0].v_type == VAR_TUPLE && filtermap != FILTERMAP_FOREACH)
+    যদি (argvars[0].v_type == VAR_TUPLE && filtermap != FILTERMAP_FOREACH)
     {
 	semsg(_(e_cannot_use_tuple_with_function_str), func_name);
-	return;
+	ফেরত;
     }
 
-    if (filtermap == FILTERMAP_MAP && in_vim9script())
+    যদি (filtermap == FILTERMAP_MAP && in_vim9script())
     {
 	// Check that map() does not change the declared type of the list or
 	// dict.
-	if (argvars[0].v_type == VAR_DICT && argvars[0].vval.v_dict != NULL)
+	যদি (argvars[0].v_type == VAR_DICT && argvars[0].vval.v_dict != ফাঁকা)
 	    type = argvars[0].vval.v_dict->dv_type;
-	else if (argvars[0].v_type == VAR_LIST
-					     && argvars[0].vval.v_list != NULL)
+	অন্যথা যদি (argvars[0].v_type == VAR_LIST
+					     && argvars[0].vval.v_list != ফাঁকা)
 	    type = argvars[0].vval.v_list->lv_type;
     }
 
-    if (argvars[0].v_type != VAR_BLOB
+    যদি (argvars[0].v_type != VAR_BLOB
 	    && argvars[0].v_type != VAR_LIST
 	    && argvars[0].v_type != VAR_TUPLE
 	    && argvars[0].v_type != VAR_DICT
 	    && argvars[0].v_type != VAR_STRING)
     {
-	char *msg;
+	অক্ষর *বার্তা;
 
-	if (filtermap == FILTERMAP_FOREACH)
-	    msg = e_argument_of_str_must_be_list_tuple_string_dictionary_or_blob;
-	else
-	    msg = e_argument_of_str_must_be_list_string_dictionary_or_blob;
-	semsg(_(msg), func_name);
-	return;
+	যদি (filtermap == FILTERMAP_FOREACH)
+	    বার্তা = e_argument_of_str_must_be_list_tuple_string_dictionary_or_blob;
+	অন্যথা
+	    বার্তা = e_argument_of_str_must_be_list_string_dictionary_or_blob;
+	semsg(_(বার্তা), func_name);
+	ফেরত;
     }
 
     // On type errors, the preceding call has already displayed an error
     // message.  Avoid a misleading error message for an empty string that
     // was not passed as argument.
-    expr = &argvars[1];
-    if (expr->v_type == VAR_UNKNOWN)
-	return;
+    রাশিমালা = &argvars[1];
+    যদি (রাশিমালা->v_type == VAR_UNKNOWN)
+	ফেরত;
 
     typval_T	save_val;
-    typval_T	save_key;
+    typval_T	save_চাবি;
 
     prepare_vimvar(VV_VAL, &save_val);
-    prepare_vimvar(VV_KEY, &save_key);
+    prepare_vimvar(VV_চাবি, &save_চাবি);
 
     // We reset "did_emsg" to be able to detect whether an error
     // occurred during evaluation of the expression.
     save_did_emsg = did_emsg;
     did_emsg = FALSE;
 
-    if (argvars[0].v_type == VAR_DICT)
+    যদি (argvars[0].v_type == VAR_DICT)
 	dict_filter_map(argvars[0].vval.v_dict, filtermap, type, func_name,
-						      arg_errmsg, expr, rettv);
-    else if (argvars[0].v_type == VAR_BLOB)
-	blob_filter_map(argvars[0].vval.v_blob, filtermap, expr,
+						      arg_errmsg, রাশিমালা, rettv);
+    অন্যথা যদি (argvars[0].v_type == VAR_BLOB)
+	blob_filter_map(argvars[0].vval.v_blob, filtermap, রাশিমালা,
 							    arg_errmsg, rettv);
-    else if (argvars[0].v_type == VAR_STRING)
-	string_filter_map(tv_get_string(&argvars[0]), filtermap, expr, rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
-	tuple_foreach(argvars[0].vval.v_tuple, filtermap, expr);
-    else // argvars[0].v_type == VAR_LIST
+    অন্যথা যদি (argvars[0].v_type == VAR_STRING)
+	string_filter_map(tv_get_string(&argvars[0]), filtermap, রাশিমালা, rettv);
+    অন্যথা যদি (argvars[0].v_type == VAR_TUPLE)
+	tuple_foreach(argvars[0].vval.v_tuple, filtermap, রাশিমালা);
+    অন্যথা // argvars[0].v_type == VAR_LIST
 	list_filter_map(argvars[0].vval.v_list, filtermap, type, func_name,
-						      arg_errmsg, expr, rettv);
+						      arg_errmsg, রাশিমালা, rettv);
 
-    restore_vimvar(VV_KEY, &save_key);
+    restore_vimvar(VV_চাবি, &save_চাবি);
     restore_vimvar(VV_VAL, &save_val);
 
     did_emsg |= save_did_emsg;
@@ -2921,7 +2921,7 @@ filter_map(typval_T *argvars, typval_T *rettv, filtermap_T filtermap)
 /*
  * "filter()" function
  */
-    void
+    শূন্য
 f_filter(typval_T *argvars, typval_T *rettv)
 {
     filter_map(argvars, rettv, FILTERMAP_FILTER);
@@ -2930,7 +2930,7 @@ f_filter(typval_T *argvars, typval_T *rettv)
 /*
  * "map()" function
  */
-    void
+    শূন্য
 f_map(typval_T *argvars, typval_T *rettv)
 {
     filter_map(argvars, rettv, FILTERMAP_MAP);
@@ -2939,7 +2939,7 @@ f_map(typval_T *argvars, typval_T *rettv)
 /*
  * "mapnew()" function
  */
-    void
+    শূন্য
 f_mapnew(typval_T *argvars, typval_T *rettv)
 {
     filter_map(argvars, rettv, FILTERMAP_MAPNEW);
@@ -2948,7 +2948,7 @@ f_mapnew(typval_T *argvars, typval_T *rettv)
 /*
  * "foreach()" function
  */
-    void
+    শূন্য
 f_foreach(typval_T *argvars, typval_T *rettv)
 {
     filter_map(argvars, rettv, FILTERMAP_FOREACH);
@@ -2957,17 +2957,17 @@ f_foreach(typval_T *argvars, typval_T *rettv)
 /*
  * "add(list, item)" function
  */
-    static void
+    স্থির শূন্য
 list_add(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l = argvars[0].vval.v_list;
 
-    if (l == NULL)
+    যদি (l == ফাঁকা)
     {
-	if (in_vim9script())
+	যদি (in_vim9script())
 	    emsg(_(e_cannot_add_to_null_list));
     }
-    else if (!value_check_lock(l->lv_lock,
+    অন্যথা যদি (!মান_check_lock(l->lv_lock,
 		(char_u *)N_("add() argument"), TRUE)
 	    && list_append_tv(l, &argvars[1]) == OK)
     {
@@ -2978,22 +2978,22 @@ list_add(typval_T *argvars, typval_T *rettv)
 /*
  * "add(object, item)" function
  */
-    void
+    শূন্য
 f_add(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = 1; // Default: Failed
+    rettv->vval.v_সংখ্যা = 1; // Default: Failed
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_list_or_blob_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type == VAR_BLOB
-		    && check_for_number_arg(argvars, 1) == FAIL)))
-	return;
+		    && check_for_সংখ্যা_arg(argvars, 1) == FAIL)))
+	ফেরত;
 
-    if (argvars[0].v_type == VAR_LIST)
+    যদি (argvars[0].v_type == VAR_LIST)
 	list_add(argvars, rettv);
-    else if (argvars[0].v_type == VAR_BLOB)
+    অন্যথা যদি (argvars[0].v_type == VAR_BLOB)
 	blob_add(argvars, rettv);
-    else
+    অন্যথা
 	emsg(_(e_list_or_blob_required));
 }
 
@@ -3001,89 +3001,89 @@ f_add(typval_T *argvars, typval_T *rettv)
  * Count the number of times item "needle" occurs in List "l" starting at index
  * "idx". Case is ignored if "ic" is TRUE.
  */
-    static long
-list_count(list_T *l, typval_T *needle, long idx, int ic)
+    স্থির long
+list_গুনতি(list_T *l, typval_T *needle, long idx, পূর্ণসংখ্যা ic)
 {
     long	n = 0;
     listitem_T	*li;
 
-    if (l == NULL)
-	return 0;
+    যদি (l == ফাঁকা)
+	ফেরত 0;
 
     CHECK_LIST_MATERIALIZE(l);
 
-    if (list_len(l) == 0)
-	return 0;
+    যদি (list_len(l) == 0)
+	ফেরত 0;
 
     li = list_find(l, idx);
-    if (li == NULL)
+    যদি (li == ফাঁকা)
     {
-	semsg(_(e_list_index_out_of_range_nr), idx);
-	return 0;
+	semsg(_(e_list_সূচক_out_of_range_nr), idx);
+	ফেরত 0;
     }
 
-    for ( ; li != NULL; li = li->li_next)
-	if (tv_equal(&li->li_tv, needle, ic))
+    জন্য ( ; li != ফাঁকা; li = li->li_পরবর্তী)
+	যদি (tv_equal(&li->li_tv, needle, ic))
 	    ++n;
 
-    return n;
+    ফেরত n;
 }
 
 /*
  * "count()" function
  */
-    void
-f_count(typval_T *argvars, typval_T *rettv)
+    শূন্য
+f_গুনতি(typval_T *argvars, typval_T *rettv)
 {
     long	n = 0;
-    int		ic = FALSE;
-    int		error = FALSE;
+    পূর্ণসংখ্যা		ic = FALSE;
+    পূর্ণসংখ্যা		error = FALSE;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_list_tuple_or_dict_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 3) == FAIL)))
-	return;
+		    && check_for_opt_সংখ্যা_arg(argvars, 3) == FAIL)))
+	ফেরত;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
-	ic = (int)tv_get_bool_chk(&argvars[2], &error);
+    যদি (argvars[2].v_type != VAR_UNKNOWN)
+	ic = (পূর্ণসংখ্যা)tv_get_bool_chk(&argvars[2], &error);
 
-    if (!error && argvars[0].v_type == VAR_STRING)
-	n = string_count(argvars[0].vval.v_string,
+    যদি (!error && argvars[0].v_type == VAR_STRING)
+	n = string_গুনতি(argvars[0].vval.v_string,
 					tv_get_string_chk(&argvars[1]), ic);
-    else if (!error && argvars[0].v_type == VAR_LIST)
+    অন্যথা যদি (!error && argvars[0].v_type == VAR_LIST)
     {
 	long idx = 0;
 
-	if (argvars[2].v_type != VAR_UNKNOWN
+	যদি (argvars[2].v_type != VAR_UNKNOWN
 		&& argvars[3].v_type != VAR_UNKNOWN)
-	    idx = (long)tv_get_number_chk(&argvars[3], &error);
-	if (!error)
-	    n = list_count(argvars[0].vval.v_list, &argvars[1], idx, ic);
+	    idx = (long)tv_get_সংখ্যা_chk(&argvars[3], &error);
+	যদি (!error)
+	    n = list_গুনতি(argvars[0].vval.v_list, &argvars[1], idx, ic);
     }
-    else if (!error && argvars[0].v_type == VAR_TUPLE)
+    অন্যথা যদি (!error && argvars[0].v_type == VAR_TUPLE)
     {
 	long idx = 0;
 
-	if (argvars[2].v_type != VAR_UNKNOWN
+	যদি (argvars[2].v_type != VAR_UNKNOWN
 		&& argvars[3].v_type != VAR_UNKNOWN)
-	    idx = (long)tv_get_number_chk(&argvars[3], &error);
-	if (!error)
-	    n = tuple_count(argvars[0].vval.v_tuple, &argvars[1], idx, ic);
+	    idx = (long)tv_get_সংখ্যা_chk(&argvars[3], &error);
+	যদি (!error)
+	    n = tuple_গুনতি(argvars[0].vval.v_tuple, &argvars[1], idx, ic);
     }
-    else if (!error && argvars[0].v_type == VAR_DICT)
+    অন্যথা যদি (!error && argvars[0].v_type == VAR_DICT)
     {
-	if (argvars[2].v_type != VAR_UNKNOWN
+	যদি (argvars[2].v_type != VAR_UNKNOWN
 		&& argvars[3].v_type != VAR_UNKNOWN)
 	    emsg(_(e_invalid_argument));
-	else
-	    n = dict_count(argvars[0].vval.v_dict, &argvars[1], ic);
+	অন্যথা
+	    n = dict_গুনতি(argvars[0].vval.v_dict, &argvars[1], ic);
     }
-    else if (!error)
+    অন্যথা যদি (!error)
 	semsg(_(e_argument_of_str_must_be_list_string_or_dictionary),
 								    "count()");
-    rettv->vval.v_number = n;
+    rettv->vval.v_সংখ্যা = n;
 }
 
 /*
@@ -3091,76 +3091,76 @@ f_count(typval_T *argvars, typval_T *rettv)
  * argvars[3] and return the resulting list in "rettv".  "is_new" is TRUE for
  * extendnew().
  */
-    static void
+    স্থির শূন্য
 list_extend_func(
 	typval_T	*argvars,
 	type_T		*type,
-	char		*func_name,
+	অক্ষর		*func_name,
 	char_u		*arg_errmsg,
-	int		is_new,
+	পূর্ণসংখ্যা		is_new,
 	typval_T	*rettv)
 {
     list_T	*l1, *l2;
     listitem_T	*item;
     long	before;
-    int		error = FALSE;
+    পূর্ণসংখ্যা		error = FALSE;
 
     l1 = argvars[0].vval.v_list;
-    if (l1 == NULL)
+    যদি (l1 == ফাঁকা)
     {
 	emsg(_(e_cannot_extend_null_list));
-	return;
+	ফেরত;
     }
-    if (is_new || !value_check_lock(l1->lv_lock, arg_errmsg, TRUE))
+    যদি (is_new || !মান_check_lock(l1->lv_lock, arg_errmsg, TRUE))
     {
-	if (is_new)
+	যদি (is_new)
 	{
 	    l1 = list_copy(l1, FALSE, TRUE, get_copyID());
-	    if (l1 == NULL)
-		return;
+	    যদি (l1 == ফাঁকা)
+		ফেরত;
 	}
 
 	l2 = argvars[1].vval.v_list;
-	if (l2 == NULL)
-	    goto theend;
+	যদি (l2 == ফাঁকা)
+	    যাও theend;
 
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	যদি (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    before = (long)tv_get_number_chk(&argvars[2], &error);
-	    if (error)
-		goto cleanup;		// type error; errmsg already given
-	    if (before == l1->lv_len)
-		item = NULL;
-	    else
+	    before = (long)tv_get_সংখ্যা_chk(&argvars[2], &error);
+	    যদি (error)
+		যাও cleanup;		// type error; errmsg already given
+	    যদি (before == l1->lv_len)
+		item = ফাঁকা;
+	    অন্যথা
 	    {
 		item = list_find(l1, before);
-		if (item == NULL)
+		যদি (item == ফাঁকা)
 		{
-		    semsg(_(e_list_index_out_of_range_nr), before);
-		    goto cleanup;
+		    semsg(_(e_list_সূচক_out_of_range_nr), before);
+		    যাও cleanup;
 		}
 	    }
 	}
-	else
-	    item = NULL;
-	if (type != NULL && check_typval_arg_type(
+	অন্যথা
+	    item = ফাঁকা;
+	যদি (type != ফাঁকা && check_typval_arg_type(
 		    type, &argvars[1], func_name, 2) == FAIL)
-	    goto cleanup;
+	    যাও cleanup;
 	list_extend(l1, l2, item);
 
 theend:
-	if (is_new)
+	যদি (is_new)
 	{
 	    rettv->v_type = VAR_LIST;
 	    rettv->vval.v_list = l1;
 	    rettv->v_lock = FALSE;
 	}
-	else
+	অন্যথা
 	    copy_tv(&argvars[0], rettv);
-	return;
+	ফেরত;
 
 cleanup:
-	if (is_new)
+	যদি (is_new)
 	    list_unref(l1);
     }
 }
@@ -3168,31 +3168,31 @@ cleanup:
 /*
  * "extend()" or "extendnew()" function.  "is_new" is TRUE for extendnew().
  */
-    static void
-extend(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg, int is_new)
+    স্থির শূন্য
+extend(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg, পূর্ণসংখ্যা is_new)
 {
-    type_T	*type = NULL;
-    char	*func_name = is_new ? "extendnew()" : "extend()";
+    type_T	*type = ফাঁকা;
+    অক্ষর	*func_name = is_new ? "extendnew()" : "extend()";
 
-    if (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_LIST)
+    যদি (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_LIST)
     {
 	// Check that extend() does not change the type of the list if it was
 	// declared.
-	if (!is_new && in_vim9script() && argvars[0].vval.v_list != NULL)
+	যদি (!is_new && in_vim9script() && argvars[0].vval.v_list != ফাঁকা)
 	    type = argvars[0].vval.v_list->lv_type;
 	list_extend_func(argvars, type, func_name, arg_errmsg, is_new, rettv);
     }
-    else if (argvars[0].v_type == VAR_DICT && argvars[1].v_type == VAR_DICT)
+    অন্যথা যদি (argvars[0].v_type == VAR_DICT && argvars[1].v_type == VAR_DICT)
     {
 	// Check that extend() does not change the type of the dict if it was
 	// declared.
-	if (!is_new && in_vim9script() && argvars[0].vval.v_dict != NULL)
+	যদি (!is_new && in_vim9script() && argvars[0].vval.v_dict != ফাঁকা)
 	    type = argvars[0].vval.v_dict->dv_type;
 	dict_extend_func(argvars, type, func_name, arg_errmsg, is_new, rettv);
     }
-    else if (argvars[0].v_type == VAR_BLOB && argvars[1].v_type == VAR_BLOB)
+    অন্যথা যদি (argvars[0].v_type == VAR_BLOB && argvars[1].v_type == VAR_BLOB)
 	blob_extend_func(argvars, arg_errmsg, is_new, rettv);
-    else
+    অন্যথা
 	semsg(_(e_argument_of_str_must_be_list_dictionary_or_blob), func_name);
 }
 
@@ -3201,7 +3201,7 @@ extend(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg, int is_new)
  * "extend(dict, dict [, action])" function
  * "extend(blob, blob [, idx])" function
  */
-    void
+    শূন্য
 f_extend(typval_T *argvars, typval_T *rettv)
 {
     char_u      *errmsg = (char_u *)N_("extend() argument");
@@ -3214,7 +3214,7 @@ f_extend(typval_T *argvars, typval_T *rettv)
  * "extendnew(dict, dict [, action])" function
  * "extendnew(blob, blob [, idx])" function
  */
-    void
+    শূন্য
 f_extendnew(typval_T *argvars, typval_T *rettv)
 {
     char_u      *errmsg = (char_u *)N_("extendnew() argument");
@@ -3222,43 +3222,43 @@ f_extendnew(typval_T *argvars, typval_T *rettv)
     extend(argvars, rettv, errmsg, TRUE);
 }
 
-    static void
-list_insert_func(typval_T *argvars, typval_T *rettv)
+    স্থির শূন্য
+list_ঢোকাও_func(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l = argvars[0].vval.v_list;
     long	before = 0;
     listitem_T	*item;
-    int		error = FALSE;
+    পূর্ণসংখ্যা		error = FALSE;
 
-    if (l == NULL)
+    যদি (l == ফাঁকা)
     {
-	if (in_vim9script())
+	যদি (in_vim9script())
 	    emsg(_(e_cannot_add_to_null_list));
-	return;
+	ফেরত;
     }
 
-    if (value_check_lock(l->lv_lock, (char_u *)N_("insert() argument"), TRUE))
-	return;
+    যদি (মান_check_lock(l->lv_lock, (char_u *)N_("insert() argument"), TRUE))
+	ফেরত;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
-	before = (long)tv_get_number_chk(&argvars[2], &error);
-    if (error)
-	return;		// type error; errmsg already given
+    যদি (argvars[2].v_type != VAR_UNKNOWN)
+	before = (long)tv_get_সংখ্যা_chk(&argvars[2], &error);
+    যদি (error)
+	ফেরত;		// type error; errmsg already given
 
-    if (before == l->lv_len)
-	item = NULL;
-    else
+    যদি (before == l->lv_len)
+	item = ফাঁকা;
+    অন্যথা
     {
 	item = list_find(l, before);
-	if (item == NULL)
+	যদি (item == ফাঁকা)
 	{
-	    semsg(_(e_list_index_out_of_range_nr), before);
-	    l = NULL;
+	    semsg(_(e_list_সূচক_out_of_range_nr), before);
+	    l = ফাঁকা;
 	}
     }
-    if (l != NULL)
+    যদি (l != ফাঁকা)
     {
-	(void)list_insert_tv(l, &argvars[1], item);
+	(শূন্য)list_ঢোকাও_tv(l, &argvars[1], item);
 	copy_tv(&argvars[0], rettv);
     }
 }
@@ -3266,63 +3266,63 @@ list_insert_func(typval_T *argvars, typval_T *rettv)
 /*
  * "insert()" function
  */
-    void
-f_insert(typval_T *argvars, typval_T *rettv)
+    শূন্য
+f_ঢোকাও(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_list_or_blob_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type == VAR_BLOB
-		    && check_for_number_arg(argvars, 1) == FAIL)
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+		    && check_for_সংখ্যা_arg(argvars, 1) == FAIL)
+		|| check_for_opt_সংখ্যা_arg(argvars, 2) == FAIL))
+	ফেরত;
 
-    if (argvars[0].v_type == VAR_BLOB)
-	blob_insert_func(argvars, rettv);
-    else if (argvars[0].v_type != VAR_LIST)
+    যদি (argvars[0].v_type == VAR_BLOB)
+	blob_ঢোকাও_func(argvars, rettv);
+    অন্যথা যদি (argvars[0].v_type != VAR_LIST)
 	semsg(_(e_argument_of_str_must_be_list_or_blob), "insert()");
-    else
-	list_insert_func(argvars, rettv);
+    অন্যথা
+	list_ঢোকাও_func(argvars, rettv);
 }
 
 /*
  * "remove()" function
  */
-    void
+    শূন্য
 f_remove(typval_T *argvars, typval_T *rettv)
 {
     char_u	*arg_errmsg = (char_u *)N_("remove() argument");
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_list_or_dict_or_blob_arg(argvars, 0) == FAIL
 		|| ((argvars[0].v_type == VAR_LIST
 			|| argvars[0].v_type == VAR_BLOB)
-		    && (check_for_number_arg(argvars, 1) == FAIL
-			|| check_for_opt_number_arg(argvars, 2) == FAIL))
+		    && (check_for_সংখ্যা_arg(argvars, 1) == FAIL
+			|| check_for_opt_সংখ্যা_arg(argvars, 2) == FAIL))
 		|| (argvars[0].v_type == VAR_DICT
-		    && check_for_string_or_number_arg(argvars, 1) == FAIL)))
-	return;
+		    && check_for_string_or_সংখ্যা_arg(argvars, 1) == FAIL)))
+	ফেরত;
 
-    if (argvars[0].v_type == VAR_DICT)
+    যদি (argvars[0].v_type == VAR_DICT)
 	dict_remove(argvars, rettv, arg_errmsg);
-    else if (argvars[0].v_type == VAR_BLOB)
+    অন্যথা যদি (argvars[0].v_type == VAR_BLOB)
 	blob_remove(argvars, rettv, arg_errmsg);
-    else if (argvars[0].v_type == VAR_LIST)
+    অন্যথা যদি (argvars[0].v_type == VAR_LIST)
 	list_remove(argvars, rettv, arg_errmsg);
-    else
+    অন্যথা
 	semsg(_(e_argument_of_str_must_be_list_dictionary_or_blob), "remove()");
 }
 
-    static void
+    স্থির শূন্য
 list_reverse(list_T *l, typval_T *rettv)
 {
     listitem_T	*li, *ni;
 
     rettv_list_set(rettv, l);
-    if (l != NULL
-	    && !value_check_lock(l->lv_lock,
+    যদি (l != ফাঁকা
+	    && !মান_check_lock(l->lv_lock,
 		(char_u *)N_("reverse() argument"), TRUE))
     {
-	if (l->lv_first == &range_list_item)
+	যদি (l->lv_first == &range_list_item)
 	{
 	    varnumber_T new_start = l->lv_u.nonmat.lv_start
 		+ ((varnumber_T)l->lv_len - 1) * l->lv_u.nonmat.lv_stride;
@@ -3330,14 +3330,14 @@ list_reverse(list_T *l, typval_T *rettv)
 		- (l->lv_u.nonmat.lv_end - l->lv_u.nonmat.lv_start);
 	    l->lv_u.nonmat.lv_start = new_start;
 	    l->lv_u.nonmat.lv_stride = -l->lv_u.nonmat.lv_stride;
-	    return;
+	    ফেরত;
 	}
 	li = l->lv_u.mat.lv_last;
-	l->lv_first = l->lv_u.mat.lv_last = NULL;
+	l->lv_first = l->lv_u.mat.lv_last = ফাঁকা;
 	l->lv_len = 0;
-	while (li != NULL)
+	যখন (li != ফাঁকা)
 	{
-	    ni = li->li_prev;
+	    ni = li->li_পূর্ব;
 	    list_append(l, li);
 	    li = ni;
 	}
@@ -3348,25 +3348,25 @@ list_reverse(list_T *l, typval_T *rettv)
 /*
  * "reverse({list})" function
  */
-    void
+    শূন্য
 f_reverse(typval_T *argvars, typval_T *rettv)
 {
-    if (check_for_string_or_list_or_tuple_or_blob_arg(argvars, 0) == FAIL)
-	return;
+    যদি (check_for_string_or_list_or_tuple_or_blob_arg(argvars, 0) == FAIL)
+	ফেরত;
 
-    if (argvars[0].v_type == VAR_BLOB)
+    যদি (argvars[0].v_type == VAR_BLOB)
 	blob_reverse(argvars[0].vval.v_blob, rettv);
-    else if (argvars[0].v_type == VAR_STRING)
+    অন্যথা যদি (argvars[0].v_type == VAR_STRING)
     {
 	rettv->v_type = VAR_STRING;
-	if (argvars[0].vval.v_string != NULL)
+	যদি (argvars[0].vval.v_string != ফাঁকা)
 	    rettv->vval.v_string = reverse_text(argvars[0].vval.v_string);
-	else
-	    rettv->vval.v_string = NULL;
+	অন্যথা
+	    rettv->vval.v_string = ফাঁকা;
     }
-    else if (argvars[0].v_type == VAR_LIST)
+    অন্যথা যদি (argvars[0].v_type == VAR_LIST)
 	list_reverse(argvars[0].vval.v_list, rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
+    অন্যথা যদি (argvars[0].v_type == VAR_TUPLE)
 	tuple_reverse(argvars[0].vval.v_tuple, rettv);
 }
 
@@ -3375,100 +3375,100 @@ f_reverse(typval_T *argvars, typval_T *rettv)
  * starting with the optional initial value argvars[2] and return the result in
  * "rettv".
  */
-    static void
+    স্থির শূন্য
 list_reduce(
 	typval_T	*argvars,
-	typval_T	*expr,
+	typval_T	*রাশিমালা,
 	typval_T	*rettv)
 {
     list_T	*l = argvars[0].vval.v_list;
-    listitem_T  *li = NULL;
-    int		range_list;
-    int		range_idx = 0;
+    listitem_T  *li = ফাঁকা;
+    পূর্ণসংখ্যা		range_list;
+    পূর্ণসংখ্যা		range_idx = 0;
     varnumber_T	range_val = 0;
     typval_T	initial;
     typval_T	argv[3];
-    int		r;
-    int		called_emsg_start = called_emsg;
-    int		prev_locked;
+    পূর্ণসংখ্যা		r;
+    পূর্ণসংখ্যা		called_emsg_start = called_emsg;
+    পূর্ণসংখ্যা		পূর্ব_locked;
     funccall_T	*fc;
 
     // Using reduce on a range() uses "range_idx" and "range_val".
-    range_list = l != NULL && l->lv_first == &range_list_item;
-    if (range_list)
+    range_list = l != ফাঁকা && l->lv_first == &range_list_item;
+    যদি (range_list)
 	range_val = l->lv_u.nonmat.lv_start;
 
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    যদি (argvars[2].v_type == VAR_UNKNOWN)
     {
-	if (l == NULL || l->lv_len == 0)
+	যদি (l == ফাঁকা || l->lv_len == 0)
 	{
-	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_value), "List");
-	    return;
+	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_মান), "List");
+	    ফেরত;
 	}
-	if (range_list)
+	যদি (range_list)
 	{
-	    initial.v_type = VAR_NUMBER;
-	    initial.vval.v_number = range_val;
+	    initial.v_type = VAR_সংখ্যা;
+	    initial.vval.v_সংখ্যা = range_val;
 	    range_val += l->lv_u.nonmat.lv_stride;
 	    range_idx = 1;
 	}
-	else
+	অন্যথা
 	{
 	    initial = l->lv_first->li_tv;
-	    li = l->lv_first->li_next;
+	    li = l->lv_first->li_পরবর্তী;
 	}
     }
-    else
+    অন্যথা
     {
 	initial = argvars[2];
-	if (l != NULL && !range_list)
+	যদি (l != ফাঁকা && !range_list)
 	    li = l->lv_first;
     }
     copy_tv(&initial, rettv);
 
-    if (l == NULL)
-	return;
+    যদি (l == ফাঁকা)
+	ফেরত;
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, rettv);
+    fc = eval_রাশিমালা_get_funccal(রাশিমালা, rettv);
 
-    prev_locked = l->lv_lock;
+    পূর্ব_locked = l->lv_lock;
     l->lv_lock = VAR_FIXED;  // disallow the list changing here
 
-    while (range_list ? range_idx < l->lv_len : li != NULL)
+    যখন (range_list ? range_idx < l->lv_len : li != ফাঁকা)
     {
 	argv[0] = *rettv;
 	rettv->v_type = VAR_UNKNOWN;
 
-	if (range_list)
+	যদি (range_list)
 	{
-	    argv[1].v_type = VAR_NUMBER;
-	    argv[1].vval.v_number = range_val;
+	    argv[1].v_type = VAR_সংখ্যা;
+	    argv[1].vval.v_সংখ্যা = range_val;
 	}
-	else
+	অন্যথা
 	    argv[1] = li->li_tv;
 
-	r = eval_expr_typval(expr, TRUE, argv, 2, fc, rettv);
+	r = eval_রাশিমালা_typval(রাশিমালা, TRUE, argv, 2, fc, rettv);
 
-	if (argv[0].v_type != VAR_NUMBER && argv[0].v_type != VAR_UNKNOWN)
+	যদি (argv[0].v_type != VAR_সংখ্যা && argv[0].v_type != VAR_UNKNOWN)
 	    clear_tv(&argv[0]);
-	if (r == FAIL || called_emsg != called_emsg_start)
-	    break;
+	যদি (r == FAIL || called_emsg != called_emsg_start)
+	    বিরতি;
 
 	// advance to the next item
-	if (range_list)
+	যদি (range_list)
 	{
 	    range_val += l->lv_u.nonmat.lv_stride;
 	    ++range_idx;
 	}
-	else
-	    li = li->li_next;
+	অন্যথা
+	    li = li->li_পরবর্তী;
     }
 
-    if (fc != NULL)
+    যদি (fc != ফাঁকা)
 	remove_funccal();
 
-    l->lv_lock = prev_locked;
+    l->lv_lock = পূর্ব_locked;
 }
 
 /*
@@ -3477,59 +3477,59 @@ list_reduce(
  * "reduce(blob, { accumulator, element -> value } [, initial])"
  * "reduce(string, { accumulator, element -> value } [, initial])"
  */
-    void
+    শূন্য
 f_reduce(typval_T *argvars, typval_T *rettv)
 {
     char_u	*func_name;
 
-    if (check_for_string_or_list_or_tuple_or_blob_arg(argvars, 0) == FAIL)
-	return;
+    যদি (check_for_string_or_list_or_tuple_or_blob_arg(argvars, 0) == FAIL)
+	ফেরত;
 
-    if (argvars[1].v_type == VAR_FUNC)
+    যদি (argvars[1].v_type == VAR_FUNC)
 	func_name = argvars[1].vval.v_string;
-    else if (argvars[1].v_type == VAR_PARTIAL)
+    অন্যথা যদি (argvars[1].v_type == VAR_PARTIAL)
 	func_name = partial_name(argvars[1].vval.v_partial);
-    else
+    অন্যথা
 	func_name = tv_get_string_strict(&argvars[1]);
-    if (func_name == NULL || *func_name == NUL)
+    যদি (func_name == ফাঁকা || *func_name == NUL)
     {
 	emsg(_(e_missing_function_argument));
-	return;
+	ফেরত;
     }
 
-    if (argvars[0].v_type == VAR_LIST)
+    যদি (argvars[0].v_type == VAR_LIST)
 	list_reduce(argvars, &argvars[1], rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
+    অন্যথা যদি (argvars[0].v_type == VAR_TUPLE)
 	tuple_reduce(argvars, &argvars[1], rettv);
-    else if (argvars[0].v_type == VAR_STRING)
+    অন্যথা যদি (argvars[0].v_type == VAR_STRING)
 	string_reduce(argvars, &argvars[1], rettv);
-    else
+    অন্যথা
 	blob_reduce(argvars, &argvars[1], rettv);
 }
 
 /*
  * slice() function
  */
-    void
+    শূন্য
 f_slice(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && ((argvars[0].v_type != VAR_STRING
 		    && argvars[0].v_type != VAR_LIST
 		    && argvars[0].v_type != VAR_TUPLE
 		    && argvars[0].v_type != VAR_BLOB
 		    && check_for_list_arg(argvars, 0) == FAIL)
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+		|| check_for_সংখ্যা_arg(argvars, 1) == FAIL
+		|| check_for_opt_সংখ্যা_arg(argvars, 2) == FAIL))
+	ফেরত;
 
-    if (check_can_index(&argvars[0], TRUE, FALSE) != OK)
-	return;
+    যদি (check_can_সূচক(&argvars[0], TRUE, FALSE) != OK)
+	ফেরত;
 
     copy_tv(argvars, rettv);
-    eval_index_inner(rettv, TRUE, argvars + 1,
-	    argvars[2].v_type == VAR_UNKNOWN ? NULL : argvars + 2,
-	    TRUE, NULL, 0, FALSE);
+    eval_সূচক_inner(rettv, TRUE, argvars + 1,
+	    argvars[2].v_type == VAR_UNKNOWN ? ফাঁকা : argvars + 2,
+	    TRUE, ফাঁকা, 0, FALSE);
 }
 
 #endif // defined(FEAT_EVAL)

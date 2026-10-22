@@ -9,7 +9,7 @@
 
 // for debugging
 // #define CHECK(c, s)	do { if (c) emsg((s)); } while (0)
-#define CHECK(c, s)	do { /**/ } while (0)
+#define CHECK(c, s)	করো { /**/ } যখন (0)
 
 /*
  * memline.c: Contains the functions for appending, deleting and changing the
@@ -42,20 +42,20 @@
  *  mf_get().
  */
 
-#include "vim.h"
+#অন্তর্ভাব "vim.h"
 
-#include <time.h>
+#অন্তর্ভাব <time.h>
 
-#if defined(SASC) || defined(__amigaos4__)
+#যদি defined(SASC) || defined(__amigaos4__)
 # include <proto/dos.h>	    // for Open() and Close()
 #endif
 
-typedef struct block0		ZERO_BL;    // contents of the first block
-typedef struct pointer_block	PTR_BL;	    // contents of a pointer block
-typedef struct data_block	DATA_BL;    // contents of a data block
-typedef struct pointer_entry	PTR_EN;	    // block/line-count pair
+প্রকারলেখ কাঠামো block0		ZERO_BL;    // contents of the first block
+প্রকারলেখ কাঠামো pointer_block	PTR_BL;	    // contents of a pointer block
+প্রকারলেখ কাঠামো তথ্য_block	তথ্য_BL;    // contents of a data block
+প্রকারলেখ কাঠামো pointer_entry	PTR_EN;	    // block/line-count pair
 
-#define DATA_ID	       (('d' << 8) + 'a')   // data block id
+#define তথ্য_ID	       (('d' << 8) + 'a')   // data block id
 #define PTR_ID	       (('p' << 8) + 't')   // pointer block id
 #define BLOCK0_ID0     'b'		    // block 0 id 0
 #define BLOCK0_ID1     '0'		    // block 0 id 1
@@ -68,8 +68,8 @@ typedef struct pointer_entry	PTR_EN;	    // block/line-count pair
 #define BLOCK0_ID1_C3  'S'		    // block 0 id 1 'cm' 3
 #define BLOCK0_ID1_C4  's'		    // block 0 id 1 'cm' 4
 
-#if defined(FEAT_CRYPT)
-static const int id1_codes[] = {
+#যদি defined(FEAT_CRYPT)
+স্থির ধ্রুবক পূর্ণসংখ্যা id1_codes[] = {
     BLOCK0_ID1_C0,  // CRYPT_M_ZIP
     BLOCK0_ID1_C1,  // CRYPT_M_BF
     BLOCK0_ID1_C2,  // CRYPT_M_BF2
@@ -81,28 +81,28 @@ static const int id1_codes[] = {
 /*
  * pointer to a block, used in a pointer block
  */
-struct pointer_entry
+কাঠামো pointer_entry
 {
     blocknr_T	pe_bnum;	// block number
-    linenr_T	pe_line_count;	// number of lines in this branch
+    linenr_T	pe_সারি_গুনতি;	// number of lines in this branch
     linenr_T	pe_old_lnum;	// lnum for this block (for recovery)
-    int		pe_page_count;	// number of pages in block pe_bnum
+    পূর্ণসংখ্যা		pe_page_গুনতি;	// number of pages in block pe_bnum
 };
 
 /*
  * A pointer block contains a list of branches in the tree.
  */
-struct pointer_block
+কাঠামো pointer_block
 {
     short_u	pb_id;		// ID for pointer block: PTR_ID
-    short_u	pb_count;	// number of pointers in this block
-    short_u	pb_count_max;	// maximum value for pb_count
+    short_u	pb_গুনতি;	// number of pointers in this block
+    short_u	pb_গুনতি_max;	// maximum value for pb_count
     PTR_EN	pb_pointer[1];	// list of pointers to blocks (actually longer)
 				// followed by empty space until end of page
 };
 
 // Value for pb_count_max.
-#define PB_COUNT_MAX(mfp) (short_u)(((mfp)->mf_page_size - offsetof(PTR_BL, pb_pointer)) / sizeof(PTR_EN))
+#define PB_গুনতি_MAX(mfp) (short_u)(((mfp)->mf_page_আকার - offsetof(PTR_BL, pb_pointer)) / আকার(PTR_EN))
 
 /*
  * A data block is a leaf in the tree.
@@ -111,14 +111,14 @@ struct pointer_block
  * in the block is put at the end, the text of the second line in front of it,
  * etc. Thus the order of the lines is the opposite of the line number.
  */
-struct data_block
+কাঠামো তথ্য_block
 {
     short_u	db_id;		// ID for data block: DATA_ID
     unsigned	db_free;	// free space available
     unsigned	db_txt_start;	// byte where text starts
     unsigned	db_txt_end;	// byte just after data block
-    linenr_T	db_line_count;	// number of lines in this block
-    unsigned	db_index[1];	// index for start of line (actually bigger)
+    linenr_T	db_সারি_গুনতি;	// number of lines in this block
+    unsigned	db_সূচক[1];	// index for start of line (actually bigger)
 				// followed by empty space up to db_txt_start
 				// followed by the text in the lines until
 				// end of page
@@ -132,17 +132,17 @@ struct data_block
  * The mark has to be in this place to keep it with the correct line when other
  * lines are inserted or deleted.
  */
-#define DB_MARKED	((unsigned)1 << ((sizeof(unsigned) * 8) - 1))
-#define DB_INDEX_MASK	(~DB_MARKED)
+#define DB_MARKED	((unsigned)1 << ((আকার(unsigned) * 8) - 1))
+#define DB_সূচক_MASK	(~DB_MARKED)
 
-#define INDEX_SIZE  (sizeof(unsigned))	    // size of one db_index entry
-#define HEADER_SIZE (offsetof(DATA_BL, db_index))  // size of data block header
+#define সূচক_আকার  (আকার(unsigned))	    // size of one db_index entry
+#define HEADER_আকার (offsetof(তথ্য_BL, db_সূচক))  // size of data block header
 
-#define B0_FNAME_SIZE_ORG	900	// what it was in older versions
-#define B0_FNAME_SIZE_NOCRYPT	898	// 2 bytes used for other things
-#define B0_FNAME_SIZE_CRYPT	890	// 10 bytes used for other things
-#define B0_UNAME_SIZE		40
-#define B0_HNAME_SIZE		40
+#define B0_FNAME_আকার_ORG	900	// what it was in older versions
+#define B0_FNAME_আকার_NOCRYPT	898	// 2 bytes used for other things
+#define B0_FNAME_আকার_CRYPT	890	// 10 bytes used for other things
+#define B0_UNAME_আকার		40
+#define B0_HNAME_আকার		40
 /*
  * Restrict the numbers to 32 bits, otherwise most compilers will complain.
  * This won't detect a 64 bit machine that only swaps a byte in the top 32
@@ -165,20 +165,20 @@ struct data_block
  * different machines. b0_magic_* is used to check the byte order and size of
  * variables, because the rest of the swap file is not portable.
  */
-struct block0
+কাঠামো block0
 {
     char_u	b0_id[2];	// id for block 0: BLOCK0_ID0 and BLOCK0_ID1,
 				// BLOCK0_ID1_C0, BLOCK0_ID1_C1, etc.
     char_u	b0_version[10];	// Vim version string
-    char_u	b0_page_size[4];// number of bytes per page
+    char_u	b0_page_আকার[4];// number of bytes per page
     char_u	b0_mtime[4];	// last modification time of file
     char_u	b0_ino[4];	// inode of b0_fname
     char_u	b0_pid[4];	// process id of creator (or 0)
-    char_u	b0_uname[B0_UNAME_SIZE]; // name of user (uid if no name)
-    char_u	b0_hname[B0_HNAME_SIZE]; // host name (if it has a name)
-    char_u	b0_fname[B0_FNAME_SIZE_ORG]; // name of file being edited
+    char_u	b0_uname[B0_UNAME_আকার]; // name of user (uid if no name)
+    char_u	b0_hname[B0_HNAME_আকার]; // host name (if it has a name)
+    char_u	b0_fname[B0_FNAME_আকার_ORG]; // name of file being edited
     long	b0_magic_long;	// check for byte order of long
-    int		b0_magic_int;	// check for byte order of int
+    পূর্ণসংখ্যা		b0_magic_int;	// check for byte order of int
     short	b0_magic_short;	// check for byte order of short
     char_u	b0_magic_char;	// check for last char
 };
@@ -190,18 +190,18 @@ struct block0
  * when there is room, for very long file names it's omitted.
  */
 #define B0_DIRTY	0x55
-#define b0_dirty	b0_fname[B0_FNAME_SIZE_ORG - 1]
+#define b0_dirty	b0_fname[B0_FNAME_আকার_ORG - 1]
 
 /*
  * The b0_flags field is new in Vim 7.0.
  */
-#define b0_flags	b0_fname[B0_FNAME_SIZE_ORG - 2]
+#define b0_flags	b0_fname[B0_FNAME_আকার_ORG - 2]
 
 /*
  * Crypt seed goes here, 8 bytes.  New in Vim 7.3.
  * Without encryption these bytes may be used for 'fenc'.
  */
-#define b0_seed		b0_fname[B0_FNAME_SIZE_ORG - 2 - MF_SEED_LEN]
+#define b0_seed		b0_fname[B0_FNAME_আকার_ORG - 2 - MF_SEED_LEN]
 
 // The lowest two bits contain the fileformat.  Zero means it's not set
 // (compatible with Vim 6.x), otherwise it's EOL_UNIX + 1, EOL_DOS + 1 or
@@ -216,7 +216,7 @@ struct block0
 // When empty there is only the NUL.
 #define B0_HAS_FENC	8
 
-#define STACK_INCR	5	// nr of entries added to ml_stack at a time
+#define স্তূপ_INCR	5	// nr of entries added to ml_stack at a time
 
 /*
  * The line number where the first mark may be is remembered.
@@ -224,51 +224,51 @@ struct block0
  * (always used for the current buffer only, no buffer change possible while
  * executing a global command).
  */
-static linenr_T	lowest_marked = 0;
+স্থির linenr_T	lowest_marked = 0;
 
 /*
  * arguments for ml_find_line()
  */
 #define ML_DELETE	0x11	    // delete line
-#define ML_INSERT	0x12	    // insert line
+#define ML_ঢোকাও	0x12	    // insert line
 #define ML_FIND		0x13	    // just find the line
 #define ML_FLUSH	0x02	    // flush locked block
 #define ML_SIMPLE(x)	((x) & 0x10)  // DEL, INS or FIND
 
 // argument for ml_upd_block0()
-typedef enum {
+প্রকারলেখ গণনা {
       UB_FNAME = 0	// update timestamp and filename
     , UB_SAME_DIR       // update the B0_SAME_DIR flag
     , UB_CRYPT		// update crypt key
 } upd_block0_T;
 
 #ifdef FEAT_CRYPT
-static void ml_set_b0_crypt(buf_T *buf, ZERO_BL *b0p);
+স্থির শূন্য ml_set_b0_crypt(buf_T *buf, ZERO_BL *b0p);
 #endif
-static void ml_upd_block0(buf_T *buf, upd_block0_T what);
-static void set_b0_fname(ZERO_BL *, buf_T *buf);
-static void set_b0_dir_flag(ZERO_BL *b0p, buf_T *buf);
-static void add_b0_fenc(ZERO_BL *b0p, buf_T *buf);
-static time_t swapfile_info(char_u *);
-static int recov_file_names(char_u **, char_u *, int prepend_dot);
-static char_u *findswapname(buf_T *, char_u **, char_u *);
-static void ml_flush_line(buf_T *);
-static bhdr_T *ml_new_data(memfile_T *, int, int);
-static bhdr_T *ml_new_ptr(memfile_T *);
-static bhdr_T *ml_find_line(buf_T *, linenr_T, int);
-static int ml_add_stack(buf_T *);
-static void ml_lineadd(buf_T *, int);
-static int b0_magic_wrong(ZERO_BL *);
+স্থির শূন্য ml_upd_block0(buf_T *buf, upd_block0_T what);
+স্থির শূন্য set_b0_fname(ZERO_BL *, buf_T *buf);
+স্থির শূন্য set_b0_dir_flag(ZERO_BL *b0p, buf_T *buf);
+স্থির শূন্য add_b0_fenc(ZERO_BL *b0p, buf_T *buf);
+স্থির time_t swapfile_info(char_u *);
+স্থির পূর্ণসংখ্যা recov_file_names(char_u **, char_u *, পূর্ণসংখ্যা prepend_dot);
+স্থির char_u *findswapname(buf_T *, char_u **, char_u *);
+স্থির শূন্য ml_flush_সারি(buf_T *);
+স্থির bhdr_T *ml_new_তথ্য(memfile_T *, পূর্ণসংখ্যা, পূর্ণসংখ্যা);
+স্থির bhdr_T *ml_new_ptr(memfile_T *);
+স্থির bhdr_T *ml_find_সারি(buf_T *, linenr_T, পূর্ণসংখ্যা);
+স্থির পূর্ণসংখ্যা ml_add_স্তূপ(buf_T *);
+স্থির শূন্য ml_lineadd(buf_T *, পূর্ণসংখ্যা);
+স্থির পূর্ণসংখ্যা b0_magic_wrong(ZERO_BL *);
 #ifdef CHECK_INODE
-static int fnamecmp_ino(char_u *, char_u *, long);
+স্থির পূর্ণসংখ্যা fnamecmp_ino(char_u *, char_u *, long);
 #endif
-static void long_to_char(long, char_u *);
-static long char_to_long(char_u *);
+স্থির শূন্য long_to_char(long, char_u *);
+স্থির long char_to_long(char_u *);
 #ifdef FEAT_CRYPT
-static cryptstate_T *ml_crypt_prepare(memfile_T *mfp, off_T offset, int reading);
+স্থির cryptstate_T *ml_crypt_prepare(memfile_T *mfp, off_T offset, পূর্ণসংখ্যা reading);
 #endif
 #ifdef FEAT_BYTEOFF
-static void ml_updatechunk(buf_T *buf, long line, long len, int updtype);
+স্থির শূন্য ml_updatechunk(buf_T *buf, long সারি, long len, পূর্ণসংখ্যা updtype);
 #endif
 
 /*
@@ -276,86 +276,86 @@ static void ml_updatechunk(buf_T *buf, long line, long len, int updtype);
  *
  * Return FAIL for failure, OK otherwise.
  */
-    int
+    পূর্ণসংখ্যা
 ml_open(buf_T *buf)
 {
     memfile_T	*mfp;
-    bhdr_T	*hp = NULL;
+    bhdr_T	*hp = ফাঁকা;
     ZERO_BL	*b0p;
     PTR_BL	*pp;
-    DATA_BL	*dp;
+    তথ্য_BL	*dp;
 
     /*
      * init fields in memline struct
      */
-    buf->b_ml.ml_stack_size = 0; // no stack yet
-    buf->b_ml.ml_stack = NULL;	// no stack yet
-    buf->b_ml.ml_stack_top = 0;	// nothing in the stack
-    buf->b_ml.ml_locked = NULL;	// no cached block
-    buf->b_ml.ml_line_lnum = 0;	// no cached line
+    buf->b_ml.ml_স্তূপ_আকার = 0; // no stack yet
+    buf->b_ml.ml_স্তূপ = ফাঁকা;	// no stack yet
+    buf->b_ml.ml_স্তূপ_শীর্ষ = 0;	// nothing in the stack
+    buf->b_ml.ml_locked = ফাঁকা;	// no cached block
+    buf->b_ml.ml_সারি_lnum = 0;	// no cached line
 #ifdef FEAT_BYTEOFF
-    buf->b_ml.ml_chunksize = NULL;
+    buf->b_ml.ml_chunksize = ফাঁকা;
     buf->b_ml.ml_usedchunks = 0;
 #endif
 
-    if (cmdmod.cmod_flags & CMOD_NOSWAPFILE)
+    যদি (cmdmod.cmod_flags & CMOD_NOSWAPFILE)
 	buf->b_p_swf = FALSE;
 
     /*
      * When 'updatecount' is non-zero swap file may be opened later.
      */
-    if (p_uc && buf->b_p_swf)
+    যদি (p_uc && buf->b_p_swf)
 	buf->b_may_swap = true;
-    else
+    অন্যথা
 	buf->b_may_swap = false;
 
     /*
      * Open the memfile.  No swap file is created yet.
      */
-    mfp = mf_open(NULL, 0);
-    if (mfp == NULL)
-	goto error;
+    mfp = mf_open(ফাঁকা, 0);
+    যদি (mfp == ফাঁকা)
+	যাও error;
 
     buf->b_ml.ml_mfp = mfp;
 #ifdef FEAT_CRYPT
-    mfp->mf_buffer = buf;
+    mfp->mf_বাফার = buf;
 #endif
     buf->b_ml.ml_flags = ML_EMPTY;
-    buf->b_ml.ml_line_count = 1;
+    buf->b_ml.ml_সারি_গুনতি = 1;
 
 /*
  * fill block0 struct and write page 0
  */
-    if ((hp = mf_new(mfp, FALSE, 1)) == NULL)
-	goto error;
-    if (hp->bh_bnum != 0)
+    যদি ((hp = mf_new(mfp, FALSE, 1)) == ফাঁকা)
+	যাও error;
+    যদি (hp->bh_bnum != 0)
     {
 	iemsg(e_didnt_get_block_nr_zero);
-	goto error;
+	যাও error;
     }
-    b0p = (ZERO_BL *)(hp->bh_data);
+    b0p = (ZERO_BL *)(hp->bh_তথ্য);
 
     b0p->b0_id[0] = BLOCK0_ID0;
     b0p->b0_id[1] = BLOCK0_ID1;
     b0p->b0_magic_long = (long)B0_MAGIC_LONG;
-    b0p->b0_magic_int = (int)B0_MAGIC_INT;
+    b0p->b0_magic_int = (পূর্ণসংখ্যা)B0_MAGIC_INT;
     b0p->b0_magic_short = (short)B0_MAGIC_SHORT;
     b0p->b0_magic_char = B0_MAGIC_CHAR;
     mch_memmove(b0p->b0_version, "VIM ", 4);
     STRNCPY(b0p->b0_version + 4, Version, 6);
-    long_to_char((long)mfp->mf_page_size, b0p->b0_page_size);
+    long_to_char((long)mfp->mf_page_আকার, b0p->b0_page_আকার);
 
 #ifdef FEAT_SPELL
-    if (!buf->b_spell)
+    যদি (!buf->b_spell)
 #endif
     {
 	b0p->b0_dirty = buf->b_changed ? B0_DIRTY : 0;
 	b0p->b0_flags = get_fileformat(buf) + 1;
 	set_b0_fname(b0p, buf);
-	(void)get_user_name(b0p->b0_uname, B0_UNAME_SIZE);
-	b0p->b0_uname[B0_UNAME_SIZE - 1] = NUL;
-	mch_get_host_name(b0p->b0_hname, B0_HNAME_SIZE);
-	b0p->b0_hname[B0_HNAME_SIZE - 1] = NUL;
+	(শূন্য)get_user_name(b0p->b0_uname, B0_UNAME_আকার);
+	b0p->b0_uname[B0_UNAME_আকার - 1] = NUL;
+	mch_get_host_name(b0p->b0_hname, B0_HNAME_আকার);
+	b0p->b0_hname[B0_HNAME_আকার - 1] = NUL;
 	long_to_char(mch_get_pid(), b0p->b0_pid);
 #ifdef FEAT_CRYPT
 	ml_set_b0_crypt(buf, b0p);
@@ -370,94 +370,94 @@ ml_open(buf_T *buf)
      * is created.
      */
     mf_put(mfp, hp, TRUE, FALSE);
-    if (!buf->b_help && !B_SPELL(buf))
-	(void)mf_sync(mfp, 0);
+    যদি (!buf->b_help && !B_SPELL(buf))
+	(শূন্য)mf_sync(mfp, 0);
 
     /*
      * Fill in root pointer block and write page 1.
      */
-    if ((hp = ml_new_ptr(mfp)) == NULL)
-	goto error;
-    if (hp->bh_bnum != 1)
+    যদি ((hp = ml_new_ptr(mfp)) == ফাঁকা)
+	যাও error;
+    যদি (hp->bh_bnum != 1)
     {
 	iemsg(e_didnt_get_block_nr_one);
-	goto error;
+	যাও error;
     }
-    pp = (PTR_BL *)(hp->bh_data);
-    pp->pb_count = 1;
+    pp = (PTR_BL *)(hp->bh_তথ্য);
+    pp->pb_গুনতি = 1;
     pp->pb_pointer[0].pe_bnum = 2;
-    pp->pb_pointer[0].pe_page_count = 1;
+    pp->pb_pointer[0].pe_page_গুনতি = 1;
     pp->pb_pointer[0].pe_old_lnum = 1;
-    pp->pb_pointer[0].pe_line_count = 1;    // line count after insertion
+    pp->pb_pointer[0].pe_সারি_গুনতি = 1;    // line count after insertion
     mf_put(mfp, hp, TRUE, FALSE);
 
     /*
      * Allocate first data block and create an empty line 1.
      */
-    if ((hp = ml_new_data(mfp, FALSE, 1)) == NULL)
-	goto error;
-    if (hp->bh_bnum != 2)
+    যদি ((hp = ml_new_তথ্য(mfp, FALSE, 1)) == ফাঁকা)
+	যাও error;
+    যদি (hp->bh_bnum != 2)
     {
 	iemsg(e_didnt_get_block_nr_two);
-	goto error;
+	যাও error;
     }
 
-    dp = (DATA_BL *)(hp->bh_data);
-    dp->db_index[0] = --dp->db_txt_start;	// at end of block
-    dp->db_free -= 1 + INDEX_SIZE;
-    dp->db_line_count = 1;
+    dp = (তথ্য_BL *)(hp->bh_তথ্য);
+    dp->db_সূচক[0] = --dp->db_txt_start;	// at end of block
+    dp->db_free -= 1 + সূচক_আকার;
+    dp->db_সারি_গুনতি = 1;
     *((char_u *)dp + dp->db_txt_start) = NUL;	// empty line
 
-    return OK;
+    ফেরত OK;
 
 error:
-    if (mfp != NULL)
+    যদি (mfp != ফাঁকা)
     {
-	if (hp)
+	যদি (hp)
 	    mf_put(mfp, hp, FALSE, FALSE);
 	mf_close(mfp, TRUE);	    // will also free(mfp->mf_fname)
     }
-    buf->b_ml.ml_mfp = NULL;
-    return FAIL;
+    buf->b_ml.ml_mfp = ফাঁকা;
+    ফেরত FAIL;
 }
 
-#if defined(FEAT_CRYPT)
+#যদি defined(FEAT_CRYPT)
 /*
  * Swapfile encryption is not supported by XChaCha20.  If this crypt method is
  * used then disable the swapfile, to avoid plain text being written to disk,
  * and return TRUE.
  * Otherwise return FALSE.
  */
-    static int
-crypt_may_close_swapfile(buf_T *buf, char_u *key, int method)
+    স্থির পূর্ণসংখ্যা
+crypt_may_close_swapfile(buf_T *buf, char_u *চাবি, পূর্ণসংখ্যা method)
 {
-    if (crypt_method_is_sodium(method) && *key != NUL)
+    যদি (crypt_method_is_sodium(method) && *চাবি != NUL)
     {
 	mf_close_file(buf, TRUE);
 	buf->b_p_swf = FALSE;
-	return TRUE;
+	ফেরত TRUE;
     }
-    return FALSE;
+    ফেরত FALSE;
 }
 
 /*
  * Prepare encryption for "buf" for the current key and method.
  */
-    static void
+    স্থির শূন্য
 ml_set_mfp_crypt(buf_T *buf)
 {
-    if (*buf->b_p_key == NUL)
-	return;
+    যদি (*buf->b_p_চাবি == NUL)
+	ফেরত;
 
-    int method_nr = crypt_get_method_nr(buf);
+    পূর্ণসংখ্যা method_nr = crypt_get_method_nr(buf);
 
-    if (method_nr > CRYPT_M_ZIP && method_nr < CRYPT_M_SOD)
+    যদি (method_nr > CRYPT_M_ZIP && method_nr < CRYPT_M_SOD)
     {
 	// Generate a seed and store it in the memfile.
-	sha2_seed(buf->b_ml.ml_mfp->mf_seed, MF_SEED_LEN, NULL, 0);
+	sha2_seed(buf->b_ml.ml_mfp->mf_seed, MF_SEED_LEN, ফাঁকা, 0);
     }
 # ifdef FEAT_SODIUM
-    else if (crypt_method_is_sodium(method_nr))
+    অন্যথা যদি (crypt_method_is_sodium(method_nr))
 	crypt_sodium_randombytes_buf(buf->b_ml.ml_mfp->mf_seed, MF_SEED_LEN);
 # endif
 }
@@ -467,20 +467,20 @@ ml_set_mfp_crypt(buf_T *buf)
  * Note: should not be called with libsodium encryption, since xchacha20 does
  * not support swapfile encryption.
  */
-    static void
+    স্থির শূন্য
 ml_set_b0_crypt(buf_T *buf, ZERO_BL *b0p)
 {
-    if (*buf->b_p_key == NUL)
+    যদি (*buf->b_p_চাবি == NUL)
 	b0p->b0_id[1] = BLOCK0_ID1;
-    else
+    অন্যথা
     {
-	int method_nr = crypt_get_method_nr(buf);
+	পূর্ণসংখ্যা method_nr = crypt_get_method_nr(buf);
 
 	b0p->b0_id[1] = id1_codes[method_nr];
-	if (method_nr > CRYPT_M_ZIP && method_nr < CRYPT_M_SOD)
+	যদি (method_nr > CRYPT_M_ZIP && method_nr < CRYPT_M_SOD)
 	{
 	    // Generate a seed and store it in block 0 and in the memfile.
-	    sha2_seed(&b0p->b0_seed, MF_SEED_LEN, NULL, 0);
+	    sha2_seed(&b0p->b0_seed, MF_SEED_LEN, ফাঁকা, 0);
 	    mch_memmove(buf->b_ml.ml_mfp->mf_seed, &b0p->b0_seed, MF_SEED_LEN);
 	}
     }
@@ -494,57 +494,57 @@ ml_set_b0_crypt(buf_T *buf, ZERO_BL *b0p)
  * "old_cm" is the previous 'cryptmethod'.  It is equal to the current
  * 'cryptmethod' when 'key' is changed.
  */
-    void
-ml_set_crypt_key(
+    শূন্য
+ml_set_crypt_চাবি(
     buf_T	*buf,
-    char_u	*old_key,
+    char_u	*old_চাবি,
     char_u	*old_cm)
 {
     memfile_T	*mfp = buf->b_ml.ml_mfp;
     bhdr_T	*hp;
-    int		page_count;
-    int		idx;
+    পূর্ণসংখ্যা		page_গুনতি;
+    পূর্ণসংখ্যা		idx;
     long	error;
     infoptr_T	*ip;
     PTR_BL	*pp;
-    DATA_BL	*dp;
+    তথ্য_BL	*dp;
     blocknr_T	bnum;
-    int		top;
-    int		old_method;
+    পূর্ণসংখ্যা		শীর্ষ_2;
+    পূর্ণসংখ্যা		old_method;
 
-    if (mfp == NULL || mfp->mf_fd < 0)
-	return;  // no memfile yet, nothing to do
+    যদি (mfp == ফাঁকা || mfp->mf_fd < 0)
+	ফেরত;  // no memfile yet, nothing to do
     old_method = crypt_method_nr_from_name(old_cm);
 
 # ifdef FEAT_CRYPT
-    if (crypt_may_close_swapfile(buf, buf->b_p_key, crypt_get_method_nr(buf)))
-	return;
+    যদি (crypt_may_close_swapfile(buf, buf->b_p_চাবি, crypt_get_method_nr(buf)))
+	ফেরত;
 # endif
 
     // First make sure the swapfile is in a consistent state, using the old
     // key and method.
     {
-	char_u *new_key = buf->b_p_key;
+	char_u *new_চাবি = buf->b_p_চাবি;
 	char_u *new_buf_cm = buf->b_p_cm;
 
-	buf->b_p_key = old_key;
+	buf->b_p_চাবি = old_চাবি;
 	buf->b_p_cm = old_cm;
 	ml_preserve(buf, FALSE);
-	buf->b_p_key = new_key;
+	buf->b_p_চাবি = new_চাবি;
 	buf->b_p_cm = new_buf_cm;
     }
 
     // Set the key, method and seed to be used for reading, these must be the
     // old values.
-    mfp->mf_old_key = old_key;
+    mfp->mf_old_চাবি = old_চাবি;
     mfp->mf_old_cm = old_method;
-    if (old_method > 0 && *old_key != NUL)
+    যদি (old_method > 0 && *old_চাবি != NUL)
 	mch_memmove(mfp->mf_old_seed, mfp->mf_seed, MF_SEED_LEN);
 
     // Update block 0 with the crypt flag and may set a new seed.
     ml_upd_block0(buf, UB_CRYPT);
 
-    if (mfp->mf_infile_count > 2)
+    যদি (mfp->mf_infile_গুনতি > 2)
     {
 	/*
 	 * Need to read back all data blocks from disk, decrypt them with the
@@ -552,99 +552,99 @@ ml_set_crypt_key(
 	 * similar to what happens in ml_recover(), but we skip negative block
 	 * numbers.
 	 */
-	ml_flush_line(buf);		    // flush buffered line
-	(void)ml_find_line(buf, (linenr_T)0, ML_FLUSH); // flush locked block
+	ml_flush_সারি(buf);		    // flush buffered line
+	(শূন্য)ml_find_সারি(buf, (linenr_T)0, ML_FLUSH); // flush locked block
 
-	hp = NULL;
+	hp = ফাঁকা;
 	bnum = 1;		// start with block 1
-	page_count = 1;		// which is 1 page
+	page_গুনতি = 1;		// which is 1 page
 	idx = 0;		// start with first index in block 1
 	error = 0;
-	buf->b_ml.ml_stack_top = 0;
-	VIM_CLEAR(buf->b_ml.ml_stack);
-	buf->b_ml.ml_stack_size = 0;	// no stack yet
+	buf->b_ml.ml_স্তূপ_শীর্ষ = 0;
+	VIM_CLEAR(buf->b_ml.ml_স্তূপ);
+	buf->b_ml.ml_স্তূপ_আকার = 0;	// no stack yet
 
-	for ( ; !got_int; line_breakcheck())
+	জন্য ( ; !got_int; সারি_breakcheck())
 	{
-	    if (hp != NULL)
+	    যদি (hp != ফাঁকা)
 		mf_put(mfp, hp, FALSE, FALSE);	// release previous block
 
 	    // get the block (pointer or data)
-	    if ((hp = mf_get(mfp, bnum, page_count)) == NULL)
+	    যদি ((hp = mf_get(mfp, bnum, page_গুনতি)) == ফাঁকা)
 	    {
-		if (bnum == 1)
-		    break;
+		যদি (bnum == 1)
+		    বিরতি;
 		++error;
 	    }
-	    else
+	    অন্যথা
 	    {
-		pp = (PTR_BL *)(hp->bh_data);
-		if (pp->pb_id == PTR_ID)	// it is a pointer block
+		pp = (PTR_BL *)(hp->bh_তথ্য);
+		যদি (pp->pb_id == PTR_ID)	// it is a pointer block
 		{
-		    if (pp->pb_count == 0)
+		    যদি (pp->pb_গুনতি == 0)
 		    {
 			// empty block?
 			++error;
 		    }
-		    else if (idx < (int)pp->pb_count)	// go a block deeper
+		    অন্যথা যদি (idx < (পূর্ণসংখ্যা)pp->pb_গুনতি)	// go a block deeper
 		    {
-			if (pp->pb_pointer[idx].pe_bnum < 0)
+			যদি (pp->pb_pointer[idx].pe_bnum < 0)
 			{
 			    // Skip data block with negative block number.
 			    // Should not happen, because of the ml_preserve()
 			    // above. Get same block again for next index.
 			    ++idx;
-			    continue;
+			    চালু;
 			}
 
 			// going one block deeper in the tree, new entry in
-			// stack
-			if ((top = ml_add_stack(buf)) < 0)
+			//স্তূপ
+			যদি ((শীর্ষ_2 = ml_add_স্তূপ(buf)) < 0)
 			{
 			    ++error;
-			    break;		    // out of memory
+			    বিরতি;		    // out of memory
 			}
-			ip = &(buf->b_ml.ml_stack[top]);
+			ip = &(buf->b_ml.ml_স্তূপ[শীর্ষ_2]);
 			ip->ip_bnum = bnum;
-			ip->ip_index = idx;
+			ip->ip_সূচক = idx;
 
 			bnum = pp->pb_pointer[idx].pe_bnum;
-			page_count = pp->pb_pointer[idx].pe_page_count;
+			page_গুনতি = pp->pb_pointer[idx].pe_page_গুনতি;
 			idx = 0;
-			continue;
+			চালু;
 		    }
 		}
-		else	    // not a pointer block
+		অন্যথা	    // not a pointer block
 		{
-		    dp = (DATA_BL *)(hp->bh_data);
-		    if (dp->db_id != DATA_ID)	// block id wrong
+		    dp = (তথ্য_BL *)(hp->bh_তথ্য);
+		    যদি (dp->db_id != তথ্য_ID)	// block id wrong
 			++error;
-		    else
+		    অন্যথা
 		    {
 			// It is a data block, need to write it back to disk.
 			mf_put(mfp, hp, TRUE, FALSE);
-			hp = NULL;
+			hp = ফাঁকা;
 		    }
 		}
 	    }
 
-	    if (buf->b_ml.ml_stack_top == 0)	// finished
-		break;
+	    যদি (buf->b_ml.ml_স্তূপ_শীর্ষ == 0)	// finished
+		বিরতি;
 
 	    // go one block up in the tree
-	    ip = &(buf->b_ml.ml_stack[--(buf->b_ml.ml_stack_top)]);
+	    ip = &(buf->b_ml.ml_স্তূপ[--(buf->b_ml.ml_স্তূপ_শীর্ষ)]);
 	    bnum = ip->ip_bnum;
-	    idx = ip->ip_index + 1;	    // go to next index
-	    page_count = 1;
+	    idx = ip->ip_সূচক + 1;	    // go to next index
+	    page_গুনতি = 1;
 	}
-	if (hp != NULL)
+	যদি (hp != ফাঁকা)
 	    mf_put(mfp, hp, FALSE, FALSE);  // release previous block
 
-	if (error > 0)
+	যদি (error > 0)
 	    emsg(_(e_error_while_updating_swap_file_crypt));
     }
 
-    mfp->mf_old_key = NULL;
+    mfp->mf_old_চাবি = ফাঁকা;
 }
 #endif
 
@@ -652,52 +652,52 @@ ml_set_crypt_key(
  * ml_setname() is called when the file name of "buf" has been changed.
  * It may rename the swap file.
  */
-    void
+    শূন্য
 ml_setname(buf_T *buf)
 {
-    int		success = FALSE;
+    পূর্ণসংখ্যা		success = FALSE;
     memfile_T	*mfp;
     char_u	*fname;
     char_u	*dirp;
-#if defined(MSWIN)
+#যদি defined(MSWIN)
     char_u	*p;
 #endif
 
     mfp = buf->b_ml.ml_mfp;
-    if (mfp->mf_fd < 0)		    // there is no swap file yet
+    যদি (mfp->mf_fd < 0)		    // there is no swap file yet
     {
 	/*
 	 * When 'updatecount' is 0 and 'noswapfile' there is no swap file.
 	 * For help files we will make a swap file now.
 	 */
-	if (p_uc != 0 && (cmdmod.cmod_flags & CMOD_NOSWAPFILE) == 0)
+	যদি (p_uc != 0 && (cmdmod.cmod_flags & CMOD_NOSWAPFILE) == 0)
 	    ml_open_file(buf);	    // create a swap file
-	return;
+	ফেরত;
     }
 
     /*
      * Try all directories in the 'directory' option.
      */
     dirp = p_dir;
-    for (;;)
+    জন্য (;;)
     {
-	if (*dirp == NUL)	    // tried all directories, fail
-	    break;
+	যদি (*dirp == NUL)	    // tried all directories, fail
+	    বিরতি;
 	fname = findswapname(buf, &dirp, mfp->mf_fname);
 	// autocmd may have freed mfp if findswapname creates
 	// different swapfile name
-	if (buf->b_ml.ml_mfp != mfp)
+	যদি (buf->b_ml.ml_mfp != mfp)
 	{
 	    vim_free(fname);
-	    return;
+	    ফেরত;
 	}
 						    // alloc's fname
-	if (dirp == NULL)	    // out of memory
-	    break;
-	if (fname == NULL)	    // no file name found for this dir
-	    continue;
+	যদি (dirp == ফাঁকা)	    // out of memory
+	    বিরতি;
+	যদি (fname == ফাঁকা)	    // no file name found for this dir
+	    চালু;
 
-#if defined(MSWIN)
+#যদি defined(MSWIN)
 	/*
 	 * Set full pathname for swap file now, because a ":!cd dir" may
 	 * change directory without us knowing it.
@@ -705,59 +705,59 @@ ml_setname(buf_T *buf)
 	p = FullName_save(fname, FALSE);
 	vim_free(fname);
 	fname = p;
-	if (fname == NULL)
-	    continue;
+	যদি (fname == ফাঁকা)
+	    চালু;
 #endif
 	// if the file name is the same we don't have to do anything
-	if (fnamecmp(fname, mfp->mf_fname) == 0)
+	যদি (fnamecmp(fname, mfp->mf_fname) == 0)
 	{
 	    vim_free(fname);
 	    success = TRUE;
-	    break;
+	    বিরতি;
 	}
 	// need to close the swap file before renaming
-	if (mfp->mf_fd >= 0)
+	যদি (mfp->mf_fd >= 0)
 	{
 	    close(mfp->mf_fd);
 	    mfp->mf_fd = -1;
 	}
 
 	// try to rename the swap file
-	if (vim_rename(mfp->mf_fname, fname) == 0)
+	যদি (vim_rename(mfp->mf_fname, fname) == 0)
 	{
 	    success = TRUE;
 	    vim_free(mfp->mf_fname);
 	    mfp->mf_fname = fname;
 	    vim_free(mfp->mf_ffname);
-#if defined(MSWIN)
-	    mfp->mf_ffname = NULL;  // mf_fname is full pathname already
-#else
+#যদি defined(MSWIN)
+	    mfp->mf_ffname = ফাঁকা;  // mf_fname is full pathname already
+#অন্যথা
 	    mf_set_ffname(mfp);
 #endif
 	    ml_upd_block0(buf, UB_SAME_DIR);
-	    break;
+	    বিরতি;
 	}
 	vim_free(fname);	    // this fname didn't work, try another
     }
 
-    if (mfp->mf_fd == -1)	    // need to (re)open the swap file
+    যদি (mfp->mf_fd == -1)	    // need to (re)open the swap file
     {
-	mfp->mf_fd = mch_open((char *)mfp->mf_fname, O_RDWR | O_EXTRA, 0);
-	if (mfp->mf_fd < 0)
+	mfp->mf_fd = mch_open((অক্ষর *)mfp->mf_fname, O_RDWR | O_EXTRA, 0);
+	যদি (mfp->mf_fd < 0)
 	{
 	    // could not (re)open the swap file, what can we do????
 	    emsg(_(e_oops_lost_the_swap_file));
-	    return;
+	    ফেরত;
 	}
 #ifdef HAVE_FD_CLOEXEC
 	{
-	    int fdflags = fcntl(mfp->mf_fd, F_GETFD);
-	    if (fdflags >= 0 && (fdflags & FD_CLOEXEC) == 0)
-		(void)fcntl(mfp->mf_fd, F_SETFD, fdflags | FD_CLOEXEC);
+	    পূর্ণসংখ্যা fdflags = fcntl(mfp->mf_fd, F_GETFD);
+	    যদি (fdflags >= 0 && (fdflags & FD_CLOEXEC) == 0)
+		(শূন্য)fcntl(mfp->mf_fd, F_SETFD, fdflags | FD_CLOEXEC);
 	}
 #endif
     }
-    if (!success)
+    যদি (!success)
 	emsg(_(e_could_not_rename_swap_file));
 }
 
@@ -766,13 +766,13 @@ ml_setname(buf_T *buf)
  * been modified.
  * Used when 'updatecount' changes from zero to non-zero.
  */
-    void
-ml_open_files(void)
+    শূন্য
+ml_open_files(শূন্য)
 {
     buf_T	*buf;
 
     FOR_ALL_BUFFERS(buf)
-	if (!buf->b_p_ro || buf->b_changed)
+	যদি (!buf->b_p_ro || buf->b_changed)
 	    ml_open_file(buf);
 }
 
@@ -781,7 +781,7 @@ ml_open_files(void)
  * If we are unable to find a file name, mf_fname will be NULL
  * and the memfile will be in memory only (no recovery possible).
  */
-    void
+    শূন্য
 ml_open_file(buf_T *buf)
 {
     memfile_T	*mfp;
@@ -789,19 +789,19 @@ ml_open_file(buf_T *buf)
     char_u	*dirp;
 
     mfp = buf->b_ml.ml_mfp;
-    if (mfp == NULL || mfp->mf_fd >= 0 || !buf->b_p_swf
+    যদি (mfp == ফাঁকা || mfp->mf_fd >= 0 || !buf->b_p_swf
 				      || (cmdmod.cmod_flags & CMOD_NOSWAPFILE))
-	return;		// nothing to do
+	ফেরত;		// nothing to do
 
 #ifdef FEAT_SPELL
     // For a spell buffer use a temp file name.
-    if (buf->b_spell)
+    যদি (buf->b_spell)
     {
 	fname = vim_tempname('s', FALSE);
-	if (fname != NULL)
-	    (void)mf_open_file(mfp, fname);	// consumes fname!
+	যদি (fname != ফাঁকা)
+	    (শূন্য)mf_open_file(mfp, fname);	// consumes fname!
 	buf->b_may_swap = false;
-	return;
+	ফেরত;
     }
 #endif
 
@@ -809,29 +809,29 @@ ml_open_file(buf_T *buf)
      * Try all directories in 'directory' option.
      */
     dirp = p_dir;
-    for (;;)
+    জন্য (;;)
     {
-	if (*dirp == NUL)
-	    break;
+	যদি (*dirp == NUL)
+	    বিরতি;
 	// There is a small chance that between choosing the swap file name
 	// and creating it, another Vim creates the file.  In that case the
 	// creation will fail and we will use another directory.
-	fname = findswapname(buf, &dirp, NULL); // allocates fname
+	fname = findswapname(buf, &dirp, ফাঁকা); // allocates fname
 	// autocmd may have freed mfp, grr!
-	if (buf->b_ml.ml_mfp != mfp)
+	যদি (buf->b_ml.ml_mfp != mfp)
 	{
 	    vim_free(fname);
-	    return;
+	    ফেরত;
 	}
-	if (dirp == NULL)
-	    break;  // out of memory
-	if (fname == NULL)
-	    continue;
-	if (mf_open_file(mfp, fname) == OK)	// consumes fname!
+	যদি (dirp == ফাঁকা)
+	    বিরতি;  // out of memory
+	যদি (fname == ফাঁকা)
+	    চালু;
+	যদি (mf_open_file(mfp, fname) == OK)	// consumes fname!
 	{
 	    // don't sync yet in ml_sync_all()
 	    mfp->mf_dirty = MF_DIRTY_YES_NOSYNC;
-#if defined(MSWIN)
+#যদি defined(MSWIN)
 	    /*
 	     * set full pathname for swap file now, because a ":!cd dir" may
 	     * change directory without us knowing it.
@@ -841,25 +841,25 @@ ml_open_file(buf_T *buf)
 	    ml_upd_block0(buf, UB_SAME_DIR);
 
 	    // Flush block zero, so others can read it
-	    if (mf_sync(mfp, MFS_ZERO) == OK)
+	    যদি (mf_sync(mfp, MFS_ZERO) == OK)
 	    {
 		// Mark all blocks that should be in the swapfile as dirty.
 		// Needed for when the 'swapfile' option was reset, so that
 		// the swap file was deleted, and then on again.
 		mf_set_dirty(mfp);
-		break;
+		বিরতি;
 	    }
 	    // Writing block 0 failed: close the file and try another dir
 	    mf_close_file(buf, FALSE);
 	}
     }
 
-    if (*p_dir != NUL && mfp->mf_fname == NULL)
+    যদি (*p_dir != NUL && mfp->mf_fname == ফাঁকা)
     {
 	need_wait_return = TRUE;	// call wait_return() later
 	++no_wait_return;
-	(void)semsg(_(e_unable_to_open_swap_file_for_str_recovery_impossible),
-		    buf_spname(buf) != NULL ? buf_spname(buf) : buf->b_fname);
+	(শূন্য)semsg(_(e_unable_to_open_swap_file_for_str_recovery_impossible),
+		    buf_spname(buf) != ফাঁকা ? buf_spname(buf) : buf->b_fname);
 	--no_wait_return;
     }
 
@@ -871,35 +871,35 @@ ml_open_file(buf_T *buf)
  * If still need to create a swap file, and starting to edit a not-readonly
  * file, or reading into an existing buffer, create a swap file now.
  */
-    void
+    শূন্য
 check_need_swap(
-    int	    newfile)		// reading file into new buffer
+    পূর্ণসংখ্যা	    newfile)		// reading file into new buffer
 {
-    int old_msg_silent = msg_silent; // might be reset by an E325 message
+    পূর্ণসংখ্যা old_বার্তা_silent = বার্তা_silent; // might be reset by an E325 message
 
-    if (curbuf->b_may_swap && (!curbuf->b_p_ro || !newfile))
+    যদি (curbuf->b_may_swap && (!curbuf->b_p_ro || !newfile))
 	ml_open_file(curbuf);
-    msg_silent = old_msg_silent;
+    বার্তা_silent = old_বার্তা_silent;
 }
 
 /*
  * Close memline for buffer 'buf'.
  * If 'del_file' is TRUE, delete the swap file
  */
-    void
-ml_close(buf_T *buf, int del_file)
+    শূন্য
+ml_close(buf_T *buf, পূর্ণসংখ্যা del_file)
 {
-    if (buf->b_ml.ml_mfp == NULL)		// not open
-	return;
+    যদি (buf->b_ml.ml_mfp == ফাঁকা)		// not open
+	ফেরত;
     mf_close(buf->b_ml.ml_mfp, del_file);	// close the .swp file
-    if (buf->b_ml.ml_line_lnum != 0
-		      && (buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED)))
-	vim_free(buf->b_ml.ml_line_ptr);
-    vim_free(buf->b_ml.ml_stack);
+    যদি (buf->b_ml.ml_সারি_lnum != 0
+		      && (buf->b_ml.ml_flags & (ML_সারি_DIRTY | ML_ALLOCATED)))
+	vim_free(buf->b_ml.ml_সারি_ptr);
+    vim_free(buf->b_ml.ml_স্তূপ);
 #ifdef FEAT_BYTEOFF
     VIM_CLEAR(buf->b_ml.ml_chunksize);
 #endif
-    buf->b_ml.ml_mfp = NULL;
+    buf->b_ml.ml_mfp = ফাঁকা;
 
     // Reset the "recovered" flag, give the ATTENTION prompt the next time
     // this buffer is loaded.
@@ -912,14 +912,14 @@ ml_close(buf_T *buf, int del_file)
  * When 'del_file' is TRUE, delete the memfiles.
  * But don't delete files that were ":preserve"d when we are POSIX compatible.
  */
-    void
-ml_close_all(int del_file)
+    শূন্য
+ml_close_all(পূর্ণসংখ্যা del_file)
 {
     buf_T	*buf;
 
     FOR_ALL_BUFFERS(buf)
 	ml_close(buf, del_file && ((buf->b_flags & BF_PRESERVED) == 0
-				 || vim_strchr(p_cpo, CPO_PRESERVE) == NULL));
+				 || vim_strchr(p_cpo, CPO_PRESERVE) == ফাঁকা));
 #ifdef FEAT_SPELL
     spell_delete_wordlist();	// delete the internal wordlist
 #endif
@@ -932,13 +932,13 @@ ml_close_all(int del_file)
  * Close all memfiles for not modified buffers.
  * Only use just before exiting!
  */
-    void
-ml_close_notmod(void)
+    শূন্য
+ml_close_notmod(শূন্য)
 {
     buf_T	*buf;
 
     FOR_ALL_BUFFERS(buf)
-	if (!bufIsChanged(buf))
+	যদি (!bufIsChanged(buf))
 	    ml_close(buf, TRUE);    // close all not-modified buffers
 }
 
@@ -946,7 +946,7 @@ ml_close_notmod(void)
  * Update the timestamp in the .swp file.
  * Used when the file has been written.
  */
-    void
+    শূন্য
 ml_timestamp(buf_T *buf)
 {
     ml_upd_block0(buf, UB_FNAME);
@@ -955,10 +955,10 @@ ml_timestamp(buf_T *buf)
 /*
  * Return FAIL when the ID of "b0p" is wrong.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 ml_check_b0_id(ZERO_BL *b0p)
 {
-    if (b0p->b0_id[0] != BLOCK0_ID0
+    যদি (b0p->b0_id[0] != BLOCK0_ID0
 	    || (b0p->b0_id[1] != BLOCK0_ID1
 		&& b0p->b0_id[1] != BLOCK0_ID1_C0
 		&& b0p->b0_id[1] != BLOCK0_ID1_C1
@@ -966,14 +966,14 @@ ml_check_b0_id(ZERO_BL *b0p)
 		&& b0p->b0_id[1] != BLOCK0_ID1_C3
 		&& b0p->b0_id[1] != BLOCK0_ID1_C4)
 	    )
-	return FAIL;
-    return OK;
+	ফেরত FAIL;
+    ফেরত OK;
 }
 
 /*
  * Update the timestamp or the B0_SAME_DIR flag of the .swp file.
  */
-    static void
+    স্থির শূন্য
 ml_upd_block0(buf_T *buf, upd_block0_T what)
 {
     memfile_T	*mfp;
@@ -981,31 +981,31 @@ ml_upd_block0(buf_T *buf, upd_block0_T what)
     ZERO_BL	*b0p;
 
     mfp = buf->b_ml.ml_mfp;
-    if (mfp == NULL)
-	return;
+    যদি (mfp == ফাঁকা)
+	ফেরত;
     hp = mf_get(mfp, (blocknr_T)0, 1);
-    if (hp == NULL)
+    যদি (hp == ফাঁকা)
     {
 #ifdef FEAT_CRYPT
 	// Possibly update the seed in the memfile before there is a block0.
-	if (what == UB_CRYPT)
+	যদি (what == UB_CRYPT)
 	    ml_set_mfp_crypt(buf);
 #endif
-	return;
+	ফেরত;
     }
 
-    b0p = (ZERO_BL *)(hp->bh_data);
-    if (ml_check_b0_id(b0p) == FAIL)
+    b0p = (ZERO_BL *)(hp->bh_তথ্য);
+    যদি (ml_check_b0_id(b0p) == FAIL)
 	iemsg(e_ml_upd_block0_didnt_get_block_zero);
-    else
+    অন্যথা
     {
-	if (what == UB_FNAME)
+	যদি (what == UB_FNAME)
 	    set_b0_fname(b0p, buf);
 #ifdef FEAT_CRYPT
-	else if (what == UB_CRYPT)
+	অন্যথা যদি (what == UB_CRYPT)
 	    ml_set_b0_crypt(buf, b0p);
 #endif
-	else // what == UB_SAME_DIR
+	অন্যথা // what == UB_SAME_DIR
 	    set_b0_dir_flag(b0p, buf);
     }
     mf_put(mfp, hp, TRUE, FALSE);
@@ -1016,26 +1016,26 @@ ml_upd_block0(buf_T *buf, upd_block0_T what)
  * Also set buf->b_mtime.
  * Don't use NameBuff[]!!!
  */
-    static void
+    স্থির শূন্য
 set_b0_fname(ZERO_BL *b0p, buf_T *buf)
 {
     stat_T	st;
 
-    if (buf->b_ffname == NULL)
+    যদি (buf->b_ffname == ফাঁকা)
 	b0p->b0_fname[0] = NUL;
-    else
+    অন্যথা
     {
-#if defined(MSWIN) || defined(AMIGA)
+#যদি defined(MSWIN) || defined(AMIGA)
 	// Systems that cannot translate "~user" back into a path: copy the
 	// file name unmodified.  Do use slashes instead of backslashes for
 	// portability.
-	vim_strncpy(b0p->b0_fname, buf->b_ffname, B0_FNAME_SIZE_CRYPT - 1);
+	vim_strncpy(b0p->b0_fname, buf->b_ffname, B0_FNAME_আকার_CRYPT - 1);
 # ifdef BACKSLASH_IN_FILENAME
 	forward_slash(b0p->b0_fname);
 # endif
-#else
+#অন্যথা
 	size_t	flen;
-	char_u	uname[B0_UNAME_SIZE];
+	char_u	uname[B0_UNAME_আকার];
 
 	/*
 	 * For a file under the home directory of the current user, we try to
@@ -1044,25 +1044,25 @@ set_b0_fname(ZERO_BL *b0p, buf_T *buf)
 	 * First replace home dir path with "~/" with home_replace().
 	 * Then insert the user name to get "~user/".
 	 */
-	flen = home_replace(NULL, buf->b_ffname, b0p->b0_fname,
-						   B0_FNAME_SIZE_CRYPT, TRUE);
-	if (b0p->b0_fname[0] == '~')
+	flen = home_replace(ফাঁকা, buf->b_ffname, b0p->b0_fname,
+						   B0_FNAME_আকার_CRYPT, TRUE);
+	যদি (b0p->b0_fname[0] == '~')
 	{
 	    size_t  ulen;
 
 	    // If there is no user name or it is too long, don't use "~/"
-	    if (get_user_name(uname, B0_UNAME_SIZE) == FAIL
-		   || (ulen = STRLEN(uname)) + flen > B0_FNAME_SIZE_CRYPT - 1)
+	    যদি (get_user_name(uname, B0_UNAME_আকার) == FAIL
+		   || (ulen = STRLEN(uname)) + flen > B0_FNAME_আকার_CRYPT - 1)
 		vim_strncpy(b0p->b0_fname, buf->b_ffname,
-						     B0_FNAME_SIZE_CRYPT - 1);
-	    else
+						     B0_FNAME_আকার_CRYPT - 1);
+	    অন্যথা
 	    {
 		mch_memmove(b0p->b0_fname + ulen + 1, b0p->b0_fname + 1, flen);
 		mch_memmove(b0p->b0_fname + 1, uname, ulen);
 	    }
 	}
 #endif
-	if (mch_stat((char *)buf->b_ffname, &st) >= 0)
+	যদি (mch_stat((অক্ষর *)buf->b_ffname, &st) >= 0)
 	{
 	    long_to_char((long)st.st_mtime, b0p->b0_mtime);
 #ifdef CHECK_INODE
@@ -1072,7 +1072,7 @@ set_b0_fname(ZERO_BL *b0p, buf_T *buf)
 	    buf->b_mtime_read = buf->b_mtime;
 	    buf->b_mtime_read_ns = buf->b_mtime_ns;
 	}
-	else
+	অন্যথা
 	{
 	    long_to_char(0L, b0p->b0_mtime);
 #ifdef CHECK_INODE
@@ -1082,7 +1082,7 @@ set_b0_fname(ZERO_BL *b0p, buf_T *buf)
 	    buf->b_mtime_ns = 0;
 	    buf->b_mtime_read = 0;
 	    buf->b_mtime_read_ns = 0;
-	    buf->b_orig_size = 0;
+	    buf->b_orig_আকার = 0;
 	    buf->b_orig_mode = 0;
 	}
     }
@@ -1097,75 +1097,75 @@ set_b0_fname(ZERO_BL *b0p, buf_T *buf)
  * This is fail safe: if we are not sure the directories are equal the flag is
  * not set.
  */
-    static void
+    স্থির শূন্য
 set_b0_dir_flag(ZERO_BL *b0p, buf_T *buf)
 {
-    if (same_directory(buf->b_ml.ml_mfp->mf_fname, buf->b_ffname))
+    যদি (same_directory(buf->b_ml.ml_mfp->mf_fname, buf->b_ffname))
 	b0p->b0_flags |= B0_SAME_DIR;
-    else
+    অন্যথা
 	b0p->b0_flags &= ~B0_SAME_DIR;
 }
 
 /*
  * When there is room, add the 'fileencoding' to block zero.
  */
-    static void
+    স্থির শূন্য
 add_b0_fenc(
     ZERO_BL	*b0p,
     buf_T	*buf)
 {
-    int		n;
-    int		size = B0_FNAME_SIZE_NOCRYPT;
+    পূর্ণসংখ্যা		n;
+    পূর্ণসংখ্যা		আকার_2 = B0_FNAME_আকার_NOCRYPT;
 
 #ifdef FEAT_CRYPT
     // Without encryption use the same offset as in Vim 7.2 to be compatible.
     // With encryption it's OK to move elsewhere, the swap file is not
     // compatible anyway.
-    if (*buf->b_p_key != NUL)
-	size = B0_FNAME_SIZE_CRYPT;
+    যদি (*buf->b_p_চাবি != NUL)
+	আকার_2 = B0_FNAME_আকার_CRYPT;
 #endif
 
-    n = (int)STRLEN(buf->b_p_fenc);
-    if ((int)STRLEN(b0p->b0_fname) + n + 1 > size)
+    n = (পূর্ণসংখ্যা)STRLEN(buf->b_p_fenc);
+    যদি ((পূর্ণসংখ্যা)STRLEN(b0p->b0_fname) + n + 1 > আকার_2)
 	b0p->b0_flags &= ~B0_HAS_FENC;
-    else
+    অন্যথা
     {
-	mch_memmove((char *)b0p->b0_fname + size - n,
-					    (char *)buf->b_p_fenc, (size_t)n);
-	*(b0p->b0_fname + size - n - 1) = NUL;
+	mch_memmove((অক্ষর *)b0p->b0_fname + আকার_2 - n,
+					    (অক্ষর *)buf->b_p_fenc, (size_t)n);
+	*(b0p->b0_fname + আকার_2 - n - 1) = NUL;
 	b0p->b0_flags |= B0_HAS_FENC;
     }
 }
 
-#if defined(HAVE_SYS_SYSINFO_H) && defined(HAVE_SYSINFO_UPTIME)
+#যদি defined(HAVE_SYS_SYSINFO_H) && defined(HAVE_SYSINFO_UPTIME)
 # include <sys/sysinfo.h>
 #endif
 
-#if defined(UNIX) || defined(MSWIN)
+#যদি defined(UNIX) || defined(MSWIN)
 /*
  * Return TRUE if the process with number "b0p->b0_pid" is still running.
  * "swap_fname" is the name of the swap file, if it's from before a reboot then
  * the result is FALSE;
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 swapfile_process_running(ZERO_BL *b0p, char_u *swap_fname UNUSED)
 {
-# if defined(HAVE_SYSINFO) && defined(HAVE_SYSINFO_UPTIME)
+# যদি defined(HAVE_SYSINFO) && defined(HAVE_SYSINFO_UPTIME)
     stat_T	    st;
-    struct sysinfo  sinfo;
+    কাঠামো sysinfo  sinfo;
 
     // If the system rebooted after when the swap file was written then the
     // process can't be running now.
-    if (mch_stat((char *)swap_fname, &st) != -1
+    যদি (mch_stat((অক্ষর *)swap_fname, &st) != -1
 	    && sysinfo(&sinfo) == 0
-	    && st.st_mtime < time(NULL) - (
+	    && st.st_mtime < time(ফাঁকা) - (
 #  ifdef FEAT_EVAL
 		override_sysinfo_uptime >= 0 ? override_sysinfo_uptime :
 #  endif
 		sinfo.uptime))
-	return FALSE;
+	ফেরত FALSE;
 # endif
-    return mch_process_running(char_to_long(b0p->b0_pid));
+    ফেরত mch_process_running(char_to_long(b0p->b0_pid));
 }
 #endif
 
@@ -1174,47 +1174,47 @@ swapfile_process_running(ZERO_BL *b0p, char_u *swap_fname UNUSED)
  * If "checkext" is TRUE, check the extension and detect whether it is
  * a swap file.
  */
-    void
-ml_recover(int checkext)
+    শূন্য
+ml_recover(পূর্ণসংখ্যা checkext)
 {
-    buf_T	*buf = NULL;
-    memfile_T	*mfp = NULL;
+    buf_T	*buf = ফাঁকা;
+    memfile_T	*mfp = ফাঁকা;
     char_u	*fname;
-    char_u	*fname_used = NULL;
-    bhdr_T	*hp = NULL;
+    char_u	*fname_used = ফাঁকা;
+    bhdr_T	*hp = ফাঁকা;
     ZERO_BL	*b0p;
-    int		b0_ff;
-    char_u	*b0_fenc = NULL;
+    পূর্ণসংখ্যা		b0_ff;
+    char_u	*b0_fenc = ফাঁকা;
 #ifdef FEAT_CRYPT
-    int		b0_cm = -1;
+    পূর্ণসংখ্যা		b0_cm = -1;
 #endif
     PTR_BL	*pp;
-    DATA_BL	*dp;
+    তথ্য_BL	*dp;
     infoptr_T	*ip;
     blocknr_T	bnum;
-    int		page_count;
+    পূর্ণসংখ্যা		page_গুনতি;
     stat_T	org_stat, swp_stat;
-    int		len;
-    int		directly;
+    পূর্ণসংখ্যা		len;
+    পূর্ণসংখ্যা		directly;
     linenr_T	lnum;
     char_u	*p;
-    int		i;
+    পূর্ণসংখ্যা		i;
     long	error;
-    int		cannot_open;
-    linenr_T	line_count;
-    int		has_error;
-    int		idx;
-    int		top;
-    int		txt_start;
-    off_T	size;
-    int		called_from_main;
-    int		serious_error = TRUE;
+    পূর্ণসংখ্যা		cannot_open;
+    linenr_T	সারি_গুনতি;
+    পূর্ণসংখ্যা		has_error;
+    পূর্ণসংখ্যা		idx;
+    পূর্ণসংখ্যা		শীর্ষ_2;
+    পূর্ণসংখ্যা		txt_start;
+    off_T	আকার_2;
+    পূর্ণসংখ্যা		called_from_main;
+    পূর্ণসংখ্যা		serious_error = TRUE;
     long	mtime;
-    int		attr;
-    int		orig_file_status = NOTDONE;
+    পূর্ণসংখ্যা		attr;
+    পূর্ণসংখ্যা		orig_file_status = NOTDONE;
 
     recoverymode = TRUE;
-    called_from_main = (curbuf->b_ml.ml_mfp == NULL);
+    called_from_main = (curbuf->b_ml.ml_mfp == ফাঁকা);
     attr = HL_ATTR(HLF_E);
 
     /*
@@ -1222,54 +1222,54 @@ ml_recover(int checkext)
      * Otherwise a search is done to find the swap file(s).
      */
     fname = curbuf->b_fname;
-    if (fname == NULL)		    // When there is no file name
+    যদি (fname == ফাঁকা)		    // When there is no file name
 	fname = (char_u *)"";
-    len = (int)STRLEN(fname);
-    if (checkext && len >= 4 &&
-#if defined(VMS)
+    len = (পূর্ণসংখ্যা)STRLEN(fname);
+    যদি (checkext && len >= 4 &&
+#যদি defined(VMS)
 	    STRNICMP(fname + len - 4, "_s", 2)
-#else
+#অন্যথা
 	    STRNICMP(fname + len - 4, ".s", 2)
 #endif
 						== 0
 		&& vim_strchr((char_u *)"abcdefghijklmnopqrstuvw",
-					   TOLOWER_ASC(fname[len - 2])) != NULL
+					   TOLOWER_ASC(fname[len - 2])) != ফাঁকা
 		&& ASCII_ISALPHA(fname[len - 1]))
     {
 	directly = TRUE;
 	fname_used = vim_strsave(fname); // make a copy for mf_open()
     }
-    else
+    অন্যথা
     {
 	directly = FALSE;
 
 	// count the number of matching swap files
-	len = recover_names(fname, FALSE, NULL, 0, NULL);
-	if (len == 0)		    // no swap files found
+	len = recover_names(fname, FALSE, ফাঁকা, 0, ফাঁকা);
+	যদি (len == 0)		    // no swap files found
 	{
 	    semsg(_(e_no_swap_file_found_for_str), fname);
-	    goto theend;
+	    যাও theend;
 	}
-	if (len == 1)		    // one swap file found, use it
+	যদি (len == 1)		    // one swap file found, use it
 	    i = 1;
-	else			    // several swap files found, choose
+	অন্যথা			    // several swap files found, choose
 	{
 	    // list the names of the swap files
-	    (void)recover_names(fname, TRUE, NULL, 0, NULL);
-	    msg_putchar('\n');
-	    msg_puts(_("Enter number of swap file to use (0 to quit): "));
-	    i = get_number(FALSE, NULL);
-	    if (i < 1 || i > len)
-		goto theend;
+	    (শূন্য)recover_names(fname, TRUE, ফাঁকা, 0, ফাঁকা);
+	    বার্তা_putchar('\n');
+	    বার্তা_puts(_("Enter number of swap file to use (0 to quit): "));
+	    i = get_সংখ্যা(FALSE, ফাঁকা);
+	    যদি (i < 1 || i > len)
+		যাও theend;
 	}
 	// get the swap file name that will be used
-	(void)recover_names(fname, FALSE, NULL, i, &fname_used);
+	(শূন্য)recover_names(fname, FALSE, ফাঁকা, i, &fname_used);
     }
-    if (fname_used == NULL)
-	goto theend;			// out of memory
+    যদি (fname_used == ফাঁকা)
+	যাও theend;			// out of memory
 
     // When called from main() still need to initialize storage structure
-    if (called_from_main && ml_open(curbuf) == FAIL)
+    যদি (called_from_main && ml_open(curbuf) == FAIL)
 	getout(1);
 
     /*
@@ -1277,20 +1277,20 @@ ml_recover(int checkext)
      * Only the memline and crypt information in it are really used.
      */
     buf = ALLOC_ONE(buf_T);
-    if (buf == NULL)
-	goto theend;
+    যদি (buf == ফাঁকা)
+	যাও theend;
 
     /*
      * init fields in memline struct
      */
-    buf->b_ml.ml_stack_size = 0;	// no stack yet
-    buf->b_ml.ml_stack = NULL;		// no stack yet
-    buf->b_ml.ml_stack_top = 0;		// nothing in the stack
-    buf->b_ml.ml_line_lnum = 0;		// no cached line
-    buf->b_ml.ml_locked = NULL;		// no locked block
+    buf->b_ml.ml_স্তূপ_আকার = 0;	// no stack yet
+    buf->b_ml.ml_স্তূপ = ফাঁকা;		// no stack yet
+    buf->b_ml.ml_স্তূপ_শীর্ষ = 0;		// nothing in the stack
+    buf->b_ml.ml_সারি_lnum = 0;		// no cached line
+    buf->b_ml.ml_locked = ফাঁকা;		// no locked block
     buf->b_ml.ml_flags = 0;
 #ifdef FEAT_CRYPT
-    buf->b_p_key = empty_option;
+    buf->b_p_চাবি = empty_option;
     buf->b_p_cm = empty_option;
 #endif
 
@@ -1301,15 +1301,15 @@ ml_recover(int checkext)
 				 // mf_open() will consume "fname_used"!
     mfp = mf_open(fname_used, O_RDONLY);
     fname_used = p;
-    if (mfp == NULL || mfp->mf_fd < 0)
+    যদি (mfp == ফাঁকা || mfp->mf_fd < 0)
     {
-	if (fname_used != NULL)
+	যদি (fname_used != ফাঁকা)
 	    semsg(_(e_cannot_open_str), fname_used);
-	goto theend;
+	যাও theend;
     }
     buf->b_ml.ml_mfp = mfp;
 #ifdef FEAT_CRYPT
-    mfp->mf_buffer = buf;
+    mfp->mf_বাফার = buf;
 #endif
 
     /*
@@ -1318,70 +1318,70 @@ ml_recover(int checkext)
      * 0 we need a page size.  Use the minimal size for block 0 here, it will
      * be set to the real value below.
      */
-    mfp->mf_page_size = MIN_SWAP_PAGE_SIZE;
+    mfp->mf_page_আকার = MIN_SWAP_PAGE_আকার;
 
     /*
      * try to read block 0
      */
-    if ((hp = mf_get(mfp, (blocknr_T)0, 1)) == NULL)
+    যদি ((hp = mf_get(mfp, (blocknr_T)0, 1)) == ফাঁকা)
     {
-	msg_start();
-	msg_puts_attr(_("Unable to read block 0 from "), attr | MSG_HIST);
-	msg_outtrans_attr(mfp->mf_fname, attr | MSG_HIST);
-	msg_puts_attr(_("\nMaybe no changes were made or Vim did not update the swap file."),
-		attr | MSG_HIST);
-	msg_end();
-	goto theend;
+	বার্তা_start();
+	বার্তা_puts_attr(_("Unable to read block 0 from "), attr | বার্তা_HIST);
+	বার্তা_outtrans_attr(mfp->mf_fname, attr | বার্তা_HIST);
+	বার্তা_puts_attr(_("\nMaybe no changes were made or Vim did not update the swap file."),
+		attr | বার্তা_HIST);
+	বার্তা_end();
+	যাও theend;
     }
-    b0p = (ZERO_BL *)(hp->bh_data);
-    if (STRNCMP(b0p->b0_version, "VIM 3.0", 7) == 0)
+    b0p = (ZERO_BL *)(hp->bh_তথ্য);
+    যদি (STRNCMP(b0p->b0_version, "VIM 3.0", 7) == 0)
     {
-	msg_start();
-	msg_outtrans_attr(mfp->mf_fname, MSG_HIST);
-	msg_puts_attr(_(" cannot be used with this version of Vim.\n"),
-								    MSG_HIST);
-	msg_puts_attr(_("Use Vim version 3.0.\n"), MSG_HIST);
-	msg_end();
-	goto theend;
+	বার্তা_start();
+	বার্তা_outtrans_attr(mfp->mf_fname, বার্তা_HIST);
+	বার্তা_puts_attr(_(" cannot be used with this version of Vim.\n"),
+								    বার্তা_HIST);
+	বার্তা_puts_attr(_("Use Vim version 3.0.\n"), বার্তা_HIST);
+	বার্তা_end();
+	যাও theend;
     }
-    if (ml_check_b0_id(b0p) == FAIL)
+    যদি (ml_check_b0_id(b0p) == FAIL)
     {
 	semsg(_(e_str_does_not_look_like_vim_swap_file), mfp->mf_fname);
-	goto theend;
+	যাও theend;
     }
-    if (b0_magic_wrong(b0p))
+    যদি (b0_magic_wrong(b0p))
     {
-	msg_start();
-	msg_outtrans_attr(mfp->mf_fname, attr | MSG_HIST);
-#if defined(MSWIN)
-	if (STRNCMP(b0p->b0_hname, "PC ", 3) == 0)
-	    msg_puts_attr(_(" cannot be used with this version of Vim.\n"),
-							     attr | MSG_HIST);
-	else
+	বার্তা_start();
+	বার্তা_outtrans_attr(mfp->mf_fname, attr | বার্তা_HIST);
+#যদি defined(MSWIN)
+	যদি (STRNCMP(b0p->b0_hname, "PC ", 3) == 0)
+	    বার্তা_puts_attr(_(" cannot be used with this version of Vim.\n"),
+							     attr | বার্তা_HIST);
+	অন্যথা
 #endif
-	    msg_puts_attr(_(" cannot be used on this computer.\n"),
-							     attr | MSG_HIST);
-	msg_puts_attr(_("The file was created on "), attr | MSG_HIST);
+	    বার্তা_puts_attr(_(" cannot be used on this computer.\n"),
+							     attr | বার্তা_HIST);
+	বার্তা_puts_attr(_("The file was created on "), attr | বার্তা_HIST);
 	// avoid going past the end of a corrupted hostname
 	b0p->b0_fname[0] = NUL;
-	msg_puts_attr((char *)b0p->b0_hname, attr | MSG_HIST);
-	msg_puts_attr(_(",\nor the file has been damaged."), attr | MSG_HIST);
-	msg_end();
-	goto theend;
+	বার্তা_puts_attr((অক্ষর *)b0p->b0_hname, attr | বার্তা_HIST);
+	বার্তা_puts_attr(_(",\nor the file has been damaged."), attr | বার্তা_HIST);
+	বার্তা_end();
+	যাও theend;
     }
 
 #ifdef FEAT_CRYPT
-    for (i = 0; i < (int)ARRAY_LENGTH(id1_codes); ++i)
-	if (id1_codes[i] == b0p->b0_id[1])
+    জন্য (i = 0; i < (পূর্ণসংখ্যা)ARRAY_দৈর্ঘ্য(id1_codes); ++i)
+	যদি (id1_codes[i] == b0p->b0_id[1])
 	    b0_cm = i;
-    if (b0_cm > 0)
+    যদি (b0_cm > 0)
 	mch_memmove(mfp->mf_seed, &b0p->b0_seed, MF_SEED_LEN);
     crypt_set_cm_option(buf, b0_cm < 0 ? 0 : b0_cm);
-#else
-    if (b0p->b0_id[1] != BLOCK0_ID1)
+#অন্যথা
+    যদি (b0p->b0_id[1] != BLOCK0_ID1)
     {
 	semsg(_(e_str_is_encrypted_and_this_version_of_vim_does_not_support_encryption), mfp->mf_fname);
-	goto theend;
+	যাও theend;
     }
 #endif
 
@@ -1389,63 +1389,63 @@ ml_recover(int checkext)
      * If we guessed the wrong page size, we have to recalculate the
      * highest block number in the file.
      */
-    if (mfp->mf_page_size != (unsigned)char_to_long(b0p->b0_page_size))
+    যদি (mfp->mf_page_আকার != (unsigned)char_to_long(b0p->b0_page_আকার))
     {
-	unsigned previous_page_size = mfp->mf_page_size;
+	unsigned previous_page_আকার = mfp->mf_page_আকার;
 
-	mf_new_page_size(mfp, (unsigned)char_to_long(b0p->b0_page_size));
-	if (mfp->mf_page_size < previous_page_size)
+	mf_new_page_আকার(mfp, (unsigned)char_to_long(b0p->b0_page_আকার));
+	যদি (mfp->mf_page_আকার < previous_page_আকার)
 	{
-	    msg_start();
-	    msg_outtrans_attr(mfp->mf_fname, attr | MSG_HIST);
-	    msg_puts_attr(_(" has been damaged (page size is smaller than minimum value).\n"),
-			attr | MSG_HIST);
-	    msg_end();
-	    goto theend;
+	    বার্তা_start();
+	    বার্তা_outtrans_attr(mfp->mf_fname, attr | বার্তা_HIST);
+	    বার্তা_puts_attr(_(" has been damaged (page size is smaller than minimum value).\n"),
+			attr | বার্তা_HIST);
+	    বার্তা_end();
+	    যাও theend;
 	}
-	if ((size = vim_lseek(mfp->mf_fd, (off_T)0L, SEEK_END)) <= 0)
+	যদি ((আকার_2 = vim_lseek(mfp->mf_fd, (off_T)0L, SEEK_END)) <= 0)
 	    mfp->mf_blocknr_max = 0;	    // no file or empty file
-	else
-	    mfp->mf_blocknr_max = (blocknr_T)(size / mfp->mf_page_size);
-	mfp->mf_infile_count = mfp->mf_blocknr_max;
+	অন্যথা
+	    mfp->mf_blocknr_max = (blocknr_T)(আকার_2 / mfp->mf_page_আকার);
+	mfp->mf_infile_গুনতি = mfp->mf_blocknr_max;
 
 	// need to reallocate the memory used to store the data
-	p = alloc(mfp->mf_page_size);
-	if (p == NULL)
-	    goto theend;
-	mch_memmove(p, hp->bh_data, previous_page_size);
-	vim_free(hp->bh_data);
-	hp->bh_data = p;
-	b0p = (ZERO_BL *)(hp->bh_data);
+	p = alloc(mfp->mf_page_আকার);
+	যদি (p == ফাঁকা)
+	    যাও theend;
+	mch_memmove(p, hp->bh_তথ্য, previous_page_আকার);
+	vim_free(hp->bh_তথ্য);
+	hp->bh_তথ্য = p;
+	b0p = (ZERO_BL *)(hp->bh_তথ্য);
     }
 
     /*
      * If .swp file name given directly, use name from swap file for buffer.
      */
-    if (directly)
+    যদি (directly)
     {
 	expand_env(b0p->b0_fname, NameBuff, MAXPATHL);
-	if (setfname(curbuf, NameBuff, NULL, TRUE) == FAIL)
-	    goto theend;
+	যদি (setfname(curbuf, NameBuff, ফাঁকা, TRUE) == FAIL)
+	    যাও theend;
     }
 
-    home_replace(NULL, mfp->mf_fname, NameBuff, MAXPATHL, TRUE);
+    home_replace(ফাঁকা, mfp->mf_fname, NameBuff, MAXPATHL, TRUE);
     smsg(_("Using swap file \"%s\""), NameBuff);
 
-    if (buf_spname(curbuf) != NULL)
+    যদি (buf_spname(curbuf) != ফাঁকা)
 	vim_strncpy(NameBuff, buf_spname(curbuf), MAXPATHL - 1);
-    else
-	home_replace(NULL, curbuf->b_ffname, NameBuff, MAXPATHL, TRUE);
+    অন্যথা
+	home_replace(ফাঁকা, curbuf->b_ffname, NameBuff, MAXPATHL, TRUE);
     smsg(_("Original file \"%s\""), NameBuff);
-    msg_putchar('\n');
+    বার্তা_putchar('\n');
 
     /*
      * check date of swap file and original file
      */
     mtime = char_to_long(b0p->b0_mtime);
-    if (curbuf->b_ffname != NULL
-	    && mch_stat((char *)curbuf->b_ffname, &org_stat) != -1
-	    && ((mch_stat((char *)mfp->mf_fname, &swp_stat) != -1
+    যদি (curbuf->b_ffname != ফাঁকা
+	    && mch_stat((অক্ষর *)curbuf->b_ffname, &org_stat) != -1
+	    && ((mch_stat((অক্ষর *)mfp->mf_fname, &swp_stat) != -1
 		    && org_stat.st_mtime > swp_stat.st_mtime)
 		|| org_stat.st_mtime != mtime))
 	emsg(_(e_warning_original_file_may_have_been_changed));
@@ -1453,28 +1453,28 @@ ml_recover(int checkext)
 
     // Get the 'fileformat' and 'fileencoding' from block zero.
     b0_ff = (b0p->b0_flags & B0_FF_MASK);
-    if (b0p->b0_flags & B0_HAS_FENC)
+    যদি (b0p->b0_flags & B0_HAS_FENC)
     {
-	int fnsize = B0_FNAME_SIZE_NOCRYPT;
+	পূর্ণসংখ্যা fnsize = B0_FNAME_আকার_NOCRYPT;
 
 #ifdef FEAT_CRYPT
 	// Use the same size as in add_b0_fenc().
-	if (b0p->b0_id[1] != BLOCK0_ID1)
-	    fnsize = B0_FNAME_SIZE_CRYPT;
+	যদি (b0p->b0_id[1] != BLOCK0_ID1)
+	    fnsize = B0_FNAME_আকার_CRYPT;
 #endif
-	for (p = b0p->b0_fname + fnsize; p > b0p->b0_fname && p[-1] != NUL; --p)
+	জন্য (p = b0p->b0_fname + fnsize; p > b0p->b0_fname && p[-1] != NUL; --p)
 	    ;
 	b0_fenc = vim_strnsave(p, b0p->b0_fname + fnsize - p);
     }
 
     mf_put(mfp, hp, FALSE, FALSE);	// release block 0
-    hp = NULL;
+    hp = ফাঁকা;
 
     /*
      * Now that we are sure that the file is going to be recovered, clear the
      * contents of the current buffer.
      */
-    while (!(curbuf->b_ml.ml_flags & ML_EMPTY))
+    যখন (!(curbuf->b_ml.ml_flags & ML_EMPTY))
 	ml_delete((linenr_T)1);
 
     /*
@@ -1482,108 +1482,108 @@ ml_recover(int checkext)
      * 'fileencoding', etc.  Ignore errors.  The text itself is not used.
      * When the file is encrypted the user is asked to enter the key.
      */
-    if (curbuf->b_ffname != NULL)
-	orig_file_status = readfile(curbuf->b_ffname, NULL, (linenr_T)0,
-			      (linenr_T)0, (linenr_T)MAXLNUM, NULL, READ_NEW);
+    যদি (curbuf->b_ffname != ফাঁকা)
+	orig_file_status = readfile(curbuf->b_ffname, ফাঁকা, (linenr_T)0,
+			      (linenr_T)0, (linenr_T)MAXLNUM, ফাঁকা, READ_NEW);
 
 #ifdef FEAT_CRYPT
-    if (b0_cm >= 0)
+    যদি (b0_cm >= 0)
     {
 	// Need to ask the user for the crypt key.  If this fails we continue
 	// without a key, will probably get garbage text.
-	if (*curbuf->b_p_key != NUL)
+	যদি (*curbuf->b_p_চাবি != NUL)
 	{
 	    smsg(_("Swap file is encrypted: \"%s\""), fname_used);
-	    msg_puts(_("\nIf you entered a new crypt key but did not write the text file,"));
-	    msg_puts(_("\nenter the new crypt key."));
-	    msg_puts(_("\nIf you wrote the text file after changing the crypt key press enter"));
-	    msg_puts(_("\nto use the same key for text file and swap file"));
+	    বার্তা_puts(_("\nIf you entered a new crypt key but did not write the text file,"));
+	    বার্তা_puts(_("\nenter the new crypt key."));
+	    বার্তা_puts(_("\nIf you wrote the text file after changing the crypt key press enter"));
+	    বার্তা_puts(_("\nto use the same key for text file and swap file"));
 	}
-	else
-	    smsg(_(need_key_msg), fname_used);
-	buf->b_p_key = crypt_get_key(FALSE, FALSE);
-	if (buf->b_p_key == NULL)
-	    buf->b_p_key = curbuf->b_p_key;
-	else if (*buf->b_p_key == NUL)
+	অন্যথা
+	    smsg(_(need_চাবি_বার্তা), fname_used);
+	buf->b_p_চাবি = crypt_get_চাবি(FALSE, FALSE);
+	যদি (buf->b_p_চাবি == ফাঁকা)
+	    buf->b_p_চাবি = curbuf->b_p_চাবি;
+	অন্যথা যদি (*buf->b_p_চাবি == NUL)
 	{
-	    vim_free(buf->b_p_key);
-	    buf->b_p_key = curbuf->b_p_key;
+	    vim_free(buf->b_p_চাবি);
+	    buf->b_p_চাবি = curbuf->b_p_চাবি;
 	}
-	if (buf->b_p_key == NULL)
-	    buf->b_p_key = empty_option;
+	যদি (buf->b_p_চাবি == ফাঁকা)
+	    buf->b_p_চাবি = empty_option;
     }
 #endif
 
     // Use the 'fileformat' and 'fileencoding' as stored in the swap file.
-    if (b0_ff != 0)
+    যদি (b0_ff != 0)
 	set_fileformat(b0_ff - 1, OPT_LOCAL);
-    if (b0_fenc != NULL)
+    যদি (b0_fenc != ফাঁকা)
     {
-	set_option_value_give_err((char_u *)"fenc", 0L, b0_fenc, OPT_LOCAL);
+	set_option_মান_give_err((char_u *)"fenc", 0L, b0_fenc, OPT_LOCAL);
 	vim_free(b0_fenc);
     }
     unchanged(curbuf, TRUE, TRUE);
 
     bnum = 1;		// start with block 1
-    page_count = 1;	// which is 1 page
+    page_গুনতি = 1;	// which is 1 page
     lnum = 0;		// append after line 0 in curbuf
-    line_count = 0;
+    সারি_গুনতি = 0;
     idx = 0;		// start with first index in block 1
     error = 0;
-    buf->b_ml.ml_stack_top = 0;
-    buf->b_ml.ml_stack = NULL;
-    buf->b_ml.ml_stack_size = 0;	// no stack yet
+    buf->b_ml.ml_স্তূপ_শীর্ষ = 0;
+    buf->b_ml.ml_স্তূপ = ফাঁকা;
+    buf->b_ml.ml_স্তূপ_আকার = 0;	// no stack yet
 
-    if (curbuf->b_ffname == NULL)
+    যদি (curbuf->b_ffname == ফাঁকা)
 	cannot_open = TRUE;
-    else
+    অন্যথা
 	cannot_open = FALSE;
 
     serious_error = FALSE;
-    for ( ; !got_int; line_breakcheck())
+    জন্য ( ; !got_int; সারি_breakcheck())
     {
-	if (hp != NULL)
+	যদি (hp != ফাঁকা)
 	    mf_put(mfp, hp, FALSE, FALSE);	// release previous block
 
 	/*
 	 * get block
 	 */
-	if ((hp = mf_get(mfp, bnum, page_count)) == NULL)
+	যদি ((hp = mf_get(mfp, bnum, page_গুনতি)) == ফাঁকা)
 	{
-	    if (bnum == 1)
+	    যদি (bnum == 1)
 	    {
 		semsg(_(e_unable_to_read_block_one_from_str), mfp->mf_fname);
-		goto theend;
+		যাও theend;
 	    }
 	    ++error;
 	    ml_append(lnum++, (char_u *)_("???MANY LINES MISSING"),
 							    (colnr_T)0, TRUE);
 	}
-	else		// there is a block
+	অন্যথা		// there is a block
 	{
-	    pp = (PTR_BL *)(hp->bh_data);
-	    if (pp->pb_id == PTR_ID)		// it is a pointer block
+	    pp = (PTR_BL *)(hp->bh_তথ্য);
+	    যদি (pp->pb_id == PTR_ID)		// it is a pointer block
 	    {
-		int ptr_block_error = FALSE;
-		if (pp->pb_count_max != PB_COUNT_MAX(mfp))
+		পূর্ণসংখ্যা ptr_block_error = FALSE;
+		যদি (pp->pb_গুনতি_max != PB_গুনতি_MAX(mfp))
 		{
 		    ptr_block_error = TRUE;
-		    pp->pb_count_max = PB_COUNT_MAX(mfp);
+		    pp->pb_গুনতি_max = PB_গুনতি_MAX(mfp);
 		}
-		if (pp->pb_count > pp->pb_count_max)
+		যদি (pp->pb_গুনতি > pp->pb_গুনতি_max)
 		{
 		    ptr_block_error = TRUE;
-		    pp->pb_count = pp->pb_count_max;
+		    pp->pb_গুনতি = pp->pb_গুনতি_max;
 		}
-		if (ptr_block_error)
+		যদি (ptr_block_error)
 		    emsg(_(e_warning_pointer_block_corrupted));
 
 		// check line count when using pointer block first time
-		if (idx == 0 && line_count != 0)
+		যদি (idx == 0 && সারি_গুনতি != 0)
 		{
-		    for (i = 0; i < (int)pp->pb_count; ++i)
-			line_count -= pp->pb_pointer[i].pe_line_count;
-		    if (line_count != 0)
+		    জন্য (i = 0; i < (পূর্ণসংখ্যা)pp->pb_গুনতি; ++i)
+			সারি_গুনতি -= pp->pb_pointer[i].pe_সারি_গুনতি;
+		    যদি (সারি_গুনতি != 0)
 		    {
 			++error;
 			ml_append(lnum++, (char_u *)_("???LINE COUNT WRONG"),
@@ -1591,68 +1591,68 @@ ml_recover(int checkext)
 		    }
 		}
 
-		if (pp->pb_count == 0)
+		যদি (pp->pb_গুনতি == 0)
 		{
 		    ml_append(lnum++, (char_u *)_("???EMPTY BLOCK"),
 							    (colnr_T)0, TRUE);
 		    ++error;
 		}
-		else if (idx < (int)pp->pb_count)	// go a block deeper
+		অন্যথা যদি (idx < (পূর্ণসংখ্যা)pp->pb_গুনতি)	// go a block deeper
 		{
-		    if (pp->pb_pointer[idx].pe_bnum < 0)
+		    যদি (pp->pb_pointer[idx].pe_bnum < 0)
 		    {
 			/*
 			 * Data block with negative block number.
 			 * Try to read lines from the original file.
 			 * This is slow, but it works.
 			 */
-			if (!cannot_open)
+			যদি (!cannot_open)
 			{
-			    line_count = pp->pb_pointer[idx].pe_line_count;
+			    সারি_গুনতি = pp->pb_pointer[idx].pe_সারি_গুনতি;
 			    linenr_T pe_old_lnum = pp->pb_pointer[idx].pe_old_lnum;
 			    // Validate pe_line_count and pe_old_lnum from the
 			    // untrusted swap file before passing to readfile().
-			    if (line_count <= 0 || pe_old_lnum < 1 ||
-				    readfile(curbuf->b_ffname, NULL, lnum,
+			    যদি (সারি_গুনতি <= 0 || pe_old_lnum < 1 ||
+				    readfile(curbuf->b_ffname, ফাঁকা, lnum,
 					pe_old_lnum - 1,
-					line_count, NULL, 0) != OK)
+					সারি_গুনতি, ফাঁকা, 0) != OK)
 				cannot_open = TRUE;
-			    else
-				lnum += line_count;
+			    অন্যথা
+				lnum += সারি_গুনতি;
 			}
-			if (cannot_open)
+			যদি (cannot_open)
 			{
 			    ++error;
 			    ml_append(lnum++, (char_u *)_("???LINES MISSING"),
 							    (colnr_T)0, TRUE);
 			}
 			++idx;	    // get same block again for next index
-			continue;
+			চালু;
 		    }
 
 		    /*
 		     * going one block deeper in the tree
 		     */
-		    if ((top = ml_add_stack(buf)) < 0)	// new entry in stack
+		    যদি ((শীর্ষ_2 = ml_add_স্তূপ(buf)) < 0)	// new entry in stack
 		    {
 			++error;
-			break;		    // out of memory
+			বিরতি;		    // out of memory
 		    }
-		    ip = &(buf->b_ml.ml_stack[top]);
+		    ip = &(buf->b_ml.ml_স্তূপ[শীর্ষ_2]);
 		    ip->ip_bnum = bnum;
-		    ip->ip_index = idx;
+		    ip->ip_সূচক = idx;
 
 		    bnum = pp->pb_pointer[idx].pe_bnum;
-		    line_count = pp->pb_pointer[idx].pe_line_count;
-		    page_count = pp->pb_pointer[idx].pe_page_count;
+		    সারি_গুনতি = pp->pb_pointer[idx].pe_সারি_গুনতি;
+		    page_গুনতি = pp->pb_pointer[idx].pe_page_গুনতি;
 		    // Validate pe_bnum and pe_page_count from the untrusted
 		    // swap file before passing to mf_get(), which uses
 		    // page_count to calculate allocation size.  A bogus value
 		    // (e.g. 0x40000000) would cause a multi-GB allocation.
 		    // pe_page_count must be >= 1 and bnum + page_count must
 		    // not exceed the number of pages in the swap file.
-		    if (page_count < 1
-			    || bnum + page_count > mfp->mf_blocknr_max + 1)
+		    যদি (page_গুনতি < 1
+			    || bnum + page_গুনতি > mfp->mf_blocknr_max + 1)
 		    {
 			++error;
 			ml_append(lnum++,
@@ -1660,32 +1660,32 @@ ml_recover(int checkext)
 				(colnr_T)0, TRUE);
 			// Skip this entry and pop back up the stack to keep
 			// recovering whatever else we can.
-			idx = ip->ip_index + 1;
+			idx = ip->ip_সূচক + 1;
 			bnum = ip->ip_bnum;
-			page_count = 1;
-			--buf->b_ml.ml_stack_top;
-			continue;
+			page_গুনতি = 1;
+			--buf->b_ml.ml_স্তূপ_শীর্ষ;
+			চালু;
 		    }
 		    idx = 0;
-		    continue;
+		    চালু;
 		}
 	    }
-	    else	    // not a pointer block
+	    অন্যথা	    // not a pointer block
 	    {
-		dp = (DATA_BL *)(hp->bh_data);
-		if (dp->db_id != DATA_ID)	// block id wrong
+		dp = (তথ্য_BL *)(hp->bh_তথ্য);
+		যদি (dp->db_id != তথ্য_ID)	// block id wrong
 		{
-		    if (bnum == 1)
+		    যদি (bnum == 1)
 		    {
 			semsg(_(e_block_one_id_wrong_str_not_swp_file),
 							       mfp->mf_fname);
-			goto theend;
+			যাও theend;
 		    }
 		    ++error;
 		    ml_append(lnum++, (char_u *)_("???BLOCK MISSING"),
 							    (colnr_T)0, TRUE);
 		}
-		else
+		অন্যথা
 		{
 		    /*
 		     * It is a data block.
@@ -1699,26 +1699,26 @@ ml_recover(int checkext)
 		    // crafted swap file referencing the same block twice
 		    // with different pe_page_count values would cause an
 		    // OOB write below.
-		    if (hp->bh_page_count != page_count)
+		    যদি (hp->bh_page_গুনতি != page_গুনতি)
 		    {
 			++error;
 			ml_append(lnum++, (char_u *)_("??? BLOCK PAGE COUNT MISMATCH"),
 							    (colnr_T)0, TRUE);
-			page_count = hp->bh_page_count;
+			page_গুনতি = hp->bh_page_গুনতি;
 		    }
 
 		    // Check the length of the block.
 		    // If wrong, use the length given in the pointer block.
-		    if (page_count * mfp->mf_page_size != dp->db_txt_end)
+		    যদি (page_গুনতি * mfp->mf_page_আকার != dp->db_txt_end)
 		    {
 			ml_append(lnum++, (char_u *)_("??? from here until ???END lines may be messed up"),
 							    (colnr_T)0, TRUE);
 			++error;
 			has_error = TRUE;
-			dp->db_txt_end = page_count * mfp->mf_page_size;
+			dp->db_txt_end = page_গুনতি * mfp->mf_page_আকার;
 		    }
 
-		    if (dp->db_txt_start < HEADER_SIZE
+		    যদি (dp->db_txt_start < HEADER_আকার
 			    || dp->db_txt_start > dp->db_txt_end)
 		    {
 			ml_append(lnum++, (char_u *)_("??? block header corrupted"),
@@ -1733,7 +1733,7 @@ ml_recover(int checkext)
 
 		    // Check the number of lines in the block.
 		    // If wrong, use the count in the data block.
-		    if (line_count != dp->db_line_count)
+		    যদি (সারি_গুনতি != dp->db_সারি_গুনতি)
 		    {
 			ml_append(lnum++, (char_u *)_("??? from here until ???END lines may have been inserted/deleted"),
 							    (colnr_T)0, TRUE);
@@ -1741,10 +1741,10 @@ ml_recover(int checkext)
 			has_error = TRUE;
 		    }
 
-		    int did_questions = FALSE;
-		    for (i = 0; i < dp->db_line_count; ++i)
+		    পূর্ণসংখ্যা did_questions = FALSE;
+		    জন্য (i = 0; i < dp->db_সারি_গুনতি; ++i)
 		    {
-			if ((char_u *)&(dp->db_index[i])
+			যদি ((char_u *)&(dp->db_সূচক[i])
 					    >= (char_u *)dp + dp->db_txt_start)
 			{
 			    // line count must be wrong
@@ -1752,44 +1752,44 @@ ml_recover(int checkext)
 			    ml_append(lnum++,
 				    (char_u *)_("??? lines may be missing"),
 							     (colnr_T)0, TRUE);
-			    break;
+			    বিরতি;
 			}
 
-			txt_start = (dp->db_index[i] & DB_INDEX_MASK);
-			if (txt_start <= (int)HEADER_SIZE
-					  || txt_start >= (int)dp->db_txt_end)
+			txt_start = (dp->db_সূচক[i] & DB_সূচক_MASK);
+			যদি (txt_start <= (পূর্ণসংখ্যা)HEADER_আকার
+					  || txt_start >= (পূর্ণসংখ্যা)dp->db_txt_end)
 			{
 			    ++error;
 			    // avoid lots of lines with "???"
-			    if (did_questions)
-				continue;
+			    যদি (did_questions)
+				চালু;
 			    did_questions = TRUE;
 			    p = (char_u *)"???";
 			}
-			else
+			অন্যথা
 			{
 			    did_questions = FALSE;
 			    p = (char_u *)dp + txt_start;
 			}
 			ml_append(lnum++, p, (colnr_T)0, TRUE);
 		    }
-		    if (has_error)
+		    যদি (has_error)
 			ml_append(lnum++, (char_u *)_("???END"),
 							    (colnr_T)0, TRUE);
 		}
 	    }
 	}
 
-	if (buf->b_ml.ml_stack_top == 0)	// finished
-	    break;
+	যদি (buf->b_ml.ml_স্তূপ_শীর্ষ == 0)	// finished
+	    বিরতি;
 
 	/*
 	 * go one block up in the tree
 	 */
-	ip = &(buf->b_ml.ml_stack[--(buf->b_ml.ml_stack_top)]);
+	ip = &(buf->b_ml.ml_স্তূপ[--(buf->b_ml.ml_স্তূপ_শীর্ষ)]);
 	bnum = ip->ip_bnum;
-	idx = ip->ip_index + 1;	    // go to next index
-	page_count = 1;
+	idx = ip->ip_সূচক + 1;	    // go to next index
+	page_গুনতি = 1;
     }
 
     /*
@@ -1799,29 +1799,29 @@ ml_recover(int checkext)
      * Lines lnum + 1 to ml_line_count are the original contents.
      * Line ml_line_count + 1 in the dummy empty line.
      */
-    if (orig_file_status != OK || curbuf->b_ml.ml_line_count != lnum * 2 + 1)
+    যদি (orig_file_status != OK || curbuf->b_ml.ml_সারি_গুনতি != lnum * 2 + 1)
     {
 	// Recovering an empty file results in two lines and the first line is
 	// empty.  Don't set the modified flag then.
-	if (!(curbuf->b_ml.ml_line_count == 2 && *ml_get(1) == NUL))
+	যদি (!(curbuf->b_ml.ml_সারি_গুনতি == 2 && *ml_get(1) == NUL))
 	{
 	    changed_internal();
 	    ++CHANGEDTICK(curbuf);
 	}
     }
-    else
+    অন্যথা
     {
-	for (idx = 1; idx <= lnum; ++idx)
+	জন্য (idx = 1; idx <= lnum; ++idx)
 	{
 	    // Need to copy one line, fetching the other one may flush it.
 	    p = vim_strnsave(ml_get(idx), ml_get_len(idx));
 	    i = STRCMP(p, ml_get(idx + lnum));
 	    vim_free(p);
-	    if (i != 0)
+	    যদি (i != 0)
 	    {
 		changed_internal();
 		++CHANGEDTICK(curbuf);
-		break;
+		বিরতি;
 	    }
 	}
     }
@@ -1830,52 +1830,52 @@ ml_recover(int checkext)
      * Delete the lines from the original file and the dummy line from the
      * empty buffer.  These will now be after the last line in the buffer.
      */
-    while (curbuf->b_ml.ml_line_count > lnum
+    যখন (curbuf->b_ml.ml_সারি_গুনতি > lnum
 				       && !(curbuf->b_ml.ml_flags & ML_EMPTY))
-	ml_delete(curbuf->b_ml.ml_line_count);
+	ml_delete(curbuf->b_ml.ml_সারি_গুনতি);
     curbuf->b_flags |= BF_RECOVERED;
     check_cursor();
 
     recoverymode = FALSE;
-    if (got_int)
+    যদি (got_int)
 	emsg(_(e_recovery_interrupted));
-    else if (error)
+    অন্যথা যদি (error)
     {
 	++no_wait_return;
-	msg(">>>>>>>>>>>>>");
-	emsg(_(e_errors_detected_while_recovering_look_for_lines_starting_with_questions));
+	বার্তা(">>>>>>>>>>>>>");
+	emsg(_(e_errors_detected_while_recovering_look_for_সারিগুলি_starting_with_questions));
 	--no_wait_return;
-	msg(_("See \":help E312\" for more information."));
-	msg(">>>>>>>>>>>>>");
+	বার্তা(_("See \":help E312\" for more information."));
+	বার্তা(">>>>>>>>>>>>>");
     }
-    else
+    অন্যথা
     {
-	if (curbuf->b_changed)
+	যদি (curbuf->b_changed)
 	{
-	    msg(_("Recovery completed. You should check if everything is OK."));
-	    msg_puts(_("\n(You might want to write out this file under another name\n"));
-	    msg_puts(_("and run diff with the original file to check for changes)"));
+	    বার্তা(_("Recovery completed. You should check if everything is OK."));
+	    বার্তা_puts(_("\n(You might want to write out this file under another name\n"));
+	    বার্তা_puts(_("and run diff with the original file to check for changes)"));
 	}
-	else
-	    msg(_("Recovery completed. Buffer contents equals file contents."));
-	msg_puts(_("\nYou may want to delete the .swp file now."));
-#if defined(UNIX) || defined(MSWIN)
-	if (swapfile_process_running(b0p, fname_used))
+	অন্যথা
+	    বার্তা(_("Recovery completed. Buffer contents equals file contents."));
+	বার্তা_puts(_("\nYou may want to delete the .swp file now."));
+#যদি defined(UNIX) || defined(MSWIN)
+	যদি (swapfile_process_running(b0p, fname_used))
 	{
 	    // Warn there could be an active Vim on the same file, the user may
 	    // want to kill it.
-	    msg_puts(_("\nNote: process STILL RUNNING: "));
-	    msg_outnum(char_to_long(b0p->b0_pid));
+	    বার্তা_puts(_("\nNote: process STILL RUNNING: "));
+	    বার্তা_outnum(char_to_long(b0p->b0_pid));
 	}
 #endif
-	msg_puts("\n\n");
-	cmdline_row = msg_row;
+	বার্তা_puts("\n\n");
+	cmdline_row = বার্তা_row;
     }
 #ifdef FEAT_CRYPT
-    if (*buf->b_p_key != NUL && STRCMP(curbuf->b_p_key, buf->b_p_key) != 0)
+    যদি (*buf->b_p_চাবি != NUL && STRCMP(curbuf->b_p_চাবি, buf->b_p_চাবি) != 0)
     {
-	msg_puts(_("Using crypt key from swap file for the text file.\n"));
-	set_option_value_give_err((char_u *)"key", 0L, buf->b_p_key, OPT_LOCAL);
+	বার্তা_puts(_("Using crypt key from swap file for the text file.\n"));
+	set_option_মান_give_err((char_u *)"key", 0L, buf->b_p_চাবি, OPT_LOCAL);
     }
 #endif
     redraw_curbuf_later(UPD_NOT_VALID);
@@ -1883,28 +1883,28 @@ ml_recover(int checkext)
 theend:
     vim_free(fname_used);
     recoverymode = FALSE;
-    if (mfp != NULL)
+    যদি (mfp != ফাঁকা)
     {
-	if (hp != NULL)
+	যদি (hp != ফাঁকা)
 	    mf_put(mfp, hp, FALSE, FALSE);
 	mf_close(mfp, FALSE);	    // will also vim_free(mfp->mf_fname)
     }
-    if (buf != NULL)
+    যদি (buf != ফাঁকা)
     {
 #ifdef FEAT_CRYPT
-	if (buf->b_p_key != curbuf->b_p_key)
-	    free_string_option(buf->b_p_key);
+	যদি (buf->b_p_চাবি != curbuf->b_p_চাবি)
+	    free_string_option(buf->b_p_চাবি);
 	free_string_option(buf->b_p_cm);
 #endif
-	vim_free(buf->b_ml.ml_stack);
+	vim_free(buf->b_ml.ml_স্তূপ);
 	vim_free(buf);
     }
-    if (serious_error && called_from_main)
+    যদি (serious_error && called_from_main)
 	ml_close(curbuf, TRUE);
-    else
+    অন্যথা
     {
-	apply_autocmds(EVENT_BUFREADPOST, NULL, curbuf->b_fname, FALSE, curbuf);
-	apply_autocmds(EVENT_BUFWINENTER, NULL, curbuf->b_fname, FALSE, curbuf);
+	apply_autocmds(EVENT_BUFREADPOST, ফাঁকা, curbuf->b_fname, FALSE, curbuf);
+	apply_autocmds(EVENT_BUFWINENTER, ফাঁকা, curbuf->b_fname, FALSE, curbuf);
     }
 }
 
@@ -1919,44 +1919,44 @@ theend:
  * - list the swap files for swapfilelist()
  * - find the name of the n'th swap file when recovering
  */
-    int
+    পূর্ণসংখ্যা
 recover_names(
     char_u	*fname,		// base for swap file name
-    int		do_list,	// when TRUE, list the swap file names
+    পূর্ণসংখ্যা		do_list,	// when TRUE, list the swap file names
     list_T	*ret_list UNUSED, // when not NULL add file names to it
-    int		nr,		// when non-zero, return nr'th swap file name
+    পূর্ণসংখ্যা		nr,		// when non-zero, return nr'th swap file name
     char_u	**fname_out)	// result when "nr" > 0
 {
-    int		num_names;
+    পূর্ণসংখ্যা		অঙ্ক_names;
     char_u	*(names[6]);
     char_u	*p;
-    int		num_files;
-    int		file_count = 0;
+    পূর্ণসংখ্যা		অঙ্ক_files;
+    পূর্ণসংখ্যা		file_গুনতি = 0;
     char_u	**files;
     char_u	*dirp;
     string_T	dir_name;
-    char_u	*fname_res = NULL;
+    char_u	*fname_res = ফাঁকা;
 #ifdef HAVE_READLINK
     char_u	fname_buf[MAXPATHL];
 #endif
 
-    if (fname != NULL)
+    যদি (fname != ফাঁকা)
     {
 #ifdef HAVE_READLINK
 	// Expand symlink in the file name, because the swap file is created
 	// with the actual file instead of with the symlink.
-	if (resolve_symlink(fname, fname_buf) == OK)
+	যদি (resolve_symlink(fname, fname_buf) == OK)
 	    fname_res = fname_buf;
-	else
+	অন্যথা
 #endif
 	    fname_res = fname;
     }
 
-    if (do_list)
+    যদি (do_list)
     {
 	// use msg() to start the scrolling properly
-	msg(_("Swap files found:"));
-	msg_putchar('\n');
+	বার্তা(_("Swap files found:"));
+	বার্তা_putchar('\n');
     }
 
     /*
@@ -1965,146 +1965,146 @@ recover_names(
      */
     dir_name.string = alloc(STRLEN(p_dir) + 1);
     dirp = p_dir;
-    while (dir_name.string != NULL && *dirp)
+    যখন (dir_name.string != ফাঁকা && *dirp)
     {
 	/*
 	 * Isolate a directory name from *dirp and put it in dir_name (we know
 	 * it is large enough, so use 31000 for length).
 	 * Advance dirp to next directory name.
 	 */
-	dir_name.length = (size_t)copy_option_part(&dirp, dir_name.string, 31000, ",");
+	dir_name.দৈর্ঘ্য = (size_t)copy_option_part(&dirp, dir_name.string, 31000, ",");
 
-	if (dir_name.string[0] == '.' && dir_name.string[1] == NUL)	// check current dir
+	যদি (dir_name.string[0] == '.' && dir_name.string[1] == NUL)	// check current dir
 	{
-	    if (fname == NULL)
+	    যদি (fname == ফাঁকা)
 	    {
 #ifdef VMS
 		names[0] = vim_strnsave((char_u *)"*_sw%", STRLEN_LITERAL("*_sw%"));
-#else
+#অন্যথা
 		names[0] = vim_strnsave((char_u *)"*.sw?", STRLEN_LITERAL("*.sw?"));
 #endif
-#if defined(UNIX) || defined(MSWIN)
+#যদি defined(UNIX) || defined(MSWIN)
 		// For Unix names starting with a dot are special.  MS-Windows
 		// supports this too, on some file systems.
 		names[1] = vim_strnsave((char_u *)".*.sw?", STRLEN_LITERAL(".*.sw?"));
 		names[2] = vim_strnsave((char_u *)".sw?", STRLEN_LITERAL(".sw?"));
-		num_names = 3;
-#else
+		অঙ্ক_names = 3;
+#অন্যথা
 # ifdef VMS
 		names[1] = vim_strnsave((char_u *)".*_sw%", STRLEN_LITERAL(".*_sw%"));
-		num_names = 2;
-# else
-		num_names = 1;
+		অঙ্ক_names = 2;
+# অন্যথা
+		অঙ্ক_names = 1;
 # endif
 #endif
 	    }
-	    else
-		num_names = recov_file_names(names, fname_res, TRUE);
+	    অন্যথা
+		অঙ্ক_names = recov_file_names(names, fname_res, TRUE);
 	}
-	else			    // check directory dir_name
+	অন্যথা			    // check directory dir_name
 	{
-	    if (fname == NULL)
+	    যদি (fname == ফাঁকা)
 	    {
 		string_T    ret;
 
 #ifdef VMS
-		names[0] = concat_fnames(dir_name.string, dir_name.length,
+		names[0] = concat_fnames(dir_name.string, dir_name.দৈর্ঘ্য,
 		    (char_u *)"*_sw%", STRLEN_LITERAL("*_sw%"), TRUE, &ret);
-#else
-		names[0] = concat_fnames(dir_name.string, dir_name.length,
+#অন্যথা
+		names[0] = concat_fnames(dir_name.string, dir_name.দৈর্ঘ্য,
 		    (char_u *)"*.sw?", STRLEN_LITERAL("*.sw?"), TRUE, &ret);
 #endif
-#if defined(UNIX) || defined(MSWIN)
+#যদি defined(UNIX) || defined(MSWIN)
 		// For Unix names starting with a dot are special.  MS-Windows
 		// supports this too, on some file systems.
-		names[1] = concat_fnames(dir_name.string, dir_name.length,
+		names[1] = concat_fnames(dir_name.string, dir_name.দৈর্ঘ্য,
 		    (char_u *)".*.sw?", STRLEN_LITERAL(".*.sw?"), TRUE, &ret);
-		names[2] = concat_fnames(dir_name.string, dir_name.length,
+		names[2] = concat_fnames(dir_name.string, dir_name.দৈর্ঘ্য,
 		    (char_u *)".sw?", STRLEN_LITERAL(".sw?"), TRUE, &ret);
-		num_names = 3;
-#else
+		অঙ্ক_names = 3;
+#অন্যথা
 # ifdef VMS
-		names[1] = concat_fnames(dir_name.string, dir_name.length,
+		names[1] = concat_fnames(dir_name.string, dir_name.দৈর্ঘ্য,
 		    (char_u *)".*_sw%", STRLEN_LITERAL(".*_sw%"), TRUE, &ret);
-		num_names = 2;
-# else
-		num_names = 1;
+		অঙ্ক_names = 2;
+# অন্যথা
+		অঙ্ক_names = 1;
 # endif
 #endif
 	    }
-	    else
+	    অন্যথা
 	    {
-		char_u	*tail;
+		char_u	*লেজ;
 
-#if defined(UNIX) || defined(MSWIN)
-		p = dir_name.string + dir_name.length;
-		if (after_pathsep(dir_name.string, p) && dir_name.length > 1 && p[-1] == p[-2])
+#যদি defined(UNIX) || defined(MSWIN)
+		p = dir_name.string + dir_name.দৈর্ঘ্য;
+		যদি (after_pathsep(dir_name.string, p) && dir_name.দৈর্ঘ্য > 1 && p[-1] == p[-2])
 		{
 		    // Ends with '//', Use Full path for swap name
-		    tail = make_percent_swname(dir_name.string, p, fname_res);
+		    লেজ = make_percent_swname(dir_name.string, p, fname_res);
 		}
-		else
+		অন্যথা
 #endif
 		{
 		    string_T	ret;
 
-		    tail = gettail(fname_res);
-		    tail = concat_fnames(dir_name.string, dir_name.length,
-			tail, STRLEN(tail), TRUE, &ret);
+		    লেজ = gettail(fname_res);
+		    লেজ = concat_fnames(dir_name.string, dir_name.দৈর্ঘ্য,
+			লেজ, STRLEN(লেজ), TRUE, &ret);
 		}
-		if (tail == NULL)
-		    num_names = 0;
-		else
+		যদি (লেজ == ফাঁকা)
+		    অঙ্ক_names = 0;
+		অন্যথা
 		{
-		    num_names = recov_file_names(names, tail, FALSE);
-		    vim_free(tail);
+		    অঙ্ক_names = recov_file_names(names, লেজ, FALSE);
+		    vim_free(লেজ);
 		}
 	    }
 	}
 
 	// check for out-of-memory
-	for (int i = 0; i < num_names; ++i)
+	জন্য (পূর্ণসংখ্যা i = 0; i < অঙ্ক_names; ++i)
 	{
-	    if (names[i] == NULL)
+	    যদি (names[i] == ফাঁকা)
 	    {
-		for (i = 0; i < num_names; ++i)
+		জন্য (i = 0; i < অঙ্ক_names; ++i)
 		    vim_free(names[i]);
-		num_names = 0;
+		অঙ্ক_names = 0;
 	    }
 	}
-	if (num_names == 0)
-	    num_files = 0;
-	else if (expand_wildcards(num_names, names, &num_files, &files,
+	যদি (অঙ্ক_names == 0)
+	    অঙ্ক_files = 0;
+	অন্যথা যদি (expand_wildcards(অঙ্ক_names, names, &অঙ্ক_files, &files,
 			    EW_NOTENV|EW_KEEPALL|EW_FILE|EW_SILENT) == FAIL)
-	    num_files = 0;
+	    অঙ্ক_files = 0;
 
 	/*
 	 * When no swap file found, wildcard expansion might have failed (e.g.
 	 * not able to execute the shell).
 	 * Try finding a swap file by simply adding ".swp" to the file name.
 	 */
-	if (*dirp == NUL && file_count + num_files == 0 && fname != NULL)
+	যদি (*dirp == NUL && file_গুনতি + অঙ্ক_files == 0 && fname != ফাঁকা)
 	{
 	    stat_T	    st;
 	    char_u	    *swapname;
 
 	    swapname = modname(fname_res,
-#if defined(VMS)
+#যদি defined(VMS)
 			       (char_u *)"_swp", FALSE
-#else
+#অন্যথা
 			       (char_u *)".swp", TRUE
 #endif
 			      );
-	    if (swapname != NULL)
+	    যদি (swapname != ফাঁকা)
 	    {
-		if (mch_stat((char *)swapname, &st) != -1)    // It exists!
+		যদি (mch_stat((অক্ষর *)swapname, &st) != -1)    // It exists!
 		{
 		    files = ALLOC_ONE(char_u *);
-		    if (files != NULL)
+		    যদি (files != ফাঁকা)
 		    {
 			files[0] = swapname;
-			swapname = NULL;
-			num_files = 1;
+			swapname = ফাঁকা;
+			অঙ্ক_files = 1;
 		    }
 		}
 		vim_free(swapname);
@@ -2115,98 +2115,98 @@ recover_names(
 	 * Remove swapfile name of the current buffer, it must be ignored.
 	 * But keep it for swapfilelist().
 	 */
-	if (curbuf->b_ml.ml_mfp != NULL
-			       && (p = curbuf->b_ml.ml_mfp->mf_fname) != NULL
-			       && ret_list == NULL)
+	যদি (curbuf->b_ml.ml_mfp != ফাঁকা
+			       && (p = curbuf->b_ml.ml_mfp->mf_fname) != ফাঁকা
+			       && ret_list == ফাঁকা)
 	{
-	    for (int i = 0; i < num_files; ++i)
+	    জন্য (পূর্ণসংখ্যা i = 0; i < অঙ্ক_files; ++i)
 		// Do not expand wildcards, on windows would try to expand
 		// "%tmp%" in "%tmp%file".
-		if (fullpathcmp(p, files[i], TRUE, FALSE) & FPC_SAME)
+		যদি (fullpathcmp(p, files[i], TRUE, FALSE) & FPC_SAME)
 		{
 		    // Remove the name from files[i].  Move further entries
 		    // down.  When the array becomes empty free it here, since
 		    // FreeWild() won't be called below.
 		    vim_free(files[i]);
-		    if (--num_files == 0)
+		    যদি (--অঙ্ক_files == 0)
 			vim_free(files);
-		    else
-			for ( ; i < num_files; ++i)
+		    অন্যথা
+			জন্য ( ; i < অঙ্ক_files; ++i)
 			    files[i] = files[i + 1];
 		}
 	}
-	if (nr > 0)
+	যদি (nr > 0)
 	{
-	    file_count += num_files;
-	    if (nr <= file_count)
+	    file_গুনতি += অঙ্ক_files;
+	    যদি (nr <= file_গুনতি)
 	    {
 		*fname_out = vim_strsave(
-				      files[nr - 1 + num_files - file_count]);
+				      files[nr - 1 + অঙ্ক_files - file_গুনতি]);
 		dirp = (char_u *)"";		    // stop searching
 	    }
 	}
-	else if (do_list)
+	অন্যথা যদি (do_list)
 	{
-	    if (dir_name.string[0] == '.' && dir_name.string[1] == NUL)
+	    যদি (dir_name.string[0] == '.' && dir_name.string[1] == NUL)
 	    {
-		if (fname == NULL)
-		    msg_puts(_("   In current directory:\n"));
-		else
-		    msg_puts(_("   Using specified name:\n"));
+		যদি (fname == ফাঁকা)
+		    বার্তা_puts(_("   In current directory:\n"));
+		অন্যথা
+		    বার্তা_puts(_("   Using specified name:\n"));
 	    }
-	    else
+	    অন্যথা
 	    {
-		msg_puts(_("   In directory "));
-		msg_home_replace(dir_name.string);
-		msg_puts(":\n");
+		বার্তা_puts(_("   In directory "));
+		বার্তা_home_replace(dir_name.string);
+		বার্তা_puts(":\n");
 	    }
 
-	    if (num_files)
+	    যদি (অঙ্ক_files)
 	    {
-		for (int i = 0; i < num_files; ++i)
+		জন্য (পূর্ণসংখ্যা i = 0; i < অঙ্ক_files; ++i)
 		{
 		    // print the swap file name
-		    msg_outnum((long)++file_count);
-		    msg_puts(".    ");
-		    msg_puts((char *)gettail(files[i]));
-		    msg_putchar('\n');
-		    (void)swapfile_info(files[i]);
+		    বার্তা_outnum((long)++file_গুনতি);
+		    বার্তা_puts(".    ");
+		    বার্তা_puts((অক্ষর *)gettail(files[i]));
+		    বার্তা_putchar('\n');
+		    (শূন্য)swapfile_info(files[i]);
 		}
 	    }
-	    else
-		msg_puts(_("      -- none --\n"));
+	    অন্যথা
+		বার্তা_puts(_("      -- none --\n"));
 	    out_flush();
 	}
 #ifdef FEAT_EVAL
-	else if (ret_list != NULL)
+	অন্যথা যদি (ret_list != ফাঁকা)
 	{
 	    string_T	name;
 
-	    for (int i = 0; i < num_files; ++i)
+	    জন্য (পূর্ণসংখ্যা i = 0; i < অঙ্ক_files; ++i)
 	    {
-		concat_fnames(dir_name.string, dir_name.length,
+		concat_fnames(dir_name.string, dir_name.দৈর্ঘ্য,
 		    files[i], STRLEN(files[i]), TRUE, &name);
-		if (name.string != NULL)
+		যদি (name.string != ফাঁকা)
 		{
-		    list_append_string(ret_list, name.string, (int)name.length);
+		    list_append_string(ret_list, name.string, (পূর্ণসংখ্যা)name.দৈর্ঘ্য);
 		    vim_free(name.string);
 		}
 	    }
 	}
 #endif
-	else
-	    file_count += num_files;
+	অন্যথা
+	    file_গুনতি += অঙ্ক_files;
 
-	for (int i = 0; i < num_names; ++i)
+	জন্য (পূর্ণসংখ্যা i = 0; i < অঙ্ক_names; ++i)
 	    vim_free(names[i]);
-	if (num_files > 0)
-	    FreeWild(num_files, files);
+	যদি (অঙ্ক_files > 0)
+	    FreeWild(অঙ্ক_files, files);
     }
     vim_free(dir_name.string);
-    return file_count;
+    ফেরত file_গুনতি;
 }
 
-#if defined(UNIX) || defined(MSWIN)
+#যদি defined(UNIX) || defined(MSWIN)
 /*
  * Need _very_ long file names.
  * Append the full path to name with path separators made into percent
@@ -2217,77 +2217,77 @@ recover_names(
     char_u *
 make_percent_swname(char_u *dir, char_u *dir_end, char_u *name)
 {
-    string_T	d = {NULL, 0};
+    string_T	d = {ফাঁকা, 0};
     string_T	fixed_fname;
     char_u	*p;
 
-    fixed_fname.string = fix_fname(name != NULL ? name : (char_u *)"");
-    if (fixed_fname.string == NULL)
-	return NULL;
+    fixed_fname.string = fix_fname(name != ফাঁকা ? name : (char_u *)"");
+    যদি (fixed_fname.string == ফাঁকা)
+	ফেরত ফাঁকা;
 
-    for (p = fixed_fname.string; *p != NUL; MB_PTR_ADV(p))
-	if (vim_ispathsep(*p))
+    জন্য (p = fixed_fname.string; *p != NUL; MB_PTR_ADV(p))
+	যদি (vim_ispathsep(*p))
 	    *p = '%';
-    fixed_fname.length = (size_t)(p - fixed_fname.string);
+    fixed_fname.দৈর্ঘ্য = (size_t)(p - fixed_fname.string);
 
     // remove one trailing slash
     p = &dir_end[-1];
     *p = NUL;
-    concat_fnames(dir, (size_t)(p - dir), fixed_fname.string, fixed_fname.length, TRUE, &d);
+    concat_fnames(dir, (size_t)(p - dir), fixed_fname.string, fixed_fname.দৈর্ঘ্য, TRUE, &d);
     vim_free(fixed_fname.string);
 
-    return d.string;
+    ফেরত d.string;
 }
 #endif
 
-#if (defined(UNIX) || defined(VMS) || defined(MSWIN)) \
+#যদি (defined(UNIX) || defined(VMS) || defined(MSWIN)) \
 	&& (defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG))
 # define HAVE_PROCESS_STILL_RUNNING
-static int process_still_running;
+স্থির পূর্ণসংখ্যা process_still_running;
 #endif
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 /*
  * Return information found in swapfile "fname" in dictionary "d".
  * This is used by the swapinfo() function.
  */
-    void
+    শূন্য
 get_b0_dict(char_u *fname, dict_T *d)
 {
-    int fd;
-    struct block0 b0;
+    পূর্ণসংখ্যা fd;
+    কাঠামো block0 b0;
 
-    if ((fd = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0)) >= 0)
+    যদি ((fd = mch_open((অক্ষর *)fname, O_RDONLY | O_EXTRA, 0)) >= 0)
     {
-	if (read_eintr(fd, &b0, sizeof(b0)) == sizeof(b0))
+	যদি (read_eintr(fd, &b0, আকার(b0)) == আকার(b0))
 	{
-	    if (ml_check_b0_id(&b0) == FAIL)
+	    যদি (ml_check_b0_id(&b0) == FAIL)
 		dict_add_string_len(d, "error",
 		    (char_u *)"Not a swap file", STRLEN_LITERAL("Not a swap file"));
-	    else if (b0_magic_wrong(&b0))
+	    অন্যথা যদি (b0_magic_wrong(&b0))
 		dict_add_string_len(d, "error",
 		    (char_u *)"Magic number mismatch", STRLEN_LITERAL("Magic number mismatch"));
-	    else
+	    অন্যথা
 	    {
 		// we have swap information
 		dict_add_string_len(d, "version", b0.b0_version, 10);
-		dict_add_string_len(d, "user", b0.b0_uname, B0_UNAME_SIZE);
-		dict_add_string_len(d, "host", b0.b0_hname, B0_HNAME_SIZE);
-		dict_add_string_len(d, "fname", b0.b0_fname, B0_FNAME_SIZE_ORG);
+		dict_add_string_len(d, "user", b0.b0_uname, B0_UNAME_আকার);
+		dict_add_string_len(d, "host", b0.b0_hname, B0_HNAME_আকার);
+		dict_add_string_len(d, "fname", b0.b0_fname, B0_FNAME_আকার_ORG);
 
-		dict_add_number(d, "pid", char_to_long(b0.b0_pid));
-		dict_add_number(d, "mtime", char_to_long(b0.b0_mtime));
-		dict_add_number(d, "dirty", b0.b0_dirty ? 1 : 0);
+		dict_add_সংখ্যা(d, "pid", char_to_long(b0.b0_pid));
+		dict_add_সংখ্যা(d, "mtime", char_to_long(b0.b0_mtime));
+		dict_add_সংখ্যা(d, "dirty", b0.b0_dirty ? 1 : 0);
 # ifdef CHECK_INODE
-		dict_add_number(d, "inode", char_to_long(b0.b0_ino));
+		dict_add_সংখ্যা(d, "inode", char_to_long(b0.b0_ino));
 # endif
 	    }
 	}
-	else
+	অন্যথা
 	    dict_add_string_len(d, "error", (char_u *)"Cannot read file", STRLEN_LITERAL("Cannot read file"));
 	close(fd);
     }
-    else
+    অন্যথা
 	dict_add_string_len(d, "error", (char_u *)"Cannot open file", STRLEN_LITERAL("Cannot open file"));
 }
 #endif
@@ -2296,85 +2296,85 @@ get_b0_dict(char_u *fname, dict_T *d)
  * Give information about an existing swap file.
  * Returns timestamp (0 when unknown).
  */
-    static time_t
+    স্থির time_t
 swapfile_info(char_u *fname)
 {
     stat_T	    st;
-    int		    fd;
-    struct block0   b0;
+    পূর্ণসংখ্যা		    fd;
+    কাঠামো block0   b0;
 #ifdef UNIX
-    char_u	    uname[B0_UNAME_SIZE];
+    char_u	    uname[B0_UNAME_আকার];
 #endif
 
     // print the swap file date
-    if (mch_stat((char *)fname, &st) != -1)
+    যদি (mch_stat((অক্ষর *)fname, &st) != -1)
     {
 #ifdef UNIX
 	// print name of owner of the file
-	if (mch_get_uname(st.st_uid, uname, B0_UNAME_SIZE) == OK)
+	যদি (mch_get_uname(st.st_uid, uname, B0_UNAME_আকার) == OK)
 	{
-	    msg_puts(_("          owned by: "));
-	    msg_outtrans(uname);
-	    msg_puts(_("   dated: "));
+	    বার্তা_puts(_("          owned by: "));
+	    বার্তা_outtrans(uname);
+	    বার্তা_puts(_("   dated: "));
 	}
-	else
+	অন্যথা
 #endif
-	    msg_puts(_("             dated: "));
-	msg_puts(get_ctime(st.st_mtime, TRUE));
+	    বার্তা_puts(_("             dated: "));
+	বার্তা_puts(get_ctime(st.st_mtime, TRUE));
     }
-    else
+    অন্যথা
 	st.st_mtime = 0;
 
     /*
      * print the original file name
      */
-    fd = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0);
-    if (fd >= 0)
+    fd = mch_open((অক্ষর *)fname, O_RDONLY | O_EXTRA, 0);
+    যদি (fd >= 0)
     {
-	if (read_eintr(fd, &b0, sizeof(b0)) == sizeof(b0))
+	যদি (read_eintr(fd, &b0, আকার(b0)) == আকার(b0))
 	{
-	    if (STRNCMP(b0.b0_version, "VIM 3.0", 7) == 0)
+	    যদি (STRNCMP(b0.b0_version, "VIM 3.0", 7) == 0)
 	    {
-		msg_puts(_("         [from Vim version 3.0]"));
+		বার্তা_puts(_("         [from Vim version 3.0]"));
 	    }
-	    else if (ml_check_b0_id(&b0) == FAIL)
+	    অন্যথা যদি (ml_check_b0_id(&b0) == FAIL)
 	    {
-		msg_puts(_("         [does not look like a Vim swap file]"));
+		বার্তা_puts(_("         [does not look like a Vim swap file]"));
 	    }
-	    else
+	    অন্যথা
 	    {
-		msg_puts(_("         file name: "));
-		if (b0.b0_fname[0] == NUL)
-		    msg_puts(_("[No Name]"));
-		else
-		    msg_outtrans(b0.b0_fname);
+		বার্তা_puts(_("         file name: "));
+		যদি (b0.b0_fname[0] == NUL)
+		    বার্তা_puts(_("[No Name]"));
+		অন্যথা
+		    বার্তা_outtrans(b0.b0_fname);
 
-		msg_puts(_("\n          modified: "));
-		msg_puts(b0.b0_dirty ? _("YES") : _("no"));
+		বার্তা_puts(_("\n          modified: "));
+		বার্তা_puts(b0.b0_dirty ? _("YES") : _("no"));
 
-		if (*(b0.b0_uname) != NUL)
+		যদি (*(b0.b0_uname) != NUL)
 		{
-		    msg_puts(_("\n         user name: "));
-		    msg_outtrans(b0.b0_uname);
+		    বার্তা_puts(_("\n         user name: "));
+		    বার্তা_outtrans(b0.b0_uname);
 		}
 
-		if (*(b0.b0_hname) != NUL)
+		যদি (*(b0.b0_hname) != NUL)
 		{
-		    if (*(b0.b0_uname) != NUL)
-			msg_puts(_("   host name: "));
-		    else
-			msg_puts(_("\n         host name: "));
-		    msg_outtrans(b0.b0_hname);
+		    যদি (*(b0.b0_uname) != NUL)
+			বার্তা_puts(_("   host name: "));
+		    অন্যথা
+			বার্তা_puts(_("\n         host name: "));
+		    বার্তা_outtrans(b0.b0_hname);
 		}
 
-		if (char_to_long(b0.b0_pid) != 0L)
+		যদি (char_to_long(b0.b0_pid) != 0L)
 		{
-		    msg_puts(_("\n        process ID: "));
-		    msg_outnum(char_to_long(b0.b0_pid));
-#if defined(UNIX) || defined(MSWIN)
-		    if (swapfile_process_running(&b0, fname))
+		    বার্তা_puts(_("\n        process ID: "));
+		    বার্তা_outnum(char_to_long(b0.b0_pid));
+#যদি defined(UNIX) || defined(MSWIN)
+		    যদি (swapfile_process_running(&b0, fname))
 		    {
-			msg_puts(_(" (STILL RUNNING)"));
+			বার্তা_puts(_(" (STILL RUNNING)"));
 # ifdef HAVE_PROCESS_STILL_RUNNING
 			process_still_running = TRUE;
 # endif
@@ -2382,82 +2382,82 @@ swapfile_info(char_u *fname)
 #endif
 		}
 
-		if (b0_magic_wrong(&b0))
+		যদি (b0_magic_wrong(&b0))
 		{
-#if defined(MSWIN)
-		    if (STRNCMP(b0.b0_hname, "PC ", 3) == 0)
-			msg_puts(_("\n         [not usable with this version of Vim]"));
-		    else
+#যদি defined(MSWIN)
+		    যদি (STRNCMP(b0.b0_hname, "PC ", 3) == 0)
+			বার্তা_puts(_("\n         [not usable with this version of Vim]"));
+		    অন্যথা
 #endif
-			msg_puts(_("\n         [not usable on this computer]"));
+			বার্তা_puts(_("\n         [not usable on this computer]"));
 		}
 	    }
 	}
-	else
-	    msg_puts(_("         [cannot be read]"));
+	অন্যথা
+	    বার্তা_puts(_("         [cannot be read]"));
 	close(fd);
     }
-    else
-	msg_puts(_("         [cannot be opened]"));
-    msg_putchar('\n');
+    অন্যথা
+	বার্তা_puts(_("         [cannot be opened]"));
+    বার্তা_putchar('\n');
 
-    return st.st_mtime;
+    ফেরত st.st_mtime;
 }
 
 /*
  * Return TRUE if the swap file looks OK and there are no changes, thus it can
  * be safely deleted.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 swapfile_unchanged(char_u *fname)
 {
     stat_T	    st;
-    int		    fd;
-    struct block0   b0;
-    int		    ret = TRUE;
+    পূর্ণসংখ্যা		    fd;
+    কাঠামো block0   b0;
+    পূর্ণসংখ্যা		    ret = TRUE;
 
     // must be able to stat the swap file
-    if (mch_stat((char *)fname, &st) == -1)
-	return FALSE;
+    যদি (mch_stat((অক্ষর *)fname, &st) == -1)
+	ফেরত FALSE;
 
     // must be able to read the first block
-    fd = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0);
-    if (fd < 0)
-	return FALSE;
-    if (read_eintr(fd, &b0, sizeof(b0)) != sizeof(b0))
+    fd = mch_open((অক্ষর *)fname, O_RDONLY | O_EXTRA, 0);
+    যদি (fd < 0)
+	ফেরত FALSE;
+    যদি (read_eintr(fd, &b0, আকার(b0)) != আকার(b0))
     {
 	close(fd);
-	return FALSE;
+	ফেরত FALSE;
     }
 
     // the ID and magic number must be correct
-    if (ml_check_b0_id(&b0) == FAIL|| b0_magic_wrong(&b0))
+    যদি (ml_check_b0_id(&b0) == FAIL|| b0_magic_wrong(&b0))
 	ret = FALSE;
 
     // must be unchanged
-    if (b0.b0_dirty)
+    যদি (b0.b0_dirty)
 	ret = FALSE;
 
-#if defined(UNIX) || defined(MSWIN)
+#যদি defined(UNIX) || defined(MSWIN)
     // Host name must be known and must equal the current host name, otherwise
     // comparing pid is meaningless.
-    if (*(b0.b0_hname) == NUL)
+    যদি (*(b0.b0_hname) == NUL)
     {
 	ret = FALSE;
     }
-    else
+    অন্যথা
     {
-	char_u	    hostname[B0_HNAME_SIZE];
+	char_u	    hostname[B0_HNAME_আকার];
 
-	mch_get_host_name(hostname, B0_HNAME_SIZE);
-	hostname[B0_HNAME_SIZE - 1] = NUL;
-	b0.b0_hname[B0_HNAME_SIZE - 1] = NUL; // in case of corruption
-	if (STRICMP(b0.b0_hname, hostname) != 0)
+	mch_get_host_name(hostname, B0_HNAME_আকার);
+	hostname[B0_HNAME_আকার - 1] = NUL;
+	b0.b0_hname[B0_HNAME_আকার - 1] = NUL; // in case of corruption
+	যদি (STRICMP(b0.b0_hname, hostname) != 0)
 	    ret = FALSE;
     }
 
     // process must be known and not be running
-    if (char_to_long(b0.b0_pid) == 0L || swapfile_process_running(&b0, fname))
+    যদি (char_to_long(b0.b0_pid) == 0L || swapfile_process_running(&b0, fname))
 	ret = FALSE;
 #endif
 
@@ -2465,13 +2465,13 @@ swapfile_unchanged(char_u *fname)
     // file is still useful.
 
     close(fd);
-    return ret;
+    ফেরত ret;
 }
 
-    static int
-recov_file_names(char_u **names, char_u *path, int prepend_dot)
+    স্থির পূর্ণসংখ্যা
+recov_file_names(char_u **names, char_u *path, পূর্ণসংখ্যা prepend_dot)
 {
-    int		num_names;
+    পূর্ণসংখ্যা		অঙ্ক_names;
 
     /*
      * (Win32 and Win64) never short names, but do prepend a dot.
@@ -2479,7 +2479,7 @@ recov_file_names(char_u **names, char_u *path, int prepend_dot)
      * Only use the short name if it is different.
      */
     char_u	*p;
-    int		i;
+    পূর্ণসংখ্যা		i;
 #ifndef MSWIN
     bool    shortname = curbuf->b_shortname;
 
@@ -2487,46 +2487,46 @@ recov_file_names(char_u **names, char_u *path, int prepend_dot)
 #endif
     string_T	ret;
 
-    num_names = 0;
+    অঙ্ক_names = 0;
 
     /*
      * May also add the file name with a dot prepended, for swap file in same
      * dir as original file.
      */
-    if (prepend_dot)
+    যদি (prepend_dot)
     {
-	names[num_names] = modname(path, (char_u *)".sw?", TRUE);
-	if (names[num_names] == NULL)
-	    goto end;
-	++num_names;
+	names[অঙ্ক_names] = modname(path, (char_u *)".sw?", TRUE);
+	যদি (names[অঙ্ক_names] == ফাঁকা)
+	    যাও end;
+	++অঙ্ক_names;
     }
 
     /*
      * Form the normal swap file name pattern by appending ".sw?".
      */
 #ifdef VMS
-    names[num_names] = concat_fnames(path, STRLEN(path),
+    names[অঙ্ক_names] = concat_fnames(path, STRLEN(path),
 	(char_u *)"_sw%", STRLEN_LITERAL("_sw%"), FALSE, &ret);
-#else
-    names[num_names] = concat_fnames(path, STRLEN(path),
+#অন্যথা
+    names[অঙ্ক_names] = concat_fnames(path, STRLEN(path),
 	(char_u *)".sw?", STRLEN_LITERAL(".sw?"), FALSE, &ret);
 #endif
-    if (names[num_names] == NULL)
-	goto end;
-    if (num_names >= 1)	    // check if we have the same name twice
+    যদি (names[অঙ্ক_names] == ফাঁকা)
+	যাও end;
+    যদি (অঙ্ক_names >= 1)	    // check if we have the same name twice
     {
-	p = names[num_names - 1];
-	i = (int)STRLEN(names[num_names - 1]) - (int)STRLEN(names[num_names]);
-	if (i > 0)
+	p = names[অঙ্ক_names - 1];
+	i = (পূর্ণসংখ্যা)STRLEN(names[অঙ্ক_names - 1]) - (পূর্ণসংখ্যা)STRLEN(names[অঙ্ক_names]);
+	যদি (i > 0)
 	    p += i;	    // file name has been expanded to full path
 
-	if (STRCMP(p, names[num_names]) != 0)
-	    ++num_names;
-	else
-	    vim_free(names[num_names]);
+	যদি (STRCMP(p, names[অঙ্ক_names]) != 0)
+	    ++অঙ্ক_names;
+	অন্যথা
+	    vim_free(names[অঙ্ক_names]);
     }
-    else
-	++num_names;
+    অন্যথা
+	++অঙ্ক_names;
 
 #ifndef MSWIN
     /*
@@ -2534,24 +2534,24 @@ recov_file_names(char_u **names, char_u *path, int prepend_dot)
      */
     curbuf->b_shortname = true;
 # ifdef VMS
-    names[num_names] = modname(path, (char_u *)"_sw%", FALSE);
-# else
-    names[num_names] = modname(path, (char_u *)".sw?", FALSE);
+    names[অঙ্ক_names] = modname(path, (char_u *)"_sw%", FALSE);
+# অন্যথা
+    names[অঙ্ক_names] = modname(path, (char_u *)".sw?", FALSE);
 # endif
-    if (names[num_names] == NULL)
-	goto end;
+    যদি (names[অঙ্ক_names] == ফাঁকা)
+	যাও end;
 
     /*
      * Remove the one from 'shortname', if it's the same as with 'noshortname'.
      */
-    p = names[num_names];
-    i = STRLEN(names[num_names]) - STRLEN(names[num_names - 1]);
-    if (i > 0)
+    p = names[অঙ্ক_names];
+    i = STRLEN(names[অঙ্ক_names]) - STRLEN(names[অঙ্ক_names - 1]);
+    যদি (i > 0)
 	p += i;		// file name has been expanded to full path
-    if (STRCMP(names[num_names - 1], p) == 0)
-	vim_free(names[num_names]);
-    else
-	++num_names;
+    যদি (STRCMP(names[অঙ্ক_names - 1], p) == 0)
+	vim_free(names[অঙ্ক_names]);
+    অন্যথা
+	++অঙ্ক_names;
 #endif
 
 end:
@@ -2559,7 +2559,7 @@ end:
     curbuf->b_shortname = shortname;
 #endif
 
-    return num_names;
+    ফেরত অঙ্ক_names;
 }
 
 /*
@@ -2569,53 +2569,53 @@ end:
  * If 'check_char' is TRUE, stop syncing when character becomes available, but
  * always sync at least one block.
  */
-    void
-ml_sync_all(int check_file, int check_char)
+    শূন্য
+ml_sync_all(পূর্ণসংখ্যা check_file, পূর্ণসংখ্যা check_char)
 {
     buf_T		*buf;
     stat_T		st;
 
     FOR_ALL_BUFFERS(buf)
     {
-	if (buf->b_ml.ml_mfp == NULL
-		|| buf->b_ml.ml_mfp->mf_fname == NULL
+	যদি (buf->b_ml.ml_mfp == ফাঁকা
+		|| buf->b_ml.ml_mfp->mf_fname == ফাঁকা
 		|| buf->b_ml.ml_mfp->mf_fd < 0)
-	    continue;			    // no file
+	    চালু;			    // no file
 
 #ifdef FEAT_CRYPT
-	if (crypt_may_close_swapfile(buf, buf->b_p_key,
+	যদি (crypt_may_close_swapfile(buf, buf->b_p_চাবি,
 						     crypt_get_method_nr(buf)))
-	    continue;
+	    চালু;
 #endif
 
-	ml_flush_line(buf);		    // flush buffered line
+	ml_flush_সারি(buf);		    // flush buffered line
 					    // flush locked block
-	(void)ml_find_line(buf, (linenr_T)0, ML_FLUSH);
-	if (bufIsChanged(buf) && check_file && mf_need_trans(buf->b_ml.ml_mfp)
-						     && buf->b_ffname != NULL)
+	(শূন্য)ml_find_সারি(buf, (linenr_T)0, ML_FLUSH);
+	যদি (bufIsChanged(buf) && check_file && mf_need_trans(buf->b_ml.ml_mfp)
+						     && buf->b_ffname != ফাঁকা)
 	{
 	    /*
 	     * If the original file does not exist anymore or has been changed
 	     * call ml_preserve() to get rid of all negative numbered blocks.
 	     */
-	    if (mch_stat((char *)buf->b_ffname, &st) == -1
+	    যদি (mch_stat((অক্ষর *)buf->b_ffname, &st) == -1
 		    || st.st_mtime != buf->b_mtime_read
 #ifdef ST_MTIM_NSEC
 		    || st.ST_MTIM_NSEC != buf->b_mtime_read_ns
 #endif
-		    || st.st_size != buf->b_orig_size)
+		    || st.st_size != buf->b_orig_আকার)
 	    {
 		ml_preserve(buf, FALSE);
 		did_check_timestamps = FALSE;
 		need_check_timestamps = TRUE;	// give message later
 	    }
 	}
-	if (buf->b_ml.ml_mfp->mf_dirty == MF_DIRTY_YES)
+	যদি (buf->b_ml.ml_mfp->mf_dirty == MF_DIRTY_YES)
 	{
-	    (void)mf_sync(buf->b_ml.ml_mfp, (check_char ? MFS_STOP : 0)
+	    (শূন্য)mf_sync(buf->b_ml.ml_mfp, (check_char ? MFS_STOP : 0)
 					| (bufIsChanged(buf) ? MFS_FLUSH : 0));
-	    if (check_char && ui_char_avail())	// character available now
-		break;
+	    যদি (check_char && ui_char_avail())	// character available now
+		বিরতি;
 	}
     }
 }
@@ -2630,36 +2630,36 @@ ml_sync_all(int check_file, int check_char)
  *
  * when message is TRUE the success of preserving is reported
  */
-    void
-ml_preserve(buf_T *buf, int message)
+    শূন্য
+ml_preserve(buf_T *buf, পূর্ণসংখ্যা message)
 {
     bhdr_T	*hp;
     linenr_T	lnum;
     memfile_T	*mfp = buf->b_ml.ml_mfp;
-    int		status;
-    int		got_int_save = got_int;
+    পূর্ণসংখ্যা		status;
+    পূর্ণসংখ্যা		got_int_save = got_int;
 
-    if (mfp == NULL || mfp->mf_fname == NULL)
+    যদি (mfp == ফাঁকা || mfp->mf_fname == ফাঁকা)
     {
-	if (message)
+	যদি (message)
 	    emsg(_(e_cannot_preserve_there_is_no_swap_file));
-	return;
+	ফেরত;
     }
 #ifdef FEAT_CRYPT
-    if (crypt_may_close_swapfile(buf, buf->b_p_key, crypt_get_method_nr(buf)))
-	return;
+    যদি (crypt_may_close_swapfile(buf, buf->b_p_চাবি, crypt_get_method_nr(buf)))
+	ফেরত;
 #endif
 
     // We only want to stop when interrupted here, not when interrupted
     // before.
     got_int = FALSE;
 
-    ml_flush_line(buf);				    // flush buffered line
-    (void)ml_find_line(buf, (linenr_T)0, ML_FLUSH); // flush locked block
+    ml_flush_সারি(buf);				    // flush buffered line
+    (শূন্য)ml_find_সারি(buf, (linenr_T)0, ML_FLUSH); // flush locked block
     status = mf_sync(mfp, MFS_ALL | MFS_FLUSH);
 
     // stack is invalid after mf_sync(.., MFS_ALL)
-    buf->b_ml.ml_stack_top = 0;
+    buf->b_ml.ml_স্তূপ_শীর্ষ = 0;
 
     /*
      * Some of the data blocks may have been changed from negative to
@@ -2673,34 +2673,34 @@ ml_preserve(buf_T *buf, int message)
      * ml_find_line() does the work by translating the negative block numbers
      * when getting the first line of each data block.
      */
-    if (mf_need_trans(mfp) && !got_int)
+    যদি (mf_need_trans(mfp) && !got_int)
     {
 	lnum = 1;
-	while (mf_need_trans(mfp) && lnum <= buf->b_ml.ml_line_count)
+	যখন (mf_need_trans(mfp) && lnum <= buf->b_ml.ml_সারি_গুনতি)
 	{
-	    hp = ml_find_line(buf, lnum, ML_FIND);
-	    if (hp == NULL)
+	    hp = ml_find_সারি(buf, lnum, ML_FIND);
+	    যদি (hp == ফাঁকা)
 	    {
 		status = FAIL;
-		goto theend;
+		যাও theend;
 	    }
-	    CHECK(buf->b_ml.ml_locked_low != lnum, "low != lnum");
-	    lnum = buf->b_ml.ml_locked_high + 1;
+	    CHECK(buf->b_ml.ml_locked_নিচের != lnum, "low != lnum");
+	    lnum = buf->b_ml.ml_locked_উপরের + 1;
 	}
-	(void)ml_find_line(buf, (linenr_T)0, ML_FLUSH);	// flush locked block
+	(শূন্য)ml_find_সারি(buf, (linenr_T)0, ML_FLUSH);	// flush locked block
 	// sync the updated pointer blocks
-	if (mf_sync(mfp, MFS_ALL | MFS_FLUSH) == FAIL)
+	যদি (mf_sync(mfp, MFS_ALL | MFS_FLUSH) == FAIL)
 	    status = FAIL;
-	buf->b_ml.ml_stack_top = 0;	    // stack is invalid now
+	buf->b_ml.ml_স্তূপ_শীর্ষ = 0;	    // stack is invalid now
     }
 theend:
     got_int |= got_int_save;
 
-    if (message)
+    যদি (message)
     {
-	if (status == OK)
-	    msg(_("File preserved"));
-	else
+	যদি (status == OK)
+	    বার্তা(_("File preserved"));
+	অন্যথা
 	    emsg(_(e_preserve_failed));
     }
 }
@@ -2721,7 +2721,7 @@ theend:
     char_u  *
 ml_get(linenr_T lnum)
 {
-    return ml_get_buf(curbuf, lnum, FALSE);
+    ফেরত ml_get_buf(curbuf, lnum, FALSE);
 }
 
 /*
@@ -2730,25 +2730,25 @@ ml_get(linenr_T lnum)
     char_u *
 ml_get_pos(pos_T *pos)
 {
-    return (ml_get_buf(curbuf, pos->lnum, FALSE) + pos->col);
+    ফেরত (ml_get_buf(curbuf, pos->lnum, FALSE) + pos->col);
 }
 
 /*
  * Return pointer to cursor line.
  */
     char_u *
-ml_get_curline(void)
+ml_get_curline(শূন্য)
 {
-    return ml_get_buf(curbuf, curwin->w_cursor.lnum, FALSE);
+    ফেরত ml_get_buf(curbuf, curwin->w_cursor.lnum, FALSE);
 }
 
 /*
  * Return pointer to cursor position.
  */
     char_u *
-ml_get_cursor(void)
+ml_get_cursor(শূন্য)
 {
-    return (ml_get_buf(curbuf, curwin->w_cursor.lnum, FALSE) +
+    ফেরত (ml_get_buf(curbuf, curwin->w_cursor.lnum, FALSE) +
 							curwin->w_cursor.col);
 }
 
@@ -2756,42 +2756,42 @@ ml_get_cursor(void)
     colnr_T
 ml_get_len(linenr_T lnum)
 {
-    return ml_get_buf_len(curbuf, lnum);
+    ফেরত ml_get_buf_len(curbuf, lnum);
 }
 
 // return length (excluding the NUL) of the text after position "pos"
     colnr_T
 ml_get_pos_len(pos_T *pos)
 {
-    return ml_get_buf_len(curbuf, pos->lnum) - pos->col;
+    ফেরত ml_get_buf_len(curbuf, pos->lnum) - pos->col;
 }
 
 // return length (excluding the NUL) of the cursor line
     colnr_T
-ml_get_curline_len(void)
+ml_get_curline_len(শূন্য)
 {
-    return ml_get_buf_len(curbuf, curwin->w_cursor.lnum);
+    ফেরত ml_get_buf_len(curbuf, curwin->w_cursor.lnum);
 }
 
 // return length (excluding the NUL) of the cursor position
     colnr_T
-ml_get_cursor_len(void)
+ml_get_cursor_len(শূন্য)
 {
-    return ml_get_buf_len(curbuf, curwin->w_cursor.lnum) - curwin->w_cursor.col;
+    ফেরত ml_get_buf_len(curbuf, curwin->w_cursor.lnum) - curwin->w_cursor.col;
 }
 
 // return length (excluding the NUL) of the given line in the given buffer
     colnr_T
 ml_get_buf_len(buf_T *buf, linenr_T lnum)
 {
-    char_u	*line;
+    char_u	*সারি;
 
-    if (*(line = ml_get_buf(buf, lnum, FALSE)) == NUL)
-	return 0;
+    যদি (*(সারি = ml_get_buf(buf, lnum, FALSE)) == NUL)
+	ফেরত 0;
 
-    if (buf->b_ml.ml_line_textlen <= 0)
-	buf->b_ml.ml_line_textlen = (int)STRLEN(line) + 1;
-    return buf->b_ml.ml_line_textlen - 1;
+    যদি (buf->b_ml.ml_সারি_textlen <= 0)
+	buf->b_ml.ml_সারি_textlen = (পূর্ণসংখ্যা)STRLEN(সারি) + 1;
+    ফেরত buf->b_ml.ml_সারি_textlen - 1;
 }
 
 /*
@@ -2804,16 +2804,16 @@ ml_get_buf_len(buf_T *buf, linenr_T lnum)
 ml_get_buf(
     buf_T	*buf,
     linenr_T	lnum,
-    int		will_change)		// line will be changed
+    পূর্ণসংখ্যা		will_change)		// line will be changed
 {
     bhdr_T	*hp;
-    DATA_BL	*dp;
-    static int	recursive = 0;
-    static char_u questions[4];
+    তথ্য_BL	*dp;
+    স্থির পূর্ণসংখ্যা	recursive = 0;
+    স্থির char_u questions[4];
 
-    if (lnum > buf->b_ml.ml_line_count)	// invalid line number
+    যদি (lnum > buf->b_ml.ml_সারি_গুনতি)	// invalid line number
     {
-	if (recursive == 0)
+	যদি (recursive == 0)
 	{
 	    // Avoid giving this message for a recursive call, may happen when
 	    // the GUI redraws part of the text.
@@ -2821,22 +2821,22 @@ ml_get_buf(
 	    siemsg(e_ml_get_invalid_lnum_nr, lnum);
 	    --recursive;
 	}
-	ml_flush_line(buf);
+	ml_flush_সারি(buf);
 errorret:
 	STRCPY(questions, "???");
-	buf->b_ml.ml_line_len = 4;
-	buf->b_ml.ml_line_textlen = buf->b_ml.ml_line_len;
-	buf->b_ml.ml_line_lnum = lnum;
-	return questions;
+	buf->b_ml.ml_সারি_len = 4;
+	buf->b_ml.ml_সারি_textlen = buf->b_ml.ml_সারি_len;
+	buf->b_ml.ml_সারি_lnum = lnum;
+	ফেরত questions;
     }
-    if (lnum <= 0)			// pretend line 0 is line 1
+    যদি (lnum <= 0)			// pretend line 0 is line 1
 	lnum = 1;
 
-    if (buf->b_ml.ml_mfp == NULL)	// there are no lines
+    যদি (buf->b_ml.ml_mfp == ফাঁকা)	// there are no lines
     {
-	buf->b_ml.ml_line_len = 1;
-	buf->b_ml.ml_line_textlen = buf->b_ml.ml_line_len;
-	return (char_u *)"";
+	buf->b_ml.ml_সারি_len = 1;
+	buf->b_ml.ml_সারি_textlen = buf->b_ml.ml_সারি_len;
+	ফেরত (char_u *)"";
     }
 
     /*
@@ -2845,88 +2845,88 @@ errorret:
      * Don't use the last used line when 'swapfile' is reset, need to load all
      * blocks.
      */
-    if (buf->b_ml.ml_line_lnum != lnum || mf_dont_release)
+    যদি (buf->b_ml.ml_সারি_lnum != lnum || mf_dont_release)
     {
 	unsigned    start, end;
-	int	    idx;
+	পূর্ণসংখ্যা	    idx;
 
-	ml_flush_line(buf);
+	ml_flush_সারি(buf);
 
 	/*
 	 * Find the data block containing the line.
 	 * This also fills the stack with the blocks from the root to the data
 	 * block and releases any locked block.
 	 */
-	if ((hp = ml_find_line(buf, lnum, ML_FIND)) == NULL)
+	যদি ((hp = ml_find_সারি(buf, lnum, ML_FIND)) == ফাঁকা)
 	{
-	    if (recursive == 0)
+	    যদি (recursive == 0)
 	    {
 		// Avoid giving this message for a recursive call, may happen
 		// when the GUI redraws part of the text.
 		++recursive;
 		get_trans_bufname(buf);
 		shorten_dir(NameBuff);
-		siemsg(e_ml_get_cannot_find_line_nr_in_buffer_nr_str,
+		siemsg(e_ml_get_cannot_find_সারি_nr_in_বাফার_nr_str,
 						  lnum, buf->b_fnum, NameBuff);
 		--recursive;
 	    }
-	    goto errorret;
+	    যাও errorret;
 	}
 
-	dp = (DATA_BL *)(hp->bh_data);
+	dp = (তথ্য_BL *)(hp->bh_তথ্য);
 
-	idx = lnum - buf->b_ml.ml_locked_low;
-	start = ((dp->db_index[idx]) & DB_INDEX_MASK);
+	idx = lnum - buf->b_ml.ml_locked_নিচের;
+	start = ((dp->db_সূচক[idx]) & DB_সূচক_MASK);
 	// The text ends where the previous line starts.  The first line ends
 	// at the end of the block.
-	if (idx == 0)
+	যদি (idx == 0)
 	    end = dp->db_txt_end;
-	else
-	    end = ((dp->db_index[idx - 1]) & DB_INDEX_MASK);
+	অন্যথা
+	    end = ((dp->db_সূচক[idx - 1]) & DB_সূচক_MASK);
 
-	buf->b_ml.ml_line_ptr = (char_u *)dp + start;
-	buf->b_ml.ml_line_len = end - start;
-#if defined(FEAT_BYTEOFF) && defined(FEAT_PROP_POPUP)
+	buf->b_ml.ml_সারি_ptr = (char_u *)dp + start;
+	buf->b_ml.ml_সারি_len = end - start;
+#যদি defined(FEAT_BYTEOFF) && defined(FEAT_PROP_POPUP)
 	// Text properties come after a NUL byte, so ml_line_len should be
 	// larger than the size of textprop_T if there is any.
-	if (buf->b_has_textprop
-			 && (size_t)buf->b_ml.ml_line_len > sizeof(textprop_T))
-	    buf->b_ml.ml_line_textlen = 0;  // call STRLEN() later when needed
-	else
+	যদি (buf->b_has_textprop
+			 && (size_t)buf->b_ml.ml_সারি_len > আকার(textprop_T))
+	    buf->b_ml.ml_সারি_textlen = 0;  // call STRLEN() later when needed
+	অন্যথা
 #endif
-	    buf->b_ml.ml_line_textlen = buf->b_ml.ml_line_len;
-	buf->b_ml.ml_line_lnum = lnum;
-	buf->b_ml.ml_flags &= ~(ML_LINE_DIRTY | ML_ALLOCATED);
+	    buf->b_ml.ml_সারি_textlen = buf->b_ml.ml_সারি_len;
+	buf->b_ml.ml_সারি_lnum = lnum;
+	buf->b_ml.ml_flags &= ~(ML_সারি_DIRTY | ML_ALLOCATED);
     }
-    if (will_change)
+    যদি (will_change)
     {
 	buf->b_ml.ml_flags |= (ML_LOCKED_DIRTY | ML_LOCKED_POS);
 #ifdef FEAT_EVAL
-	if (ml_get_alloc_lines && (buf->b_ml.ml_flags & ML_ALLOCATED))
+	যদি (ml_get_alloc_সারিগুলি && (buf->b_ml.ml_flags & ML_ALLOCATED))
 	    // can't make the change in the data block
-	    buf->b_ml.ml_flags |= ML_LINE_DIRTY;
+	    buf->b_ml.ml_flags |= ML_সারি_DIRTY;
 #endif
     }
 
 #ifdef FEAT_EVAL
-    if (ml_get_alloc_lines
-		 && (buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED)) == 0)
+    যদি (ml_get_alloc_সারিগুলি
+		 && (buf->b_ml.ml_flags & (ML_সারি_DIRTY | ML_ALLOCATED)) == 0)
     {
-	char_u *p = alloc(buf->b_ml.ml_line_len);
+	char_u *p = alloc(buf->b_ml.ml_সারি_len);
 
 	// make sure the text is in allocated memory
-	if (p != NULL)
+	যদি (p != ফাঁকা)
 	{
-	    memmove(p, buf->b_ml.ml_line_ptr, buf->b_ml.ml_line_len);
-	    buf->b_ml.ml_line_ptr = p;
+	    memmove(p, buf->b_ml.ml_সারি_ptr, buf->b_ml.ml_সারি_len);
+	    buf->b_ml.ml_সারি_ptr = p;
 	    buf->b_ml.ml_flags |= ML_ALLOCATED;
-	    if (will_change)
+	    যদি (will_change)
 		// can't make the change in the data block
-		buf->b_ml.ml_flags |= ML_LINE_DIRTY;
+		buf->b_ml.ml_flags |= ML_সারি_DIRTY;
 	}
     }
 #endif
-    return buf->b_ml.ml_line_ptr;
+    ফেরত buf->b_ml.ml_সারি_ptr;
 }
 
 /*
@@ -2935,168 +2935,168 @@ errorret:
  * This ignores ML_ALLOCATED to get the same behavior as without the test
  * override.
  */
-    int
-ml_line_alloced(void)
+    পূর্ণসংখ্যা
+ml_সারি_alloced(শূন্য)
 {
-    return (curbuf->b_ml.ml_flags & ML_LINE_DIRTY);
+    ফেরত (curbuf->b_ml.ml_flags & ML_সারি_DIRTY);
 }
 
 #ifdef FEAT_PROP_POPUP
 /*
  * Add text properties that continue from the previous line.
  */
-    static void
+    স্থির শূন্য
 add_text_props_for_append(
 	    buf_T	*buf,
 	    linenr_T	lnum,
-	    char_u	**line,
-	    int		*len,
+	    char_u	**সারি,
+	    পূর্ণসংখ্যা		*len,
 	    char_u	**tofree)
 {
-    int		round;
-    int		new_prop_count = 0;
-    int		count;
-    int		n;
+    পূর্ণসংখ্যা		round;
+    পূর্ণসংখ্যা		new_prop_গুনতি = 0;
+    পূর্ণসংখ্যা		গুনতি;
+    পূর্ণসংখ্যা		n;
     char_u	*props;
-    int		new_len = 0;  // init for gcc
-    char_u	*new_line = NULL;
+    পূর্ণসংখ্যা		new_len = 0;  // init for gcc
+    char_u	*new_সারি = ফাঁকা;
     textprop_T	prop;
 
     // Make two rounds:
     // 1. calculate the extra space needed
     // 2. allocate the space and fill it
-    for (round = 1; round <= 2; ++round)
+    জন্য (round = 1; round <= 2; ++round)
     {
-	if (round == 2)
+	যদি (round == 2)
 	{
 	    uint16_t pc;
 
-	    if (new_prop_count == 0)
-		return;  // nothing to do
-	    new_len = *len + (int)PROP_COUNT_SIZE
-			     + new_prop_count * (int)sizeof(textprop_T);
-	    new_line = alloc(new_len);
-	    if (new_line == NULL)
-		return;
-	    mch_memmove(new_line, *line, *len);
+	    যদি (new_prop_গুনতি == 0)
+		ফেরত;  // nothing to do
+	    new_len = *len + (পূর্ণসংখ্যা)PROP_গুনতি_আকার
+			     + new_prop_গুনতি * (পূর্ণসংখ্যা)আকার(textprop_T);
+	    new_সারি = alloc(new_len);
+	    যদি (new_সারি == ফাঁকা)
+		ফেরত;
+	    mch_memmove(new_সারি, *সারি, *len);
 	    // Write prop_count header.
-	    pc = (uint16_t)new_prop_count;
-	    mch_memmove(new_line + *len, &pc, PROP_COUNT_SIZE);
-	    new_prop_count = 0;
+	    pc = (uint16_t)new_prop_গুনতি;
+	    mch_memmove(new_সারি + *len, &pc, PROP_গুনতি_আকার);
+	    new_prop_গুনতি = 0;
 	}
 
 	// Get the line above to find any props that continue in the next
 	// line.
-	count = get_text_props(buf, lnum, &props, FALSE);
-	for (n = 0; n < count; ++n)
+	গুনতি = get_text_props(buf, lnum, &props, FALSE);
+	জন্য (n = 0; n < গুনতি; ++n)
 	{
-	    mch_memmove(&prop, props + n * sizeof(textprop_T),
-							   sizeof(textprop_T));
-	    if (prop.tp_flags & TP_FLAG_CONT_NEXT)
+	    mch_memmove(&prop, props + n * আকার(textprop_T),
+							   আকার(textprop_T));
+	    যদি (prop.tp_flags & TP_FLAG_CONT_পরবর্তী)
 	    {
-		if (round == 2)
+		যদি (round == 2)
 		{
-		    prop.tp_flags |= TP_FLAG_CONT_PREV;
+		    prop.tp_flags |= TP_FLAG_CONT_পূর্ব;
 		    prop.tp_col = 1;
 		    prop.tp_len = *len;  // not exactly the right length
 		    prop.u.tp_text_offset = 0;
-		    mch_memmove(new_line + *len + (int)PROP_COUNT_SIZE
-			    + new_prop_count * sizeof(textprop_T),
-			    &prop, sizeof(textprop_T));
+		    mch_memmove(new_সারি + *len + (পূর্ণসংখ্যা)PROP_গুনতি_আকার
+			    + new_prop_গুনতি * আকার(textprop_T),
+			    &prop, আকার(textprop_T));
 		}
-		++new_prop_count;
+		++new_prop_গুনতি;
 	    }
 	}
     }
-    *line = new_line;
-    *tofree = new_line;
+    *সারি = new_সারি;
+    *tofree = new_সারি;
     *len = new_len;
 }
 #endif
 
-    static int
+    স্থির পূর্ণসংখ্যা
 ml_append_int(
     buf_T	*buf,
     linenr_T	lnum,		// append after this line (can be 0)
-    char_u	*line_arg,	// text of the new line
+    char_u	*সারি_arg,	// text of the new line
     colnr_T	len_arg,	// length of line, including NUL, or 0
-    int		flags)		// ML_APPEND_ flags
+    পূর্ণসংখ্যা		flags)		// ML_APPEND_ flags
 {
-    char_u	*line = line_arg;
+    char_u	*সারি = সারি_arg;
     colnr_T	len = len_arg;
-    int		i;
-    int		line_count;	// number of indexes in current block
-    int		offset;
-    int		from, to;
+    পূর্ণসংখ্যা		i;
+    পূর্ণসংখ্যা		সারি_গুনতি;	// number of indexes in current block
+    পূর্ণসংখ্যা		offset;
+    পূর্ণসংখ্যা		from, to;
     long	space_needed;	// space needed for new line
-    int		page_size;
-    int		page_count;
-    int		db_idx;		// index for lnum in data block
+    পূর্ণসংখ্যা		page_আকার;
+    পূর্ণসংখ্যা		page_গুনতি;
+    পূর্ণসংখ্যা		db_idx;		// index for lnum in data block
     bhdr_T	*hp;
     memfile_T	*mfp;
-    DATA_BL	*dp;
+    তথ্য_BL	*dp;
     PTR_BL	*pp;
     infoptr_T	*ip;
 #ifdef FEAT_PROP_POPUP
-    char_u	*tofree = NULL;
+    char_u	*tofree = ফাঁকা;
 # ifdef FEAT_BYTEOFF
     colnr_T	text_len = 0;	// text len with NUL without text properties
 # endif
 #endif
-    int		ret = FAIL;
+    পূর্ণসংখ্যা		ret = FAIL;
 
-    if (lnum > buf->b_ml.ml_line_count || buf->b_ml.ml_mfp == NULL)
-	return FAIL;  // lnum out of range
+    যদি (lnum > buf->b_ml.ml_সারি_গুনতি || buf->b_ml.ml_mfp == ফাঁকা)
+	ফেরত FAIL;  // lnum out of range
 
-    if (lowest_marked && lowest_marked > lnum)
+    যদি (lowest_marked && lowest_marked > lnum)
 	lowest_marked = lnum + 1;
 
-    if (len == 0)
+    যদি (len == 0)
     {
-	len = (colnr_T)STRLEN(line) + 1;	// space needed for the text
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_BYTEOFF)
+	len = (colnr_T)STRLEN(সারি) + 1;	// space needed for the text
+#যদি defined(FEAT_PROP_POPUP) && defined(FEAT_BYTEOFF)
 	text_len = len;
 #endif
     }
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_BYTEOFF)
-    else if (curbuf->b_has_textprop)
+#যদি defined(FEAT_PROP_POPUP) && defined(FEAT_BYTEOFF)
+    অন্যথা যদি (curbuf->b_has_textprop)
 	// "len" may include text properties, get the length of the text.
-	text_len = (colnr_T)STRLEN(line) + 1;
-    else
+	text_len = (colnr_T)STRLEN(সারি) + 1;
+    অন্যথা
 	text_len = len;
 #endif
 
 #ifdef FEAT_PROP_POPUP
-    if (curbuf->b_has_textprop && lnum > 0
+    যদি (curbuf->b_has_textprop && lnum > 0
 			     && !(flags & (ML_APPEND_UNDO | ML_APPEND_NOPROP)))
 	// Add text properties that continue from the previous line.
-	add_text_props_for_append(buf, lnum, &line, &len, &tofree);
+	add_text_props_for_append(buf, lnum, &সারি, &len, &tofree);
 #endif
 
-    space_needed = len + INDEX_SIZE;	// space needed for text + index
+    space_needed = len + সূচক_আকার;	// space needed for text + index
 
     mfp = buf->b_ml.ml_mfp;
-    page_size = mfp->mf_page_size;
+    page_আকার = mfp->mf_page_আকার;
 
 /*
  * find the data block containing the previous line
  * This also fills the stack with the blocks from the root to the data block
  * This also releases any locked block.
  */
-    if ((hp = ml_find_line(buf, lnum == 0 ? (linenr_T)1 : lnum,
-							  ML_INSERT)) == NULL)
-	goto theend;
+    যদি ((hp = ml_find_সারি(buf, lnum == 0 ? (linenr_T)1 : lnum,
+							  ML_ঢোকাও)) == ফাঁকা)
+	যাও theend;
 
     buf->b_ml.ml_flags &= ~ML_EMPTY;
 
-    if (lnum == 0)		// got line one instead, correct db_idx
+    যদি (lnum == 0)		// got line one instead, correct db_idx
 	db_idx = -1;		// careful, it is negative!
-    else
-	db_idx = lnum - buf->b_ml.ml_locked_low;
+    অন্যথা
+	db_idx = lnum - buf->b_ml.ml_locked_নিচের;
 		// get line count before the insertion
-    line_count = buf->b_ml.ml_locked_high - buf->b_ml.ml_locked_low;
+    সারি_গুনতি = buf->b_ml.ml_locked_উপরের - buf->b_ml.ml_locked_নিচের;
 
-    dp = (DATA_BL *)(hp->bh_data);
+    dp = (তথ্য_BL *)(hp->bh_তথ্য);
 
 /*
  * If
@@ -3105,8 +3105,8 @@ ml_append_int(
  * - not appending to the last line in the file
  * insert in front of the next block.
  */
-    if ((long)dp->db_free < space_needed && db_idx == line_count - 1
-					    && lnum < buf->b_ml.ml_line_count)
+    যদি ((long)dp->db_free < space_needed && db_idx == সারি_গুনতি - 1
+					    && lnum < buf->b_ml.ml_সারি_গুনতি)
     {
 	/*
 	 * Now that the line is not going to be inserted in the block that we
@@ -3114,21 +3114,21 @@ ml_append_int(
 	 * by using ml_locked_lineadd.
 	 */
 	--(buf->b_ml.ml_locked_lineadd);
-	--(buf->b_ml.ml_locked_high);
-	if ((hp = ml_find_line(buf, lnum + 1, ML_INSERT)) == NULL)
-	    goto theend;
+	--(buf->b_ml.ml_locked_উপরের);
+	যদি ((hp = ml_find_সারি(buf, lnum + 1, ML_ঢোকাও)) == ফাঁকা)
+	    যাও theend;
 
 	db_idx = -1;		    // careful, it is negative!
 		    // get line count before the insertion
-	line_count = buf->b_ml.ml_locked_high - buf->b_ml.ml_locked_low;
-	CHECK(buf->b_ml.ml_locked_low != lnum + 1, "locked_low != lnum + 1");
+	সারি_গুনতি = buf->b_ml.ml_locked_উপরের - buf->b_ml.ml_locked_নিচের;
+	CHECK(buf->b_ml.ml_locked_নিচের != lnum + 1, "locked_low != lnum + 1");
 
-	dp = (DATA_BL *)(hp->bh_data);
+	dp = (তথ্য_BL *)(hp->bh_তথ্য);
     }
 
-    ++buf->b_ml.ml_line_count;
+    ++buf->b_ml.ml_সারি_গুনতি;
 
-    if ((long)dp->db_free >= space_needed)	// enough room in data block
+    যদি ((long)dp->db_free >= space_needed)	// enough room in data block
     {
 	/*
 	 * Insert the new line in an existing data block, or in the data block
@@ -3136,64 +3136,64 @@ ml_append_int(
 	 */
 	dp->db_txt_start -= len;
 	dp->db_free -= space_needed;
-	++(dp->db_line_count);
+	++(dp->db_সারি_গুনতি);
 
 	/*
 	 * move the text of the lines that follow to the front
 	 * adjust the indexes of the lines that follow
 	 */
-	if (line_count > db_idx + 1)	    // if there are following lines
+	যদি (সারি_গুনতি > db_idx + 1)	    // if there are following lines
 	{
 	    /*
 	     * Offset is the start of the previous line.
 	     * This will become the character just after the new line.
 	     */
-	    if (db_idx < 0)
+	    যদি (db_idx < 0)
 		offset = dp->db_txt_end;
-	    else
-		offset = ((dp->db_index[db_idx]) & DB_INDEX_MASK);
-	    mch_memmove((char *)dp + dp->db_txt_start,
-					  (char *)dp + dp->db_txt_start + len,
+	    অন্যথা
+		offset = ((dp->db_সূচক[db_idx]) & DB_সূচক_MASK);
+	    mch_memmove((অক্ষর *)dp + dp->db_txt_start,
+					  (অক্ষর *)dp + dp->db_txt_start + len,
 				 (size_t)(offset - (dp->db_txt_start + len)));
-	    for (i = line_count - 1; i > db_idx; --i)
-		dp->db_index[i + 1] = dp->db_index[i] - len;
-	    dp->db_index[db_idx + 1] = offset - len;
+	    জন্য (i = সারি_গুনতি - 1; i > db_idx; --i)
+		dp->db_সূচক[i + 1] = dp->db_সূচক[i] - len;
+	    dp->db_সূচক[db_idx + 1] = offset - len;
 	}
-	else
+	অন্যথা
 	    // add line at the end (which is the start of the text)
-	    dp->db_index[db_idx + 1] = dp->db_txt_start;
+	    dp->db_সূচক[db_idx + 1] = dp->db_txt_start;
 
 	/*
 	 * copy the text into the block
 	 */
-	mch_memmove((char *)dp + dp->db_index[db_idx + 1], line, (size_t)len);
-	if (flags & ML_APPEND_MARK)
-	    dp->db_index[db_idx + 1] |= DB_MARKED;
+	mch_memmove((অক্ষর *)dp + dp->db_সূচক[db_idx + 1], সারি, (size_t)len);
+	যদি (flags & ML_APPEND_MARK)
+	    dp->db_সূচক[db_idx + 1] |= DB_MARKED;
 
 	/*
 	 * Mark the block dirty.
 	 */
 	buf->b_ml.ml_flags |= ML_LOCKED_DIRTY;
-	if (!(flags & ML_APPEND_NEW))
+	যদি (!(flags & ML_APPEND_NEW))
 	    buf->b_ml.ml_flags |= ML_LOCKED_POS;
     }
-    else	    // not enough space in data block
+    অন্যথা	    // not enough space in data block
     {
-	long	    line_count_left, line_count_right;
-	int	    page_count_left, page_count_right;
-	bhdr_T	    *hp_left;
-	bhdr_T	    *hp_right;
+	long	    সারি_গুনতি_বাম, সারি_গুনতি_ডান;
+	পূর্ণসংখ্যা	    page_গুনতি_বাম, page_গুনতি_ডান;
+	bhdr_T	    *hp_বাম;
+	bhdr_T	    *hp_ডান;
 	bhdr_T	    *hp_new;
-	int	    lines_moved;
-	int	    data_moved = 0;	    // init to shut up gcc
-	int	    total_moved = 0;	    // init to shut up gcc
-	DATA_BL	    *dp_right, *dp_left;
-	int	    stack_idx;
-	int	    in_left;
-	int	    lineadd;
-	blocknr_T   bnum_left, bnum_right;
-	linenr_T    lnum_left, lnum_right;
-	int	    pb_idx;
+	পূর্ণসংখ্যা	    সারিগুলি_moved;
+	পূর্ণসংখ্যা	    তথ্য_moved = 0;	    // init to shut up gcc
+	পূর্ণসংখ্যা	    যোগ_moved = 0;	    // init to shut up gcc
+	তথ্য_BL	    *dp_ডান, *dp_বাম;
+	পূর্ণসংখ্যা	    স্তূপ_idx;
+	পূর্ণসংখ্যা	    in_বাম;
+	পূর্ণসংখ্যা	    lineadd;
+	blocknr_T   bnum_বাম, bnum_ডান;
+	linenr_T    lnum_বাম, lnum_ডান;
+	পূর্ণসংখ্যা	    pb_idx;
 	PTR_BL	    *pp_new;
 
 	/*
@@ -3212,135 +3212,135 @@ ml_append_int(
 	 * also put in the right block. This method is more efficient when
 	 * inserting a lot of lines at one place.
 	 */
-	if (db_idx < 0)		// left block is new, right block is existing
+	যদি (db_idx < 0)		// left block is new, right block is existing
 	{
-	    lines_moved = 0;
-	    in_left = TRUE;
+	    সারিগুলি_moved = 0;
+	    in_বাম = TRUE;
 	    // space_needed does not change
 	}
-	else			// left block is existing, right block is new
+	অন্যথা			// left block is existing, right block is new
 	{
-	    lines_moved = line_count - db_idx - 1;
-	    if (lines_moved == 0)
-		in_left = FALSE;	// put new line in right block
+	    সারিগুলি_moved = সারি_গুনতি - db_idx - 1;
+	    যদি (সারিগুলি_moved == 0)
+		in_বাম = FALSE;	// put new line in right block
 					// space_needed does not change
-	    else
+	    অন্যথা
 	    {
-		data_moved = ((dp->db_index[db_idx]) & DB_INDEX_MASK) -
+		তথ্য_moved = ((dp->db_সূচক[db_idx]) & DB_সূচক_MASK) -
 							    dp->db_txt_start;
-		total_moved = data_moved + lines_moved * INDEX_SIZE;
-		if ((long)dp->db_free + total_moved >= space_needed)
+		যোগ_moved = তথ্য_moved + সারিগুলি_moved * সূচক_আকার;
+		যদি ((long)dp->db_free + যোগ_moved >= space_needed)
 		{
-		    in_left = TRUE;	// put new line in left block
-		    space_needed = total_moved;
+		    in_বাম = TRUE;	// put new line in left block
+		    space_needed = যোগ_moved;
 		}
-		else
+		অন্যথা
 		{
-		    in_left = FALSE;	    // put new line in right block
-		    space_needed += total_moved;
+		    in_বাম = FALSE;	    // put new line in right block
+		    space_needed += যোগ_moved;
 		}
 	    }
 	}
 
-	page_count = ((space_needed + HEADER_SIZE) + page_size - 1) / page_size;
-	if ((hp_new = ml_new_data(mfp, flags & ML_APPEND_NEW, page_count))
-								       == NULL)
+	page_গুনতি = ((space_needed + HEADER_আকার) + page_আকার - 1) / page_আকার;
+	যদি ((hp_new = ml_new_তথ্য(mfp, flags & ML_APPEND_NEW, page_গুনতি))
+								       == ফাঁকা)
 	{
 			// correct line counts in pointer blocks
 	    --(buf->b_ml.ml_locked_lineadd);
-	    --(buf->b_ml.ml_locked_high);
-	    goto theend;
+	    --(buf->b_ml.ml_locked_উপরের);
+	    যাও theend;
 	}
-	if (db_idx < 0)		// left block is new
+	যদি (db_idx < 0)		// left block is new
 	{
-	    hp_left = hp_new;
-	    hp_right = hp;
-	    line_count_left = 0;
-	    line_count_right = line_count;
+	    hp_বাম = hp_new;
+	    hp_ডান = hp;
+	    সারি_গুনতি_বাম = 0;
+	    সারি_গুনতি_ডান = সারি_গুনতি;
 	}
-	else			// right block is new
+	অন্যথা			// right block is new
 	{
-	    hp_left = hp;
-	    hp_right = hp_new;
-	    line_count_left = line_count;
-	    line_count_right = 0;
+	    hp_বাম = hp;
+	    hp_ডান = hp_new;
+	    সারি_গুনতি_বাম = সারি_গুনতি;
+	    সারি_গুনতি_ডান = 0;
 	}
-	dp_right = (DATA_BL *)(hp_right->bh_data);
-	dp_left = (DATA_BL *)(hp_left->bh_data);
-	bnum_left = hp_left->bh_bnum;
-	bnum_right = hp_right->bh_bnum;
-	page_count_left = hp_left->bh_page_count;
-	page_count_right = hp_right->bh_page_count;
+	dp_ডান = (তথ্য_BL *)(hp_ডান->bh_তথ্য);
+	dp_বাম = (তথ্য_BL *)(hp_বাম->bh_তথ্য);
+	bnum_বাম = hp_বাম->bh_bnum;
+	bnum_ডান = hp_ডান->bh_bnum;
+	page_গুনতি_বাম = hp_বাম->bh_page_গুনতি;
+	page_গুনতি_ডান = hp_ডান->bh_page_গুনতি;
 
 	/*
 	 * May move the new line into the right/new block.
 	 */
-	if (!in_left)
+	যদি (!in_বাম)
 	{
-	    dp_right->db_txt_start -= len;
-	    dp_right->db_free -= len + INDEX_SIZE;
-	    dp_right->db_index[0] = dp_right->db_txt_start;
-	    if (flags & ML_APPEND_MARK)
-		dp_right->db_index[0] |= DB_MARKED;
+	    dp_ডান->db_txt_start -= len;
+	    dp_ডান->db_free -= len + সূচক_আকার;
+	    dp_ডান->db_সূচক[0] = dp_ডান->db_txt_start;
+	    যদি (flags & ML_APPEND_MARK)
+		dp_ডান->db_সূচক[0] |= DB_MARKED;
 
-	    mch_memmove((char *)dp_right + dp_right->db_txt_start,
-							   line, (size_t)len);
-	    ++line_count_right;
+	    mch_memmove((অক্ষর *)dp_ডান + dp_ডান->db_txt_start,
+							   সারি, (size_t)len);
+	    ++সারি_গুনতি_ডান;
 	}
 	/*
 	 * may move lines from the left/old block to the right/new one.
 	 */
-	if (lines_moved)
+	যদি (সারিগুলি_moved)
 	{
-	    dp_right->db_txt_start -= data_moved;
-	    dp_right->db_free -= total_moved;
-	    mch_memmove((char *)dp_right + dp_right->db_txt_start,
-			(char *)dp_left + dp_left->db_txt_start,
-			(size_t)data_moved);
-	    offset = dp_right->db_txt_start - dp_left->db_txt_start;
-	    dp_left->db_txt_start += data_moved;
-	    dp_left->db_free += total_moved;
+	    dp_ডান->db_txt_start -= তথ্য_moved;
+	    dp_ডান->db_free -= যোগ_moved;
+	    mch_memmove((অক্ষর *)dp_ডান + dp_ডান->db_txt_start,
+			(অক্ষর *)dp_বাম + dp_বাম->db_txt_start,
+			(size_t)তথ্য_moved);
+	    offset = dp_ডান->db_txt_start - dp_বাম->db_txt_start;
+	    dp_বাম->db_txt_start += তথ্য_moved;
+	    dp_বাম->db_free += যোগ_moved;
 
 	    /*
 	     * update indexes in the new block
 	     */
-	    for (to = line_count_right, from = db_idx + 1;
-					 from < line_count_left; ++from, ++to)
-		dp_right->db_index[to] = dp->db_index[from] + offset;
-	    line_count_right += lines_moved;
-	    line_count_left -= lines_moved;
+	    জন্য (to = সারি_গুনতি_ডান, from = db_idx + 1;
+					 from < সারি_গুনতি_বাম; ++from, ++to)
+		dp_ডান->db_সূচক[to] = dp->db_সূচক[from] + offset;
+	    সারি_গুনতি_ডান += সারিগুলি_moved;
+	    সারি_গুনতি_বাম -= সারিগুলি_moved;
 	}
 
 	/*
 	 * May move the new line into the left (old or new) block.
 	 */
-	if (in_left)
+	যদি (in_বাম)
 	{
-	    dp_left->db_txt_start -= len;
-	    dp_left->db_free -= len + INDEX_SIZE;
-	    dp_left->db_index[line_count_left] = dp_left->db_txt_start;
-	    if (flags & ML_APPEND_MARK)
-		dp_left->db_index[line_count_left] |= DB_MARKED;
-	    mch_memmove((char *)dp_left + dp_left->db_txt_start,
-							   line, (size_t)len);
-	    ++line_count_left;
+	    dp_বাম->db_txt_start -= len;
+	    dp_বাম->db_free -= len + সূচক_আকার;
+	    dp_বাম->db_সূচক[সারি_গুনতি_বাম] = dp_বাম->db_txt_start;
+	    যদি (flags & ML_APPEND_MARK)
+		dp_বাম->db_সূচক[সারি_গুনতি_বাম] |= DB_MARKED;
+	    mch_memmove((অক্ষর *)dp_বাম + dp_বাম->db_txt_start,
+							   সারি, (size_t)len);
+	    ++সারি_গুনতি_বাম;
 	}
 
-	if (db_idx < 0)		// left block is new
+	যদি (db_idx < 0)		// left block is new
 	{
-	    lnum_left = lnum + 1;
-	    lnum_right = 0;
+	    lnum_বাম = lnum + 1;
+	    lnum_ডান = 0;
 	}
-	else			// right block is new
+	অন্যথা			// right block is new
 	{
-	    lnum_left = 0;
-	    if (in_left)
-		lnum_right = lnum + 2;
-	    else
-		lnum_right = lnum + 1;
+	    lnum_বাম = 0;
+	    যদি (in_বাম)
+		lnum_ডান = lnum + 2;
+	    অন্যথা
+		lnum_ডান = lnum + 1;
 	}
-	dp_left->db_line_count = line_count_left;
-	dp_right->db_line_count = line_count_right;
+	dp_বাম->db_সারি_গুনতি = সারি_গুনতি_বাম;
+	dp_ডান->db_সারি_গুনতি = সারি_গুনতি_ডান;
 
 	/*
 	 * release the two data blocks
@@ -3348,9 +3348,9 @@ ml_append_int(
 	 * The old one (hp, in ml_locked) gets a positive blocknumber if
 	 * we changed it and we are not editing a new file.
 	 */
-	if (lines_moved || in_left)
+	যদি (সারিগুলি_moved || in_বাম)
 	    buf->b_ml.ml_flags |= ML_LOCKED_DIRTY;
-	if (!(flags & ML_APPEND_NEW) && db_idx >= 0 && in_left)
+	যদি (!(flags & ML_APPEND_NEW) && db_idx >= 0 && in_বাম)
 	    buf->b_ml.ml_flags |= ML_LOCKED_POS;
 	mf_put(mfp, hp_new, TRUE, FALSE);
 
@@ -3361,67 +3361,67 @@ ml_append_int(
 	 */
 	lineadd = buf->b_ml.ml_locked_lineadd;
 	buf->b_ml.ml_locked_lineadd = 0;
-	ml_find_line(buf, (linenr_T)0, ML_FLUSH);   // flush data block
+	ml_find_সারি(buf, (linenr_T)0, ML_FLUSH);   // flush data block
 
 	/*
 	 * update pointer blocks for the new data block
 	 */
-	for (stack_idx = buf->b_ml.ml_stack_top - 1; stack_idx >= 0;
-								  --stack_idx)
+	জন্য (স্তূপ_idx = buf->b_ml.ml_স্তূপ_শীর্ষ - 1; স্তূপ_idx >= 0;
+								  --স্তূপ_idx)
 	{
-	    ip = &(buf->b_ml.ml_stack[stack_idx]);
-	    pb_idx = ip->ip_index;
-	    if ((hp = mf_get(mfp, ip->ip_bnum, 1)) == NULL)
-		goto theend;
-	    pp = (PTR_BL *)(hp->bh_data);   // must be pointer block
-	    if (pp->pb_id != PTR_ID)
+	    ip = &(buf->b_ml.ml_স্তূপ[স্তূপ_idx]);
+	    pb_idx = ip->ip_সূচক;
+	    যদি ((hp = mf_get(mfp, ip->ip_bnum, 1)) == ফাঁকা)
+		যাও theend;
+	    pp = (PTR_BL *)(hp->bh_তথ্য);   // must be pointer block
+	    যদি (pp->pb_id != PTR_ID)
 	    {
 		iemsg(e_pointer_block_id_wrong_three);
 		mf_put(mfp, hp, FALSE, FALSE);
-		goto theend;
+		যাও theend;
 	    }
 	    /*
 	     * TODO: If the pointer block is full and we are adding at the end
 	     * try to insert in front of the next block
 	     */
 	    // block not full, add one entry
-	    if (pp->pb_count < pp->pb_count_max)
+	    যদি (pp->pb_গুনতি < pp->pb_গুনতি_max)
 	    {
-		if (pb_idx + 1 < (int)pp->pb_count)
+		যদি (pb_idx + 1 < (পূর্ণসংখ্যা)pp->pb_গুনতি)
 		    mch_memmove(&pp->pb_pointer[pb_idx + 2],
 				&pp->pb_pointer[pb_idx + 1],
-			(size_t)(pp->pb_count - pb_idx - 1) * sizeof(PTR_EN));
-		++pp->pb_count;
-		pp->pb_pointer[pb_idx].pe_line_count = line_count_left;
-		pp->pb_pointer[pb_idx].pe_bnum = bnum_left;
-		pp->pb_pointer[pb_idx].pe_page_count = page_count_left;
-		pp->pb_pointer[pb_idx + 1].pe_line_count = line_count_right;
-		pp->pb_pointer[pb_idx + 1].pe_bnum = bnum_right;
-		pp->pb_pointer[pb_idx + 1].pe_page_count = page_count_right;
+			(size_t)(pp->pb_গুনতি - pb_idx - 1) * আকার(PTR_EN));
+		++pp->pb_গুনতি;
+		pp->pb_pointer[pb_idx].pe_সারি_গুনতি = সারি_গুনতি_বাম;
+		pp->pb_pointer[pb_idx].pe_bnum = bnum_বাম;
+		pp->pb_pointer[pb_idx].pe_page_গুনতি = page_গুনতি_বাম;
+		pp->pb_pointer[pb_idx + 1].pe_সারি_গুনতি = সারি_গুনতি_ডান;
+		pp->pb_pointer[pb_idx + 1].pe_bnum = bnum_ডান;
+		pp->pb_pointer[pb_idx + 1].pe_page_গুনতি = page_গুনতি_ডান;
 
-		if (lnum_left != 0)
-		    pp->pb_pointer[pb_idx].pe_old_lnum = lnum_left;
-		if (lnum_right != 0)
-		    pp->pb_pointer[pb_idx + 1].pe_old_lnum = lnum_right;
+		যদি (lnum_বাম != 0)
+		    pp->pb_pointer[pb_idx].pe_old_lnum = lnum_বাম;
+		যদি (lnum_ডান != 0)
+		    pp->pb_pointer[pb_idx + 1].pe_old_lnum = lnum_ডান;
 
 		mf_put(mfp, hp, TRUE, FALSE);
-		buf->b_ml.ml_stack_top = stack_idx + 1;	    // truncate stack
+		buf->b_ml.ml_স্তূপ_শীর্ষ = স্তূপ_idx + 1;	    // truncate stack
 
-		if (lineadd)
+		যদি (lineadd)
 		{
-		    --(buf->b_ml.ml_stack_top);
+		    --(buf->b_ml.ml_স্তূপ_শীর্ষ);
 		    // fix line count for rest of blocks in the stack
 		    ml_lineadd(buf, lineadd);
 							// fix stack itself
-		    buf->b_ml.ml_stack[buf->b_ml.ml_stack_top].ip_high +=
+		    buf->b_ml.ml_স্তূপ[buf->b_ml.ml_স্তূপ_শীর্ষ].ip_উপরের +=
 								      lineadd;
-		    ++(buf->b_ml.ml_stack_top);
+		    ++(buf->b_ml.ml_স্তূপ_শীর্ষ);
 		}
 
 		/*
 		 * We are finished, break the loop here.
 		 */
-		break;
+		বিরতি;
 	    }
 	    // pointer block full
 	    /*
@@ -3430,15 +3430,15 @@ ml_append_int(
 	     * move some of the pointer into the new block
 	     * prepare for updating the parent block
 	     */
-	    for (;;)	// do this twice when splitting block 1
+	    জন্য (;;)	// do this twice when splitting block 1
 	    {
 		hp_new = ml_new_ptr(mfp);
-		if (hp_new == NULL)	    // TODO: try to fix tree
-		    goto theend;
-		pp_new = (PTR_BL *)(hp_new->bh_data);
+		যদি (hp_new == ফাঁকা)	    // TODO: try to fix tree
+		    যাও theend;
+		pp_new = (PTR_BL *)(hp_new->bh_তথ্য);
 
-		if (hp->bh_bnum != 1)
-		    break;
+		যদি (hp->bh_bnum != 1)
+		    বিরতি;
 
 		/*
 		 * if block 1 becomes full the tree is given an extra level
@@ -3446,67 +3446,67 @@ ml_append_int(
 		 * block 1 is updated to point to the new block
 		 * then continue to split the new block
 		 */
-		mch_memmove(pp_new, pp, (size_t)page_size);
-		pp->pb_count = 1;
+		mch_memmove(pp_new, pp, (size_t)page_আকার);
+		pp->pb_গুনতি = 1;
 		pp->pb_pointer[0].pe_bnum = hp_new->bh_bnum;
-		pp->pb_pointer[0].pe_line_count = buf->b_ml.ml_line_count;
+		pp->pb_pointer[0].pe_সারি_গুনতি = buf->b_ml.ml_সারি_গুনতি;
 		pp->pb_pointer[0].pe_old_lnum = 1;
-		pp->pb_pointer[0].pe_page_count = 1;
+		pp->pb_pointer[0].pe_page_গুনতি = 1;
 		mf_put(mfp, hp, TRUE, FALSE);   // release block 1
 		hp = hp_new;		// new block is to be split
 		pp = pp_new;
-		CHECK(stack_idx != 0, _("stack_idx should be 0"));
-		ip->ip_index = 0;
-		++stack_idx;	// do block 1 again later
+		CHECK(স্তূপ_idx != 0, _("stack_idx should be 0"));
+		ip->ip_সূচক = 0;
+		++স্তূপ_idx;	// do block 1 again later
 	    }
 	    /*
 	     * move the pointers after the current one to the new block
 	     * If there are none, the new entry will be in the new block.
 	     */
-	    total_moved = pp->pb_count - pb_idx - 1;
-	    if (total_moved)
+	    যোগ_moved = pp->pb_গুনতি - pb_idx - 1;
+	    যদি (যোগ_moved)
 	    {
 		mch_memmove(&pp_new->pb_pointer[0],
 				&pp->pb_pointer[pb_idx + 1],
-				(size_t)(total_moved) * sizeof(PTR_EN));
-		pp_new->pb_count = total_moved;
-		pp->pb_count -= total_moved - 1;
-		pp->pb_pointer[pb_idx + 1].pe_bnum = bnum_right;
-		pp->pb_pointer[pb_idx + 1].pe_line_count = line_count_right;
-		pp->pb_pointer[pb_idx + 1].pe_page_count = page_count_right;
-		if (lnum_right)
-		    pp->pb_pointer[pb_idx + 1].pe_old_lnum = lnum_right;
+				(size_t)(যোগ_moved) * আকার(PTR_EN));
+		pp_new->pb_গুনতি = যোগ_moved;
+		pp->pb_গুনতি -= যোগ_moved - 1;
+		pp->pb_pointer[pb_idx + 1].pe_bnum = bnum_ডান;
+		pp->pb_pointer[pb_idx + 1].pe_সারি_গুনতি = সারি_গুনতি_ডান;
+		pp->pb_pointer[pb_idx + 1].pe_page_গুনতি = page_গুনতি_ডান;
+		যদি (lnum_ডান)
+		    pp->pb_pointer[pb_idx + 1].pe_old_lnum = lnum_ডান;
 	    }
-	    else
+	    অন্যথা
 	    {
-		pp_new->pb_count = 1;
-		pp_new->pb_pointer[0].pe_bnum = bnum_right;
-		pp_new->pb_pointer[0].pe_line_count = line_count_right;
-		pp_new->pb_pointer[0].pe_page_count = page_count_right;
-		pp_new->pb_pointer[0].pe_old_lnum = lnum_right;
+		pp_new->pb_গুনতি = 1;
+		pp_new->pb_pointer[0].pe_bnum = bnum_ডান;
+		pp_new->pb_pointer[0].pe_সারি_গুনতি = সারি_গুনতি_ডান;
+		pp_new->pb_pointer[0].pe_page_গুনতি = page_গুনতি_ডান;
+		pp_new->pb_pointer[0].pe_old_lnum = lnum_ডান;
 	    }
-	    pp->pb_pointer[pb_idx].pe_bnum = bnum_left;
-	    pp->pb_pointer[pb_idx].pe_line_count = line_count_left;
-	    pp->pb_pointer[pb_idx].pe_page_count = page_count_left;
-	    if (lnum_left)
-		pp->pb_pointer[pb_idx].pe_old_lnum = lnum_left;
-	    lnum_left = 0;
-	    lnum_right = 0;
+	    pp->pb_pointer[pb_idx].pe_bnum = bnum_বাম;
+	    pp->pb_pointer[pb_idx].pe_সারি_গুনতি = সারি_গুনতি_বাম;
+	    pp->pb_pointer[pb_idx].pe_page_গুনতি = page_গুনতি_বাম;
+	    যদি (lnum_বাম)
+		pp->pb_pointer[pb_idx].pe_old_lnum = lnum_বাম;
+	    lnum_বাম = 0;
+	    lnum_ডান = 0;
 
 	    /*
 	     * recompute line counts
 	     */
-	    line_count_right = 0;
-	    for (i = 0; i < (int)pp_new->pb_count; ++i)
-		line_count_right += pp_new->pb_pointer[i].pe_line_count;
-	    line_count_left = 0;
-	    for (i = 0; i < (int)pp->pb_count; ++i)
-		line_count_left += pp->pb_pointer[i].pe_line_count;
+	    সারি_গুনতি_ডান = 0;
+	    জন্য (i = 0; i < (পূর্ণসংখ্যা)pp_new->pb_গুনতি; ++i)
+		সারি_গুনতি_ডান += pp_new->pb_pointer[i].pe_সারি_গুনতি;
+	    সারি_গুনতি_বাম = 0;
+	    জন্য (i = 0; i < (পূর্ণসংখ্যা)pp->pb_গুনতি; ++i)
+		সারি_গুনতি_বাম += pp->pb_pointer[i].pe_সারি_গুনতি;
 
-	    bnum_left = hp->bh_bnum;
-	    bnum_right = hp_new->bh_bnum;
-	    page_count_left = 1;
-	    page_count_right = 1;
+	    bnum_বাম = hp->bh_bnum;
+	    bnum_ডান = hp_new->bh_bnum;
+	    page_গুনতি_বাম = 1;
+	    page_গুনতি_ডান = 1;
 	    mf_put(mfp, hp, TRUE, FALSE);
 	    mf_put(mfp, hp_new, TRUE, FALSE);
 
@@ -3515,10 +3515,10 @@ ml_append_int(
 	/*
 	 * Safety check: fallen out of for loop?
 	 */
-	if (stack_idx < 0)
+	যদি (স্তূপ_idx < 0)
 	{
 	    iemsg(e_updated_too_many_blocks);
-	    buf->b_ml.ml_stack_top = 0;	// invalidate stack
+	    buf->b_ml.ml_স্তূপ_শীর্ষ = 0;	// invalidate stack
 	}
     }
 
@@ -3527,24 +3527,24 @@ ml_append_int(
     ml_updatechunk(buf, lnum + 1,
 # ifdef FEAT_PROP_POPUP
 	    (long)text_len
-# else
+# অন্যথা
 	    (long)len
 # endif
 	    , ML_CHNK_ADDLINE);
 #endif
 
 #ifdef FEAT_NETBEANS_INTG
-    if (!(flags & ML_APPEND_NEW) && netbeans_active())
+    যদি (!(flags & ML_APPEND_NEW) && netbeans_active())
     {
-	int line_len = (int)STRLEN(line);
-	if (line_len > 0)
-	    netbeans_inserted(buf, lnum+1, (colnr_T)0, line, line_len);
-	netbeans_inserted(buf, lnum+1, (colnr_T)line_len, (char_u *)"\n", 1);
+	পূর্ণসংখ্যা সারি_len = (পূর্ণসংখ্যা)STRLEN(সারি);
+	যদি (সারি_len > 0)
+	    netbeans_inserted(buf, lnum+1, (colnr_T)0, সারি, সারি_len);
+	netbeans_inserted(buf, lnum+1, (colnr_T)সারি_len, (char_u *)"\n", 1);
     }
 #endif
 #ifdef FEAT_JOB_CHANNEL
-    if (!(flags & ML_APPEND_NEW) && buf->b_write_to_channel)
-	channel_write_new_lines(buf);
+    যদি (!(flags & ML_APPEND_NEW) && buf->b_write_to_channel)
+	channel_write_new_সারিগুলি(buf);
 #endif
     ret = OK;
 
@@ -3552,40 +3552,40 @@ theend:
 #ifdef FEAT_PROP_POPUP
     vim_free(tofree);
 #endif
-    return ret;
+    ফেরত ret;
 }
 
 /*
  * Flush any pending change and call ml_append_int()
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 ml_append_flush(
     buf_T	*buf,
     linenr_T	lnum,		// append after this line (can be 0)
-    char_u	*line,		// text of the new line
+    char_u	*সারি,		// text of the new line
     colnr_T	len,		// length of line, including NUL, or 0
-    int		flags)		// ML_APPEND_ flags
+    পূর্ণসংখ্যা		flags)		// ML_APPEND_ flags
 {
-    if (lnum > buf->b_ml.ml_line_count)
-	return FAIL;  // lnum out of range
+    যদি (lnum > buf->b_ml.ml_সারি_গুনতি)
+	ফেরত FAIL;  // lnum out of range
 
-    if (buf->b_ml.ml_line_lnum != 0)
+    যদি (buf->b_ml.ml_সারি_lnum != 0)
 	// This may also invoke ml_append_int().
-	ml_flush_line(buf);
+	ml_flush_সারি(buf);
 
 #ifdef FEAT_EVAL
-    if (!(flags & ML_APPEND_NEW))
+    যদি (!(flags & ML_APPEND_NEW))
     {
 	// When inserting above recorded changes: flush the changes before
 	// changing the text.  Then flush the cached line, it may become
 	// invalid.  Skip during initial file read for performance.
 	may_invoke_listeners(buf, lnum + 1, lnum + 1, 1);
-	if (buf->b_ml.ml_line_lnum != 0)
-	    ml_flush_line(buf);
+	যদি (buf->b_ml.ml_সারি_lnum != 0)
+	    ml_flush_সারি(buf);
     }
 #endif
 
-    return ml_append_int(buf, lnum, line, len, flags);
+    ফেরত ml_append_int(buf, lnum, সারি, len, flags);
 }
 
 /*
@@ -3600,47 +3600,47 @@ ml_append_flush(
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    পূর্ণসংখ্যা
 ml_append(
     linenr_T	lnum,		// append after this line (can be 0)
-    char_u	*line,		// text of the new line
+    char_u	*সারি,		// text of the new line
     colnr_T	len,		// length of new line, including NUL, or 0
-    int		newfile)	// flag, see above
+    পূর্ণসংখ্যা		newfile)	// flag, see above
 {
-    return ml_append_flags(lnum, line, len, newfile ? ML_APPEND_NEW : 0);
+    ফেরত ml_append_flags(lnum, সারি, len, newfile ? ML_APPEND_NEW : 0);
 }
 
-    int
+    পূর্ণসংখ্যা
 ml_append_flags(
     linenr_T	lnum,		// append after this line (can be 0)
-    char_u	*line,		// text of the new line
+    char_u	*সারি,		// text of the new line
     colnr_T	len,		// length of new line, including NUL, or 0
-    int		flags)		// ML_APPEND_ values
+    পূর্ণসংখ্যা		flags)		// ML_APPEND_ values
 {
     // When starting up, we might still need to create the memfile
-    if (curbuf->b_ml.ml_mfp == NULL && open_buffer(FALSE, NULL, 0) == FAIL)
-	return FAIL;
-    return ml_append_flush(curbuf, lnum, line, len, flags);
+    যদি (curbuf->b_ml.ml_mfp == ফাঁকা && open_বাফার(FALSE, ফাঁকা, 0) == FAIL)
+	ফেরত FAIL;
+    ফেরত ml_append_flush(curbuf, lnum, সারি, len, flags);
 }
 
 
-#if defined(FEAT_SPELL) || defined(FEAT_QUICKFIX) || defined(FEAT_PROP_POPUP)
+#যদি defined(FEAT_SPELL) || defined(FEAT_QUICKFIX) || defined(FEAT_PROP_POPUP)
 
 /*
  * Like ml_append() but for an arbitrary buffer.  The buffer must already have
  * a memline.
  */
-    int
+    পূর্ণসংখ্যা
 ml_append_buf(
     buf_T	*buf,
     linenr_T	lnum,		// append after this line (can be 0)
-    char_u	*line,		// text of the new line
+    char_u	*সারি,		// text of the new line
     colnr_T	len,		// length of new line, including NUL, or 0
-    int		newfile)	// flag, see above
+    পূর্ণসংখ্যা		newfile)	// flag, see above
 {
-    if (buf->b_ml.ml_mfp == NULL)
-	return FAIL;
-    return ml_append_flush(buf, lnum, line, len, newfile ? ML_APPEND_NEW : 0);
+    যদি (buf->b_ml.ml_mfp == ফাঁকা)
+	ফেরত FAIL;
+    ফেরত ml_append_flush(buf, lnum, সারি, len, newfile ? ML_APPEND_NEW : 0);
 }
 #endif
 
@@ -3657,14 +3657,14 @@ ml_append_buf(
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-ml_replace(linenr_T lnum, char_u *line, int copy)
+    পূর্ণসংখ্যা
+ml_replace(linenr_T lnum, char_u *সারি, পূর্ণসংখ্যা copy)
 {
     colnr_T len = -1;
 
-    if (line != NULL)
-	len = (colnr_T)STRLEN(line);
-    return ml_replace_len(lnum, line, len, FALSE, copy);
+    যদি (সারি != ফাঁকা)
+	len = (colnr_T)STRLEN(সারি);
+    ফেরত ml_replace_len(lnum, সারি, len, FALSE, copy);
 }
 
 /*
@@ -3675,93 +3675,93 @@ ml_replace(linenr_T lnum, char_u *line, int copy)
  * When "copy" is TRUE copy the text into allocated memory, otherwise
  * "line_arg" must be allocated and will be consumed here.
  */
-    int
+    পূর্ণসংখ্যা
 ml_replace_len(
 	linenr_T    lnum,
-	char_u	    *line_arg,
+	char_u	    *সারি_arg,
 	colnr_T	    len_arg,
-	int	    has_props,
-	int	    copy)
+	পূর্ণসংখ্যা	    has_props,
+	পূর্ণসংখ্যা	    copy)
 {
-    char_u *line = line_arg;
+    char_u *সারি = সারি_arg;
     colnr_T len = len_arg;
 
-    if (line == NULL)		// just checking...
-	return FAIL;
+    যদি (সারি == ফাঁকা)		// just checking...
+	ফেরত FAIL;
 
     // When starting up, we might still need to create the memfile
-    if (curbuf->b_ml.ml_mfp == NULL && open_buffer(FALSE, NULL, 0) == FAIL)
-	return FAIL;
+    যদি (curbuf->b_ml.ml_mfp == ফাঁকা && open_বাফার(FALSE, ফাঁকা, 0) == FAIL)
+	ফেরত FAIL;
 
-    if (!has_props)
+    যদি (!has_props)
 	++len;  // include the NUL after the text
-    if (copy)
+    যদি (copy)
     {
 	// copy the line to allocated memory
 #ifdef FEAT_PROP_POPUP
-	if (has_props)
-	    line = vim_memsave(line, len);
-	else
+	যদি (has_props)
+	    সারি = vim_memsave(সারি, len);
+	অন্যথা
 #endif
-	    line = vim_strnsave(line, len - 1);
-	if (line == NULL)
-	    return FAIL;
+	    সারি = vim_strnsave(সারি, len - 1);
+	যদি (সারি == ফাঁকা)
+	    ফেরত FAIL;
     }
 
 #ifdef FEAT_NETBEANS_INTG
-    if (netbeans_active())
+    যদি (netbeans_active())
     {
 	netbeans_removed(curbuf, lnum, 0, (long)ml_get_len(lnum));
-	netbeans_inserted(curbuf, lnum, 0, line, (int)STRLEN(line));
+	netbeans_inserted(curbuf, lnum, 0, সারি, (পূর্ণসংখ্যা)STRLEN(সারি));
     }
 #endif
-    if (curbuf->b_ml.ml_line_lnum != lnum)
+    যদি (curbuf->b_ml.ml_সারি_lnum != lnum)
     {
 	// another line is buffered, flush it
-	ml_flush_line(curbuf);
+	ml_flush_সারি(curbuf);
 
 #ifdef FEAT_PROP_POPUP
-	if (curbuf->b_has_textprop && !has_props)
+	যদি (curbuf->b_has_textprop && !has_props)
 	    // Need to fetch the old line to copy over any text properties.
 	    ml_get_buf(curbuf, lnum, TRUE);
 #endif
     }
 
 #ifdef FEAT_PROP_POPUP
-    if (curbuf->b_has_textprop && !has_props)
+    যদি (curbuf->b_has_textprop && !has_props)
     {
-	size_t	oldtextlen = STRLEN(curbuf->b_ml.ml_line_ptr) + 1;
+	size_t	oldtextlen = STRLEN(curbuf->b_ml.ml_সারি_ptr) + 1;
 
-	if (oldtextlen < (size_t)curbuf->b_ml.ml_line_len)
+	যদি (oldtextlen < (size_t)curbuf->b_ml.ml_সারি_len)
 	{
 	    char_u *newline;
-	    size_t textproplen = curbuf->b_ml.ml_line_len - oldtextlen;
+	    size_t textproplen = curbuf->b_ml.ml_সারি_len - oldtextlen;
 
 	    // Need to copy over text properties, stored after the text.
 	    newline = alloc(len + textproplen);
-	    if (newline != NULL)
+	    যদি (newline != ফাঁকা)
 	    {
-		mch_memmove(newline, line, len);
-		mch_memmove(newline + len, curbuf->b_ml.ml_line_ptr
+		mch_memmove(newline, সারি, len);
+		mch_memmove(newline + len, curbuf->b_ml.ml_সারি_ptr
 						    + oldtextlen, textproplen);
-		vim_free(line);
-		line = newline;
+		vim_free(সারি);
+		সারি = newline;
 		len += (colnr_T)textproplen;
 	    }
 	}
     }
 #endif
 
-    if (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	vim_free(curbuf->b_ml.ml_line_ptr);	// free allocated line
+    যদি (curbuf->b_ml.ml_flags & (ML_সারি_DIRTY | ML_ALLOCATED))
+	vim_free(curbuf->b_ml.ml_সারি_ptr);	// free allocated line
 
-    curbuf->b_ml.ml_line_ptr = line;
-    curbuf->b_ml.ml_line_len = len;
-    curbuf->b_ml.ml_line_textlen = !has_props ? len_arg + 1 : 0;
-    curbuf->b_ml.ml_line_lnum = lnum;
-    curbuf->b_ml.ml_flags = (curbuf->b_ml.ml_flags | ML_LINE_DIRTY) & ~ML_EMPTY;
+    curbuf->b_ml.ml_সারি_ptr = সারি;
+    curbuf->b_ml.ml_সারি_len = len;
+    curbuf->b_ml.ml_সারি_textlen = !has_props ? len_arg + 1 : 0;
+    curbuf->b_ml.ml_সারি_lnum = lnum;
+    curbuf->b_ml.ml_flags = (curbuf->b_ml.ml_flags | ML_সারি_DIRTY) & ~ML_EMPTY;
 
-    return OK;
+    ফেরত OK;
 }
 
 #ifdef FEAT_PROP_POPUP
@@ -3771,108 +3771,108 @@ ml_replace_len(
  * is the line below the deleted line.
  * "del_props[del_props_len]" are the properties of the deleted line.
  */
-    static void
+    স্থির শূন্য
 adjust_text_props_for_delete(
 	buf_T	    *buf,
 	linenr_T    lnum,
 	char_u	    *del_props,
-	int	    del_props_len,
-	int	    above)
+	পূর্ণসংখ্যা	    del_props_len,
+	পূর্ণসংখ্যা	    above)
 {
-    int		did_get_line = FALSE;
-    int		done_del;
-    int		done_this;
+    পূর্ণসংখ্যা		did_get_সারি = FALSE;
+    পূর্ণসংখ্যা		done_del;
+    পূর্ণসংখ্যা		done_this;
     textprop_T	prop_del;
     bhdr_T	*hp;
-    DATA_BL	*dp;
-    int		idx;
-    int		line_start;
-    long	line_size;
-    int		this_props_len = 0;
+    তথ্য_BL	*dp;
+    পূর্ণসংখ্যা		idx;
+    পূর্ণসংখ্যা		সারি_start;
+    long	সারি_আকার;
+    পূর্ণসংখ্যা		this_props_len = 0;
     char_u	*text;
     size_t	textlen;
-    int		found;
+    পূর্ণসংখ্যা		found;
 
-    for (done_del = 0; done_del < del_props_len; done_del += sizeof(textprop_T))
+    জন্য (done_del = 0; done_del < del_props_len; done_del += আকার(textprop_T))
     {
-	mch_memmove(&prop_del, del_props + done_del, sizeof(textprop_T));
-	if ((above && (prop_del.tp_flags & TP_FLAG_CONT_PREV)
-		    && !(prop_del.tp_flags & TP_FLAG_CONT_NEXT))
-		|| (!above && (prop_del.tp_flags & TP_FLAG_CONT_NEXT)
-		    && !(prop_del.tp_flags & TP_FLAG_CONT_PREV)))
+	mch_memmove(&prop_del, del_props + done_del, আকার(textprop_T));
+	যদি ((above && (prop_del.tp_flags & TP_FLAG_CONT_পূর্ব)
+		    && !(prop_del.tp_flags & TP_FLAG_CONT_পরবর্তী))
+		|| (!above && (prop_del.tp_flags & TP_FLAG_CONT_পরবর্তী)
+		    && !(prop_del.tp_flags & TP_FLAG_CONT_পূর্ব)))
 	{
-	    if (!did_get_line)
+	    যদি (!did_get_সারি)
 	    {
-		did_get_line = TRUE;
-		if ((hp = ml_find_line(buf, lnum, ML_FIND)) == NULL)
-		    return;
+		did_get_সারি = TRUE;
+		যদি ((hp = ml_find_সারি(buf, lnum, ML_FIND)) == ফাঁকা)
+		    ফেরত;
 
-		dp = (DATA_BL *)(hp->bh_data);
-		idx = lnum - buf->b_ml.ml_locked_low;
-		line_start = ((dp->db_index[idx]) & DB_INDEX_MASK);
-		if (idx == 0)		// first line in block, text at the end
-		    line_size = dp->db_txt_end - line_start;
-		else
-		    line_size = ((dp->db_index[idx - 1]) & DB_INDEX_MASK)
-								  - line_start;
-		text = (char_u *)dp + line_start;
+		dp = (তথ্য_BL *)(hp->bh_তথ্য);
+		idx = lnum - buf->b_ml.ml_locked_নিচের;
+		সারি_start = ((dp->db_সূচক[idx]) & DB_সূচক_MASK);
+		যদি (idx == 0)		// first line in block, text at the end
+		    সারি_আকার = dp->db_txt_end - সারি_start;
+		অন্যথা
+		    সারি_আকার = ((dp->db_সূচক[idx - 1]) & DB_সূচক_MASK)
+								  - সারি_start;
+		text = (char_u *)dp + সারি_start;
 		textlen = STRLEN(text) + 1;
-		if ((long)textlen >= line_size)
+		যদি ((long)textlen >= সারি_আকার)
 		{
 		    // No properties on this line.
-		    if (above)
+		    যদি (above)
 			internal_error("no text property above deleted line");
-		    else
+		    অন্যথা
 			internal_error("no text property below deleted line");
-		    return;
+		    ফেরত;
 		}
-		if ((long)textlen + (long)PROP_COUNT_SIZE > line_size)
+		যদি ((long)textlen + (long)PROP_গুনতি_আকার > সারি_আকার)
 		{
 		    internal_error("text property data too short");
-		    return;
+		    ফেরত;
 		}
 
 		uint16_t pc;
 
-		mch_memmove(&pc, text + textlen, PROP_COUNT_SIZE);
-		if (!text_prop_count_valid(pc, (size_t)(line_size - (long)textlen)))
+		mch_memmove(&pc, text + textlen, PROP_গুনতি_আকার);
+		যদি (!text_prop_গুনতি_valid(pc, (size_t)(সারি_আকার - (long)textlen)))
 		{
 		    internal_error("text property count too large");
-		    return;
+		    ফেরত;
 		}
-		this_props_len = pc * (int)sizeof(textprop_T);
+		this_props_len = pc * (পূর্ণসংখ্যা)আকার(textprop_T);
 	    }
 
 	    found = FALSE;
 	    {
-		char_u *props_start = text + textlen + PROP_COUNT_SIZE;
+		char_u *props_start = text + textlen + PROP_গুনতি_আকার;
 
-		for (done_this = 0; done_this < this_props_len;
-					       done_this += sizeof(textprop_T))
+		জন্য (done_this = 0; done_this < this_props_len;
+					       done_this += আকার(textprop_T))
 		{
-		    int		flag = above ? TP_FLAG_CONT_NEXT
-							   : TP_FLAG_CONT_PREV;
+		    পূর্ণসংখ্যা		flag = above ? TP_FLAG_CONT_পরবর্তী
+							   : TP_FLAG_CONT_পূর্ব;
 		    textprop_T	prop_this;
 
 		    mch_memmove(&prop_this, props_start + done_this,
-							   sizeof(textprop_T));
-		    if ((prop_this.tp_flags & flag)
+							   আকার(textprop_T));
+		    যদি ((prop_this.tp_flags & flag)
 			    && prop_del.tp_id == prop_this.tp_id
 			    && prop_del.tp_type == prop_this.tp_type)
 		    {
 			found = TRUE;
 			prop_this.tp_flags &= ~flag;
 			mch_memmove(props_start + done_this, &prop_this,
-							   sizeof(textprop_T));
-			break;
+							   আকার(textprop_T));
+			বিরতি;
 		    }
 		}
 	    }
-	    if (!found)
+	    যদি (!found)
 	    {
-		if (above)
+		যদি (above)
 		    internal_error("text property above deleted line not found");
-		else
+		অন্যথা
 		    internal_error("text property below deleted line not found");
 	    }
 
@@ -3889,47 +3889,47 @@ adjust_text_props_for_delete(
  *
  * return FAIL for failure, OK otherwise
  */
-    static int
-ml_delete_int(buf_T *buf, linenr_T lnum, int flags)
+    স্থির পূর্ণসংখ্যা
+ml_delete_int(buf_T *buf, linenr_T lnum, পূর্ণসংখ্যা flags)
 {
     bhdr_T	*hp;
     memfile_T	*mfp;
-    DATA_BL	*dp;
+    তথ্য_BL	*dp;
     PTR_BL	*pp;
     infoptr_T	*ip;
-    int		count;	    // number of entries in block
-    int		idx;
-    int		stack_idx;
-    int		text_start;
-    int		line_start;
-    long	line_size;
-    int		i;
-    int		ret = FAIL;
+    পূর্ণসংখ্যা		গুনতি;	    // number of entries in block
+    পূর্ণসংখ্যা		idx;
+    পূর্ণসংখ্যা		স্তূপ_idx;
+    পূর্ণসংখ্যা		text_start;
+    পূর্ণসংখ্যা		সারি_start;
+    long	সারি_আকার;
+    পূর্ণসংখ্যা		i;
+    পূর্ণসংখ্যা		ret = FAIL;
 #ifdef FEAT_PROP_POPUP
-    char_u	*textprop_save = NULL;
+    char_u	*textprop_save = ফাঁকা;
     long	textprop_len = 0;
 #endif
 
-    if (lowest_marked && lowest_marked > lnum)
+    যদি (lowest_marked && lowest_marked > lnum)
 	lowest_marked--;
 
 /*
  * If the file becomes empty the last line is replaced by an empty line.
  */
-    if (buf->b_ml.ml_line_count == 1)	    // file becomes empty
+    যদি (buf->b_ml.ml_সারি_গুনতি == 1)	    // file becomes empty
     {
-	if ((flags & ML_DEL_MESSAGE)
+	যদি ((flags & ML_DEL_MESSAGE)
 #ifdef FEAT_NETBEANS_INTG
-		&& !netbeansSuppressNoLines
+		&& !netbeans_Suppress_No_সারিগুলি
 #endif
 	   )
-	    set_keep_msg((char_u *)_(no_lines_msg), 0);
+	    set_keep_বার্তা((char_u *)_(no_সারিগুলি_বার্তা), 0);
 
 	// FEAT_BYTEOFF already handled in there, don't worry 'bout it below
 	i = ml_replace((linenr_T)1, (char_u *)"", TRUE);
 	buf->b_ml.ml_flags |= ML_EMPTY;
 
-	return i;
+	ফেরত i;
     }
 
 /*
@@ -3938,41 +3938,41 @@ ml_delete_int(buf_T *buf, linenr_T lnum, int flags)
  * This also releases any locked block..
  */
     mfp = buf->b_ml.ml_mfp;
-    if (mfp == NULL)
-	return FAIL;
+    যদি (mfp == ফাঁকা)
+	ফেরত FAIL;
 
-    if ((hp = ml_find_line(buf, lnum, ML_DELETE)) == NULL)
-	return FAIL;
+    যদি ((hp = ml_find_সারি(buf, lnum, ML_DELETE)) == ফাঁকা)
+	ফেরত FAIL;
 
-    dp = (DATA_BL *)(hp->bh_data);
+    dp = (তথ্য_BL *)(hp->bh_তথ্য);
     // compute line count before the delete
-    count = (long)(buf->b_ml.ml_locked_high)
-					- (long)(buf->b_ml.ml_locked_low) + 2;
-    idx = lnum - buf->b_ml.ml_locked_low;
+    গুনতি = (long)(buf->b_ml.ml_locked_উপরের)
+					- (long)(buf->b_ml.ml_locked_নিচের) + 2;
+    idx = lnum - buf->b_ml.ml_locked_নিচের;
 
-    --buf->b_ml.ml_line_count;
+    --buf->b_ml.ml_সারি_গুনতি;
 
-    line_start = ((dp->db_index[idx]) & DB_INDEX_MASK);
-    if (idx == 0)		// first line in block, text at the end
-	line_size = dp->db_txt_end - line_start;
-    else
-	line_size = ((dp->db_index[idx - 1]) & DB_INDEX_MASK) - line_start;
+    সারি_start = ((dp->db_সূচক[idx]) & DB_সূচক_MASK);
+    যদি (idx == 0)		// first line in block, text at the end
+	সারি_আকার = dp->db_txt_end - সারি_start;
+    অন্যথা
+	সারি_আকার = ((dp->db_সূচক[idx - 1]) & DB_সূচক_MASK) - সারি_start;
 
 #ifdef FEAT_NETBEANS_INTG
-    if (netbeans_active())
-	netbeans_removed(buf, lnum, 0, line_size);
+    যদি (netbeans_active())
+	netbeans_removed(buf, lnum, 0, সারি_আকার);
 #endif
 #ifdef FEAT_PROP_POPUP
     // If there are text properties compute their byte length.
     // if needed make a copy, so that we can update properties in preceding and
     // following lines.
-    if (buf->b_has_textprop)
+    যদি (buf->b_has_textprop)
     {
-	size_t	textlen = STRLEN((char_u *)dp + line_start) + 1;
+	size_t	textlen = STRLEN((char_u *)dp + সারি_start) + 1;
 
-	textprop_len = line_size - (long)textlen;
-	if (!(flags & (ML_DEL_UNDO | ML_DEL_NOPROP)) && textprop_len > 0)
-	    textprop_save = vim_memsave((char_u *)dp + line_start + textlen,
+	textprop_len = সারি_আকার - (long)textlen;
+	যদি (!(flags & (ML_DEL_UNDO | ML_DEL_NOPROP)) && textprop_len > 0)
+	    textprop_save = vim_memsave((char_u *)dp + সারি_start + textlen,
 								 textprop_len);
     }
 #endif
@@ -3985,70 +3985,70 @@ ml_delete_int(buf_T *buf, linenr_T lnum, int flags)
  * The line counts in the pointer blocks have already been adjusted by
  * ml_find_line().
  */
-    if (count == 1)
+    যদি (গুনতি == 1)
     {
 	mf_free(mfp, hp);	// free the data block
-	buf->b_ml.ml_locked = NULL;
+	buf->b_ml.ml_locked = ফাঁকা;
 
-	for (stack_idx = buf->b_ml.ml_stack_top - 1; stack_idx >= 0;
-								  --stack_idx)
+	জন্য (স্তূপ_idx = buf->b_ml.ml_স্তূপ_শীর্ষ - 1; স্তূপ_idx >= 0;
+								  --স্তূপ_idx)
 	{
-	    buf->b_ml.ml_stack_top = 0;	    // stack is invalid when failing
-	    ip = &(buf->b_ml.ml_stack[stack_idx]);
-	    idx = ip->ip_index;
-	    if ((hp = mf_get(mfp, ip->ip_bnum, 1)) == NULL)
-		goto theend;
-	    pp = (PTR_BL *)(hp->bh_data);   // must be pointer block
-	    if (pp->pb_id != PTR_ID)
+	    buf->b_ml.ml_স্তূপ_শীর্ষ = 0;	    // stack is invalid when failing
+	    ip = &(buf->b_ml.ml_স্তূপ[স্তূপ_idx]);
+	    idx = ip->ip_সূচক;
+	    যদি ((hp = mf_get(mfp, ip->ip_bnum, 1)) == ফাঁকা)
+		যাও theend;
+	    pp = (PTR_BL *)(hp->bh_তথ্য);   // must be pointer block
+	    যদি (pp->pb_id != PTR_ID)
 	    {
 		iemsg(e_pointer_block_id_wrong_four);
 		mf_put(mfp, hp, FALSE, FALSE);
-		goto theend;
+		যাও theend;
 	    }
-	    count = --(pp->pb_count);
-	    if (count == 0)	    // the pointer block becomes empty!
+	    গুনতি = --(pp->pb_গুনতি);
+	    যদি (গুনতি == 0)	    // the pointer block becomes empty!
 		mf_free(mfp, hp);
-	    else
+	    অন্যথা
 	    {
-		if (count != idx)	// move entries after the deleted one
+		যদি (গুনতি != idx)	// move entries after the deleted one
 		    mch_memmove(&pp->pb_pointer[idx], &pp->pb_pointer[idx + 1],
-				      (size_t)(count - idx) * sizeof(PTR_EN));
+				      (size_t)(গুনতি - idx) * আকার(PTR_EN));
 		mf_put(mfp, hp, TRUE, FALSE);
 
-		buf->b_ml.ml_stack_top = stack_idx;	// truncate stack
+		buf->b_ml.ml_স্তূপ_শীর্ষ = স্তূপ_idx;	// truncate stack
 		// fix line count for rest of blocks in the stack
-		if (buf->b_ml.ml_locked_lineadd != 0)
+		যদি (buf->b_ml.ml_locked_lineadd != 0)
 		{
 		    ml_lineadd(buf, buf->b_ml.ml_locked_lineadd);
-		    buf->b_ml.ml_stack[buf->b_ml.ml_stack_top].ip_high +=
+		    buf->b_ml.ml_স্তূপ[buf->b_ml.ml_স্তূপ_শীর্ষ].ip_উপরের +=
 						  buf->b_ml.ml_locked_lineadd;
 		}
-		++(buf->b_ml.ml_stack_top);
+		++(buf->b_ml.ml_স্তূপ_শীর্ষ);
 
-		break;
+		বিরতি;
 	    }
 	}
-	CHECK(stack_idx < 0, _("deleted block 1?"));
+	CHECK(স্তূপ_idx < 0, _("deleted block 1?"));
     }
-    else
+    অন্যথা
     {
 	/*
 	 * delete the text by moving the next lines forwards
 	 */
 	text_start = dp->db_txt_start;
-	mch_memmove((char *)dp + text_start + line_size,
-		  (char *)dp + text_start, (size_t)(line_start - text_start));
+	mch_memmove((অক্ষর *)dp + text_start + সারি_আকার,
+		  (অক্ষর *)dp + text_start, (size_t)(সারি_start - text_start));
 
 	/*
 	 * delete the index by moving the next indexes backwards
 	 * Adjust the indexes for the text movement.
 	 */
-	for (i = idx; i < count - 1; ++i)
-	    dp->db_index[i] = dp->db_index[i + 1] + line_size;
+	জন্য (i = idx; i < গুনতি - 1; ++i)
+	    dp->db_সূচক[i] = dp->db_সূচক[i + 1] + সারি_আকার;
 
-	dp->db_free += line_size + INDEX_SIZE;
-	dp->db_txt_start += line_size;
-	--(dp->db_line_count);
+	dp->db_free += সারি_আকার + সূচক_আকার;
+	dp->db_txt_start += সারি_আকার;
+	--(dp->db_সারি_গুনতি);
 
 	/*
 	 * mark the block dirty and make sure it is in the file (for recovery)
@@ -4057,7 +4057,7 @@ ml_delete_int(buf_T *buf, linenr_T lnum, int flags)
     }
 
 #ifdef FEAT_BYTEOFF
-    ml_updatechunk(buf, lnum, line_size
+    ml_updatechunk(buf, lnum, সারি_আকার
 # ifdef FEAT_PROP_POPUP
 					- textprop_len
 # endif
@@ -4067,31 +4067,31 @@ ml_delete_int(buf_T *buf, linenr_T lnum, int flags)
 
 theend:
 #ifdef FEAT_PROP_POPUP
-    if (textprop_save != NULL)
+    যদি (textprop_save != ফাঁকা)
     {
 	// textprop_save is [prop_count][textprop_T...][vtext...].
 	// Skip prop_count header and pass only the textprop_T part.
 	uint16_t    pc;
-	char_u	    *props_data;
-	int	    props_bytes;
+	char_u	    *props_তথ্য;
+	পূর্ণসংখ্যা	    props_bytes;
 
-	mch_memmove(&pc, textprop_save, PROP_COUNT_SIZE);
-	props_data = textprop_save + PROP_COUNT_SIZE;
-	props_bytes = pc * (int)sizeof(textprop_T);
-	if (!text_prop_count_valid(pc, (size_t)textprop_len))
+	mch_memmove(&pc, textprop_save, PROP_গুনতি_আকার);
+	props_তথ্য = textprop_save + PROP_গুনতি_আকার;
+	props_bytes = pc * (পূর্ণসংখ্যা)আকার(textprop_T);
+	যদি (!text_prop_গুনতি_valid(pc, (size_t)textprop_len))
 	    props_bytes = 0;
 
 	// Adjust text properties in the line above and below.
-	if (lnum > 1)
+	যদি (lnum > 1)
 	    adjust_text_props_for_delete(buf, lnum - 1,
-					     props_data, props_bytes, TRUE);
-	if (lnum <= buf->b_ml.ml_line_count)
+					     props_তথ্য, props_bytes, TRUE);
+	যদি (lnum <= buf->b_ml.ml_সারি_গুনতি)
 	    adjust_text_props_for_delete(buf, lnum,
-					    props_data, props_bytes, FALSE);
+					    props_তথ্য, props_bytes, FALSE);
     }
     vim_free(textprop_save);
 #endif
-    return ret;
+    ফেরত ret;
 }
 
 /*
@@ -4103,21 +4103,21 @@ theend:
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    পূর্ণসংখ্যা
 ml_delete(linenr_T lnum)
 {
-    return ml_delete_flags(lnum, 0);
+    ফেরত ml_delete_flags(lnum, 0);
 }
 
 /*
  * Like ml_delete() but using flags (see ml_delete_int()).
  */
-    int
-ml_delete_flags(linenr_T lnum, int flags)
+    পূর্ণসংখ্যা
+ml_delete_flags(linenr_T lnum, পূর্ণসংখ্যা flags)
 {
-    ml_flush_line(curbuf);
-    if (lnum < 1 || lnum > curbuf->b_ml.ml_line_count)
-	return FAIL;
+    ml_flush_সারি(curbuf);
+    যদি (lnum < 1 || lnum > curbuf->b_ml.ml_সারি_গুনতি)
+	ফেরত FAIL;
 
 #ifdef FEAT_EVAL
     // When inserting above recorded changes: flush the changes before changing
@@ -4125,23 +4125,23 @@ ml_delete_flags(linenr_T lnum, int flags)
     may_invoke_listeners(curbuf, lnum, lnum + 1, -1);
 #endif
 
-    return ml_delete_int(curbuf, lnum, flags);
+    ফেরত ml_delete_int(curbuf, lnum, flags);
 }
 
 /*
  * set the DB_MARKED flag for line 'lnum'
  */
-    void
+    শূন্য
 ml_setmarked(linenr_T lnum)
 {
     bhdr_T    *hp;
-    DATA_BL *dp;
+    তথ্য_BL *dp;
 				    // invalid line number
-    if (lnum < 1 || lnum > curbuf->b_ml.ml_line_count
-					       || curbuf->b_ml.ml_mfp == NULL)
-	return;			    // give error message?
+    যদি (lnum < 1 || lnum > curbuf->b_ml.ml_সারি_গুনতি
+					       || curbuf->b_ml.ml_mfp == ফাঁকা)
+	ফেরত;			    // give error message?
 
-    if (lowest_marked == 0 || lowest_marked > lnum)
+    যদি (lowest_marked == 0 || lowest_marked > lnum)
 	lowest_marked = lnum;
 
     /*
@@ -4149,11 +4149,11 @@ ml_setmarked(linenr_T lnum)
      * This also fills the stack with the blocks from the root to the data block
      * This also releases any locked block.
      */
-    if ((hp = ml_find_line(curbuf, lnum, ML_FIND)) == NULL)
-	return;		    // give error message?
+    যদি ((hp = ml_find_সারি(curbuf, lnum, ML_FIND)) == ফাঁকা)
+	ফেরত;		    // give error message?
 
-    dp = (DATA_BL *)(hp->bh_data);
-    dp->db_index[lnum - curbuf->b_ml.ml_locked_low] |= DB_MARKED;
+    dp = (তথ্য_BL *)(hp->bh_তথ্য);
+    dp->db_সূচক[lnum - curbuf->b_ml.ml_locked_নিচের] |= DB_MARKED;
     curbuf->b_ml.ml_flags |= ML_LOCKED_DIRTY;
 }
 
@@ -4161,80 +4161,80 @@ ml_setmarked(linenr_T lnum)
  * find the first line with its DB_MARKED flag set
  */
     linenr_T
-ml_firstmarked(void)
+ml_firstmarked(শূন্য)
 {
     bhdr_T	*hp;
-    DATA_BL	*dp;
+    তথ্য_BL	*dp;
     linenr_T	lnum;
-    int		i;
+    পূর্ণসংখ্যা		i;
 
-    if (curbuf->b_ml.ml_mfp == NULL)
-	return (linenr_T) 0;
+    যদি (curbuf->b_ml.ml_mfp == ফাঁকা)
+	ফেরত (linenr_T) 0;
 
     /*
      * The search starts with lowest_marked line. This is the last line where
      * a mark was found, adjusted by inserting/deleting lines.
      */
-    for (lnum = lowest_marked; lnum <= curbuf->b_ml.ml_line_count; )
+    জন্য (lnum = lowest_marked; lnum <= curbuf->b_ml.ml_সারি_গুনতি; )
     {
 	/*
 	 * Find the data block containing the line.
 	 * This also fills the stack with the blocks from the root to the data
 	 * block This also releases any locked block.
 	 */
-	if ((hp = ml_find_line(curbuf, lnum, ML_FIND)) == NULL)
-	    return (linenr_T)0;		    // give error message?
+	যদি ((hp = ml_find_সারি(curbuf, lnum, ML_FIND)) == ফাঁকা)
+	    ফেরত (linenr_T)0;		    // give error message?
 
-	dp = (DATA_BL *)(hp->bh_data);
+	dp = (তথ্য_BL *)(hp->bh_তথ্য);
 
-	for (i = lnum - curbuf->b_ml.ml_locked_low;
-			    lnum <= curbuf->b_ml.ml_locked_high; ++i, ++lnum)
-	    if ((dp->db_index[i]) & DB_MARKED)
+	জন্য (i = lnum - curbuf->b_ml.ml_locked_নিচের;
+			    lnum <= curbuf->b_ml.ml_locked_উপরের; ++i, ++lnum)
+	    যদি ((dp->db_সূচক[i]) & DB_MARKED)
 	    {
-		(dp->db_index[i]) &= DB_INDEX_MASK;
+		(dp->db_সূচক[i]) &= DB_সূচক_MASK;
 		curbuf->b_ml.ml_flags |= ML_LOCKED_DIRTY;
 		lowest_marked = lnum + 1;
-		return lnum;
+		ফেরত lnum;
 	    }
     }
 
-    return (linenr_T) 0;
+    ফেরত (linenr_T) 0;
 }
 
 /*
  * clear all DB_MARKED flags
  */
-    void
-ml_clearmarked(void)
+    শূন্য
+ml_clearmarked(শূন্য)
 {
     bhdr_T	*hp;
-    DATA_BL	*dp;
+    তথ্য_BL	*dp;
     linenr_T	lnum;
-    int		i;
+    পূর্ণসংখ্যা		i;
 
-    if (curbuf->b_ml.ml_mfp == NULL)	    // nothing to do
-	return;
+    যদি (curbuf->b_ml.ml_mfp == ফাঁকা)	    // nothing to do
+	ফেরত;
 
     /*
      * The search starts with line lowest_marked.
      */
-    for (lnum = lowest_marked; lnum <= curbuf->b_ml.ml_line_count; )
+    জন্য (lnum = lowest_marked; lnum <= curbuf->b_ml.ml_সারি_গুনতি; )
     {
 	/*
 	 * Find the data block containing the line.
 	 * This also fills the stack with the blocks from the root to the data
 	 * block and releases any locked block.
 	 */
-	if ((hp = ml_find_line(curbuf, lnum, ML_FIND)) == NULL)
-	    return;		// give error message?
+	যদি ((hp = ml_find_সারি(curbuf, lnum, ML_FIND)) == ফাঁকা)
+	    ফেরত;		// give error message?
 
-	dp = (DATA_BL *)(hp->bh_data);
+	dp = (তথ্য_BL *)(hp->bh_তথ্য);
 
-	for (i = lnum - curbuf->b_ml.ml_locked_low;
-			    lnum <= curbuf->b_ml.ml_locked_high; ++i, ++lnum)
-	    if ((dp->db_index[i]) & DB_MARKED)
+	জন্য (i = lnum - curbuf->b_ml.ml_locked_নিচের;
+			    lnum <= curbuf->b_ml.ml_locked_উপরের; ++i, ++lnum)
+	    যদি ((dp->db_সূচক[i]) & DB_MARKED)
 	    {
-		(dp->db_index[i]) &= DB_INDEX_MASK;
+		(dp->db_সূচক[i]) &= DB_সূচক_MASK;
 		curbuf->b_ml.ml_flags |= ML_LOCKED_DIRTY;
 	    }
     }
@@ -4245,98 +4245,98 @@ ml_clearmarked(void)
 /*
  * flush ml_line if necessary
  */
-    static void
-ml_flush_line(buf_T *buf)
+    স্থির শূন্য
+ml_flush_সারি(buf_T *buf)
 {
     bhdr_T	*hp;
-    DATA_BL	*dp;
+    তথ্য_BL	*dp;
     linenr_T	lnum;
-    char_u	*new_line;
-    char_u	*old_line;
+    char_u	*new_সারি;
+    char_u	*old_সারি;
     colnr_T	new_len;
-    int		old_len;
-    int		extra;
-    int		idx;
-    int		start;
-    int		count;
-    int		i;
-    static int  entered = FALSE;
+    পূর্ণসংখ্যা		old_len;
+    পূর্ণসংখ্যা		extra;
+    পূর্ণসংখ্যা		idx;
+    পূর্ণসংখ্যা		start;
+    পূর্ণসংখ্যা		গুনতি;
+    পূর্ণসংখ্যা		i;
+    স্থির পূর্ণসংখ্যা  entered = FALSE;
 
-    if (buf->b_ml.ml_line_lnum == 0 || buf->b_ml.ml_mfp == NULL)
-	return;		// nothing to do
+    যদি (buf->b_ml.ml_সারি_lnum == 0 || buf->b_ml.ml_mfp == ফাঁকা)
+	ফেরত;		// nothing to do
 
-    if (buf->b_ml.ml_flags & ML_LINE_DIRTY)
+    যদি (buf->b_ml.ml_flags & ML_সারি_DIRTY)
     {
 	// This code doesn't work recursively, but Netbeans may call back here
 	// when obtaining the cursor position.
-	if (entered)
-	    return;
+	যদি (entered)
+	    ফেরত;
 	entered = TRUE;
 
-	lnum = buf->b_ml.ml_line_lnum;
-	new_line = buf->b_ml.ml_line_ptr;
+	lnum = buf->b_ml.ml_সারি_lnum;
+	new_সারি = buf->b_ml.ml_সারি_ptr;
 
-	hp = ml_find_line(buf, lnum, ML_FIND);
-	if (hp == NULL)
-	    siemsg(e_cannot_find_line_nr, lnum);
-	else
+	hp = ml_find_সারি(buf, lnum, ML_FIND);
+	যদি (hp == ফাঁকা)
+	    siemsg(e_cannot_find_সারি_nr, lnum);
+	অন্যথা
 	{
-	    dp = (DATA_BL *)(hp->bh_data);
-	    idx = lnum - buf->b_ml.ml_locked_low;
-	    start = ((dp->db_index[idx]) & DB_INDEX_MASK);
-	    old_line = (char_u *)dp + start;
-	    if (idx == 0)	// line is last in block
+	    dp = (তথ্য_BL *)(hp->bh_তথ্য);
+	    idx = lnum - buf->b_ml.ml_locked_নিচের;
+	    start = ((dp->db_সূচক[idx]) & DB_সূচক_MASK);
+	    old_সারি = (char_u *)dp + start;
+	    যদি (idx == 0)	// line is last in block
 		old_len = dp->db_txt_end - start;
-	    else		// text of previous line follows
-		old_len = (dp->db_index[idx - 1] & DB_INDEX_MASK) - start;
-	    new_len = buf->b_ml.ml_line_len;
+	    অন্যথা		// text of previous line follows
+		old_len = (dp->db_সূচক[idx - 1] & DB_সূচক_MASK) - start;
+	    new_len = buf->b_ml.ml_সারি_len;
 	    extra = new_len - old_len;	    // negative if lines gets smaller
 
 	    /*
 	     * if new line fits in data block, replace directly
 	     */
-	    if ((int)dp->db_free >= extra)
+	    যদি ((পূর্ণসংখ্যা)dp->db_free >= extra)
 	    {
-#if defined(FEAT_BYTEOFF) && defined(FEAT_PROP_POPUP)
-		int old_prop_len = 0;
-		if (buf->b_has_textprop)
-		    old_prop_len = old_len - (int)STRLEN(old_line) - 1;
+#যদি defined(FEAT_BYTEOFF) && defined(FEAT_PROP_POPUP)
+		পূর্ণসংখ্যা old_prop_len = 0;
+		যদি (buf->b_has_textprop)
+		    old_prop_len = old_len - (পূর্ণসংখ্যা)STRLEN(old_সারি) - 1;
 #endif
 		// if the length changes and there are following lines
-		count = buf->b_ml.ml_locked_high - buf->b_ml.ml_locked_low + 1;
-		if (extra != 0 && idx < count - 1)
+		গুনতি = buf->b_ml.ml_locked_উপরের - buf->b_ml.ml_locked_নিচের + 1;
+		যদি (extra != 0 && idx < গুনতি - 1)
 		{
 		    // move text of following lines
-		    mch_memmove((char *)dp + dp->db_txt_start - extra,
-				(char *)dp + dp->db_txt_start,
+		    mch_memmove((অক্ষর *)dp + dp->db_txt_start - extra,
+				(অক্ষর *)dp + dp->db_txt_start,
 				(size_t)(start - dp->db_txt_start));
 
 		    // adjust pointers of this and following lines
-		    for (i = idx + 1; i < count; ++i)
-			dp->db_index[i] -= extra;
+		    জন্য (i = idx + 1; i < গুনতি; ++i)
+			dp->db_সূচক[i] -= extra;
 		}
-		dp->db_index[idx] -= extra;
+		dp->db_সূচক[idx] -= extra;
 
 		// adjust free space
 		dp->db_free -= extra;
 		dp->db_txt_start -= extra;
 
 		// copy new line into the data block
-		mch_memmove(old_line - extra, new_line, (size_t)new_len);
+		mch_memmove(old_সারি - extra, new_সারি, (size_t)new_len);
 		buf->b_ml.ml_flags |= (ML_LOCKED_DIRTY | ML_LOCKED_POS);
-#if defined(FEAT_BYTEOFF) && defined(FEAT_PROP_POPUP)
+#যদি defined(FEAT_BYTEOFF) && defined(FEAT_PROP_POPUP)
 		// The else case is already covered by the insert and delete
-		if (buf->b_has_textprop)
+		যদি (buf->b_has_textprop)
 		{
 		    // Do not count the size of any text properties.
 		    extra += old_prop_len;
-		    extra -= new_len - (int)STRLEN(new_line) - 1;
+		    extra -= new_len - (পূর্ণসংখ্যা)STRLEN(new_সারি) - 1;
 		}
-		if (extra != 0)
+		যদি (extra != 0)
 		    ml_updatechunk(buf, lnum, (long)extra, ML_CHNK_UPDLINE);
 #endif
 	    }
-	    else
+	    অন্যথা
 	    {
 		/*
 		 * Cannot do it in one data block: Delete and append.
@@ -4346,65 +4346,65 @@ ml_flush_line(buf_T *buf)
 		 * Don't forget to copy the mark!
 		 */
 		// How about handling errors???
-		(void)ml_append_int(buf, lnum, new_line, new_len,
-			 ((dp->db_index[idx] & DB_MARKED) ? ML_APPEND_MARK : 0)
+		(শূন্য)ml_append_int(buf, lnum, new_সারি, new_len,
+			 ((dp->db_সূচক[idx] & DB_MARKED) ? ML_APPEND_MARK : 0)
 #ifdef FEAT_PROP_POPUP
 			     | ML_APPEND_NOPROP
 #endif
 			 );
-		(void)ml_delete_int(buf, lnum, ML_DEL_NOPROP);
+		(শূন্য)ml_delete_int(buf, lnum, ML_DEL_NOPROP);
 	    }
 	}
-	vim_free(new_line);
+	vim_free(new_সারি);
 
 	entered = FALSE;
     }
-    else if (buf->b_ml.ml_flags & ML_ALLOCATED)
-	vim_free(buf->b_ml.ml_line_ptr);
+    অন্যথা যদি (buf->b_ml.ml_flags & ML_ALLOCATED)
+	vim_free(buf->b_ml.ml_সারি_ptr);
 
-    buf->b_ml.ml_flags &= ~(ML_LINE_DIRTY | ML_ALLOCATED);
-    buf->b_ml.ml_line_lnum = 0;
+    buf->b_ml.ml_flags &= ~(ML_সারি_DIRTY | ML_ALLOCATED);
+    buf->b_ml.ml_সারি_lnum = 0;
 }
 
 /*
  * create a new, empty, data block
  */
-    static bhdr_T *
-ml_new_data(memfile_T *mfp, int negative, int page_count)
+    স্থির bhdr_T *
+ml_new_তথ্য(memfile_T *mfp, পূর্ণসংখ্যা negative, পূর্ণসংখ্যা page_গুনতি)
 {
     bhdr_T	*hp;
-    DATA_BL	*dp;
+    তথ্য_BL	*dp;
 
-    if ((hp = mf_new(mfp, negative, page_count)) == NULL)
-	return NULL;
+    যদি ((hp = mf_new(mfp, negative, page_গুনতি)) == ফাঁকা)
+	ফেরত ফাঁকা;
 
-    dp = (DATA_BL *)(hp->bh_data);
-    dp->db_id = DATA_ID;
-    dp->db_txt_start = dp->db_txt_end = page_count * mfp->mf_page_size;
-    dp->db_free = dp->db_txt_start - HEADER_SIZE;
-    dp->db_line_count = 0;
+    dp = (তথ্য_BL *)(hp->bh_তথ্য);
+    dp->db_id = তথ্য_ID;
+    dp->db_txt_start = dp->db_txt_end = page_গুনতি * mfp->mf_page_আকার;
+    dp->db_free = dp->db_txt_start - HEADER_আকার;
+    dp->db_সারি_গুনতি = 0;
 
-    return hp;
+    ফেরত hp;
 }
 
 /*
  * create a new, empty, pointer block
  */
-    static bhdr_T *
+    স্থির bhdr_T *
 ml_new_ptr(memfile_T *mfp)
 {
     bhdr_T	*hp;
     PTR_BL	*pp;
 
-    if ((hp = mf_new(mfp, FALSE, 1)) == NULL)
-	return NULL;
+    যদি ((hp = mf_new(mfp, FALSE, 1)) == ফাঁকা)
+	ফেরত ফাঁকা;
 
-    pp = (PTR_BL *)(hp->bh_data);
+    pp = (PTR_BL *)(hp->bh_তথ্য);
     pp->pb_id = PTR_ID;
-    pp->pb_count = 0;
-    pp->pb_count_max = PB_COUNT_MAX(mfp);
+    pp->pb_গুনতি = 0;
+    pp->pb_গুনতি_max = PB_গুনতি_MAX(mfp);
 
-    return hp;
+    ফেরত hp;
 }
 
 /*
@@ -4422,21 +4422,21 @@ ml_new_ptr(memfile_T *mfp)
  *
  * return: NULL for failure, pointer to block header otherwise
  */
-    static bhdr_T *
-ml_find_line(buf_T *buf, linenr_T lnum, int action)
+    স্থির bhdr_T *
+ml_find_সারি(buf_T *buf, linenr_T lnum, পূর্ণসংখ্যা action)
 {
-    DATA_BL	*dp;
+    তথ্য_BL	*dp;
     PTR_BL	*pp;
     infoptr_T	*ip;
     bhdr_T	*hp;
     memfile_T	*mfp;
     linenr_T	t;
     blocknr_T	bnum, bnum2;
-    int		dirty;
-    linenr_T	low, high;
-    int		top;
-    int		page_count;
-    int		idx;
+    পূর্ণসংখ্যা		dirty;
+    linenr_T	নিচের, উপরের;
+    পূর্ণসংখ্যা		শীর্ষ_2;
+    পূর্ণসংখ্যা		page_গুনতি;
+    পূর্ণসংখ্যা		idx;
 
     mfp = buf->b_ml.ml_mfp;
 
@@ -4447,129 +4447,129 @@ ml_find_line(buf_T *buf, linenr_T lnum, int action)
      * Don't do this for ML_FLUSH, because we want to flush the locked block.
      * Don't do this when 'swapfile' is reset, we want to load all the blocks.
      */
-    if (buf->b_ml.ml_locked)
+    যদি (buf->b_ml.ml_locked)
     {
-	if (ML_SIMPLE(action)
-		&& buf->b_ml.ml_locked_low <= lnum
-		&& buf->b_ml.ml_locked_high >= lnum
+	যদি (ML_SIMPLE(action)
+		&& buf->b_ml.ml_locked_নিচের <= lnum
+		&& buf->b_ml.ml_locked_উপরের >= lnum
 		&& !mf_dont_release)
 	{
 	    // remember to update pointer blocks and stack later
-	    if (action == ML_INSERT)
+	    যদি (action == ML_ঢোকাও)
 	    {
 		++(buf->b_ml.ml_locked_lineadd);
-		++(buf->b_ml.ml_locked_high);
+		++(buf->b_ml.ml_locked_উপরের);
 	    }
-	    else if (action == ML_DELETE)
+	    অন্যথা যদি (action == ML_DELETE)
 	    {
 		--(buf->b_ml.ml_locked_lineadd);
-		--(buf->b_ml.ml_locked_high);
+		--(buf->b_ml.ml_locked_উপরের);
 	    }
-	    return (buf->b_ml.ml_locked);
+	    ফেরত (buf->b_ml.ml_locked);
 	}
 
 	mf_put(mfp, buf->b_ml.ml_locked, buf->b_ml.ml_flags & ML_LOCKED_DIRTY,
 					    buf->b_ml.ml_flags & ML_LOCKED_POS);
-	buf->b_ml.ml_locked = NULL;
+	buf->b_ml.ml_locked = ফাঁকা;
 
 	/*
 	 * If lines have been added or deleted in the locked block, need to
 	 * update the line count in pointer blocks.
 	 */
-	if (buf->b_ml.ml_locked_lineadd != 0)
+	যদি (buf->b_ml.ml_locked_lineadd != 0)
 	    ml_lineadd(buf, buf->b_ml.ml_locked_lineadd);
     }
 
-    if (action == ML_FLUSH)	    // nothing else to do
-	return NULL;
+    যদি (action == ML_FLUSH)	    // nothing else to do
+	ফেরত ফাঁকা;
 
     bnum = 1;			    // start at the root of the tree
-    page_count = 1;
-    low = 1;
-    high = buf->b_ml.ml_line_count;
+    page_গুনতি = 1;
+    নিচের = 1;
+    উপরের = buf->b_ml.ml_সারি_গুনতি;
 
-    if (action == ML_FIND)	// first try stack entries
+    যদি (action == ML_FIND)	// first try stack entries
     {
-	for (top = buf->b_ml.ml_stack_top - 1; top >= 0; --top)
+	জন্য (শীর্ষ_2 = buf->b_ml.ml_স্তূপ_শীর্ষ - 1; শীর্ষ_2 >= 0; --শীর্ষ_2)
 	{
-	    ip = &(buf->b_ml.ml_stack[top]);
-	    if (ip->ip_low <= lnum && ip->ip_high >= lnum)
+	    ip = &(buf->b_ml.ml_স্তূপ[শীর্ষ_2]);
+	    যদি (ip->ip_নিচের <= lnum && ip->ip_উপরের >= lnum)
 	    {
 		bnum = ip->ip_bnum;
-		low = ip->ip_low;
-		high = ip->ip_high;
-		buf->b_ml.ml_stack_top = top;	// truncate stack at prev entry
-		break;
+		নিচের = ip->ip_নিচের;
+		উপরের = ip->ip_উপরের;
+		buf->b_ml.ml_স্তূপ_শীর্ষ = শীর্ষ_2;	// truncate stack at prev entry
+		বিরতি;
 	    }
 	}
-	if (top < 0)
-	    buf->b_ml.ml_stack_top = 0;		// not found, start at the root
+	যদি (শীর্ষ_2 < 0)
+	    buf->b_ml.ml_স্তূপ_শীর্ষ = 0;		// not found, start at the root
     }
-    else	// ML_DELETE or ML_INSERT
-	buf->b_ml.ml_stack_top = 0;	// start at the root
+    অন্যথা	// ML_DELETE or ML_INSERT
+	buf->b_ml.ml_স্তূপ_শীর্ষ = 0;	// start at the root
 
 /*
  * search downwards in the tree until a data block is found
  */
-    for (;;)
+    জন্য (;;)
     {
-	if ((hp = mf_get(mfp, bnum, page_count)) == NULL)
-	    goto error_noblock;
+	যদি ((hp = mf_get(mfp, bnum, page_গুনতি)) == ফাঁকা)
+	    যাও error_noblock;
 
 	/*
 	 * update high for insert/delete
 	 */
-	if (action == ML_INSERT)
-	    ++high;
-	else if (action == ML_DELETE)
-	    --high;
+	যদি (action == ML_ঢোকাও)
+	    ++উপরের;
+	অন্যথা যদি (action == ML_DELETE)
+	    --উপরের;
 
-	dp = (DATA_BL *)(hp->bh_data);
-	if (dp->db_id == DATA_ID)	// data block
+	dp = (তথ্য_BL *)(hp->bh_তথ্য);
+	যদি (dp->db_id == তথ্য_ID)	// data block
 	{
 	    buf->b_ml.ml_locked = hp;
-	    buf->b_ml.ml_locked_low = low;
-	    buf->b_ml.ml_locked_high = high;
+	    buf->b_ml.ml_locked_নিচের = নিচের;
+	    buf->b_ml.ml_locked_উপরের = উপরের;
 	    buf->b_ml.ml_locked_lineadd = 0;
 	    buf->b_ml.ml_flags &= ~(ML_LOCKED_DIRTY | ML_LOCKED_POS);
-	    return hp;
+	    ফেরত hp;
 	}
 
 	pp = (PTR_BL *)(dp);		// must be pointer block
-	if (pp->pb_id != PTR_ID)
+	যদি (pp->pb_id != PTR_ID)
 	{
 	    iemsg(e_pointer_block_id_wrong);
-	    goto error_block;
+	    যাও error_block;
 	}
 
-	if ((top = ml_add_stack(buf)) < 0)	// add new entry to stack
-	    goto error_block;
-	ip = &(buf->b_ml.ml_stack[top]);
+	যদি ((শীর্ষ_2 = ml_add_স্তূপ(buf)) < 0)	// add new entry to stack
+	    যাও error_block;
+	ip = &(buf->b_ml.ml_স্তূপ[শীর্ষ_2]);
 	ip->ip_bnum = bnum;
-	ip->ip_low = low;
-	ip->ip_high = high;
-	ip->ip_index = -1;		// index not known yet
+	ip->ip_নিচের = নিচের;
+	ip->ip_উপরের = উপরের;
+	ip->ip_সূচক = -1;		// index not known yet
 
 	dirty = FALSE;
-	for (idx = 0; idx < (int)pp->pb_count; ++idx)
+	জন্য (idx = 0; idx < (পূর্ণসংখ্যা)pp->pb_গুনতি; ++idx)
 	{
-	    t = pp->pb_pointer[idx].pe_line_count;
+	    t = pp->pb_pointer[idx].pe_সারি_গুনতি;
 	    CHECK(t == 0, _("pe_line_count is zero"));
-	    if ((low += t) > lnum)
+	    যদি ((নিচের += t) > lnum)
 	    {
-		ip->ip_index = idx;
+		ip->ip_সূচক = idx;
 		bnum = pp->pb_pointer[idx].pe_bnum;
-		page_count = pp->pb_pointer[idx].pe_page_count;
-		high = low - 1;
-		low -= t;
+		page_গুনতি = pp->pb_pointer[idx].pe_page_গুনতি;
+		উপরের = নিচের - 1;
+		নিচের -= t;
 
 		/*
 		 * a negative block number may have been changed
 		 */
-		if (bnum < 0)
+		যদি (bnum < 0)
 		{
 		    bnum2 = mf_trans_del(mfp, bnum);
-		    if (bnum != bnum2)
+		    যদি (bnum != bnum2)
 		    {
 			bnum = bnum2;
 			pp->pb_pointer[idx].pe_bnum = bnum;
@@ -4577,27 +4577,27 @@ ml_find_line(buf_T *buf, linenr_T lnum, int action)
 		    }
 		}
 
-		break;
+		বিরতি;
 	    }
 	}
-	if (idx >= (int)pp->pb_count)	    // past the end: something wrong!
+	যদি (idx >= (পূর্ণসংখ্যা)pp->pb_গুনতি)	    // past the end: something wrong!
 	{
-	    if (lnum > buf->b_ml.ml_line_count)
-		siemsg(e_line_number_out_of_range_nr_past_the_end,
-					      lnum - buf->b_ml.ml_line_count);
+	    যদি (lnum > buf->b_ml.ml_সারি_গুনতি)
+		siemsg(e_সারি_সংখ্যা_out_of_range_nr_past_the_end,
+					      lnum - buf->b_ml.ml_সারি_গুনতি);
 
-	    else
-		siemsg(e_line_count_wrong_in_block_nr, bnum);
-	    goto error_block;
+	    অন্যথা
+		siemsg(e_সারি_গুনতি_wrong_in_block_nr, bnum);
+	    যাও error_block;
 	}
-	if (action == ML_DELETE)
+	যদি (action == ML_DELETE)
 	{
-	    pp->pb_pointer[idx].pe_line_count--;
+	    pp->pb_pointer[idx].pe_সারি_গুনতি--;
 	    dirty = TRUE;
 	}
-	else if (action == ML_INSERT)
+	অন্যথা যদি (action == ML_ঢোকাও)
 	{
-	    pp->pb_pointer[idx].pe_line_count++;
+	    pp->pb_pointer[idx].pe_সারি_গুনতি++;
 	    dirty = TRUE;
 	}
 	mf_put(mfp, hp, dirty, FALSE);
@@ -4611,12 +4611,12 @@ error_noblock:
      * the incremented/decremented line counts, because there won't be a line
      * inserted/deleted after all.
      */
-    if (action == ML_DELETE)
+    যদি (action == ML_DELETE)
 	ml_lineadd(buf, 1);
-    else if (action == ML_INSERT)
+    অন্যথা যদি (action == ML_ঢোকাও)
 	ml_lineadd(buf, -1);
-    buf->b_ml.ml_stack_top = 0;
-    return NULL;
+    buf->b_ml.ml_স্তূপ_শীর্ষ = 0;
+    ফেরত ফাঁকা;
 }
 
 /*
@@ -4624,32 +4624,32 @@ error_noblock:
  *
  * return -1 for failure, number of the new entry otherwise
  */
-    static int
-ml_add_stack(buf_T *buf)
+    স্থির পূর্ণসংখ্যা
+ml_add_স্তূপ(buf_T *buf)
 {
-    int		top;
+    পূর্ণসংখ্যা		শীর্ষ_2;
     infoptr_T	*newstack;
 
-    top = buf->b_ml.ml_stack_top;
+    শীর্ষ_2 = buf->b_ml.ml_স্তূপ_শীর্ষ;
 
     // may have to increase the stack size
-    if (top == buf->b_ml.ml_stack_size)
+    যদি (শীর্ষ_2 == buf->b_ml.ml_স্তূপ_আকার)
     {
-	CHECK(top > 0, _("Stack size increases")); // more than 5 levels???
+	CHECK(শীর্ষ_2 > 0, _("Stack size increases")); // more than 5 levels???
 
-	newstack = ALLOC_MULT(infoptr_T, buf->b_ml.ml_stack_size + STACK_INCR);
-	if (newstack == NULL)
-	    return -1;
-	if (top > 0)
-	    mch_memmove(newstack, buf->b_ml.ml_stack,
-					     (size_t)top * sizeof(infoptr_T));
-	vim_free(buf->b_ml.ml_stack);
-	buf->b_ml.ml_stack = newstack;
-	buf->b_ml.ml_stack_size += STACK_INCR;
+	newstack = ALLOC_MULT(infoptr_T, buf->b_ml.ml_স্তূপ_আকার + স্তূপ_INCR);
+	যদি (newstack == ফাঁকা)
+	    ফেরত -1;
+	যদি (শীর্ষ_2 > 0)
+	    mch_memmove(newstack, buf->b_ml.ml_স্তূপ,
+					     (size_t)শীর্ষ_2 * আকার(infoptr_T));
+	vim_free(buf->b_ml.ml_স্তূপ);
+	buf->b_ml.ml_স্তূপ = newstack;
+	buf->b_ml.ml_স্তূপ_আকার += স্তূপ_INCR;
     }
 
-    buf->b_ml.ml_stack_top++;
-    return top;
+    buf->b_ml.ml_স্তূপ_শীর্ষ++;
+    ফেরত শীর্ষ_2;
 }
 
 /*
@@ -4662,34 +4662,34 @@ ml_add_stack(buf_T *buf)
  *
  * Count is the number of lines added, negative if lines have been deleted.
  */
-    static void
-ml_lineadd(buf_T *buf, int count)
+    স্থির শূন্য
+ml_lineadd(buf_T *buf, পূর্ণসংখ্যা গুনতি)
 {
-    int		idx;
+    পূর্ণসংখ্যা		idx;
     infoptr_T	*ip;
     PTR_BL	*pp;
     memfile_T	*mfp = buf->b_ml.ml_mfp;
     bhdr_T	*hp;
 
-    for (idx = buf->b_ml.ml_stack_top - 1; idx >= 0; --idx)
+    জন্য (idx = buf->b_ml.ml_স্তূপ_শীর্ষ - 1; idx >= 0; --idx)
     {
-	ip = &(buf->b_ml.ml_stack[idx]);
-	if ((hp = mf_get(mfp, ip->ip_bnum, 1)) == NULL)
-	    break;
-	pp = (PTR_BL *)(hp->bh_data);	// must be pointer block
-	if (pp->pb_id != PTR_ID)
+	ip = &(buf->b_ml.ml_স্তূপ[idx]);
+	যদি ((hp = mf_get(mfp, ip->ip_bnum, 1)) == ফাঁকা)
+	    বিরতি;
+	pp = (PTR_BL *)(hp->bh_তথ্য);	// must be pointer block
+	যদি (pp->pb_id != PTR_ID)
 	{
 	    mf_put(mfp, hp, FALSE, FALSE);
 	    iemsg(e_pointer_block_id_wrong_two);
-	    break;
+	    বিরতি;
 	}
-	pp->pb_pointer[ip->ip_index].pe_line_count += count;
-	ip->ip_high += count;
+	pp->pb_pointer[ip->ip_সূচক].pe_সারি_গুনতি += গুনতি;
+	ip->ip_উপরের += গুনতি;
 	mf_put(mfp, hp, TRUE, FALSE);
     }
 }
 
-#if defined(HAVE_READLINK)
+#যদি defined(HAVE_READLINK)
 /*
  * Resolve a symlink in the last component of a file name.
  * Note that f_resolve() does it for every part of the path, we don't do that
@@ -4697,45 +4697,45 @@ ml_lineadd(buf_T *buf, int count)
  * If it worked returns OK and the resolved link in "buf[MAXPATHL]".
  * Otherwise returns FAIL.
  */
-    int
+    পূর্ণসংখ্যা
 resolve_symlink(char_u *fname, char_u *buf)
 {
     char_u	tmp[MAXPATHL];
-    int		ret;
-    int		depth = 0;
+    পূর্ণসংখ্যা		ret;
+    পূর্ণসংখ্যা		depth = 0;
 
-    if (fname == NULL)
-	return FAIL;
+    যদি (fname == ফাঁকা)
+	ফেরত FAIL;
 
     // Put the result so far in tmp[], starting with the original name.
     vim_strncpy(tmp, fname, MAXPATHL - 1);
 
-    for (;;)
+    জন্য (;;)
     {
 	// Limit symlink depth to 100, catch recursive loops.
-	if (++depth == 100)
+	যদি (++depth == 100)
 	{
 	    semsg(_(e_symlink_loop_for_str), fname);
-	    return FAIL;
+	    ফেরত FAIL;
 	}
 
-	ret = readlink((char *)tmp, (char *)buf, MAXPATHL - 1);
-	if (ret <= 0)
+	ret = readlink((অক্ষর *)tmp, (অক্ষর *)buf, MAXPATHL - 1);
+	যদি (ret <= 0)
 	{
-	    if (errno == EINVAL || errno == ENOENT)
+	    যদি (errno == EINVAL || errno == ENOENT)
 	    {
 		// Found non-symlink or not existing file, stop here.
 		// When at the first level use the unmodified name, skip the
 		// call to vim_FullName().
-		if (depth == 1)
-		    return FAIL;
+		যদি (depth == 1)
+		    ফেরত FAIL;
 
 		// Use the resolved name in tmp[].
-		break;
+		বিরতি;
 	    }
 
 	    // There must be some error reading links, use original name.
-	    return FAIL;
+	    ফেরত FAIL;
 	}
 	buf[ret] = NUL;
 
@@ -4745,16 +4745,16 @@ resolve_symlink(char_u *fname, char_u *buf)
 	 * portion of the filename (if any) and the path the symlink
 	 * points to.
 	 */
-	if (mch_isFullName(buf))
+	যদি (mch_isFullName(buf))
 	    STRCPY(tmp, buf);
-	else
+	অন্যথা
 	{
-	    char_u *tail;
+	    char_u *লেজ;
 
-	    tail = gettail(tmp);
-	    if (STRLEN(tail) + STRLEN(buf) >= MAXPATHL)
-		return FAIL;
-	    STRCPY(tail, buf);
+	    লেজ = gettail(tmp);
+	    যদি (STRLEN(লেজ) + STRLEN(buf) >= MAXPATHL)
+		ফেরত FAIL;
+	    STRCPY(লেজ, buf);
 	}
     }
 
@@ -4763,7 +4763,7 @@ resolve_symlink(char_u *fname, char_u *buf)
      * be consistent even when opening a relative symlink from different
      * working directories.
      */
-    return vim_FullName(tmp, buf, MAXPATHL, TRUE);
+    ফেরত vim_FullName(tmp, buf, MAXPATHL, TRUE);
 }
 #endif
 
@@ -4785,23 +4785,23 @@ makeswapname(
 
     // Expand symlink in the file name, so that we put the swap file with the
     // actual file instead of with the symlink.
-    if (resolve_symlink(fname, fname_buf) == OK)
+    যদি (resolve_symlink(fname, fname_buf) == OK)
 	fname_res = fname_buf;
 #endif
 
-#if defined(UNIX) || defined(MSWIN)  // Need _very_ long file names
-    int		len = (int)STRLEN(dir_name);
+#যদি defined(UNIX) || defined(MSWIN)  // Need _very_ long file names
+    পূর্ণসংখ্যা		len = (পূর্ণসংখ্যা)STRLEN(dir_name);
 
     s = dir_name + len;
-    if (after_pathsep(dir_name, s) && len > 1 && s[-1] == s[-2])
+    যদি (after_pathsep(dir_name, s) && len > 1 && s[-1] == s[-2])
     {			       // Ends with '//', Use Full path
-	r = NULL;
-	if ((s = make_percent_swname(dir_name, s, fname_res)) != NULL)
+	r = ফাঁকা;
+	যদি ((s = make_percent_swname(dir_name, s, fname_res)) != ফাঁকা)
 	{
 	    r = modname(s, (char_u *)".swp", FALSE);
 	    vim_free(s);
 	}
-	return r;
+	ফেরত r;
     }
 #endif
 
@@ -4809,19 +4809,19 @@ makeswapname(
 	    (buf->b_p_sn || buf->b_shortname),
 	    fname_res,
 	    (char_u *)
-#if defined(VMS)
+#যদি defined(VMS)
 	    "_swp",
-#else
+#অন্যথা
 	    ".swp",
 #endif
 	    // Prepend a '.' to the swap file name for the current directory.
 	    dir_name[0] == '.' && dir_name[1] == NUL);
-    if (r == NULL)	    // out of memory
-	return NULL;
+    যদি (r == ফাঁকা)	    // out of memory
+	ফেরত ফাঁকা;
 
     s = get_file_in_dir(r, dir_name);
     vim_free(r);
-    return s;
+    ফেরত s;
 }
 
 /*
@@ -4841,67 +4841,67 @@ get_file_in_dir(
     char_u  *fname,
     char_u  *dname)	// don't use "dirname", it is a global for Alpha
 {
-    string_T	tail;
+    string_T	লেজ;
     string_T	retval;
 
-    tail.string = gettail(fname);
-    tail.length = STRLEN(tail.string);
+    লেজ.string = gettail(fname);
+    লেজ.দৈর্ঘ্য = STRLEN(লেজ.string);
 
-    if (dname[0] == '.' && dname[1] == NUL)
+    যদি (dname[0] == '.' && dname[1] == NUL)
 	retval.string =
-	    vim_strnsave(fname, (size_t)(tail.string - fname) + tail.length);
-    else
+	    vim_strnsave(fname, (size_t)(লেজ.string - fname) + লেজ.দৈর্ঘ্য);
+    অন্যথা
     {
 	size_t	dname_len = STRLEN(dname);
 
-	if (dname[0] == '.' && vim_ispathsep(dname[1]))
+	যদি (dname[0] == '.' && vim_ispathsep(dname[1]))
 	{
-	    if (tail.string == fname)	    // no path before file name
+	    যদি (লেজ.string == fname)	    // no path before file name
 		concat_fnames(dname + 2, dname_len - 2,
-		    tail.string, tail.length, TRUE, &retval);
-	    else
+		    লেজ.string, লেজ.দৈর্ঘ্য, TRUE, &retval);
+	    অন্যথা
 	    {
-		int	    save_char;
+		পূর্ণসংখ্যা	    save_char;
 		string_T    tmp;
 
-		save_char = *tail.string;
-		*tail.string = NUL;
-		concat_fnames(fname, (size_t)(tail.string - fname),
+		save_char = *লেজ.string;
+		*লেজ.string = NUL;
+		concat_fnames(fname, (size_t)(লেজ.string - fname),
 		    dname + 2, dname_len - 2, TRUE, &tmp);
-		*tail.string = save_char;
-		if (tmp.string == NULL)	    // out of memory
-		    retval.string = NULL;
-		else
+		*লেজ.string = save_char;
+		যদি (tmp.string == ফাঁকা)	    // out of memory
+		    retval.string = ফাঁকা;
+		অন্যথা
 		{
-		    concat_fnames(tmp.string, tmp.length,
-			tail.string, tail.length, TRUE, &retval);
+		    concat_fnames(tmp.string, tmp.দৈর্ঘ্য,
+			লেজ.string, লেজ.দৈর্ঘ্য, TRUE, &retval);
 		    vim_free(tmp.string);
 		}
 	    }
 	}
-	else
-	    concat_fnames(dname, dname_len, tail.string, tail.length,
+	অন্যথা
+	    concat_fnames(dname, dname_len, লেজ.string, লেজ.দৈর্ঘ্য,
 		TRUE, &retval);
     }
 
 #ifdef MSWIN
-    if (retval.string != NULL)
+    যদি (retval.string != ফাঁকা)
     {
 	char_u	*t;
 
-	for (t = gettail(retval.string); *t != NUL; MB_PTR_ADV(t))
-	    if (*t == ':')
+	জন্য (t = gettail(retval.string); *t != NUL; MB_PTR_ADV(t))
+	    যদি (*t == ':')
 		*t = '%';
     }
 #endif
 
-    return retval.string;
+    ফেরত retval.string;
 }
 
 /*
  * Print the ATTENTION message: info about an existing swap file.
  */
-    static void
+    স্থির শূন্য
 attention_message(
     buf_T   *buf,	// buffer being edited
     char_u  *fname)	// swap file name
@@ -4910,40 +4910,40 @@ attention_message(
     time_t	swap_mtime;
 
     ++no_wait_return;
-    (void)emsg(_(e_attention));
-    msg_puts(_("\nFound a swap file by the name \""));
-    msg_home_replace(fname);
-    msg_puts("\"\n");
+    (শূন্য)emsg(_(e_attention));
+    বার্তা_puts(_("\nFound a swap file by the name \""));
+    বার্তা_home_replace(fname);
+    বার্তা_puts("\"\n");
     swap_mtime = swapfile_info(fname);
-    msg_puts(_("While opening file \""));
-    msg_outtrans(buf->b_fname);
-    msg_puts("\"\n");
-    if (mch_stat((char *)buf->b_fname, &st) == -1)
+    বার্তা_puts(_("While opening file \""));
+    বার্তা_outtrans(buf->b_fname);
+    বার্তা_puts("\"\n");
+    যদি (mch_stat((অক্ষর *)buf->b_fname, &st) == -1)
     {
-	msg_puts(_("      CANNOT BE FOUND"));
+	বার্তা_puts(_("      CANNOT BE FOUND"));
     }
-    else
+    অন্যথা
     {
-	msg_puts(_("             dated: "));
-	msg_puts(get_ctime(st.st_mtime, TRUE));
-	if (swap_mtime != 0 && st.st_mtime > swap_mtime)
-	    msg_puts(_("      NEWER than swap file!\n"));
+	বার্তা_puts(_("             dated: "));
+	বার্তা_puts(get_ctime(st.st_mtime, TRUE));
+	যদি (swap_mtime != 0 && st.st_mtime > swap_mtime)
+	    বার্তা_puts(_("      NEWER than swap file!\n"));
     }
     // Some of these messages are long to allow translation to
     // other languages.
-    msg_puts(_("\n(1) Another program may be editing the same file.  If this is the case,\n    be careful not to end up with two different instances of the same\n    file when making changes.  Quit, or continue with caution.\n"));
-    msg_puts(_("(2) An edit session for this file crashed.\n"));
-    msg_puts(_("    If this is the case, use \":recover\" or \"vim -r "));
-    msg_outtrans(buf->b_fname);
-    msg_puts(_("\"\n    to recover the changes (see \":help recovery\").\n"));
-    msg_puts(_("    If you did this already, delete the swap file \""));
-    msg_outtrans(fname);
-    msg_puts(_("\"\n    to avoid this message.\n"));
-    cmdline_row = msg_row;
+    বার্তা_puts(_("\n(1) Another program may be editing the same file.  If this is the case,\n    be careful not to end up with two different instances of the same\n    file when making changes.  Quit, or continue with caution.\n"));
+    বার্তা_puts(_("(2) An edit session for this file crashed.\n"));
+    বার্তা_puts(_("    If this is the case, use \":recover\" or \"vim -r "));
+    বার্তা_outtrans(buf->b_fname);
+    বার্তা_puts(_("\"\n    to recover the changes (see \":help recovery\").\n"));
+    বার্তা_puts(_("    If you did this already, delete the swap file \""));
+    বার্তা_outtrans(fname);
+    বার্তা_puts(_("\"\n    to avoid this message.\n"));
+    cmdline_row = বার্তা_row;
     --no_wait_return;
 }
 
-typedef enum {
+প্রকারলেখ গণনা {
     SEA_CHOICE_NONE = 0,
     SEA_CHOICE_READONLY = 1,
     SEA_CHOICE_EDIT = 2,
@@ -4953,36 +4953,36 @@ typedef enum {
     SEA_CHOICE_ABORT = 6
 } sea_choice_T;
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 /*
  * Trigger the SwapExists autocommands.
  * Returns a value for equivalent to do_dialog().
  */
-    static sea_choice_T
+    স্থির sea_choice_T
 do_swapexists(buf_T *buf, char_u *fname)
 {
     set_vim_var_string(VV_SWAPNAME, fname, -1);
-    set_vim_var_string(VV_SWAPCHOICE, NULL, -1);
+    set_vim_var_string(VV_SWAPCHOICE, ফাঁকা, -1);
 
     // Trigger SwapExists autocommands with <afile> set to the file being
     // edited.  Disallow changing directory here.
     ++allbuf_lock;
-    apply_autocmds(EVENT_SWAPEXISTS, buf->b_fname, NULL, FALSE, NULL);
+    apply_autocmds(EVENT_SWAPEXISTS, buf->b_fname, ফাঁকা, FALSE, ফাঁকা);
     --allbuf_lock;
 
-    set_vim_var_string(VV_SWAPNAME, NULL, -1);
+    set_vim_var_string(VV_SWAPNAME, ফাঁকা, -1);
 
-    switch (*get_vim_var_str(VV_SWAPCHOICE))
+    নির্বাচন (*get_vim_var_str(VV_SWAPCHOICE))
     {
-	case 'o': return SEA_CHOICE_READONLY;
-	case 'e': return SEA_CHOICE_EDIT;
-	case 'r': return SEA_CHOICE_RECOVER;
-	case 'd': return SEA_CHOICE_DELETE;
-	case 'q': return SEA_CHOICE_QUIT;
-	case 'a': return SEA_CHOICE_ABORT;
+	ক্ষেত্র 'o': ফেরত SEA_CHOICE_READONLY;
+	ক্ষেত্র 'e': ফেরত SEA_CHOICE_EDIT;
+	ক্ষেত্র 'r': ফেরত SEA_CHOICE_RECOVER;
+	ক্ষেত্র 'd': ফেরত SEA_CHOICE_DELETE;
+	ক্ষেত্র 'q': ফেরত SEA_CHOICE_QUIT;
+	ক্ষেত্র 'a': ফেরত SEA_CHOICE_ABORT;
     }
 
-    return SEA_CHOICE_NONE;
+    ফেরত SEA_CHOICE_NONE;
 }
 #endif
 
@@ -4997,37 +4997,37 @@ do_swapexists(buf_T *buf, char_u *fname)
  *	 not being able to open the swap or undo file
  * Note: May trigger SwapExists autocmd, pointers may change!
  */
-    static char_u *
+    স্থির char_u *
 findswapname(
     buf_T	*buf,
     char_u	**dirp,		// pointer to list of directories
     char_u	*old_fname)	// don't give warning for this file name
 {
     char_u	*fname;
-    int		n;
+    পূর্ণসংখ্যা		n;
     char_u	*dir_name;
 #ifdef AMIGA
     BPTR	fh;
 #endif
-    int		r;
+    পূর্ণসংখ্যা		r;
     char_u	*buf_fname = buf->b_fname;
 
-#if !defined(UNIX)
+#যদি !defined(UNIX)
 # define CREATE_DUMMY_FILE
-    FILE	*dummyfd = NULL;
+    FILE	*dummyfd = ফাঁকা;
 
 # ifdef MSWIN
-    if (buf_fname != NULL && !mch_isFullName(buf_fname)
+    যদি (buf_fname != ফাঁকা && !mch_isFullName(buf_fname)
 				       && vim_strchr(gettail(buf_fname), ':'))
     {
 	char_u *t;
 
 	buf_fname = vim_strsave(buf_fname);
-	if (buf_fname == NULL)
+	যদি (buf_fname == ফাঁকা)
 	    buf_fname = buf->b_fname;
-	else
-	    for (t = gettail(buf_fname); *t != NUL; MB_PTR_ADV(t))
-		if (*t == ':')
+	অন্যথা
+	    জন্য (t = gettail(buf_fname); *t != NUL; MB_PTR_ADV(t))
+		যদি (*t == ':')
 		    *t = '%';
     }
 # endif
@@ -5039,9 +5039,9 @@ findswapname(
      * this problem we temporarily create "test.doc".  Don't do this when the
      * check below for an 8.3 file name is used.
      */
-    if (!(buf->b_p_sn || buf->b_shortname) && buf_fname != NULL
+    যদি (!(buf->b_p_sn || buf->b_shortname) && buf_fname != ফাঁকা
 					     && mch_getperm(buf_fname) < 0)
-	dummyfd = mch_fopen((char *)buf_fname, "w");
+	dummyfd = mch_fopen((অক্ষর *)buf_fname, "w");
 #endif
 
     /*
@@ -5049,116 +5049,116 @@ findswapname(
      * First allocate some memory to put the directory name in.
      */
     dir_name = alloc(STRLEN(*dirp) + 1);
-    if (dir_name == NULL)
-	*dirp = NULL;
-    else
-	(void)copy_option_part(dirp, dir_name, 31000, ",");
+    যদি (dir_name == ফাঁকা)
+	*dirp = ফাঁকা;
+    অন্যথা
+	(শূন্য)copy_option_part(dirp, dir_name, 31000, ",");
 
     /*
      * we try different names until we find one that does not exist yet
      */
-    if (dir_name == NULL)	    // out of memory
-	fname = NULL;
-    else
+    যদি (dir_name == ফাঁকা)	    // out of memory
+	fname = ফাঁকা;
+    অন্যথা
 	fname = makeswapname(buf_fname, buf->b_ffname, buf, dir_name);
 
-    for (;;)
+    জন্য (;;)
     {
-	if (fname == NULL)	// must be out of memory
-	    break;
-	if ((n = (int)STRLEN(fname)) == 0)	// safety check
+	যদি (fname == ফাঁকা)	// must be out of memory
+	    বিরতি;
+	যদি ((n = (পূর্ণসংখ্যা)STRLEN(fname)) == 0)	// safety check
 	{
 	    VIM_CLEAR(fname);
-	    break;
+	    বিরতি;
 	}
-#if defined(UNIX)
+#যদি defined(UNIX)
 /*
  * Some systems have a MS-DOS compatible filesystem that use 8.3 character
  * file names. If this is the first try and the swap file name does not fit in
  * 8.3, detect if this is the case, set shortname and try again.
  */
-	if (fname[n - 2] == 'w' && fname[n - 1] == 'p'
+	যদি (fname[n - 2] == 'w' && fname[n - 1] == 'p'
 					&& !(buf->b_p_sn || buf->b_shortname))
 	{
-	    char_u	    *tail;
+	    char_u	    *লেজ;
 	    char_u	    *fname2;
 	    stat_T	    s1, s2;
-	    int		    f1, f2;
-	    int		    created1 = FALSE, created2 = FALSE;
-	    int		    same = FALSE;
+	    পূর্ণসংখ্যা		    f1, f2;
+	    পূর্ণসংখ্যা		    created1 = FALSE, created2 = FALSE;
+	    পূর্ণসংখ্যা		    same = FALSE;
 
 	    /*
 	     * Check if swapfile name does not fit in 8.3:
 	     * It either contains two dots, is longer than 8 chars, or starts
 	     * with a dot.
 	     */
-	    tail = gettail(buf_fname);
-	    if (       vim_strchr(tail, '.') != NULL
-		    || STRLEN(tail) > (size_t)8
+	    লেজ = gettail(buf_fname);
+	    যদি (       vim_strchr(লেজ, '.') != ফাঁকা
+		    || STRLEN(লেজ) > (size_t)8
 		    || *gettail(fname) == '.')
 	    {
 		fname2 = alloc(n + 2);
-		if (fname2 != NULL)
+		যদি (fname2 != ফাঁকা)
 		{
 		    STRCPY(fname2, fname);
 		    // if fname == "xx.xx.swp",	    fname2 = "xx.xx.swx"
 		    // if fname == ".xx.swp",	    fname2 = ".xx.swpx"
 		    // if fname == "123456789.swp", fname2 = "12345678x.swp"
-		    if (vim_strchr(tail, '.') != NULL)
+		    যদি (vim_strchr(লেজ, '.') != ফাঁকা)
 			fname2[n - 1] = 'x';
-		    else if (*gettail(fname) == '.')
+		    অন্যথা যদি (*gettail(fname) == '.')
 		    {
 			fname2[n] = 'x';
 			fname2[n + 1] = NUL;
 		    }
-		    else
+		    অন্যথা
 			fname2[n - 5] += 1;
 		    /*
 		     * may need to create the files to be able to use mch_stat()
 		     */
-		    f1 = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0);
-		    if (f1 < 0)
+		    f1 = mch_open((অক্ষর *)fname, O_RDONLY | O_EXTRA, 0);
+		    যদি (f1 < 0)
 		    {
-			f1 = mch_open_rw((char *)fname,
+			f1 = mch_open_rw((অক্ষর *)fname,
 					       O_RDWR|O_CREAT|O_EXCL|O_EXTRA);
 			created1 = TRUE;
 		    }
-		    if (f1 >= 0)
+		    যদি (f1 >= 0)
 		    {
-			f2 = mch_open((char *)fname2, O_RDONLY | O_EXTRA, 0);
-			if (f2 < 0)
+			f2 = mch_open((অক্ষর *)fname2, O_RDONLY | O_EXTRA, 0);
+			যদি (f2 < 0)
 			{
-			    f2 = mch_open_rw((char *)fname2,
+			    f2 = mch_open_rw((অক্ষর *)fname2,
 					       O_RDWR|O_CREAT|O_EXCL|O_EXTRA);
 			    created2 = TRUE;
 			}
-			if (f2 >= 0)
+			যদি (f2 >= 0)
 			{
 			    /*
 			     * Both files exist now. If mch_stat() returns the
 			     * same device and inode they are the same file.
 			     */
-			    if (mch_fstat(f1, &s1) != -1
+			    যদি (mch_fstat(f1, &s1) != -1
 				    && mch_fstat(f2, &s2) != -1
 				    && s1.st_dev == s2.st_dev
 				    && s1.st_ino == s2.st_ino)
 				same = TRUE;
 			    close(f2);
-			    if (created2)
+			    যদি (created2)
 				mch_remove(fname2);
 			}
 			close(f1);
-			if (created1)
+			যদি (created1)
 			    mch_remove(fname);
 		    }
 		    vim_free(fname2);
-		    if (same)
+		    যদি (same)
 		    {
 			buf->b_shortname = true;
 			vim_free(fname);
 			fname = makeswapname(buf_fname, buf->b_ffname,
 							       buf, dir_name);
-			continue;	// try again with b_shortname set
+			চালু;	// try again with b_shortname set
 		    }
 		}
 	    }
@@ -5167,7 +5167,7 @@ findswapname(
 	/*
 	 * check if the swapfile already exists
 	 */
-	if (mch_getperm(fname) < 0)	// it does not exist
+	যদি (mch_getperm(fname) < 0)	// it does not exist
 	{
 #ifdef HAVE_LSTAT
 	    stat_T	sb;
@@ -5176,8 +5176,8 @@ findswapname(
 	     * Extra security check: When a swap file is a symbolic link, this
 	     * is most likely a symlink attack.
 	     */
-	    if (mch_lstat((char *)fname, &sb) < 0)
-#else
+	    যদি (mch_lstat((অক্ষর *)fname, &sb) < 0)
+#অন্যথা
 # ifdef AMIGA
 	    fh = Open((UBYTE *)fname, (long)MODE_NEWFILE);
 	    /*
@@ -5185,29 +5185,29 @@ findswapname(
 	     * but is being used by another program. This happens if you edit
 	     * a file twice.
 	     */
-	    if (fh != (BPTR)NULL)	// can open file, OK
+	    যদি (fh != (BPTR)ফাঁকা)	// can open file, OK
 	    {
 		Close(fh);
 		mch_remove(fname);
-		break;
+		বিরতি;
 	    }
-	    if (IoErr() != ERROR_OBJECT_IN_USE
+	    যদি (IoErr() != ERROR_OBJECT_IN_USE
 					    && IoErr() != ERROR_OBJECT_EXISTS)
 # endif
 #endif
-		break;
+		বিরতি;
 	}
 
 	/*
 	 * A file name equal to old_fname is OK to use.
 	 */
-	if (old_fname != NULL && fnamecmp(fname, old_fname) == 0)
-	    break;
+	যদি (old_fname != ফাঁকা && fnamecmp(fname, old_fname) == 0)
+	    বিরতি;
 
 	/*
 	 * get here when file already exists
 	 */
-	if (fname[n - 2] == 'w' && fname[n - 1] == 'p')	// first try
+	যদি (fname[n - 2] == 'w' && fname[n - 1] == 'p')	// first try
 	{
 	    /*
 	     * on MS-DOS compatible filesystems (e.g. messydos) file.doc.swp
@@ -5217,18 +5217,18 @@ findswapname(
 	     * underscores for this file), and try again. If it doesn't we
 	     * assume that "file.doc.swp" already exists.
 	     */
-	    if (!(buf->b_p_sn || buf->b_shortname))	// not tried yet
+	    যদি (!(buf->b_p_sn || buf->b_shortname))	// not tried yet
 	    {
 		fname[n - 1] = 'x';
 		r = mch_getperm(fname);		// try "file.swx"
 		fname[n - 1] = 'p';
-		if (r >= 0)		    // "file.swx" seems to exist
+		যদি (r >= 0)		    // "file.swx" seems to exist
 		{
 		    buf->b_shortname = true;
 		    vim_free(fname);
 		    fname = makeswapname(buf_fname, buf->b_ffname,
 							       buf, dir_name);
-		    continue;	    // try again with '.' replaced with '_'
+		    চালু;	    // try again with '.' replaced with '_'
 		}
 	    }
 	    /*
@@ -5237,31 +5237,31 @@ findswapname(
 	     * viewing a help file or when the path of the file is different
 	     * (happens when all .swp files are in one directory).
 	     */
-	    if (!recoverymode && buf_fname != NULL
+	    যদি (!recoverymode && buf_fname != ফাঁকা
 				&& !buf->b_help
 				&& !(buf->b_flags & (BF_DUMMY | BF_NO_SEA)))
 	    {
-		int		fd;
-		struct block0	b0;
-		int		differ = FALSE;
+		পূর্ণসংখ্যা		fd;
+		কাঠামো block0	b0;
+		পূর্ণসংখ্যা		differ = FALSE;
 
 		/*
 		 * Try to read block 0 from the swap file to get the original
 		 * file name (and inode number).
 		 */
-		fd = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0);
-		if (fd >= 0)
+		fd = mch_open((অক্ষর *)fname, O_RDONLY | O_EXTRA, 0);
+		যদি (fd >= 0)
 		{
-		    if (read_eintr(fd, &b0, sizeof(b0)) == sizeof(b0))
+		    যদি (read_eintr(fd, &b0, আকার(b0)) == আকার(b0))
 		    {
 			/*
 			 * If the swapfile has the same directory as the
 			 * buffer don't compare the directory names, they can
 			 * have a different mountpoint.
 			 */
-			if (b0.b0_flags & B0_SAME_DIR)
+			যদি (b0.b0_flags & B0_SAME_DIR)
 			{
-			    if (fnamecmp(gettail(buf->b_ffname),
+			    যদি (fnamecmp(gettail(buf->b_ffname),
 						   gettail(b0.b0_fname)) != 0
 				    || !same_directory(fname, buf->b_ffname))
 			    {
@@ -5270,13 +5270,13 @@ findswapname(
 				// when the name differs, need to check the
 				// inode too.
 				expand_env(b0.b0_fname, NameBuff, MAXPATHL);
-				if (fnamecmp_ino(buf->b_ffname, NameBuff,
+				যদি (fnamecmp_ino(buf->b_ffname, NameBuff,
 						     char_to_long(b0.b0_ino)))
 #endif
 				    differ = TRUE;
 			    }
 			}
-			else
+			অন্যথা
 			{
 			    /*
 			     * The name in the swap file may be
@@ -5284,11 +5284,11 @@ findswapname(
 			     */
 			    expand_env(b0.b0_fname, NameBuff, MAXPATHL);
 #ifdef CHECK_INODE
-			    if (fnamecmp_ino(buf->b_ffname, NameBuff,
+			    যদি (fnamecmp_ino(buf->b_ffname, NameBuff,
 						     char_to_long(b0.b0_ino)))
 				differ = TRUE;
-#else
-			    if (fnamecmp(NameBuff, buf->b_ffname) != 0)
+#অন্যথা
+			    যদি (fnamecmp(NameBuff, buf->b_ffname) != 0)
 				differ = TRUE;
 #endif
 			}
@@ -5298,22 +5298,22 @@ findswapname(
 
 		// give the ATTENTION message when there is an old swap file
 		// for the current file, and the buffer was not recovered.
-		if (differ == FALSE && !(curbuf->b_flags & BF_RECOVERED)
-			&& vim_strchr(p_shm, SHM_ATTENTION) == NULL)
+		যদি (differ == FALSE && !(curbuf->b_flags & BF_RECOVERED)
+			&& vim_strchr(p_shm, SHM_ATTENTION) == ফাঁকা)
 		{
 		    sea_choice_T choice = SEA_CHOICE_NONE;
 		    stat_T	 st;
 #ifdef CREATE_DUMMY_FILE
-		    int		 did_use_dummy = FALSE;
+		    পূর্ণসংখ্যা		 did_use_dummy = FALSE;
 
 		    // Avoid getting a warning for the file being created
 		    // outside of Vim, it was created at the start of this
 		    // function.  Delete the file now, because Vim might exit
 		    // here if the window is closed.
-		    if (dummyfd != NULL)
+		    যদি (dummyfd != ফাঁকা)
 		    {
 			fclose(dummyfd);
-			dummyfd = NULL;
+			dummyfd = ফাঁকা;
 			mch_remove(buf_fname);
 			did_use_dummy = TRUE;
 		    }
@@ -5325,42 +5325,42 @@ findswapname(
 		    // It's safe to delete the swap file if all these are true:
 		    // - the edited file exists
 		    // - the swap file has no changes and looks OK
-		    if (mch_stat((char *)buf->b_fname, &st) == 0
+		    যদি (mch_stat((অক্ষর *)buf->b_fname, &st) == 0
 						  && swapfile_unchanged(fname))
 		    {
 			choice = SEA_CHOICE_DELETE;
-			if (p_verbose > 0)
-			    verb_msg(_("Found a swap file that is not useful, deleting it"));
+			যদি (p_verbose > 0)
+			    verb_বার্তা(_("Found a swap file that is not useful, deleting it"));
 		    }
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 		    /*
 		     * If there is an SwapExists autocommand and we can handle
 		     * the response, trigger it.  It may return 0 to ask the
 		     * user anyway.
 		     */
-		    if (choice == SEA_CHOICE_NONE
+		    যদি (choice == SEA_CHOICE_NONE
 			    && swap_exists_action != SEA_NONE
 			    && has_autocmd(EVENT_SWAPEXISTS, buf_fname, buf))
 			choice = do_swapexists(buf, fname);
 #endif
 
-		    if (choice == SEA_CHOICE_NONE
+		    যদি (choice == SEA_CHOICE_NONE
 					 && swap_exists_action == SEA_READONLY)
 		    {
 			// always open readonly.
 			choice = SEA_CHOICE_READONLY;
 		    }
 
-		    if (choice == SEA_CHOICE_NONE)
+		    যদি (choice == SEA_CHOICE_NONE)
 		    {
 #ifdef FEAT_GUI
 			// If we are supposed to start the GUI but it wasn't
 			// completely started yet, start it now.  This makes
 			// the messages displayed in the Vim window when
 			// loading a session from the .gvimrc file.
-			if (gui.starting && !gui.in_use)
-			    gui_start(NULL);
+			যদি (gui.starting && !gui.in_use)
+			    gui_start(ফাঁকা);
 #endif
 			// Show info about the existing swap file.
 			attention_message(buf, fname);
@@ -5374,92 +5374,92 @@ findswapname(
 			flush_buffers(FLUSH_TYPEAHEAD);
 		    }
 
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-		    if (swap_exists_action != SEA_NONE
+#যদি defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+		    যদি (swap_exists_action != SEA_NONE
 						  && choice == SEA_CHOICE_NONE)
 		    {
 			string_T    prefix = {(char_u *)_("Swap file \""), 0};
 			string_T    suffix = {(char_u *)_("\" already exists!"), 0};
-			size_t	    message_size;
+			size_t	    message_আকার;
 			string_T    message;
 			char_u	    *tofree;
-			int	    dialog_result;
+			পূর্ণসংখ্যা	    dialog_ফলাফল;
 
-			prefix.length = STRLEN(prefix.string);
-			suffix.length = STRLEN(suffix.string);
-			message_size = prefix.length
+			prefix.দৈর্ঘ্য = STRLEN(prefix.string);
+			suffix.দৈর্ঘ্য = STRLEN(suffix.string);
+			message_আকার = prefix.দৈর্ঘ্য
 				+ STRLEN(fname)
-				+ suffix.length + 5;
-			message.string = tofree = alloc(message_size);
-			if (message.string != NULL)
+				+ suffix.দৈর্ঘ্য + 5;
+			message.string = tofree = alloc(message_আকার);
+			যদি (message.string != ফাঁকা)
 			{
 			    STRCPY(message.string, prefix.string);
-			    message.length = prefix.length;
-			    message.length += home_replace(NULL, fname,
-				message.string + message.length, (int)(message_size - message.length), TRUE);
-			    STRCPY(message.string + message.length, suffix.string);
+			    message.দৈর্ঘ্য = prefix.দৈর্ঘ্য;
+			    message.দৈর্ঘ্য += home_replace(ফাঁকা, fname,
+				message.string + message.দৈর্ঘ্য, (পূর্ণসংখ্যা)(message_আকার - message.দৈর্ঘ্য), TRUE);
+			    STRCPY(message.string + message.দৈর্ঘ্য, suffix.string);
 			}
-			else
+			অন্যথা
 			    message.string = (char_u *)_("Swap file already exists!");
-			dialog_result = do_dialog(VIM_WARNING,
+			dialog_ফলাফল = do_dialog(VIM_WARNING,
 				    (char_u *)_("VIM - ATTENTION"),
 				    message.string,
 # ifdef HAVE_PROCESS_STILL_RUNNING
 				    process_still_running
 					? (char_u *)_("&Open Read-Only\n&Edit anyway\n&Recover\n&Quit\n&Abort") :
 # endif
-					(char_u *)_("&Open Read-Only\n&Edit anyway\n&Recover\n&Delete it\n&Quit\n&Abort"), 1, NULL, FALSE);
+					(char_u *)_("&Open Read-Only\n&Edit anyway\n&Recover\n&Delete it\n&Quit\n&Abort"), 1, ফাঁকা, FALSE);
 
 # ifdef HAVE_PROCESS_STILL_RUNNING
-			if (process_still_running && dialog_result >= 4)
+			যদি (process_still_running && dialog_ফলাফল >= 4)
 			    // compensate for missing "Delete it" button
-			    dialog_result++;
+			    dialog_ফলাফল++;
 # endif
-			choice = dialog_result;
+			choice = dialog_ফলাফল;
 			vim_free(tofree);
 
 			// pretend screen didn't scroll, need redraw anyway
-			msg_scrolled = 0;
+			বার্তা_scrolled = 0;
 			redraw_all_later(UPD_NOT_VALID);
 		    }
 #endif
 
-		    switch (choice)
+		    নির্বাচন (choice)
 		    {
-			case SEA_CHOICE_READONLY:
+			ক্ষেত্র SEA_CHOICE_READONLY:
 			    buf->b_p_ro = TRUE;
-			    break;
-			case SEA_CHOICE_EDIT:
-			    break;
-			case SEA_CHOICE_RECOVER:
+			    বিরতি;
+			ক্ষেত্র SEA_CHOICE_EDIT:
+			    বিরতি;
+			ক্ষেত্র SEA_CHOICE_RECOVER:
 			    swap_exists_action = SEA_RECOVER;
-			    break;
-			case SEA_CHOICE_DELETE:
+			    বিরতি;
+			ক্ষেত্র SEA_CHOICE_DELETE:
 			    mch_remove(fname);
-			    break;
-			case SEA_CHOICE_QUIT:
+			    বিরতি;
+			ক্ষেত্র SEA_CHOICE_QUIT:
 			    swap_exists_action = SEA_QUIT;
-			    break;
-			case SEA_CHOICE_ABORT:
+			    বিরতি;
+			ক্ষেত্র SEA_CHOICE_ABORT:
 			    swap_exists_action = SEA_QUIT;
 			    got_int = TRUE;
-			    break;
-			case SEA_CHOICE_NONE:
-			    msg_puts("\n");
-			    if (msg_silent == 0)
+			    বিরতি;
+			ক্ষেত্র SEA_CHOICE_NONE:
+			    বার্তা_puts("\n");
+			    যদি (বার্তা_silent == 0)
 				// call wait_return() later
 				need_wait_return = TRUE;
-			    break;
+			    বিরতি;
 		    }
 
 		    // If the file was deleted this fname can be used.
-		    if (choice != SEA_CHOICE_NONE && mch_getperm(fname) < 0)
-			break;
+		    যদি (choice != SEA_CHOICE_NONE && mch_getperm(fname) < 0)
+			বিরতি;
 
 #ifdef CREATE_DUMMY_FILE
 		    // Going to try another name, need the dummy file again.
-		    if (did_use_dummy)
-			dummyfd = mch_fopen((char *)buf_fname, "w");
+		    যদি (did_use_dummy)
+			dummyfd = mch_fopen((অক্ষর *)buf_fname, "w");
 #endif
 		}
 	    }
@@ -5471,13 +5471,13 @@ findswapname(
 	 * If that still isn't enough decrement the last but one char: ".svz"
 	 * Can happen when editing many "No Name" buffers.
 	 */
-	if (fname[n - 1] == 'a')	// ".s?a"
+	যদি (fname[n - 1] == 'a')	// ".s?a"
 	{
-	    if (fname[n - 2] == 'a')    // ".saa": tried enough, give up
+	    যদি (fname[n - 2] == 'a')    // ".saa": tried enough, give up
 	    {
 		emsg(_(e_too_many_swap_files_found));
 		VIM_CLEAR(fname);
-		break;
+		বিরতি;
 	    }
 	    --fname[n - 2];		// ".svz", ".suz", etc.
 	    fname[n - 1] = 'z' + 1;
@@ -5487,24 +5487,24 @@ findswapname(
 
     vim_free(dir_name);
 #ifdef CREATE_DUMMY_FILE
-    if (dummyfd != NULL)	// file has been created temporarily
+    যদি (dummyfd != ফাঁকা)	// file has been created temporarily
     {
 	fclose(dummyfd);
 	mch_remove(buf_fname);
     }
 #endif
 #ifdef MSWIN
-    if (buf_fname != buf->b_fname)
+    যদি (buf_fname != buf->b_fname)
 	vim_free(buf_fname);
 #endif
-    return fname;
+    ফেরত fname;
 }
 
-    static int
+    স্থির পূর্ণসংখ্যা
 b0_magic_wrong(ZERO_BL *b0p)
 {
-    return (b0p->b0_magic_long != (long)B0_MAGIC_LONG
-	    || b0p->b0_magic_int != (int)B0_MAGIC_INT
+    ফেরত (b0p->b0_magic_long != (long)B0_MAGIC_LONG
+	    || b0p->b0_magic_int != (পূর্ণসংখ্যা)B0_MAGIC_INT
 	    || b0p->b0_magic_short != (short)B0_MAGIC_SHORT
 	    || b0p->b0_magic_char != B0_MAGIC_CHAR);
 }
@@ -5559,7 +5559,7 @@ b0_magic_wrong(ZERO_BL *b0p)
  * versions.
  */
 
-    static int
+    স্থির পূর্ণসংখ্যা
 fnamecmp_ino(
     char_u	*fname_c,	    // current file name
     char_u	*fname_s,	    // file name from swap file
@@ -5570,10 +5570,10 @@ fnamecmp_ino(
     ino_t	ino_s;		    // ino of file from swap file
     char_u	buf_c[MAXPATHL];    // full path of fname_c
     char_u	buf_s[MAXPATHL];    // full path of fname_s
-    int		retval_c;	    // flag: buf_c valid
-    int		retval_s;	    // flag: buf_s valid
+    পূর্ণসংখ্যা		retval_c;	    // flag: buf_c valid
+    পূর্ণসংখ্যা		retval_s;	    // flag: buf_s valid
 
-    if (mch_stat((char *)fname_c, &st) == 0)
+    যদি (mch_stat((অক্ষর *)fname_c, &st) == 0)
 	ino_c = (ino_t)st.st_ino;
 
     /*
@@ -5581,13 +5581,13 @@ fnamecmp_ino(
      * the swap file may be outdated.  If that fails (e.g. this path is not
      * valid on this machine), use the inode from block 0.
      */
-    if (mch_stat((char *)fname_s, &st) == 0)
+    যদি (mch_stat((অক্ষর *)fname_s, &st) == 0)
 	ino_s = (ino_t)st.st_ino;
-    else
+    অন্যথা
 	ino_s = (ino_t)ino_block0;
 
-    if (ino_c && ino_s)
-	return (ino_c != ino_s);
+    যদি (ino_c && ino_s)
+	ফেরত (ino_c != ino_s);
 
     /*
      * One of the inode numbers is unknown, try a forced vim_FullName() and
@@ -5595,17 +5595,17 @@ fnamecmp_ino(
      */
     retval_c = vim_FullName(fname_c, buf_c, MAXPATHL, TRUE);
     retval_s = vim_FullName(fname_s, buf_s, MAXPATHL, TRUE);
-    if (retval_c == OK && retval_s == OK)
-	return STRCMP(buf_c, buf_s) != 0;
+    যদি (retval_c == OK && retval_s == OK)
+	ফেরত STRCMP(buf_c, buf_s) != 0;
 
     /*
      * Can't compare inodes or file names, guess that the files are different,
      * unless both appear not to exist at all, then compare with the file name
      * in the swap file.
      */
-    if (ino_s == 0 && ino_c == 0 && retval_c == FAIL && retval_s == FAIL)
-	return STRCMP(fname_c, fname_s) != 0;
-    return TRUE;
+    যদি (ino_s == 0 && ino_c == 0 && retval_c == FAIL && retval_s == FAIL)
+	ফেরত STRCMP(fname_c, fname_s) != 0;
+    ফেরত TRUE;
 }
 #endif // CHECK_INODE
 
@@ -5613,7 +5613,7 @@ fnamecmp_ino(
  * Move a long integer into a four byte character array.
  * Used for machine independency in block zero.
  */
-    static void
+    স্থির শূন্য
 long_to_char(long n, char_u *s)
 {
     s[0] = (char_u)(n & 0xff);
@@ -5625,7 +5625,7 @@ long_to_char(long n, char_u *s)
     s[3] = (char_u)(n & 0xff);
 }
 
-    static long
+    স্থির long
 char_to_long(char_u *s)
 {
     long    retval;
@@ -5638,7 +5638,7 @@ char_to_long(char_u *s)
     retval <<= 8;
     retval |= s[0];
 
-    return retval;
+    ফেরত retval;
 }
 
 /*
@@ -5647,112 +5647,112 @@ char_to_long(char_u *s)
  * - 'fileformat'
  * - 'fileencoding'
  */
-    void
+    শূন্য
 ml_setflags(buf_T *buf)
 {
     bhdr_T	*hp;
     ZERO_BL	*b0p;
 
-    if (!buf->b_ml.ml_mfp)
-	return;
-    for (hp = buf->b_ml.ml_mfp->mf_used_last; hp != NULL; hp = hp->bh_prev)
+    যদি (!buf->b_ml.ml_mfp)
+	ফেরত;
+    জন্য (hp = buf->b_ml.ml_mfp->mf_used_last; hp != ফাঁকা; hp = hp->bh_পূর্ব)
     {
-	if (hp->bh_bnum == 0)
+	যদি (hp->bh_bnum == 0)
 	{
-	    b0p = (ZERO_BL *)(hp->bh_data);
+	    b0p = (ZERO_BL *)(hp->bh_তথ্য);
 	    b0p->b0_dirty = buf->b_changed ? B0_DIRTY : 0;
 	    b0p->b0_flags = (b0p->b0_flags & ~B0_FF_MASK)
 						  | (get_fileformat(buf) + 1);
 	    add_b0_fenc(b0p, buf);
 	    hp->bh_flags |= BH_DIRTY;
 	    mf_sync(buf->b_ml.ml_mfp, MFS_ZERO);
-	    break;
+	    বিরতি;
 	}
     }
 }
 
-#if defined(FEAT_CRYPT)
+#যদি defined(FEAT_CRYPT)
 /*
  * If "data" points to a data block encrypt the text in it and return a copy
  * in allocated memory.  Return NULL when out of memory.
  * Otherwise return "data".
  */
     char_u *
-ml_encrypt_data(
+ml_encrypt_তথ্য(
     memfile_T	*mfp,
-    char_u	*data,
+    char_u	*তথ্য,
     off_T	offset,
-    unsigned	size)
+    unsigned	আকার_2)
 {
-    DATA_BL	*dp = (DATA_BL *)data;
-    char_u	*head_end;
+    তথ্য_BL	*dp = (তথ্য_BL *)তথ্য;
+    char_u	*শীর্ষ_end_2;
     char_u	*text_start;
-    char_u	*new_data;
-    int		text_len;
+    char_u	*new_তথ্য;
+    পূর্ণসংখ্যা		text_len;
     cryptstate_T *state;
 
-    if (dp->db_id != DATA_ID)
-	return data;
+    যদি (dp->db_id != তথ্য_ID)
+	ফেরত তথ্য;
 
     state = ml_crypt_prepare(mfp, offset, FALSE);
-    if (state == NULL)
-	return data;
+    যদি (state == ফাঁকা)
+	ফেরত তথ্য;
 
-    new_data = alloc(size);
-    if (new_data == NULL)
+    new_তথ্য = alloc(আকার_2);
+    যদি (new_তথ্য == ফাঁকা)
     {
 	crypt_free_state(state);
-	return NULL;
+	ফেরত ফাঁকা;
     }
-    head_end = (char_u *)(&dp->db_index[dp->db_line_count]);
+    শীর্ষ_end_2 = (char_u *)(&dp->db_সূচক[dp->db_সারি_গুনতি]);
     text_start = (char_u *)dp + dp->db_txt_start;
-    text_len = size - dp->db_txt_start;
+    text_len = আকার_2 - dp->db_txt_start;
 
     // Copy the header and the text.
-    mch_memmove(new_data, dp, head_end - (char_u *)dp);
+    mch_memmove(new_তথ্য, dp, শীর্ষ_end_2 - (char_u *)dp);
 
     // Encrypt the text.
-    crypt_encode(state, text_start, text_len, new_data + dp->db_txt_start,
+    crypt_encode(state, text_start, text_len, new_তথ্য + dp->db_txt_start,
 									FALSE);
     crypt_free_state(state);
 
     // Clear the gap.
-    if (head_end < text_start)
-	vim_memset(new_data + (head_end - data), 0, text_start - head_end);
+    যদি (শীর্ষ_end_2 < text_start)
+	vim_memset(new_তথ্য + (শীর্ষ_end_2 - তথ্য), 0, text_start - শীর্ষ_end_2);
 
-    return new_data;
+    ফেরত new_তথ্য;
 }
 
 /*
  * Decrypt the text in "data" if it points to an encrypted data block.
  */
-    void
-ml_decrypt_data(
+    শূন্য
+ml_decrypt_তথ্য(
     memfile_T	*mfp,
-    char_u	*data,
+    char_u	*তথ্য,
     off_T	offset,
-    unsigned	size)
+    unsigned	আকার_2)
 {
-    DATA_BL	*dp = (DATA_BL *)data;
-    char_u	*head_end;
+    তথ্য_BL	*dp = (তথ্য_BL *)তথ্য;
+    char_u	*শীর্ষ_end_2;
     char_u	*text_start;
-    int		text_len;
+    পূর্ণসংখ্যা		text_len;
     cryptstate_T *state;
 
-    if (dp->db_id != DATA_ID)
-	return;
+    যদি (dp->db_id != তথ্য_ID)
+	ফেরত;
 
-    head_end = (char_u *)(&dp->db_index[dp->db_line_count]);
+    শীর্ষ_end_2 = (char_u *)(&dp->db_সূচক[dp->db_সারি_গুনতি]);
     text_start = (char_u *)dp + dp->db_txt_start;
     text_len = dp->db_txt_end - dp->db_txt_start;
 
-    if (head_end > text_start || dp->db_txt_start > size
-	    || dp->db_txt_end > size)
-	return;  // data was messed up
+    যদি (শীর্ষ_end_2 > text_start || dp->db_txt_start > আকার_2
+	    || dp->db_txt_end > আকার_2)
+	ফেরত;  // data was messed up
 
     state = ml_crypt_prepare(mfp, offset, TRUE);
-    if (state == NULL)
-	return;
+    যদি (state == ফাঁকা)
+	ফেরত;
 
     // Decrypt the text in place.
     crypt_decode_inplace(state, text_start, text_len, FALSE);
@@ -5764,65 +5764,65 @@ ml_decrypt_data(
  * Return an allocated cryptstate_T *.
  * Note: Encryption not supported for SODIUM
  */
-    static cryptstate_T *
-ml_crypt_prepare(memfile_T *mfp, off_T offset, int reading)
+    স্থির cryptstate_T *
+ml_crypt_prepare(memfile_T *mfp, off_T offset, পূর্ণসংখ্যা reading)
 {
-    buf_T	*buf = mfp->mf_buffer;
+    buf_T	*buf = mfp->mf_বাফার;
     char_u	salt[50];
-    int		method_nr;
-    char_u	*key;
+    পূর্ণসংখ্যা		method_nr;
+    char_u	*চাবি;
     crypt_arg_T arg;
 
     CLEAR_FIELD(arg);
-    if (reading && mfp->mf_old_key != NULL)
+    যদি (reading && mfp->mf_old_চাবি != ফাঁকা)
     {
 	// Reading back blocks with the previous key/method/seed.
 	method_nr = mfp->mf_old_cm;
-	key = mfp->mf_old_key;
+	চাবি = mfp->mf_old_চাবি;
 	arg.cat_seed = mfp->mf_old_seed;
     }
-    else
+    অন্যথা
     {
 	method_nr = crypt_get_method_nr(buf);
-	key = buf->b_p_key;
+	চাবি = buf->b_p_চাবি;
 	arg.cat_seed = mfp->mf_seed;
     }
 
-    if (*key == NUL)
-	return NULL;
+    যদি (*চাবি == NUL)
+	ফেরত ফাঁকা;
 
-    if (crypt_may_close_swapfile(buf, key, method_nr))
-	return NULL;
+    যদি (crypt_may_close_swapfile(buf, চাবি, method_nr))
+	ফেরত ফাঁকা;
 
-    if (method_nr == CRYPT_M_ZIP)
+    যদি (method_nr == CRYPT_M_ZIP)
     {
 	// For PKzip: Append the offset to the key, so that we use a different
 	// key for every block.
-	vim_snprintf((char *)salt, sizeof(salt), "%s%ld", key, (long)offset);
-	arg.cat_seed = NULL;
+	vim_snprintf((অক্ষর *)salt, আকার(salt), "%s%ld", চাবি, (long)offset);
+	arg.cat_seed = ফাঁকা;
 	arg.cat_init_from_file = FALSE;
 
-	return crypt_create(method_nr, salt, &arg);
+	ফেরত crypt_create(method_nr, salt, &arg);
     }
 
     // Using blowfish or better: add salt and seed. We use the byte offset
     // of the block for the salt.
-    vim_snprintf((char *)salt, sizeof(salt), "%ld", (long)offset);
+    vim_snprintf((অক্ষর *)salt, আকার(salt), "%ld", (long)offset);
 
     arg.cat_salt = salt;
-    arg.cat_salt_len = (int)STRLEN(salt);
+    arg.cat_salt_len = (পূর্ণসংখ্যা)STRLEN(salt);
     arg.cat_seed_len = MF_SEED_LEN;
     arg.cat_add_len = 0;
-    arg.cat_add = NULL;
+    arg.cat_add = ফাঁকা;
     arg.cat_init_from_file = FALSE;
 
-    return crypt_create(method_nr, key, &arg);
+    ফেরত crypt_create(method_nr, চাবি, &arg);
 }
 
 #endif
 
 
-#if defined(FEAT_BYTEOFF)
+#যদি defined(FEAT_BYTEOFF)
 
 # define MLCS_MAXL 800	// max no of lines in chunk
 # define MLCS_MINL 400   // should be half of MLCS_MAXL
@@ -5834,52 +5834,52 @@ ml_crypt_prepare(memfile_T *mfp, off_T offset, int reading)
  * ML_CHNK_DELLINE: Subtract len from parent chunk, possibly deleting it
  * ML_CHNK_UPDLINE: Add len to parent chunk, as a signed entity.
  */
-    static void
+    স্থির শূন্য
 ml_updatechunk(
     buf_T	*buf,
-    linenr_T	line,
+    linenr_T	সারি,
     long	len,
-    int		updtype)
+    পূর্ণসংখ্যা		updtype)
 {
-    static buf_T	*ml_upd_lastbuf = NULL;
-    static linenr_T	ml_upd_lastcurline;
-    static int		ml_upd_lastcurix;
+    স্থির buf_T	*ml_upd_lastbuf = ফাঁকা;
+    স্থির linenr_T	ml_upd_lastcurline;
+    স্থির পূর্ণসংখ্যা		ml_upd_lastcurix;
 
     linenr_T		curline = ml_upd_lastcurline;
-    int			curix = ml_upd_lastcurix;
-    long		size;
+    পূর্ণসংখ্যা			curix = ml_upd_lastcurix;
+    long		আকার_2;
     chunksize_T		*curchnk;
-    int			rest;
+    পূর্ণসংখ্যা			rest;
     bhdr_T		*hp;
-    DATA_BL		*dp;
+    তথ্য_BL		*dp;
 
-    if (buf->b_ml.ml_usedchunks == -1 || len == 0)
-	return;
-    if (buf->b_ml.ml_chunksize == NULL)
+    যদি (buf->b_ml.ml_usedchunks == -1 || len == 0)
+	ফেরত;
+    যদি (buf->b_ml.ml_chunksize == ফাঁকা)
     {
 	buf->b_ml.ml_chunksize = ALLOC_MULT(chunksize_T, 100);
-	if (buf->b_ml.ml_chunksize == NULL)
+	যদি (buf->b_ml.ml_chunksize == ফাঁকা)
 	{
 	    buf->b_ml.ml_usedchunks = -1;
-	    return;
+	    ফেরত;
 	}
 	buf->b_ml.ml_numchunks = 100;
 	buf->b_ml.ml_usedchunks = 1;
 	buf->b_ml.ml_chunksize[0].mlcs_numlines = 1;
 	buf->b_ml.ml_chunksize[0].mlcs_totalsize = 1;
-	ml_upd_lastbuf = NULL;		// invalidate resume cache
+	ml_upd_lastbuf = ফাঁকা;		// invalidate resume cache
     }
 
-    if (updtype == ML_CHNK_UPDLINE && buf->b_ml.ml_line_count == 1)
+    যদি (updtype == ML_CHNK_UPDLINE && buf->b_ml.ml_সারি_গুনতি == 1)
     {
 	/*
 	 * First line in empty buffer from ml_flush_line() -- reset
 	 */
 	buf->b_ml.ml_usedchunks = 1;
 	buf->b_ml.ml_chunksize[0].mlcs_numlines = 1;
-	buf->b_ml.ml_chunksize[0].mlcs_totalsize = (long)buf->b_ml.ml_line_len;
-	ml_upd_lastbuf = NULL;		// invalidate resume cache
-	return;
+	buf->b_ml.ml_chunksize[0].mlcs_totalsize = (long)buf->b_ml.ml_সারি_len;
+	ml_upd_lastbuf = ফাঁকা;		// invalidate resume cache
+	ফেরত;
     }
 
     /*
@@ -5888,116 +5888,116 @@ ml_updatechunk(
      * The scan resumes at the cached chunk while ml_upd_lastbuf is set: the
      * chunks have not moved since the last call.
      */
-    if (buf != ml_upd_lastbuf || line < curline)
+    যদি (buf != ml_upd_lastbuf || সারি < curline)
     {
 	curline = 1;
 	curix = 0;
     }
-    for (; curix < buf->b_ml.ml_usedchunks - 1
-	     && line >= curline + buf->b_ml.ml_chunksize[curix].mlcs_numlines;
+    জন্য (; curix < buf->b_ml.ml_usedchunks - 1
+	     && সারি >= curline + buf->b_ml.ml_chunksize[curix].mlcs_numlines;
 	     curix++)
 	curline += buf->b_ml.ml_chunksize[curix].mlcs_numlines;
     curchnk = buf->b_ml.ml_chunksize + curix;
 
-    if (updtype == ML_CHNK_DELLINE)
+    যদি (updtype == ML_CHNK_DELLINE)
 	len = -len;
     curchnk->mlcs_totalsize += len;
-    if (updtype == ML_CHNK_ADDLINE)
+    যদি (updtype == ML_CHNK_ADDLINE)
     {
 	curchnk->mlcs_numlines++;
 
 	// May resize here so we don't have to do it in both cases below
-	if (buf->b_ml.ml_usedchunks + 1 >= buf->b_ml.ml_numchunks)
+	যদি (buf->b_ml.ml_usedchunks + 1 >= buf->b_ml.ml_numchunks)
 	{
 	    chunksize_T *t_chunksize = buf->b_ml.ml_chunksize;
 
 	    buf->b_ml.ml_numchunks = buf->b_ml.ml_numchunks * 3 / 2;
 	    buf->b_ml.ml_chunksize = vim_realloc(buf->b_ml.ml_chunksize,
-			    sizeof(chunksize_T) * buf->b_ml.ml_numchunks);
-	    if (buf->b_ml.ml_chunksize == NULL)
+			    আকার(chunksize_T) * buf->b_ml.ml_numchunks);
+	    যদি (buf->b_ml.ml_chunksize == ফাঁকা)
 	    {
 		// Hmmmm, Give up on offset for this buffer
 		vim_free(t_chunksize);
 		buf->b_ml.ml_usedchunks = -1;
-		return;
+		ফেরত;
 	    }
 	}
 
-	if (buf->b_ml.ml_chunksize[curix].mlcs_numlines >= MLCS_MAXL)
+	যদি (buf->b_ml.ml_chunksize[curix].mlcs_numlines >= MLCS_MAXL)
 	{
-	    int	    count;	    // number of entries in block
-	    int	    idx;
-	    int	    end_idx;
-	    int	    text_end;
-	    int	    linecnt;
+	    পূর্ণসংখ্যা	    গুনতি;	    // number of entries in block
+	    পূর্ণসংখ্যা	    idx;
+	    পূর্ণসংখ্যা	    end_idx;
+	    পূর্ণসংখ্যা	    text_end;
+	    পূর্ণসংখ্যা	    linecnt;
 
 	    mch_memmove(buf->b_ml.ml_chunksize + curix + 1,
 			buf->b_ml.ml_chunksize + curix,
 			(buf->b_ml.ml_usedchunks - curix) *
-			sizeof(chunksize_T));
+			আকার(chunksize_T));
 	    // Compute length of first half of lines in the split chunk
-	    size = 0;
+	    আকার_2 = 0;
 	    linecnt = 0;
-	    while (curline < buf->b_ml.ml_line_count
+	    যখন (curline < buf->b_ml.ml_সারি_গুনতি
 			&& linecnt < MLCS_MINL)
 	    {
-		if ((hp = ml_find_line(buf, curline, ML_FIND)) == NULL)
+		যদি ((hp = ml_find_সারি(buf, curline, ML_FIND)) == ফাঁকা)
 		{
 		    buf->b_ml.ml_usedchunks = -1;
-		    return;
+		    ফেরত;
 		}
-		dp = (DATA_BL *)(hp->bh_data);
-		count = (long)(buf->b_ml.ml_locked_high) -
-			(long)(buf->b_ml.ml_locked_low) + 1;
-		idx = curline - buf->b_ml.ml_locked_low;
-		curline = buf->b_ml.ml_locked_high + 1;
+		dp = (তথ্য_BL *)(hp->bh_তথ্য);
+		গুনতি = (long)(buf->b_ml.ml_locked_উপরের) -
+			(long)(buf->b_ml.ml_locked_নিচের) + 1;
+		idx = curline - buf->b_ml.ml_locked_নিচের;
+		curline = buf->b_ml.ml_locked_উপরের + 1;
 
 		// compute index of last line to use in this MEMLINE
-		rest = count - idx;
-		if (linecnt + rest > MLCS_MINL)
+		rest = গুনতি - idx;
+		যদি (linecnt + rest > MLCS_MINL)
 		{
 		    end_idx = idx + MLCS_MINL - linecnt - 1;
 		    linecnt = MLCS_MINL;
 		}
-		else
+		অন্যথা
 		{
-		    end_idx = count - 1;
+		    end_idx = গুনতি - 1;
 		    linecnt += rest;
 		}
 # ifdef FEAT_PROP_POPUP
-		if (buf->b_has_textprop)
+		যদি (buf->b_has_textprop)
 		{
-		    int i;
+		    পূর্ণসংখ্যা i;
 
 		    // We cannot use the text pointers to get the text length,
 		    // the text prop info would also be counted.  Go over the
 		    // lines.
-		    for (i = end_idx; i < idx; ++i)
-			size += (int)STRLEN((char_u *)dp
-				      + (dp->db_index[i] & DB_INDEX_MASK)) + 1;
+		    জন্য (i = end_idx; i < idx; ++i)
+			আকার_2 += (পূর্ণসংখ্যা)STRLEN((char_u *)dp
+				      + (dp->db_সূচক[i] & DB_সূচক_MASK)) + 1;
 		}
-		else
+		অন্যথা
 # endif
 		{
-		    if (idx == 0) // first line in block, text at the end
+		    যদি (idx == 0) // first line in block, text at the end
 			text_end = dp->db_txt_end;
-		    else
-			text_end = ((dp->db_index[idx - 1]) & DB_INDEX_MASK);
-		    size += text_end
-				   - ((dp->db_index[end_idx]) & DB_INDEX_MASK);
+		    অন্যথা
+			text_end = ((dp->db_সূচক[idx - 1]) & DB_সূচক_MASK);
+		    আকার_2 += text_end
+				   - ((dp->db_সূচক[end_idx]) & DB_সূচক_MASK);
 		}
 	    }
 	    buf->b_ml.ml_chunksize[curix].mlcs_numlines = linecnt;
 	    buf->b_ml.ml_chunksize[curix + 1].mlcs_numlines -= linecnt;
-	    buf->b_ml.ml_chunksize[curix].mlcs_totalsize = size;
-	    buf->b_ml.ml_chunksize[curix + 1].mlcs_totalsize -= size;
+	    buf->b_ml.ml_chunksize[curix].mlcs_totalsize = আকার_2;
+	    buf->b_ml.ml_chunksize[curix + 1].mlcs_totalsize -= আকার_2;
 	    buf->b_ml.ml_usedchunks++;
-	    ml_upd_lastbuf = NULL;   // Force recalc of curix & curline
-	    return;
+	    ml_upd_lastbuf = ফাঁকা;   // Force recalc of curix & curline
+	    ফেরত;
 	}
-	else if (buf->b_ml.ml_chunksize[curix].mlcs_numlines >= MLCS_MINL
+	অন্যথা যদি (buf->b_ml.ml_chunksize[curix].mlcs_numlines >= MLCS_MINL
 		     && curix == buf->b_ml.ml_usedchunks - 1
-		     && buf->b_ml.ml_line_count - line <= 1)
+		     && buf->b_ml.ml_সারি_গুনতি - সারি <= 1)
 	{
 	    /*
 	     * We are in the last chunk and it is cheap to create a new one
@@ -6005,29 +6005,29 @@ ml_updatechunk(
 	     */
 	    curchnk = buf->b_ml.ml_chunksize + curix + 1;
 	    buf->b_ml.ml_usedchunks++;
-	    if (line == buf->b_ml.ml_line_count)
+	    যদি (সারি == buf->b_ml.ml_সারি_গুনতি)
 	    {
 		curchnk->mlcs_numlines = 0;
 		curchnk->mlcs_totalsize = 0;
 	    }
-	    else
+	    অন্যথা
 	    {
 		/*
 		 * Line is just prior to last, move count for last
 		 * This is the common case  when loading a new file
 		 */
-		hp = ml_find_line(buf, buf->b_ml.ml_line_count, ML_FIND);
-		if (hp == NULL)
+		hp = ml_find_সারি(buf, buf->b_ml.ml_সারি_গুনতি, ML_FIND);
+		যদি (hp == ফাঁকা)
 		{
 		    buf->b_ml.ml_usedchunks = -1;
-		    return;
+		    ফেরত;
 		}
-		dp = (DATA_BL *)(hp->bh_data);
-		if (dp->db_line_count == 1)
+		dp = (তথ্য_BL *)(hp->bh_তথ্য);
+		যদি (dp->db_সারি_গুনতি == 1)
 		    rest = dp->db_txt_end - dp->db_txt_start;
-		else
+		অন্যথা
 		    rest =
-			((dp->db_index[dp->db_line_count - 2]) & DB_INDEX_MASK)
+			((dp->db_সূচক[dp->db_সারি_গুনতি - 2]) & DB_সূচক_MASK)
 			- dp->db_txt_start;
 		curchnk->mlcs_totalsize = rest;
 		curchnk->mlcs_numlines = 1;
@@ -6036,25 +6036,25 @@ ml_updatechunk(
 	    }
 	}
     }
-    else if (updtype == ML_CHNK_DELLINE)
+    অন্যথা যদি (updtype == ML_CHNK_DELLINE)
     {
 	curchnk->mlcs_numlines--;
-	if (curix < buf->b_ml.ml_usedchunks - 1
+	যদি (curix < buf->b_ml.ml_usedchunks - 1
 		&& curchnk->mlcs_numlines + curchnk[1].mlcs_numlines
 								  <= MLCS_MINL)
 	{
 	    curix++;
 	    curchnk = buf->b_ml.ml_chunksize + curix;
 	}
-	else if (curix == 0 && curchnk->mlcs_numlines <= 0)
+	অন্যথা যদি (curix == 0 && curchnk->mlcs_numlines <= 0)
 	{
-	    ml_upd_lastbuf = NULL;   // Force recalc of curix & curline
+	    ml_upd_lastbuf = ফাঁকা;   // Force recalc of curix & curline
 	    buf->b_ml.ml_usedchunks--;
 	    mch_memmove(buf->b_ml.ml_chunksize, buf->b_ml.ml_chunksize + 1,
-			buf->b_ml.ml_usedchunks * sizeof(chunksize_T));
-	    return;
+			buf->b_ml.ml_usedchunks * আকার(chunksize_T));
+	    ফেরত;
 	}
-	else if (curix == 0 || (curchnk->mlcs_numlines > 10
+	অন্যথা যদি (curix == 0 || (curchnk->mlcs_numlines > 10
 		    && curchnk->mlcs_numlines + curchnk[-1].mlcs_numlines
 								  > MLCS_MINL))
 	{
@@ -6063,20 +6063,20 @@ ml_updatechunk(
 	    ml_upd_lastbuf = buf;
 	    ml_upd_lastcurline = curline;
 	    ml_upd_lastcurix = curix;
-	    return;
+	    ফেরত;
 	}
 
 	// Collapse chunks
-	ml_upd_lastbuf = NULL;   // Force recalc of curix & curline
+	ml_upd_lastbuf = ফাঁকা;   // Force recalc of curix & curline
 	curchnk[-1].mlcs_numlines += curchnk->mlcs_numlines;
 	curchnk[-1].mlcs_totalsize += curchnk->mlcs_totalsize;
 	buf->b_ml.ml_usedchunks--;
-	if (curix < buf->b_ml.ml_usedchunks)
+	যদি (curix < buf->b_ml.ml_usedchunks)
 	    mch_memmove(buf->b_ml.ml_chunksize + curix,
 			buf->b_ml.ml_chunksize + curix + 1,
 			(buf->b_ml.ml_usedchunks - curix) *
-			sizeof(chunksize_T));
-	return;
+			আকার(chunksize_T));
+	ফেরত;
     }
     ml_upd_lastbuf = buf;
     ml_upd_lastcurline = curline;
@@ -6090,201 +6090,201 @@ ml_updatechunk(
  * return -1 if information is not available
  */
     long
-ml_find_line_or_offset(buf_T *buf, linenr_T lnum, long *offp)
+ml_find_সারি_or_offset(buf_T *buf, linenr_T lnum, long *offp)
 {
     linenr_T	curline;
-    int		curix;
-    long	size;
+    পূর্ণসংখ্যা		curix;
+    long	আকার_2;
     bhdr_T	*hp;
-    DATA_BL	*dp;
-    int		count;		// number of entries in block
-    int		idx;
-    int		start_idx;
-    int		text_end;
+    তথ্য_BL	*dp;
+    পূর্ণসংখ্যা		গুনতি;		// number of entries in block
+    পূর্ণসংখ্যা		idx;
+    পূর্ণসংখ্যা		start_idx;
+    পূর্ণসংখ্যা		text_end;
     long	offset;
-    int		len;
-    int		ffdos = (get_fileformat(buf) == EOL_DOS);
-    int		extra = 0;
+    পূর্ণসংখ্যা		len;
+    পূর্ণসংখ্যা		ffdos = (get_fileformat(buf) == EOL_DOS);
+    পূর্ণসংখ্যা		extra = 0;
 
     // take care of cached line first
-    ml_flush_line(curbuf);
+    ml_flush_সারি(curbuf);
 
-    if (buf->b_ml.ml_usedchunks == -1
-	    || buf->b_ml.ml_chunksize == NULL
+    যদি (buf->b_ml.ml_usedchunks == -1
+	    || buf->b_ml.ml_chunksize == ফাঁকা
 	    || lnum < 0)
-	return -1;
+	ফেরত -1;
 
-    if (offp == NULL)
+    যদি (offp == ফাঁকা)
 	offset = 0;
-    else
+    অন্যথা
 	offset = *offp;
-    if (lnum == 0 && offset <= 0)
-	return 1;   // Not a "find offset" and offset 0 _must_ be in line 1
+    যদি (lnum == 0 && offset <= 0)
+	ফেরত 1;   // Not a "find offset" and offset 0 _must_ be in line 1
     /*
      * Find the last chunk before the one containing our line. Last chunk is
      * special because it will never qualify.
      */
     curline = 1;
-    curix = size = 0;
-    while (curix < buf->b_ml.ml_usedchunks - 1
+    curix = আকার_2 = 0;
+    যখন (curix < buf->b_ml.ml_usedchunks - 1
 	    && ((lnum != 0
 	     && lnum >= curline + buf->b_ml.ml_chunksize[curix].mlcs_numlines)
 		|| (offset != 0
-	       && offset > size + buf->b_ml.ml_chunksize[curix].mlcs_totalsize
+	       && offset > আকার_2 + buf->b_ml.ml_chunksize[curix].mlcs_totalsize
 		 + (long)ffdos * buf->b_ml.ml_chunksize[curix].mlcs_numlines)))
     {
 	curline += buf->b_ml.ml_chunksize[curix].mlcs_numlines;
-	size += buf->b_ml.ml_chunksize[curix].mlcs_totalsize;
-	if (offset && ffdos)
-	    size += buf->b_ml.ml_chunksize[curix].mlcs_numlines;
+	আকার_2 += buf->b_ml.ml_chunksize[curix].mlcs_totalsize;
+	যদি (offset && ffdos)
+	    আকার_2 += buf->b_ml.ml_chunksize[curix].mlcs_numlines;
 	curix++;
     }
 
-    while ((lnum != 0 && curline < lnum) || (offset != 0 && size < offset))
+    যখন ((lnum != 0 && curline < lnum) || (offset != 0 && আকার_2 < offset))
     {
 # ifdef FEAT_PROP_POPUP
-	size_t textprop_total = 0;
+	size_t textprop_যোগ = 0;
 # endif
 
-	if (curline > buf->b_ml.ml_line_count
-		|| (hp = ml_find_line(buf, curline, ML_FIND)) == NULL)
-	    return -1;
-	dp = (DATA_BL *)(hp->bh_data);
-	count = (long)(buf->b_ml.ml_locked_high) -
-		(long)(buf->b_ml.ml_locked_low) + 1;
-	start_idx = idx = curline - buf->b_ml.ml_locked_low;
-	if (idx == 0)  // first line in block, text at the end
+	যদি (curline > buf->b_ml.ml_সারি_গুনতি
+		|| (hp = ml_find_সারি(buf, curline, ML_FIND)) == ফাঁকা)
+	    ফেরত -1;
+	dp = (তথ্য_BL *)(hp->bh_তথ্য);
+	গুনতি = (long)(buf->b_ml.ml_locked_উপরের) -
+		(long)(buf->b_ml.ml_locked_নিচের) + 1;
+	start_idx = idx = curline - buf->b_ml.ml_locked_নিচের;
+	যদি (idx == 0)  // first line in block, text at the end
 	    text_end = dp->db_txt_end;
-	else
-	    text_end = ((dp->db_index[idx - 1]) & DB_INDEX_MASK);
+	অন্যথা
+	    text_end = ((dp->db_সূচক[idx - 1]) & DB_সূচক_MASK);
 	// Compute index of last line to use in this MEMLINE
-	if (lnum != 0)
+	যদি (lnum != 0)
 	{
-	    if (curline + (count - idx) >= lnum)
+	    যদি (curline + (গুনতি - idx) >= lnum)
 		idx += lnum - curline - 1;
-	    else
-		idx = count - 1;
+	    অন্যথা
+		idx = গুনতি - 1;
 	}
-	else
+	অন্যথা
 	{
 	    extra = 0;
-	    for (;;)
+	    জন্য (;;)
 	    {
 # ifdef FEAT_PROP_POPUP
-		size_t textprop_size = 0;
+		size_t textprop_আকার = 0;
 
-		if (buf->b_has_textprop)
+		যদি (buf->b_has_textprop)
 		{
 		    char_u *l1, *l2;
 
 		    // compensate for the extra bytes taken by textprops
-		    l1 = (char_u *)dp + ((dp->db_index[idx]) & DB_INDEX_MASK);
+		    l1 = (char_u *)dp + ((dp->db_সূচক[idx]) & DB_সূচক_MASK);
 		    l2 = (char_u *)dp + (idx == 0 ? dp->db_txt_end
-				  : ((dp->db_index[idx - 1]) & DB_INDEX_MASK));
-		    textprop_size = (l2 - l1) - (STRLEN(l1) + 1);
+				  : ((dp->db_সূচক[idx - 1]) & DB_সূচক_MASK));
+		    textprop_আকার = (l2 - l1) - (STRLEN(l1) + 1);
 		}
 # endif
-		if (!(offset >= size
-			+ text_end - (int)((dp->db_index[idx]) & DB_INDEX_MASK)
+		যদি (!(offset >= আকার_2
+			+ text_end - (পূর্ণসংখ্যা)((dp->db_সূচক[idx]) & DB_সূচক_MASK)
 # ifdef FEAT_PROP_POPUP
-			- (long)(textprop_total + textprop_size)
+			- (long)(textprop_যোগ + textprop_আকার)
 # endif
 			+ ffdos))
-		    break;
+		    বিরতি;
 
-		if (ffdos)
-		    size++;
+		যদি (ffdos)
+		    আকার_2++;
 # ifdef FEAT_PROP_POPUP
-		textprop_total += textprop_size;
+		textprop_যোগ += textprop_আকার;
 # endif
-		if (idx == count - 1)
+		যদি (idx == গুনতি - 1)
 		{
 		    extra = 1;
-		    break;
+		    বিরতি;
 		}
 		idx++;
 	    }
 	}
 # ifdef FEAT_PROP_POPUP
-	if (buf->b_has_textprop && lnum != 0)
+	যদি (buf->b_has_textprop && lnum != 0)
 	{
-	    int i;
+	    পূর্ণসংখ্যা i;
 
 	    // cannot use the db_index pointer, need to get the actual text
 	    // lengths.
 	    len = 0;
-	    for (i = start_idx; i <= idx; ++i)
+	    জন্য (i = start_idx; i <= idx; ++i)
 	    {
-		char_u *p = (char_u *)dp + ((dp->db_index[i]) & DB_INDEX_MASK);
-		len += (int)STRLEN(p) + 1;
+		char_u *p = (char_u *)dp + ((dp->db_সূচক[i]) & DB_সূচক_MASK);
+		len += (পূর্ণসংখ্যা)STRLEN(p) + 1;
 	    }
 	}
-	else
+	অন্যথা
 # endif
-	    len = text_end - ((dp->db_index[idx]) & DB_INDEX_MASK)
+	    len = text_end - ((dp->db_সূচক[idx]) & DB_সূচক_MASK)
 # ifdef FEAT_PROP_POPUP
-				- (long)textprop_total
+				- (long)textprop_যোগ
 # endif
 				;
-	size += len;
-	if (offset != 0 && size >= offset)
+	আকার_2 += len;
+	যদি (offset != 0 && আকার_2 >= offset)
 	{
-	    if (size + ffdos == offset)
+	    যদি (আকার_2 + ffdos == offset)
 		*offp = 0;
-	    else if (idx == start_idx)
-		*offp = offset - size + len;
-	    else
-		*offp = offset - size + len
-		     - (text_end - ((dp->db_index[idx - 1]) & DB_INDEX_MASK))
+	    অন্যথা যদি (idx == start_idx)
+		*offp = offset - আকার_2 + len;
+	    অন্যথা
+		*offp = offset - আকার_2 + len
+		     - (text_end - ((dp->db_সূচক[idx - 1]) & DB_সূচক_MASK))
 # ifdef FEAT_PROP_POPUP
-		     + (long)textprop_total
+		     + (long)textprop_যোগ
 # endif
 		     ;
 	    curline += idx - start_idx + extra;
-	    if (curline > buf->b_ml.ml_line_count)
-		return -1;	// exactly one byte beyond the end
-	    return curline;
+	    যদি (curline > buf->b_ml.ml_সারি_গুনতি)
+		ফেরত -1;	// exactly one byte beyond the end
+	    ফেরত curline;
 	}
-	curline = buf->b_ml.ml_locked_high + 1;
+	curline = buf->b_ml.ml_locked_উপরের + 1;
     }
 
-    if (lnum != 0)
+    যদি (lnum != 0)
     {
 	// Count extra CR characters.
-	if (ffdos)
-	    size += lnum - 1;
+	যদি (ffdos)
+	    আকার_2 += lnum - 1;
 
 	// Don't count the last line break if 'noeol' and ('bin' or
 	// 'nofixeol').
-	if ((!buf->b_p_fixeol || buf->b_p_bin) && !buf->b_p_eol
-					   && lnum > buf->b_ml.ml_line_count)
-	    size -= ffdos + 1;
+	যদি ((!buf->b_p_fixeol || buf->b_p_bin) && !buf->b_p_eol
+					   && lnum > buf->b_ml.ml_সারি_গুনতি)
+	    আকার_2 -= ffdos + 1;
     }
 
-    return size;
+    ফেরত আকার_2;
 }
 
 /*
  * Goto byte in buffer with offset 'cnt'.
  */
-    void
+    শূন্য
 goto_byte(long cnt)
 {
     long	boff = cnt;
     linenr_T	lnum;
 
-    ml_flush_line(curbuf);	// cached line may be dirty
+    ml_flush_সারি(curbuf);	// cached line may be dirty
     setpcmark();
-    if (boff)
+    যদি (boff)
 	--boff;
-    lnum = ml_find_line_or_offset(curbuf, (linenr_T)0, &boff);
-    if (lnum < 1)	// past the end
+    lnum = ml_find_সারি_or_offset(curbuf, (linenr_T)0, &boff);
+    যদি (lnum < 1)	// past the end
     {
-	curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	curwin->w_cursor.lnum = curbuf->b_ml.ml_সারি_গুনতি;
 	curwin->w_curswant = MAXCOL;
 	coladvance((colnr_T)MAXCOL);
     }
-    else
+    অন্যথা
     {
 	curwin->w_cursor.lnum = lnum;
 	curwin->w_cursor.col = (colnr_T)boff;
@@ -6294,7 +6294,7 @@ goto_byte(long cnt)
     check_cursor();
 
     // Make sure the cursor is on the first byte of a multi-byte char.
-    if (has_mbyte)
+    যদি (has_mbyte)
 	mb_adjust_cursor();
 }
 #endif

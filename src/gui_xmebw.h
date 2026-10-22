@@ -38,8 +38,8 @@
 # define XmCLocation		"Location"
 #endif
 
-#ifndef XmNpixmapData
-# define XmNpixmapData		"pixmapData"
+#ifndef Xm_Npixmap_তথ্য
+# define Xm_Npixmap_তথ্য		"pixmapData"
 #endif
 
 #ifndef XmNpixmapFile
@@ -51,10 +51,10 @@
  */
 #ifdef HAVE_XM_JOINSIDET_H
 # include <Xm/JoinSideT.h>
-#else
-# define XmLEFT	    1
-# define XmRIGHT    2
-# define XmTOP	    3
+#অন্যথা
+# define Xm_বাম	    1
+# define Xm_ডান    2
+# define Xm_শীর্ষ	    3
 # define XmBOTTOM   4
 #endif
 
@@ -63,10 +63,10 @@
 /*
  * Convenience creation function.
  */
-extern Widget XgCreateEPushButtonWidget(Widget, char *, ArgList, Cardinal);
+বাহ্যিক Widget XgCreateEPushButtonWidget(Widget, অক্ষর *, ArgList, Cardinal);
 
-extern WidgetClass xmEnhancedButtonWidgetClass;
-typedef struct _XmEnhancedButtonClassRec *XmEnhancedButtonWidgetClass;
-typedef struct _XmEnhancedButtonRec *XmEnhancedButtonWidget;
+বাহ্যিক WidgetClass xmEnhancedButtonWidgetClass;
+প্রকারলেখ কাঠামো _XmEnhancedButtonClassRec *XmEnhancedButtonWidgetClass;
+প্রকারলেখ কাঠামো _XmEnhancedButtonRec *XmEnhancedButtonWidget;
 
 #endif

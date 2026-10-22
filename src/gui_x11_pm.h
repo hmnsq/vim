@@ -11,44 +11,44 @@
 /*
  * Icons used by the toolbar code.
  */
-#include "../pixmaps/tb_new.xpm"
-#include "../pixmaps/tb_open.xpm"
-#include "../pixmaps/tb_close.xpm"
-#include "../pixmaps/tb_save.xpm"
-#include "../pixmaps/tb_print.xpm"
-#include "../pixmaps/tb_cut.xpm"
-#include "../pixmaps/tb_copy.xpm"
-#include "../pixmaps/tb_paste.xpm"
-#include "../pixmaps/tb_find.xpm"
-#include "../pixmaps/tb_find_next.xpm"
-#include "../pixmaps/tb_find_prev.xpm"
-#include "../pixmaps/tb_find_help.xpm"
-#include "../pixmaps/tb_exit.xpm"
-#include "../pixmaps/tb_undo.xpm"
-#include "../pixmaps/tb_redo.xpm"
-#include "../pixmaps/tb_help.xpm"
-#include "../pixmaps/tb_macro.xpm"
-#include "../pixmaps/tb_make.xpm"
-#include "../pixmaps/tb_save_all.xpm"
-#include "../pixmaps/tb_jump.xpm"
-#include "../pixmaps/tb_ctags.xpm"
-#include "../pixmaps/tb_load_session.xpm"
-#include "../pixmaps/tb_save_session.xpm"
-#include "../pixmaps/tb_new_session.xpm"
-#include "../pixmaps/tb_blank.xpm"
-#include "../pixmaps/tb_maximize.xpm"
-#include "../pixmaps/tb_split.xpm"
-#include "../pixmaps/tb_minimize.xpm"
-#include "../pixmaps/tb_shell.xpm"
-#include "../pixmaps/tb_replace.xpm"
-#include "../pixmaps/tb_vsplit.xpm"
-#include "../pixmaps/tb_maxwidth.xpm"
-#include "../pixmaps/tb_minwidth.xpm"
+#অন্তর্ভাব "../pixmaps/tb_new.xpm"
+#অন্তর্ভাব "../pixmaps/tb_open.xpm"
+#অন্তর্ভাব "../pixmaps/tb_close.xpm"
+#অন্তর্ভাব "../pixmaps/tb_save.xpm"
+#অন্তর্ভাব "../pixmaps/tb_print.xpm"
+#অন্তর্ভাব "../pixmaps/tb_cut.xpm"
+#অন্তর্ভাব "../pixmaps/tb_copy.xpm"
+#অন্তর্ভাব "../pixmaps/tb_paste.xpm"
+#অন্তর্ভাব "../pixmaps/tb_find.xpm"
+#অন্তর্ভাব "../pixmaps/tb_find_next.xpm"
+#অন্তর্ভাব "../pixmaps/tb_find_prev.xpm"
+#অন্তর্ভাব "../pixmaps/tb_find_help.xpm"
+#অন্তর্ভাব "../pixmaps/tb_exit.xpm"
+#অন্তর্ভাব "../pixmaps/tb_undo.xpm"
+#অন্তর্ভাব "../pixmaps/tb_redo.xpm"
+#অন্তর্ভাব "../pixmaps/tb_help.xpm"
+#অন্তর্ভাব "../pixmaps/tb_macro.xpm"
+#অন্তর্ভাব "../pixmaps/tb_make.xpm"
+#অন্তর্ভাব "../pixmaps/tb_save_all.xpm"
+#অন্তর্ভাব "../pixmaps/tb_jump.xpm"
+#অন্তর্ভাব "../pixmaps/tb_ctags.xpm"
+#অন্তর্ভাব "../pixmaps/tb_load_session.xpm"
+#অন্তর্ভাব "../pixmaps/tb_save_session.xpm"
+#অন্তর্ভাব "../pixmaps/tb_new_session.xpm"
+#অন্তর্ভাব "../pixmaps/tb_blank.xpm"
+#অন্তর্ভাব "../pixmaps/tb_maximize.xpm"
+#অন্তর্ভাব "../pixmaps/tb_split.xpm"
+#অন্তর্ভাব "../pixmaps/tb_minimize.xpm"
+#অন্তর্ভাব "../pixmaps/tb_shell.xpm"
+#অন্তর্ভাব "../pixmaps/tb_replace.xpm"
+#অন্তর্ভাব "../pixmaps/tb_vsplit.xpm"
+#অন্তর্ভাব "../pixmaps/tb_maxwidth.xpm"
+#অন্তর্ভাব "../pixmaps/tb_minwidth.xpm"
 
 /*
  * Those are the pixmaps used for the default buttons.
  */
-static char **(built_in_pixmaps[]) =
+স্থির অক্ষর **(built_in_pixmaps[]) =
 {
     tb_new_xpm,
     tb_open_xpm,
@@ -72,8 +72,8 @@ static char **(built_in_pixmaps[]) =
     tb_minimize_xpm,
     tb_split_xpm,
     tb_shell_xpm,
-    tb_find_prev_xpm,
-    tb_find_next_xpm,
+    tb_find_পূর্ব_xpm,
+    tb_find_পরবর্তী_xpm,
     tb_find_help_xpm,
     tb_make_xpm,
     tb_jump_xpm,
@@ -88,5 +88,5 @@ static char **(built_in_pixmaps[]) =
 #define BACKGROUND	0
 #define FOREGROUND	1
 #define BOTTOM_SHADOW	2
-#define TOP_SHADOW	3
+#define শীর্ষ_SHADOW	3
 #define HIGHLIGHT	4

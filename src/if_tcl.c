@@ -66,26 +66,26 @@ TODO:
  *  ::vim::buffer new		#   create new buffer + Tcl command
  */
 
-#include "vim.h"
+#অন্তর্ভাব "vim.h"
 #undef EXTERN			// tcl.h defines it too
 
 #ifdef DYNAMIC_TCL
 # define USE_TCL_STUBS // use tcl's stubs mechanism
 #endif
 
-#include <tcl.h>
-#include <string.h>
+#অন্তর্ভাব <tcl.h>
+#অন্তর্ভাব <string.h>
 
-typedef struct
+প্রকারলেখ কাঠামো
 {
     Tcl_Interp *interp;
-    int exitvalue;
-    int range_start, range_end;
-    int lbase;
-    char *curbuf, *curwin;
+    পূর্ণসংখ্যা exitvalue;
+    পূর্ণসংখ্যা range_start, range_end;
+    পূর্ণসংখ্যা lbase;
+    অক্ষর *curbuf, *curwin;
 } tcl_info;
 
-static tcl_info tclinfo = { NULL, 0, 0, 0, 0, NULL, NULL };
+স্থির tcl_info tclinfo = { ফাঁকা, 0, 0, 0, 0, ফাঁকা, ফাঁকা };
 
 #define VAR_RANGE1	"::vim::range(start)"
 #define VAR_RANGE2	"::vim::range(begin)"
@@ -95,7 +95,7 @@ static tcl_info tclinfo = { NULL, 0, 0, 0, 0, NULL, NULL };
 #define VAR_LBASE	"::vim::lbase"
 #define VAR_CURLINE	"line"
 #define VAR_CURLNUM	"lnum"
-#define VARNAME_SIZE	64
+#define VARNAME_আকার	64
 
 #define row2tcl(x)  ((x) - (tclinfo.lbase==0))
 #define row2vim(x)  ((x) + (tclinfo.lbase==0))
@@ -103,8 +103,8 @@ static tcl_info tclinfo = { NULL, 0, 0, 0, 0, NULL, NULL };
 #define col2vim(x)  ((x) - (tclinfo.lbase!=0))
 
 
-#define VIMOUT	((ClientData)1)
-#define VIMERR	((ClientData)2)
+#define VIMOUT	((Client_তথ্য)1)
+#define VIMERR	((Client_তথ্য)2)
 
 // This appears to be new in Tcl 8.4.
 #ifndef CONST84
@@ -118,37 +118,37 @@ static tcl_info tclinfo = { NULL, 0, 0, 0, 0, NULL, NULL };
  *  the "interp" command, and each interpreter can reference all windows and
  *  buffers.
  */
-struct ref
+কাঠামো ref
 {
-    struct ref	*next;
+    কাঠামো ref	*পরবর্তী;
 
     Tcl_Interp	*interp;
     Tcl_Command cmd;	    // Tcl command that represents this object
     Tcl_Obj	*delcmd;    // Tcl command to call when object is being del.
-    void	*vimobj;    // Vim window or buffer (win_T* or buf_T*)
+    শূন্য	*vimobj;    // Vim window or buffer (win_T* or buf_T*)
 };
-static char * tclgetbuffer _ANSI_ARGS_((Tcl_Interp *interp, buf_T *buf));
-static char * tclgetwindow _ANSI_ARGS_((Tcl_Interp *interp, win_T *win));
-static int tclsetdelcmd _ANSI_ARGS_((Tcl_Interp *interp, struct ref *reflist, void *vimobj, Tcl_Obj *delcmd));
-static int tclgetlinenum _ANSI_ARGS_ ((Tcl_Interp *interp, Tcl_Obj *obj, int *valueP, buf_T *buf));
-static win_T *tclfindwin _ANSI_ARGS_ ((buf_T *buf));
-static int tcldoexcommand _ANSI_ARGS_ ((Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[], int objn));
-static int tclsetoption _ANSI_ARGS_ ((Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[], int objn));
-static int tclvimexpr _ANSI_ARGS_ ((Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[], int objn));
-static void tcldelthisinterp _ANSI_ARGS_ ((void));
+স্থির অক্ষর * tclgetbuffer _ANSI_ARGS_((Tcl_Interp *interp, buf_T *buf));
+স্থির অক্ষর * tclgetwindow _ANSI_ARGS_((Tcl_Interp *interp, win_T *win));
+স্থির পূর্ণসংখ্যা tclsetdelcmd _ANSI_ARGS_((Tcl_Interp *interp, কাঠামো ref *reflist, শূন্য *vimobj, Tcl_Obj *delcmd));
+স্থির পূর্ণসংখ্যা tclgetlinenum _ANSI_ARGS_ ((Tcl_Interp *interp, Tcl_Obj *obj, পূর্ণসংখ্যা *মান_P, buf_T *buf));
+স্থির win_T *tclfindwin _ANSI_ARGS_ ((buf_T *buf));
+স্থির পূর্ণসংখ্যা tcldoexcommand _ANSI_ARGS_ ((Tcl_Interp *interp, পূর্ণসংখ্যা objc, Tcl_Obj *CONST objv[], পূর্ণসংখ্যা objn));
+স্থির পূর্ণসংখ্যা tclsetoption _ANSI_ARGS_ ((Tcl_Interp *interp, পূর্ণসংখ্যা objc, Tcl_Obj *CONST objv[], পূর্ণসংখ্যা objn));
+স্থির পূর্ণসংখ্যা tclvimexpr _ANSI_ARGS_ ((Tcl_Interp *interp, পূর্ণসংখ্যা objc, Tcl_Obj *CONST objv[], পূর্ণসংখ্যা objn));
+স্থির শূন্য tcldelthisinterp _ANSI_ARGS_ ((শূন্য));
 
-static int vimerror _ANSI_ARGS_((Tcl_Interp *interp));
-static void tclmsg _ANSI_ARGS_((char *text));
-static void tclerrmsg _ANSI_ARGS_((char *text));
-static void tclupdatevars _ANSI_ARGS_((void));
+স্থির পূর্ণসংখ্যা vimerror _ANSI_ARGS_((Tcl_Interp *interp));
+স্থির শূন্য tclmsg _ANSI_ARGS_((অক্ষর *text));
+স্থির শূন্য tclerrmsg _ANSI_ARGS_((অক্ষর *text));
+স্থির শূন্য tclupdatevars _ANSI_ARGS_((শূন্য));
 
-static struct ref refsdeleted;	// dummy object for deleted ref list
+স্থির কাঠামো ref refsdeleted;	// dummy object for deleted ref list
 
 //////////////////////////////////////////////////////////////////////////////
 // TCL interface manager
 ////////////////////////////////////////////////////////////////////////////
 
-#if defined(DYNAMIC_TCL)
+#যদি defined(DYNAMIC_TCL)
 # ifndef DYNAMIC_TCL_DLL
 #  define DYNAMIC_TCL_DLL "tcl83.dll"
 # endif
@@ -157,21 +157,21 @@ static struct ref refsdeleted;	// dummy object for deleted ref list
 # endif
 
 # ifndef  DYNAMIC_TCL // Just generating prototypes
-typedef int HANDLE;
+প্রকারলেখ পূর্ণসংখ্যা HANDLE;
 # endif
 
 # ifdef MSWIN
 #  define TCL_PROC FARPROC
 #  define load_dll vimLoadLib
-#  define symbol_from_dll GetProcAddress
+#  define প্রতীক_from_dll GetProcAddress
 #  define close_dll FreeLibrary
 #  define load_dll_error GetWin32Error
-# else
+# অন্যথা
 #  include <dlfcn.h>
-#  define HANDLE void*
-#  define TCL_PROC void*
+#  define HANDLE শূন্য*
+#  define TCL_PROC শূন্য*
 #  define load_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
-#  define symbol_from_dll dlsym
+#  define প্রতীক_from_dll dlsym
 #  define close_dll dlclose
 #  define load_dll_error dlerror
 # endif
@@ -179,20 +179,20 @@ typedef int HANDLE;
 /*
  * Declare HANDLE for tcl.dll and function pointers.
  */
-static HANDLE hTclLib = NULL;
-Tcl_Interp* (*dll_Tcl_CreateInterp)(void);
-void (*dll_Tcl_FindExecutable)(const void *);
+স্থির HANDLE hTclLib = ফাঁকা;
+Tcl_Interp* (*dll_Tcl_CreateInterp)(শূন্য);
+শূন্য (*dll_Tcl_FindExecutable)(ধ্রুবক শূন্য *);
 
 /*
  * Table of name to function pointer of tcl.
  */
-static struct {
-    char* name;
+স্থির কাঠামো {
+    অক্ষর* name;
     TCL_PROC* ptr;
 } tcl_funcname_table[] = {
     {"Tcl_CreateInterp", (TCL_PROC*)&dll_Tcl_CreateInterp},
     {"Tcl_FindExecutable", (TCL_PROC*)&dll_Tcl_FindExecutable},
-    {NULL, NULL},
+    {ফাঁকা, ফাঁকা},
 };
 
 /*
@@ -205,62 +205,62 @@ static struct {
  * Parameter 'libname' provides name of DLL.
  * Return OK or FAIL.
  */
-    static int
-tcl_runtime_link_init(char *libname, int verbose)
+    স্থির পূর্ণসংখ্যা
+tcl_runtime_link_init(অক্ষর *libname, পূর্ণসংখ্যা verbose)
 {
-    int i;
+    পূর্ণসংখ্যা i;
 
-    if (hTclLib)
-	return OK;
-    if (!(hTclLib = load_dll(libname)))
+    যদি (hTclLib)
+	ফেরত OK;
+    যদি (!(hTclLib = load_dll(libname)))
     {
-	if (verbose)
+	যদি (verbose)
 	    semsg(_(e_could_not_load_library_str_str), libname, load_dll_error());
-	return FAIL;
+	ফেরত FAIL;
     }
-    for (i = 0; tcl_funcname_table[i].ptr; ++i)
+    জন্য (i = 0; tcl_funcname_table[i].ptr; ++i)
     {
-	if (!(*tcl_funcname_table[i].ptr = symbol_from_dll(hTclLib,
+	যদি (!(*tcl_funcname_table[i].ptr = প্রতীক_from_dll(hTclLib,
 						  tcl_funcname_table[i].name)))
 	{
 	    close_dll(hTclLib);
-	    hTclLib = NULL;
-	    if (verbose)
+	    hTclLib = ফাঁকা;
+	    যদি (verbose)
 		semsg(_(e_could_not_load_library_function_str),
 						   tcl_funcname_table[i].name);
-	    return FAIL;
+	    ফেরত FAIL;
 	}
     }
-    return OK;
+    ফেরত OK;
 }
 #endif // defined(DYNAMIC_TCL)
 
 #ifdef DYNAMIC_TCL
-static char *find_executable_arg = NULL;
+স্থির অক্ষর *find_executable_arg = ফাঁকা;
 #endif
 
-    void
-vim_tcl_init(char *arg)
+    শূন্য
+vim_tcl_init(অক্ষর *arg)
 {
 #ifdef DYNAMIC_TCL
     find_executable_arg = arg;
-#else
+#অন্যথা
     Tcl_FindExecutable(arg);
 #endif
 }
 
-#if defined(DYNAMIC_TCL)
+#যদি defined(DYNAMIC_TCL)
 
-static int stubs_initialized = FALSE;
+স্থির পূর্ণসংখ্যা stubs_initialized = FALSE;
 
 /*
  * Return TRUE if the TCL interface can be used.
  */
-    int
-tcl_enabled(int verbose)
+    পূর্ণসংখ্যা
+tcl_enabled(পূর্ণসংখ্যা verbose)
 {
-    if (!stubs_initialized && find_executable_arg != NULL
-	    && tcl_runtime_link_init((char *)p_tcldll, verbose) == OK)
+    যদি (!stubs_initialized && find_executable_arg != ফাঁকা
+	    && tcl_runtime_link_init((অক্ষর *)p_tcldll, verbose) == OK)
     {
 	Tcl_Interp *interp;
 
@@ -268,9 +268,9 @@ tcl_enabled(int verbose)
 	// which will be reported as possibly leaked by valgrind.
 	dll_Tcl_FindExecutable(find_executable_arg);
 
-	if ((interp = dll_Tcl_CreateInterp()) != NULL)
+	যদি ((interp = dll_Tcl_CreateInterp()) != ফাঁকা)
 	{
-	    if (Tcl_InitStubs(interp, DYNAMIC_TCL_VER, 0) != NULL)
+	    যদি (Tcl_InitStubs(interp, DYNAMIC_TCL_VER, 0) != ফাঁকা)
 	    {
 		Tcl_DeleteInterp(interp);
 		stubs_initialized = TRUE;
@@ -278,26 +278,26 @@ tcl_enabled(int verbose)
 	    // FIXME: When Tcl_InitStubs() was failed, how delete interp?
 	}
     }
-    return stubs_initialized;
+    ফেরত stubs_initialized;
 }
 #endif
 
-#if defined(EXITFREE)
+#যদি defined(EXITFREE)
 /*
  * Called once when exiting.
  */
-    void
-vim_tcl_finalize(void)
+    শূন্য
+vim_tcl_finalize(শূন্য)
 {
 # ifdef DYNAMIC_TCL
-    if (stubs_initialized)
+    যদি (stubs_initialized)
 # endif
 	Tcl_Finalize();
 }
 #endif
 
-    void
-tcl_end(void)
+    শূন্য
+tcl_end(শূন্য)
 {
 }
 
@@ -319,49 +319,49 @@ tcl_end(void)
  * string in the interpreter's result value. Therefore it would be
  * useless for this routine to return the exit code via Tcl_SetResult().
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 exitcmd(
-    ClientData dummy UNUSED,
+    Client_তথ্য dummy UNUSED,
     Tcl_Interp *interp,
-    int objc,
+    পূর্ণসংখ্যা objc,
     Tcl_Obj *CONST objv[])
 {
-    int value = 0;
+    পূর্ণসংখ্যা মান = 0;
 
-    switch (objc)
+    নির্বাচন (objc)
     {
-	case 2:
-	    if (Tcl_GetIntFromObj(interp, objv[1], &value) != TCL_OK)
-		break;
+	ক্ষেত্র 2:
+	    যদি (Tcl_GetIntFromObj(interp, objv[1], &মান) != TCL_OK)
+		বিরতি;
 	    // FALLTHROUGH
-	case 1:
-	    tclinfo.exitvalue = value;
+	ক্ষেত্র 1:
+	    tclinfo.exitvalue = মান;
 
 	    Tcl_DeleteInterp(interp);
-	    break;
-	default:
-	    Tcl_WrongNumArgs(interp, 1, objv, "?returnCode?");
+	    বিরতি;
+	পূর্বনির্ধারিত:
+	    Tcl_Wrong_অঙ্ক_Args(interp, 1, objv, "?returnCode?");
     }
-    return TCL_ERROR;
+    ফেরত TCL_ERROR;
 }
 
 /*
  *  "::vim::beep" - what Vi[m] does best :-)
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 beepcmd(
-    ClientData dummy UNUSED,
+    Client_তথ্য dummy UNUSED,
     Tcl_Interp *interp,
-    int objc,
+    পূর্ণসংখ্যা objc,
     Tcl_Obj *CONST objv[])
 {
-    if (objc != 1)
+    যদি (objc != 1)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, NULL);
-	return TCL_ERROR;
+	Tcl_Wrong_অঙ্ক_Args(interp, 1, objv, ফাঁকা);
+	ফেরত TCL_ERROR;
     }
     vim_beep(BO_LANG);
-    return TCL_OK;
+    ফেরত TCL_OK;
 }
 
 /*
@@ -370,131 +370,131 @@ beepcmd(
  *  "::vim::buffer exists {N}" - test if buffer N exists.
  *  "::vim::buffer new" - create a new buffer (not implemented)
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 buffercmd(
-    ClientData dummy UNUSED,
+    Client_তথ্য dummy UNUSED,
     Tcl_Interp *interp,
-    int objc,
+    পূর্ণসংখ্যা objc,
     Tcl_Obj *CONST objv[])
 {
-    char	*name;
+    অক্ষর	*name;
     buf_T	*buf;
     Tcl_Obj	*resobj;
-    int		err, n, idx;
-    enum {BCMD_EXISTS, BCMD_LIST};
-    static CONST84 char *bcmdoptions[] =
+    পূর্ণসংখ্যা		err, n, idx;
+    গণনা {BCMD_EXISTS, BCMD_LIST};
+    স্থির CONST84 অক্ষর *bcmdoptions[] =
     {
-	"exists", "list", (char *)0
+	"exists", "list", (অক্ষর *)0
     };
 
-    if (objc < 2)
+    যদি (objc < 2)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "option");
-	return TCL_ERROR;
+	Tcl_Wrong_অঙ্ক_Args(interp, 1, objv, "option");
+	ফেরত TCL_ERROR;
     }
     err = Tcl_GetIntFromObj(interp, objv[1], &n);
-    if (err == TCL_OK)
+    যদি (err == TCL_OK)
     {
-	if (objc != 2)
+	যদি (objc != 2)
 	{
-	    Tcl_WrongNumArgs(interp, 1, objv, "bufNumber");
-	    return TCL_ERROR;
+	    Tcl_Wrong_অঙ্ক_Args(interp, 1, objv, "bufNumber");
+	    ফেরত TCL_ERROR;
 	}
 	FOR_ALL_BUFFERS(buf)
 	{
-	    if (buf->b_fnum == n)
+	    যদি (buf->b_fnum == n)
 	    {
 		name = tclgetbuffer(interp, buf);
-		if (name == NULL)
-		    return TCL_ERROR;
-		Tcl_SetResult(interp, name, TCL_VOLATILE);
-		return TCL_OK;
+		যদি (name == ফাঁকা)
+		    ফেরত TCL_ERROR;
+		Tcl_Set_ফলাফল(interp, name, TCL_VOLATILE);
+		ফেরত TCL_OK;
 	    }
 	}
-	Tcl_SetResult(interp, _("invalid buffer number"), TCL_STATIC);
-	return TCL_ERROR;
+	Tcl_Set_ফলাফল(interp, _("invalid buffer number"), TCL_STATIC);
+	ফেরত TCL_ERROR;
     }
-    Tcl_ResetResult(interp); // clear error from Tcl_GetIntFromObj
+    Tcl_Reset_ফলাফল(interp); // clear error from Tcl_GetIntFromObj
 
-    err = Tcl_GetIndexFromObj(interp, objv[1], bcmdoptions, "option", 0, &idx);
-    if (err != TCL_OK)
-	return err;
-    switch (idx)
+    err = Tcl_Get_সূচক_From_Obj(interp, objv[1], bcmdoptions, "option", 0, &idx);
+    যদি (err != TCL_OK)
+	ফেরত err;
+    নির্বাচন (idx)
     {
-	case BCMD_LIST:
-	    if (objc != 2)
+	ক্ষেত্র BCMD_LIST:
+	    যদি (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "");
+		Tcl_Wrong_অঙ্ক_Args(interp, 2, objv, "");
 		err = TCL_ERROR;
-		break;
+		বিরতি;
 	    }
 	    FOR_ALL_BUFFERS(buf)
 	    {
 		name = tclgetbuffer(interp, buf);
-		if (name == NULL)
+		যদি (name == ফাঁকা)
 		{
 		    err = TCL_ERROR;
-		    break;
+		    বিরতি;
 		}
 		Tcl_AppendElement(interp, name);
 	    }
-	    break;
+	    বিরতি;
 
-	case BCMD_EXISTS:
-	    if (objc != 3)
+	ক্ষেত্র BCMD_EXISTS:
+	    যদি (objc != 3)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "bufNumber");
+		Tcl_Wrong_অঙ্ক_Args(interp, 2, objv, "bufNumber");
 		err = TCL_ERROR;
-		break;
+		বিরতি;
 	    }
 	    err = Tcl_GetIntFromObj(interp, objv[2], &n);
-	    if (err == TCL_OK)
+	    যদি (err == TCL_OK)
 	    {
 		buf = buflist_findnr(n);
-		resobj = Tcl_NewIntObj(buf != NULL);
-		Tcl_SetObjResult(interp, resobj);
+		resobj = Tcl_NewIntObj(buf != ফাঁকা);
+		Tcl_Set_Obj_ফলাফল(interp, resobj);
 	    }
-	    break;
+	    বিরতি;
 
-	default:
-	    Tcl_SetResult(interp, _("not implemented yet"), TCL_STATIC);
+	পূর্বনির্ধারিত:
+	    Tcl_Set_ফলাফল(interp, _("not implemented yet"), TCL_STATIC);
 	    err = TCL_ERROR;
     }
-    return err;
+    ফেরত err;
 }
 
 /*
  * "::vim::window list" - create list of window commands.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 windowcmd(
-    ClientData	dummy UNUSED,
+    Client_তথ্য	dummy UNUSED,
     Tcl_Interp	*interp,
-    int		objc,
+    পূর্ণসংখ্যা		objc,
     Tcl_Obj	*CONST objv[])
 {
-    char	*what, *string;
+    অক্ষর	*what, *string;
     win_T	*win;
 
-    if (objc != 2)
+    যদি (objc != 2)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "option");
-	return TCL_ERROR;
+	Tcl_Wrong_অঙ্ক_Args(interp, 1, objv, "option");
+	ফেরত TCL_ERROR;
     }
-    what = Tcl_GetStringFromObj(objv[1], NULL);
-    if (strcmp(what, "list") == 0)
+    what = Tcl_GetStringFromObj(objv[1], ফাঁকা);
+    যদি (strcmp(what, "list") == 0)
     {
 	FOR_ALL_WINDOWS(win)
 	{
 	    string = tclgetwindow(interp, win);
-	    if (string == NULL)
-		return TCL_ERROR;
+	    যদি (string == ফাঁকা)
+		ফেরত TCL_ERROR;
 	    Tcl_AppendElement(interp, string);
 	}
-	return TCL_OK;
+	ফেরত TCL_OK;
     }
-    Tcl_SetResult(interp, _("unknown option"), TCL_STATIC);
-    return TCL_ERROR;
+    Tcl_Set_ফলাফল(interp, _("unknown option"), TCL_STATIC);
+    ফেরত TCL_ERROR;
 }
 
 /*
@@ -507,193 +507,193 @@ windowcmd(
 /*
  * This function implements the buffer commands.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 bufselfcmd(
-    ClientData	ref,
+    Client_তথ্য	ref,
     Tcl_Interp	*interp,
-    int		objc,
+    পূর্ণসংখ্যা		objc,
     Tcl_Obj	*CONST objv[])
 {
-    int		opt, err, idx, flags;
-    int		val1, val2, n, i;
+    পূর্ণসংখ্যা		opt, err, idx, flags;
+    পূর্ণসংখ্যা		val1, val2, n, i;
     buf_T	*buf, *savebuf;
     win_T	*win, *savewin;
     Tcl_Obj	*resobj;
     pos_T	*pos;
-    char	*line;
+    অক্ষর	*সারি;
 
-    enum
+    গণনা
     {
-	BUF_APPEND, BUF_COMMAND, BUF_COUNT, BUF_DELCMD, BUF_DELETE, BUF_EXPR,
-	BUF_GET, BUF_INSERT, BUF_LAST, BUF_MARK, BUF_NAME, BUF_NUMBER,
+	BUF_APPEND, BUF_COMMAND, BUF_গুনতি, BUF_DELCMD, BUF_DELETE, BUF_রাশিমালা,
+	BUF_GET, BUF_ঢোকাও, BUF_LAST, BUF_MARK, BUF_NAME, BUF_সংখ্যা,
 	BUF_OPTION, BUF_SET, BUF_WINDOWS
     };
-    static CONST84 char *bufoptions[] =
+    স্থির CONST84 অক্ষর *bufoptions[] =
     {
 	"append", "command", "count", "delcmd", "delete", "expr",
 	"get", "insert", "last", "mark", "name", "number",
-	"option", "set", "windows", (char *)0
+	"option", "set", "windows", (অক্ষর *)0
     };
 
-    if (objc < 2)
+    যদি (objc < 2)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "option ?arg ...?");
-	return TCL_ERROR;
+	Tcl_Wrong_অঙ্ক_Args(interp, 1, objv, "option ?arg ...?");
+	ফেরত TCL_ERROR;
     }
 
-    err = Tcl_GetIndexFromObj(interp, objv[1], bufoptions, "option", 0, &idx);
-    if (err != TCL_OK)
-	return err;
+    err = Tcl_Get_সূচক_From_Obj(interp, objv[1], bufoptions, "option", 0, &idx);
+    যদি (err != TCL_OK)
+	ফেরত err;
 
-    buf = (buf_T *)((struct ref *)ref)->vimobj;
+    buf = (buf_T *)((কাঠামো ref *)ref)->vimobj;
     savebuf = curbuf;  curbuf = buf;
     savewin = curwin;  curwin = tclfindwin(buf);
     flags = 0;
     opt = 0;
 
-    switch (idx)
+    নির্বাচন (idx)
     {
-	case BUF_COMMAND:
+	ক্ষেত্র BUF_COMMAND:
 	    err = tcldoexcommand(interp, objc, objv, 2);
 	    flags |= FL_UPDATE_SCREEN;
-	    break;
+	    বিরতি;
 
-	case BUF_OPTION:
+	ক্ষেত্র BUF_OPTION:
 	    err = tclsetoption(interp, objc, objv, 2);
 	    flags |= FL_UPDATE_SCREEN;
-	    break;
+	    বিরতি;
 
-	case BUF_EXPR:
+	ক্ষেত্র BUF_রাশিমালা:
 	    err = tclvimexpr(interp, objc, objv, 2);
-	    break;
+	    বিরতি;
 
-	case BUF_NAME:
+	ক্ষেত্র BUF_NAME:
 	    /*
 	     *	Get filename of buffer.
 	     */
-	    if (objc != 2)
+	    যদি (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, NULL);
+		Tcl_Wrong_অঙ্ক_Args(interp, 2, objv, ফাঁকা);
 		err = TCL_ERROR;
-		break;
+		বিরতি;
 	    }
-	    if (buf->b_ffname)
-		Tcl_SetResult(interp, (char *)buf->b_ffname, TCL_VOLATILE);
-	    else
-		Tcl_SetResult(interp, "", TCL_STATIC);
-	    break;
+	    যদি (buf->b_ffname)
+		Tcl_Set_ফলাফল(interp, (অক্ষর *)buf->b_ffname, TCL_VOLATILE);
+	    অন্যথা
+		Tcl_Set_ফলাফল(interp, "", TCL_STATIC);
+	    বিরতি;
 
-	case BUF_LAST:
+	ক্ষেত্র BUF_LAST:
 	    /*
 	     * Get line number of last line.
 	     */
 	    opt = 1;
 	    // fallthrough
-	case BUF_COUNT:
+	ক্ষেত্র BUF_গুনতি:
 	    /*
 	     * Get number of lines in buffer.
 	     */
-	    if (objc != 2)
+	    যদি (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, NULL);
+		Tcl_Wrong_অঙ্ক_Args(interp, 2, objv, ফাঁকা);
 		err = TCL_ERROR;
-		break;
+		বিরতি;
 	    }
-	    val1 = (int)buf->b_ml.ml_line_count;
-	    if (opt)
+	    val1 = (পূর্ণসংখ্যা)buf->b_ml.ml_সারি_গুনতি;
+	    যদি (opt)
 		val1 = row2tcl(val1);
 
 	    resobj = Tcl_NewIntObj(val1);
-	    Tcl_SetObjResult(interp, resobj);
-	    break;
+	    Tcl_Set_Obj_ফলাফল(interp, resobj);
+	    বিরতি;
 
-	case BUF_NUMBER:
+	ক্ষেত্র BUF_সংখ্যা:
 	    /*
 	     * Get buffer's number.
 	     */
-	    if (objc != 2)
+	    যদি (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, NULL);
+		Tcl_Wrong_অঙ্ক_Args(interp, 2, objv, ফাঁকা);
 		err = TCL_ERROR;
-		break;
+		বিরতি;
 	    }
-	    resobj = Tcl_NewIntObj((int)buf->b_fnum);
-	    Tcl_SetObjResult(interp, resobj);
-	    break;
+	    resobj = Tcl_NewIntObj((পূর্ণসংখ্যা)buf->b_fnum);
+	    Tcl_Set_Obj_ফলাফল(interp, resobj);
+	    বিরতি;
 
-	case BUF_GET:
-	    if (objc != 3 && objc != 4)
+	ক্ষেত্র BUF_GET:
+	    যদি (objc != 3 && objc != 4)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "lineNumber ?lineNumber?");
+		Tcl_Wrong_অঙ্ক_Args(interp, 2, objv, "lineNumber ?lineNumber?");
 		err = TCL_ERROR;
-		break;
+		বিরতি;
 	    }
 	    err = tclgetlinenum(interp, objv[2], &val1, buf);
-	    if (err != TCL_OK)
-		break;
-	    if (objc == 4)
+	    যদি (err != TCL_OK)
+		বিরতি;
+	    যদি (objc == 4)
 	    {
 		err = tclgetlinenum(interp, objv[3], &val2, buf);
-		if (err != TCL_OK)
-		    break;
-		if (val1 > val2)
+		যদি (err != TCL_OK)
+		    বিরতি;
+		যদি (val1 > val2)
 		{
 		    n = val1; val1 = val2; val2 = n;
 		}
-		Tcl_ResetResult(interp);
+		Tcl_Reset_ফলাফল(interp);
 
-		for (n = val1; n <= val2 && err == TCL_OK; n++)
+		জন্য (n = val1; n <= val2 && err == TCL_OK; n++)
 		{
-		    line = (char *)ml_get_buf(buf, (linenr_T)n, FALSE);
-		    if (line)
-			Tcl_AppendElement(interp, line);
-		    else
+		    সারি = (অক্ষর *)ml_get_buf(buf, (linenr_T)n, FALSE);
+		    যদি (সারি)
+			Tcl_AppendElement(interp, সারি);
+		    অন্যথা
 			err = TCL_ERROR;
 		}
 	    }
-	    else
+	    অন্যথা
 	    {  // objc == 3
-		line = (char *)ml_get_buf(buf, (linenr_T)val1, FALSE);
-		Tcl_SetResult(interp, line, TCL_VOLATILE);
+		সারি = (অক্ষর *)ml_get_buf(buf, (linenr_T)val1, FALSE);
+		Tcl_Set_ফলাফল(interp, সারি, TCL_VOLATILE);
 	    }
-	    break;
+	    বিরতি;
 
-	case BUF_SET:
-	    if (objc != 4 && objc != 5)
+	ক্ষেত্র BUF_SET:
+	    যদি (objc != 4 && objc != 5)
 	    {
-		Tcl_WrongNumArgs(interp, 3, objv, "lineNumber ?lineNumber? stringOrList");
+		Tcl_Wrong_অঙ্ক_Args(interp, 3, objv, "lineNumber ?lineNumber? stringOrList");
 		err = TCL_ERROR;
-		break;
+		বিরতি;
 	    }
 	    err = tclgetlinenum(interp, objv[2], &val1, buf);
-	    if (err != TCL_OK)
-		return TCL_ERROR;
-	    if (objc == 4)
+	    যদি (err != TCL_OK)
+		ফেরত TCL_ERROR;
+	    যদি (objc == 4)
 	    {
 		/*
 		 *  Replace one line with a string.
 		 *	$buf set {n} {string}
 		 */
-		line = Tcl_GetStringFromObj(objv[3], NULL);
-		if (u_savesub((linenr_T)val1) != OK)
+		সারি = Tcl_GetStringFromObj(objv[3], ফাঁকা);
+		যদি (u_savesub((linenr_T)val1) != OK)
 		{
-		    Tcl_SetResult(interp, _("cannot save undo information"), TCL_STATIC);
+		    Tcl_Set_ফলাফল(interp, _("cannot save undo information"), TCL_STATIC);
 		    err = TCL_ERROR;
 		}
-		else
-		if (ml_replace((linenr_T)val1, (char_u *)line, TRUE) != OK)
+		অন্যথা
+		যদি (ml_replace((linenr_T)val1, (char_u *)সারি, TRUE) != OK)
 		{
-		    Tcl_SetResult(interp, _("cannot replace line"), TCL_STATIC);
+		    Tcl_Set_ফলাফল(interp, _("cannot replace line"), TCL_STATIC);
 		    err = TCL_ERROR;
 		}
-		else
+		অন্যথা
 		{
 		    changed_bytes((linenr_T)val1, 0);
 		    flags |= FL_UPDATE_CURBUF;
 		}
-		break;
+		বিরতি;
 	    }
-	    else
+	    অন্যথা
 	    {
 		/*
 		 * Replace several lines with the elements of a Tcl list.
@@ -703,16 +703,16 @@ bufselfcmd(
 		 * elements, * the lines from {n}+length({list}) through {m}
 		 * are deleted.
 		 */
-		int	    lc;
+		পূর্ণসংখ্যা	    lc;
 		Tcl_Obj	    **lv;
 
 		err = tclgetlinenum(interp, objv[3], &val2, buf);
-		if (err != TCL_OK)
-		    break;
+		যদি (err != TCL_OK)
+		    বিরতি;
 		err = Tcl_ListObjGetElements(interp, objv[4], &lc, &lv);
-		if (err != TCL_OK)
-		    break;
-		if (val1 > val2)
+		যদি (err != TCL_OK)
+		    বিরতি;
+		যদি (val1 > val2)
 		{
 		    n = val1;
 		    val1 = val2;
@@ -720,443 +720,443 @@ bufselfcmd(
 		}
 
 		n = val1;
-		if (u_save((linenr_T)(val1 - 1), (linenr_T)(val2 + 1)) != OK)
+		যদি (u_save((linenr_T)(val1 - 1), (linenr_T)(val2 + 1)) != OK)
 		{
-		    Tcl_SetResult(interp, _("cannot save undo information"),
+		    Tcl_Set_ফলাফল(interp, _("cannot save undo information"),
 								  TCL_STATIC);
 		    err = TCL_ERROR;
-		    break;
+		    বিরতি;
 		}
 		flags |= FL_UPDATE_CURBUF;
 
-		for (i = 0; i < lc && n <= val2; i++)
+		জন্য (i = 0; i < lc && n <= val2; i++)
 		{
-		    line = Tcl_GetStringFromObj(lv[i], NULL);
-		    if (ml_replace((linenr_T)n, (char_u *)line, TRUE) != OK)
-			goto setListError;
+		    সারি = Tcl_GetStringFromObj(lv[i], ফাঁকা);
+		    যদি (ml_replace((linenr_T)n, (char_u *)সারি, TRUE) != OK)
+			যাও setListError;
 		    ++n;
 		}
-		if (i < lc)
+		যদি (i < lc)
 		{
 		    // append lines
-		    do
+		    করো
 		    {
-			line = Tcl_GetStringFromObj(lv[i], NULL);
-			if (ml_append((linenr_T)(n - 1),
-					      (char_u *)line, 0, FALSE) != OK)
-			    goto setListError;
+			সারি = Tcl_GetStringFromObj(lv[i], ফাঁকা);
+			যদি (ml_append((linenr_T)(n - 1),
+					      (char_u *)সারি, 0, FALSE) != OK)
+			    যাও setListError;
 			++n;
 			++i;
-		    } while (i < lc);
+		    } যখন (i < lc);
 		}
-		else if (n <= val2)
+		অন্যথা যদি (n <= val2)
 		{
 		    // did not replace all lines, delete
 		    i = n;
-		    do
+		    করো
 		    {
-			if (ml_delete((linenr_T)i) != OK)
-			    goto setListError;
+			যদি (ml_delete((linenr_T)i) != OK)
+			    যাও setListError;
 			++n;
-		    } while (n <= val2);
+		    } যখন (n <= val2);
 		}
 		lc -= val2 - val1 + 1;	// number of lines to be replaced
 		mark_adjust((linenr_T)val1, (linenr_T)val2, (long)MAXLNUM,
 								    (long)lc);
-		changed_lines((linenr_T)val1, 0, (linenr_T)val2 + 1, (long)lc);
-		break;
+		changed_সারিগুলি((linenr_T)val1, 0, (linenr_T)val2 + 1, (long)lc);
+		বিরতি;
     setListError:
 		u_undo(1);  // ???
-		Tcl_SetResult(interp, _("cannot set line(s)"), TCL_STATIC);
+		Tcl_Set_ফলাফল(interp, _("cannot set line(s)"), TCL_STATIC);
 		err = TCL_ERROR;
 	    }
-	    break;
+	    বিরতি;
 
-	case BUF_DELETE:
-	    if (objc != 3  &&  objc != 4)
+	ক্ষেত্র BUF_DELETE:
+	    যদি (objc != 3  &&  objc != 4)
 	    {
-		Tcl_WrongNumArgs(interp, 3, objv, "lineNumber ?lineNumber?");
+		Tcl_Wrong_অঙ্ক_Args(interp, 3, objv, "lineNumber ?lineNumber?");
 		err = TCL_ERROR;
-		break;
+		বিরতি;
 	    }
 	    err = tclgetlinenum(interp, objv[2], &val1, buf);
-	    if (err != TCL_OK)
-		break;
+	    যদি (err != TCL_OK)
+		বিরতি;
 	    val2 = val1;
-	    if (objc == 4)
+	    যদি (objc == 4)
 	    {
 		err = tclgetlinenum(interp, objv[3], &val2, buf);
-		if (err != TCL_OK)
-		    return err;
-		if (val1 > val2)
+		যদি (err != TCL_OK)
+		    ফেরত err;
+		যদি (val1 > val2)
 		{
 		    i = val1; val1 = val2; val2 = i;
 		}
 	    }
 	    n = val2 - val1 + 1;
-	    if (u_savedel((linenr_T)val1, (long)n) != OK)
+	    যদি (u_savedel((linenr_T)val1, (long)n) != OK)
 	    {
-		Tcl_SetResult(interp, _("cannot save undo information"),
+		Tcl_Set_ফলাফল(interp, _("cannot save undo information"),
 								  TCL_STATIC);
 		err = TCL_ERROR;
-		break;
+		বিরতি;
 	    }
-	    for (i = 0; i < n; i++)
+	    জন্য (i = 0; i < n; i++)
 	    {
 		ml_delete((linenr_T)val1);
 		err = vimerror(interp);
-		if (err != TCL_OK)
-		    break;
+		যদি (err != TCL_OK)
+		    বিরতি;
 	    }
-	    if (i > 0)
-		deleted_lines_mark((linenr_T)val1, (long)i);
+	    যদি (i > 0)
+		deleted_সারিগুলি_mark((linenr_T)val1, (long)i);
 	    flags |= FL_ADJUST_CURSOR|FL_UPDATE_SCREEN;
-	    break;
+	    বিরতি;
 
-	case BUF_MARK:
-	    if (objc != 3)
+	ক্ষেত্র BUF_MARK:
+	    যদি (objc != 3)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "markName");
+		Tcl_Wrong_অঙ্ক_Args(interp, 2, objv, "markName");
 		err = TCL_ERROR;
-		break;
+		বিরতি;
 	    }
-	    line = Tcl_GetStringFromObj(objv[2], NULL);
+	    সারি = Tcl_GetStringFromObj(objv[2], ফাঁকা);
 
-	    pos = NULL;
-	    if (line[0] != '\0'  &&  line[1] == '\0')
-		pos = getmark(line[0], FALSE);
-	    if (pos == NULL)
+	    pos = ফাঁকা;
+	    যদি (সারি[0] != '\0'  &&  সারি[1] == '\0')
+		pos = getmark(সারি[0], FALSE);
+	    যদি (pos == ফাঁকা)
 	    {
-		Tcl_SetResult(interp, _("invalid mark name"), TCL_STATIC);
+		Tcl_Set_ফলাফল(interp, _("invalid mark name"), TCL_STATIC);
 		err = TCL_ERROR;
-		break;
+		বিরতি;
 	    }
 	    err = vimerror(interp);
-	    if (err != TCL_OK)
-		break;
-	    if (pos->lnum <= 0)
+	    যদি (err != TCL_OK)
+		বিরতি;
+	    যদি (pos->lnum <= 0)
 	    {
-		Tcl_SetResult(interp, _("mark not set"), TCL_STATIC);
+		Tcl_Set_ফলাফল(interp, _("mark not set"), TCL_STATIC);
 		err = TCL_ERROR;
 	    }
-	    else
+	    অন্যথা
 	    {
-		char rbuf[64];
+		অক্ষর rbuf[64];
 
 		sprintf(rbuf, _("row %d column %d"),
-			     (int)row2tcl(pos->lnum), (int)col2tcl(pos->col));
-		Tcl_SetResult(interp, rbuf, TCL_VOLATILE);
+			     (পূর্ণসংখ্যা)row2tcl(pos->lnum), (পূর্ণসংখ্যা)col2tcl(pos->col));
+		Tcl_Set_ফলাফল(interp, rbuf, TCL_VOLATILE);
 	    }
-	    break;
+	    বিরতি;
 
-	case BUF_INSERT:
+	ক্ষেত্র BUF_ঢোকাও:
 	    opt = 1;
 	    // fallthrough
-	case BUF_APPEND:
-	    if (objc != 4)
+	ক্ষেত্র BUF_APPEND:
+	    যদি (objc != 4)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "lineNum text");
+		Tcl_Wrong_অঙ্ক_Args(interp, 2, objv, "lineNum text");
 		err = TCL_ERROR;
-		break;
+		বিরতি;
 	    }
 	    err = tclgetlinenum(interp, objv[2], &val1, buf);
-	    if (err != TCL_OK)
-		break;
-	    if (opt)
+	    যদি (err != TCL_OK)
+		বিরতি;
+	    যদি (opt)
 		--val1;
-	    if (u_save((linenr_T)val1, (linenr_T)(val1+1)) != OK)
+	    যদি (u_save((linenr_T)val1, (linenr_T)(val1+1)) != OK)
 	    {
-		Tcl_SetResult(interp, _("cannot save undo information"),
+		Tcl_Set_ফলাফল(interp, _("cannot save undo information"),
 								  TCL_STATIC);
 		err = TCL_ERROR;
-		break;
+		বিরতি;
 	    }
 
-	    line = Tcl_GetStringFromObj(objv[3], NULL);
-	    if (ml_append((linenr_T)val1, (char_u *)line, 0, FALSE) != OK)
+	    সারি = Tcl_GetStringFromObj(objv[3], ফাঁকা);
+	    যদি (ml_append((linenr_T)val1, (char_u *)সারি, 0, FALSE) != OK)
 	    {
-		Tcl_SetResult(interp, _("cannot insert/append line"),
+		Tcl_Set_ফলাফল(interp, _("cannot insert/append line"),
 								  TCL_STATIC);
 		err = TCL_ERROR;
-		break;
+		বিরতি;
 	    }
-	    appended_lines_mark((linenr_T)val1, 1L);
+	    appended_সারিগুলি_mark((linenr_T)val1, 1L);
 	    flags |= FL_UPDATE_SCREEN;
-	    break;
+	    বিরতি;
 
-	case BUF_WINDOWS:
+	ক্ষেত্র BUF_WINDOWS:
 	    /*
 	     * Return list of window commands.
 	     */
-	    if (objc != 2)
+	    যদি (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, NULL);
+		Tcl_Wrong_অঙ্ক_Args(interp, 2, objv, ফাঁকা);
 		err = TCL_ERROR;
-		break;
+		বিরতি;
 	    }
-	    Tcl_ResetResult(interp);
+	    Tcl_Reset_ফলাফল(interp);
 	    FOR_ALL_WINDOWS(win)
 	    {
-		if (win->w_buffer == buf)
+		যদি (win->w_বাফার == buf)
 		{
-		    line = tclgetwindow(interp, win);
-		    if (line != NULL)
-			Tcl_AppendElement(interp, line);
-		    else
+		    সারি = tclgetwindow(interp, win);
+		    যদি (সারি != ফাঁকা)
+			Tcl_AppendElement(interp, সারি);
+		    অন্যথা
 		    {
 			err = TCL_ERROR;
-			break;
+			বিরতি;
 		    }
 		}
 	    }
-	    break;
+	    বিরতি;
 
-	case BUF_DELCMD:
+	ক্ষেত্র BUF_DELCMD:
 	    /*
 	     * Register deletion callback.
 	     * TODO: Should be able to register multiple callbacks
 	     */
-	    if (objc != 3)
+	    যদি (objc != 3)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "command");
+		Tcl_Wrong_অঙ্ক_Args(interp, 2, objv, "command");
 		err = TCL_ERROR;
-		break;
+		বিরতি;
 	    }
-	    err = tclsetdelcmd(interp, buf->b_tcl_ref, (void *)buf, objv[2]);
-	    break;
+	    err = tclsetdelcmd(interp, buf->b_tcl_ref, (শূন্য *)buf, objv[2]);
+	    বিরতি;
 
-	default:
-	    Tcl_SetResult(interp, _("not implemented yet"), TCL_STATIC);
+	পূর্বনির্ধারিত:
+	    Tcl_Set_ফলাফল(interp, _("not implemented yet"), TCL_STATIC);
 	    err = TCL_ERROR;
     }
 
-    if (flags & FL_UPDATE_CURBUF)
+    যদি (flags & FL_UPDATE_CURBUF)
 	redraw_curbuf_later(UPD_NOT_VALID);
     curbuf = savebuf;
     curwin = savewin;
-    if (flags & FL_ADJUST_CURSOR)
+    যদি (flags & FL_ADJUST_CURSOR)
 	check_cursor();
-    if (flags & (FL_UPDATE_SCREEN | FL_UPDATE_CURBUF))
+    যদি (flags & (FL_UPDATE_SCREEN | FL_UPDATE_CURBUF))
 	update_screen(UPD_NOT_VALID);
 
-    return err;
+    ফেরত err;
 }
 
 /*
  * This function implements the window commands.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 winselfcmd(
-    ClientData	ref,
+    Client_তথ্য	ref,
     Tcl_Interp	*interp,
-    int		objc,
+    পূর্ণসংখ্যা		objc,
     Tcl_Obj	*CONST objv[])
 {
-    int		err, idx, flags;
-    int		val1, val2;
+    পূর্ণসংখ্যা		err, idx, flags;
+    পূর্ণসংখ্যা		val1, val2;
     Tcl_Obj	*resobj;
     win_T	*savewin, *win;
     buf_T	*savebuf;
-    char	*str;
+    অক্ষর	*str;
 
-    enum
+    গণনা
     {
-	WIN_BUFFER, WIN_COMMAND, WIN_CURSOR, WIN_DELCMD, WIN_EXPR,
+	WIN_বাফার, WIN_COMMAND, WIN_CURSOR, WIN_DELCMD, WIN_রাশিমালা,
 	WIN_HEIGHT, WIN_OPTION
     };
-    static CONST84 char *winoptions[] =
+    স্থির CONST84 অক্ষর *winoptions[] =
     {
 	"buffer", "command", "cursor", "delcmd", "expr",
-	"height", "option", (char *)0
+	"height", "option", (অক্ষর *)0
     };
 
-    if (objc < 2)
+    যদি (objc < 2)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "option ?arg ...?");
-	return TCL_ERROR;
+	Tcl_Wrong_অঙ্ক_Args(interp, 1, objv, "option ?arg ...?");
+	ফেরত TCL_ERROR;
     }
 
-    err = Tcl_GetIndexFromObj(interp, objv[1], winoptions, "option", 0,  &idx);
-    if (err != TCL_OK)
-	return TCL_ERROR;
+    err = Tcl_Get_সূচক_From_Obj(interp, objv[1], winoptions, "option", 0,  &idx);
+    যদি (err != TCL_OK)
+	ফেরত TCL_ERROR;
 
-    win = (win_T *)((struct ref *)ref)->vimobj;
+    win = (win_T *)((কাঠামো ref *)ref)->vimobj;
     savewin = curwin;  curwin = win;
-    savebuf = curbuf;  curbuf = win->w_buffer;
+    savebuf = curbuf;  curbuf = win->w_বাফার;
     flags = 0;
 
-    switch (idx)
+    নির্বাচন (idx)
     {
-	case WIN_OPTION:
+	ক্ষেত্র WIN_OPTION:
 	    err = tclsetoption(interp, objc, objv, 2);
 	    flags |= FL_UPDATE_SCREEN;
-	    break;
+	    বিরতি;
 
-	case WIN_COMMAND:
+	ক্ষেত্র WIN_COMMAND:
 	    err = tcldoexcommand(interp, objc, objv, 2);
 	    flags |= FL_UPDATE_SCREEN;
-	    break;
+	    বিরতি;
 
-	case WIN_EXPR:
+	ক্ষেত্র WIN_রাশিমালা:
 	    err = tclvimexpr(interp, objc, objv, 2);
-	    break;
+	    বিরতি;
 
-	case WIN_HEIGHT:
-	    if (objc == 3)
+	ক্ষেত্র WIN_HEIGHT:
+	    যদি (objc == 3)
 	    {
 		err = Tcl_GetIntFromObj(interp, objv[2], &val1);
-		if (err != TCL_OK)
-		    break;
+		যদি (err != TCL_OK)
+		    বিরতি;
 #ifdef FEAT_GUI
 		need_mouse_correct = TRUE;
 #endif
 		win_setheight(val1);
 		err = vimerror(interp);
-		if (err != TCL_OK)
-		    break;
+		যদি (err != TCL_OK)
+		    বিরতি;
 	    }
-	    else
-	    if (objc != 2)
+	    অন্যথা
+	    যদি (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "?value?");
+		Tcl_Wrong_অঙ্ক_Args(interp, 2, objv, "?value?");
 		err = TCL_ERROR;
-		break;
+		বিরতি;
 	    }
 
-	    resobj = Tcl_NewIntObj((int)(win->w_height));
-	    Tcl_SetObjResult(interp, resobj);
-	    break;
+	    resobj = Tcl_NewIntObj((পূর্ণসংখ্যা)(win->w_height));
+	    Tcl_Set_Obj_ফলাফল(interp, resobj);
+	    বিরতি;
 
-	case WIN_BUFFER:
-	    if (objc != 2)
+	ক্ষেত্র WIN_বাফার:
+	    যদি (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, NULL);
+		Tcl_Wrong_অঙ্ক_Args(interp, 2, objv, ফাঁকা);
 		err = TCL_ERROR;
-		break;
+		বিরতি;
 	    }
-	    str = tclgetbuffer(interp, win->w_buffer);
-	    if (str)
-		Tcl_SetResult(interp, str, TCL_VOLATILE);
-	    else
+	    str = tclgetbuffer(interp, win->w_বাফার);
+	    যদি (str)
+		Tcl_Set_ফলাফল(interp, str, TCL_VOLATILE);
+	    অন্যথা
 		err = TCL_ERROR;
-	    break;
+	    বিরতি;
 
-	case WIN_DELCMD:
-	    if (objc != 3)
+	ক্ষেত্র WIN_DELCMD:
+	    যদি (objc != 3)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "command");
+		Tcl_Wrong_অঙ্ক_Args(interp, 2, objv, "command");
 		err = TCL_ERROR;
-		break;
+		বিরতি;
 	    }
-	    err = tclsetdelcmd(interp, win->w_tcl_ref, (void *)win, objv[2]);
-	    break;
+	    err = tclsetdelcmd(interp, win->w_tcl_ref, (শূন্য *)win, objv[2]);
+	    বিরতি;
 
-	case WIN_CURSOR:
-	    if (objc > 4)
+	ক্ষেত্র WIN_CURSOR:
+	    যদি (objc > 4)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "?arg1 ?arg2??");
+		Tcl_Wrong_অঙ্ক_Args(interp, 2, objv, "?arg1 ?arg2??");
 		err = TCL_ERROR;
-		break;
+		বিরতি;
 	    }
-	    if (objc == 2)
+	    যদি (objc == 2)
 	    {
-		char buf[64];
+		অক্ষর buf[64];
 
-		sprintf(buf, _("row %d column %d"), (int)row2tcl(win->w_cursor.lnum), (int)col2tcl(win->w_cursor.col));
-		Tcl_SetResult(interp, buf, TCL_VOLATILE);
-		break;
+		sprintf(buf, _("row %d column %d"), (পূর্ণসংখ্যা)row2tcl(win->w_cursor.lnum), (পূর্ণসংখ্যা)col2tcl(win->w_cursor.col));
+		Tcl_Set_ফলাফল(interp, buf, TCL_VOLATILE);
+		বিরতি;
 	    }
-	    else if (objc == 3)
+	    অন্যথা যদি (objc == 3)
 	    {
 		Tcl_Obj *part, *var;
 
 		part = Tcl_NewStringObj("row", -1);
-		var = Tcl_ObjGetVar2(interp, objv[2], part, TCL_LEAVE_ERR_MSG);
-		if (var == NULL)
+		var = Tcl_ObjGetVar2(interp, objv[2], part, TCL_LEAVE_ERR_বার্তা);
+		যদি (var == ফাঁকা)
 		{
 		    err = TCL_ERROR;
-		    break;
+		    বিরতি;
 		}
-		err = tclgetlinenum(interp, var, &val1, win->w_buffer);
-		if (err != TCL_OK)
-		    break;
+		err = tclgetlinenum(interp, var, &val1, win->w_বাফার);
+		যদি (err != TCL_OK)
+		    বিরতি;
 		part = Tcl_NewStringObj("column", -1);
-		var = Tcl_ObjGetVar2(interp, objv[2], part, TCL_LEAVE_ERR_MSG);
-		if (var == NULL)
+		var = Tcl_ObjGetVar2(interp, objv[2], part, TCL_LEAVE_ERR_বার্তা);
+		যদি (var == ফাঁকা)
 		{
 		    err = TCL_ERROR;
-		    break;
+		    বিরতি;
 		}
 		err = Tcl_GetIntFromObj(interp, var, &val2);
-		if (err != TCL_OK)
-		    break;
+		যদি (err != TCL_OK)
+		    বিরতি;
 	    }
-	    else
+	    অন্যথা
 	    {  // objc == 4
-		err = tclgetlinenum(interp, objv[2], &val1, win->w_buffer);
-		if (err != TCL_OK)
-		    break;
+		err = tclgetlinenum(interp, objv[2], &val1, win->w_বাফার);
+		যদি (err != TCL_OK)
+		    বিরতি;
 		err = Tcl_GetIntFromObj(interp, objv[3], &val2);
-		if (err != TCL_OK)
-		    break;
+		যদি (err != TCL_OK)
+		    বিরতি;
 	    }
 	    // TODO: should check column
 	    win->w_cursor.lnum = val1;
 	    win->w_cursor.col = col2vim(val2);
 	    win->w_set_curswant = true;
 	    flags |= FL_UPDATE_SCREEN;
-	    break;
+	    বিরতি;
 
-	default:
-	    Tcl_SetResult(interp, _("not implemented yet"), TCL_STATIC);
-	    break;
+	পূর্বনির্ধারিত:
+	    Tcl_Set_ফলাফল(interp, _("not implemented yet"), TCL_STATIC);
+	    বিরতি;
     }
 
     curwin = savewin;
     curbuf = savebuf;
-    if (flags & FL_UPDATE_SCREEN)
+    যদি (flags & FL_UPDATE_SCREEN)
 	update_screen(UPD_NOT_VALID);
 
-    return err;
+    ফেরত err;
 }
 
 
-    static int
+    স্থির পূর্ণসংখ্যা
 commandcmd(
-    ClientData	dummy UNUSED,
+    Client_তথ্য	dummy UNUSED,
     Tcl_Interp	*interp,
-    int		objc,
+    পূর্ণসংখ্যা		objc,
     Tcl_Obj	*CONST objv[])
 {
-    int		err;
+    পূর্ণসংখ্যা		err;
 
     err = tcldoexcommand(interp, objc, objv, 1);
     update_screen(UPD_VALID);
-    return err;
+    ফেরত err;
 }
 
-    static int
+    স্থির পূর্ণসংখ্যা
 optioncmd(
-    ClientData	dummy UNUSED,
+    Client_তথ্য	dummy UNUSED,
     Tcl_Interp	*interp,
-    int		objc,
+    পূর্ণসংখ্যা		objc,
     Tcl_Obj	*CONST objv[])
 {
-    int		err;
+    পূর্ণসংখ্যা		err;
 
     err = tclsetoption(interp, objc, objv, 1);
     update_screen(UPD_VALID);
-    return err;
+    ফেরত err;
 }
 
-    static int
+    স্থির পূর্ণসংখ্যা
 exprcmd(
-    ClientData	dummy UNUSED,
+    Client_তথ্য	dummy UNUSED,
     Tcl_Interp	*interp,
-    int		objc,
+    পূর্ণসংখ্যা		objc,
     Tcl_Obj	*CONST objv[])
 {
-    return tclvimexpr(interp, objc, objv, 1);
+    ফেরত tclvimexpr(interp, objc, objv, 1);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1166,271 +1166,271 @@ exprcmd(
 /*
  * Get a line number from 'obj' and convert it to vim's range.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 tclgetlinenum(
     Tcl_Interp	*interp,
     Tcl_Obj	*obj,
-    int		*valueP,
+    পূর্ণসংখ্যা		*মান_P,
     buf_T	*buf)
 {
-    int err, i;
+    পূর্ণসংখ্যা err, i;
 
-    enum { LN_BEGIN, LN_BOTTOM, LN_END, LN_FIRST, LN_LAST, LN_START, LN_TOP };
+    গণনা { LN_BEGIN, LN_BOTTOM, LN_END, LN_FIRST, LN_LAST, LN_START, LN_শীর্ষ };
 
-    static CONST84 char *keyw[] =
+    স্থির CONST84 অক্ষর *keyw[] =
     {
-	"begin", "bottom", "end", "first", "last", "start", "top", (char *)0
+	"begin", "bottom", "end", "first", "last", "start", "top", (অক্ষর *)0
     };
 
-    err = Tcl_GetIndexFromObj(interp, obj, keyw, "", 0, &i);
-    if (err == TCL_OK)
+    err = Tcl_Get_সূচক_From_Obj(interp, obj, keyw, "", 0, &i);
+    যদি (err == TCL_OK)
     {
-	switch (i)
+	নির্বাচন (i)
 	{
-	    case LN_BEGIN:
-	    case LN_FIRST:
-	    case LN_START:
-	    case LN_TOP:
-		*valueP = 1;
-		break;
-	    case LN_BOTTOM:
-	    case LN_END:
-	    case LN_LAST:
-		*valueP = buf->b_ml.ml_line_count;
-		break;
+	    ক্ষেত্র LN_BEGIN:
+	    ক্ষেত্র LN_FIRST:
+	    ক্ষেত্র LN_START:
+	    ক্ষেত্র LN_শীর্ষ:
+		*মান_P = 1;
+		বিরতি;
+	    ক্ষেত্র LN_BOTTOM:
+	    ক্ষেত্র LN_END:
+	    ক্ষেত্র LN_LAST:
+		*মান_P = buf->b_ml.ml_সারি_গুনতি;
+		বিরতি;
 	}
-	return TCL_OK;
+	ফেরত TCL_OK;
     }
-    Tcl_ResetResult(interp);
+    Tcl_Reset_ফলাফল(interp);
 
     err = Tcl_GetIntFromObj(interp, obj, &i);
-    if (err != TCL_OK)
-	return err;
+    যদি (err != TCL_OK)
+	ফেরত err;
     i = row2vim(i);
-    if (i < 1  ||  i > buf->b_ml.ml_line_count)
+    যদি (i < 1  ||  i > buf->b_ml.ml_সারি_গুনতি)
     {
-	Tcl_SetResult(interp, _("line number out of range"), TCL_STATIC);
-	return TCL_ERROR;
+	Tcl_Set_ফলাফল(interp, _("line number out of range"), TCL_STATIC);
+	ফেরত TCL_ERROR;
     }
-    *valueP = i;
-    return TCL_OK;
+    *মান_P = i;
+    ফেরত TCL_OK;
 }
 
 /*
  * Find the first window in the window list that displays the buffer.
  */
-    static win_T *
+    স্থির win_T *
 tclfindwin(buf_T *buf)
 {
     win_T *win;
 
     FOR_ALL_WINDOWS(win)
     {
-	if (win->w_buffer == buf)
-	    return win;
+	যদি (win->w_বাফার == buf)
+	    ফেরত win;
     }
-    return curwin;  // keep current window context
+    ফেরত curwin;  // keep current window context
 }
 
 /*
  * Do-it-all function for "::vim::command", "$buf command" and "$win command".
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 tcldoexcommand(
     Tcl_Interp	*interp,
-    int		objc,
+    পূর্ণসংখ্যা		objc,
     Tcl_Obj	*CONST objv[],
-    int		objn)
+    পূর্ণসংখ্যা		objn)
 {
     tcl_info	saveinfo;
-    int		err, flag, nobjs;
-    char	*arg;
+    পূর্ণসংখ্যা		err, flag, nobjs;
+    অক্ষর	*arg;
 
     nobjs = objc - objn;
-    if (nobjs < 1 || nobjs > 2)
+    যদি (nobjs < 1 || nobjs > 2)
     {
-	Tcl_WrongNumArgs(interp, objn, objv, "?-quiet? exCommand");
-	return TCL_ERROR;
+	Tcl_Wrong_অঙ্ক_Args(interp, objn, objv, "?-quiet? exCommand");
+	ফেরত TCL_ERROR;
     }
 
     flag = 0;
-    if (nobjs == 2)
+    যদি (nobjs == 2)
     {
-	arg = Tcl_GetStringFromObj(objv[objn], NULL);
-	if (strcmp(arg, "-quiet") == 0)
+	arg = Tcl_GetStringFromObj(objv[objn], ফাঁকা);
+	যদি (strcmp(arg, "-quiet") == 0)
 	    flag = 1;
-	else
+	অন্যথা
 	{
-	    Tcl_ResetResult(interp);
-	    Tcl_AppendResult(interp, _("unknown flag: "), arg, (char *)0);
-	    return TCL_ERROR;
+	    Tcl_Reset_ফলাফল(interp);
+	    Tcl_Append_ফলাফল(interp, _("unknown flag: "), arg, (অক্ষর *)0);
+	    ফেরত TCL_ERROR;
 	}
 	++objn;
     }
 
-    memcpy(&saveinfo, &tclinfo, sizeof(tcl_info));
-    tclinfo.interp = NULL;
-    tclinfo.curwin = NULL;
-    tclinfo.curbuf = NULL;
+    memcpy(&saveinfo, &tclinfo, আকার(tcl_info));
+    tclinfo.interp = ফাঁকা;
+    tclinfo.curwin = ফাঁকা;
+    tclinfo.curbuf = ফাঁকা;
 
-    arg = Tcl_GetStringFromObj(objv[objn], NULL);
-    if (flag)
+    arg = Tcl_GetStringFromObj(objv[objn], ফাঁকা);
+    যদি (flag)
 	++emsg_off;
     do_cmdline_cmd((char_u *)arg);
-    if (flag)
+    যদি (flag)
 	--emsg_off;
     err = vimerror(interp);
 
     // If the ex command created a new Tcl interpreter, remove it
-    if (tclinfo.interp)
+    যদি (tclinfo.interp)
 	tcldelthisinterp();
-    memcpy(&tclinfo, &saveinfo, sizeof(tcl_info));
+    memcpy(&tclinfo, &saveinfo, আকার(tcl_info));
     tclupdatevars();
 
-    return err;
+    ফেরত err;
 }
 
 /*
  * Do-it-all function for "::vim::option", "$buf option" and "$win option".
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 tclsetoption(
     Tcl_Interp	*interp,
-    int		objc,
+    পূর্ণসংখ্যা		objc,
     Tcl_Obj	*CONST objv[],
-    int		objn)
+    পূর্ণসংখ্যা		objn)
 {
-    int		err, nobjs, idx;
+    পূর্ণসংখ্যা		err, nobjs, idx;
     char_u	*option;
     getoption_T	gov;
     long	lval;
     char_u	*sval;
     Tcl_Obj	*resobj;
 
-    enum { OPT_OFF, OPT_ON, OPT_TOGGLE };
-    static CONST84 char *optkw[] = { "off", "on", "toggle", (char *)0 };
+    গণনা { OPT_OFF, OPT_ON, OPT_TOGGLE };
+    স্থির CONST84 অক্ষর *optkw[] = { "off", "on", "toggle", (অক্ষর *)0 };
 
     nobjs = objc - objn;
-    if (nobjs != 1 && nobjs != 2)
+    যদি (nobjs != 1 && nobjs != 2)
     {
-	Tcl_WrongNumArgs(interp, objn, objv, "vimOption ?value?");
-	return TCL_ERROR;
+	Tcl_Wrong_অঙ্ক_Args(interp, objn, objv, "vimOption ?value?");
+	ফেরত TCL_ERROR;
     }
 
-    option = (char_u *)Tcl_GetStringFromObj(objv[objn], NULL);
+    option = (char_u *)Tcl_GetStringFromObj(objv[objn], ফাঁকা);
     ++objn;
-    gov = get_option_value(option, &lval, &sval, NULL, 0);
+    gov = get_option_মান(option, &lval, &sval, ফাঁকা, 0);
     err = TCL_OK;
-    switch (gov)
+    নির্বাচন (gov)
     {
-	case gov_string:
-	    Tcl_SetResult(interp, (char *)sval, TCL_VOLATILE);
+	ক্ষেত্র gov_string:
+	    Tcl_Set_ফলাফল(interp, (অক্ষর *)sval, TCL_VOLATILE);
 	    vim_free(sval);
-	    break;
-	case gov_bool:
-	case gov_number:
+	    বিরতি;
+	ক্ষেত্র gov_bool:
+	ক্ষেত্র gov_সংখ্যা:
 	    resobj = Tcl_NewLongObj(lval);
-	    Tcl_SetObjResult(interp, resobj);
-	    break;
-	default:
-	    Tcl_SetResult(interp, _("unknown vimOption"), TCL_STATIC);
-	    return TCL_ERROR;
+	    Tcl_Set_Obj_ফলাফল(interp, resobj);
+	    বিরতি;
+	পূর্বনির্ধারিত:
+	    Tcl_Set_ফলাফল(interp, _("unknown vimOption"), TCL_STATIC);
+	    ফেরত TCL_ERROR;
     }
-    if (nobjs == 2)
+    যদি (nobjs == 2)
     {
-	if (gov != gov_string)
+	যদি (gov != gov_string)
 	{
-	    sval = NULL;    // avoid compiler warning
-	    err = Tcl_GetIndexFromObj(interp, objv[objn], optkw, "", 0, &idx);
-	    if (err != TCL_OK)
+	    sval = ফাঁকা;    // avoid compiler warning
+	    err = Tcl_Get_সূচক_From_Obj(interp, objv[objn], optkw, "", 0, &idx);
+	    যদি (err != TCL_OK)
 	    {
-		Tcl_ResetResult(interp);
+		Tcl_Reset_ফলাফল(interp);
 		err = Tcl_GetLongFromObj(interp, objv[objn], &lval);
 	    }
-	    else
+	    অন্যথা
 	    {
-		switch (idx)
+		নির্বাচন (idx)
 		{
-		    case OPT_ON:
+		    ক্ষেত্র OPT_ON:
 			lval = 1;
-			break;
-		    case OPT_OFF:
+			বিরতি;
+		    ক্ষেত্র OPT_OFF:
 			lval = 0;
-			break;
-		    case OPT_TOGGLE:
+			বিরতি;
+		    ক্ষেত্র OPT_TOGGLE:
 			lval = !lval;
-			break;
+			বিরতি;
 		}
 	    }
 	}
-	else
-	    sval = (char_u *)Tcl_GetStringFromObj(objv[objn], NULL);
-	if (err == TCL_OK)
+	অন্যথা
+	    sval = (char_u *)Tcl_GetStringFromObj(objv[objn], ফাঁকা);
+	যদি (err == TCL_OK)
 	{
-	    set_option_value_give_err(option, lval, sval, OPT_LOCAL);
+	    set_option_মান_give_err(option, lval, sval, OPT_LOCAL);
 	    err = vimerror(interp);
 	}
     }
-    return err;
+    ফেরত err;
 }
 
 /*
  * Do-it-all function for "::vim::expr", "$buf expr" and "$win expr".
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 tclvimexpr(
     Tcl_Interp	*interp,
-    int		objc,
+    পূর্ণসংখ্যা		objc,
     Tcl_Obj	*CONST objv[],
-    int		objn)
+    পূর্ণসংখ্যা		objn)
 {
 #ifdef FEAT_EVAL
-    char	*expr, *str;
+    অক্ষর	*রাশিমালা, *str;
 #endif
-    int		err;
+    পূর্ণসংখ্যা		err;
 
-    if (objc - objn != 1)
+    যদি (objc - objn != 1)
     {
-	Tcl_WrongNumArgs(interp, objn, objv, "vimExpr");
-	return TCL_ERROR;
+	Tcl_Wrong_অঙ্ক_Args(interp, objn, objv, "vimExpr");
+	ফেরত TCL_ERROR;
     }
 
 #ifdef FEAT_EVAL
-    expr = Tcl_GetStringFromObj(objv[objn], NULL);
-    str = (char *)eval_to_string((char_u *)expr, TRUE, FALSE);
-    if (str == NULL)
-	Tcl_SetResult(interp, _("invalid expression"), TCL_STATIC);
-    else
+    রাশিমালা = Tcl_GetStringFromObj(objv[objn], ফাঁকা);
+    str = (অক্ষর *)eval_to_string((char_u *)রাশিমালা, TRUE, FALSE);
+    যদি (str == ফাঁকা)
+	Tcl_Set_ফলাফল(interp, _("invalid expression"), TCL_STATIC);
+    অন্যথা
     {
-	Tcl_SetResult(interp, str, TCL_VOLATILE);
+	Tcl_Set_ফলাফল(interp, str, TCL_VOLATILE);
 	vim_free(str);
     }
     err = vimerror(interp);
-#else
-    Tcl_SetResult(interp, _("expressions disabled at compile time"), TCL_STATIC);
+#অন্যথা
+    Tcl_Set_ফলাফল(interp, _("expressions disabled at compile time"), TCL_STATIC);
     err = TCL_ERROR;
 #endif
 
-    return err;
+    ফেরত err;
 }
 
 /*
  * Check for internal vim errors.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 vimerror(Tcl_Interp *interp)
 {
-    if (got_int)
+    যদি (got_int)
     {
-	Tcl_SetResult(interp, _("keyboard interrupt"), TCL_STATIC);
-	return TCL_ERROR;
+	Tcl_Set_ফলাফল(interp, _("keyboard interrupt"), TCL_STATIC);
+	ফেরত TCL_ERROR;
     }
-    else if (did_emsg)
+    অন্যথা যদি (did_emsg)
     {
-	Tcl_SetResult(interp, _("Vim error"), TCL_STATIC);
-	return TCL_ERROR;
+	Tcl_Set_ফলাফল(interp, _("Vim error"), TCL_STATIC);
+	ফেরত TCL_ERROR;
     }
-    return TCL_OK;
+    ফেরত TCL_OK;
 }
 
 /*
@@ -1441,120 +1441,120 @@ vimerror(Tcl_Interp *interp)
  *   tclgetbuffer() - buffer frontend for tclgetref()
  *   tclsetdelcmd() - add Tcl callback command to a vim object
  */
-    static void
-delref(ClientData cref)
+    স্থির শূন্য
+delref(Client_তথ্য cref)
 {
-    struct ref *ref = (struct ref *)cref;
+    কাঠামো ref *ref = (কাঠামো ref *)cref;
 
-    if (ref->delcmd)
+    যদি (ref->delcmd)
     {
-	Tcl_DecrRefCount(ref->delcmd);
-	ref->delcmd = NULL;
+	Tcl_Decr_Ref_গুনতি(ref->delcmd);
+	ref->delcmd = ফাঁকা;
     }
-    ref->interp = NULL;
+    ref->interp = ফাঁকা;
 }
 
-    static char *
+    স্থির অক্ষর *
 tclgetref(
     Tcl_Interp	*interp,
-    void	**refstartP,	// ptr to w_tcl_ref/b_tcl-ref member of
+    শূন্য	**refstartP,	// ptr to w_tcl_ref/b_tcl-ref member of
 				// win_T/buf_T struct
-    char	*prefix,	// "win" or "buf"
-    void	*vimobj,	// win_T* or buf_T*
+    অক্ষর	*prefix,	// "win" or "buf"
+    শূন্য	*vimobj,	// win_T* or buf_T*
     Tcl_ObjCmdProc *proc)	// winselfcmd or bufselfcmd
 {
-    struct ref *ref, *unused = NULL;
-    static char name[VARNAME_SIZE];
+    কাঠামো ref *ref, *unused = ফাঁকা;
+    স্থির অক্ষর name[VARNAME_আকার];
     Tcl_Command cmd;
 
-    ref = (struct ref *)(*refstartP);
-    if (ref == &refsdeleted)
+    ref = (কাঠামো ref *)(*refstartP);
+    যদি (ref == &refsdeleted)
     {
-	Tcl_SetResult(interp, _("cannot create buffer/window command: object is being deleted"), TCL_STATIC);
-	return NULL;
+	Tcl_Set_ফলাফল(interp, _("cannot create buffer/window command: object is being deleted"), TCL_STATIC);
+	ফেরত ফাঁকা;
     }
 
-    while (ref != NULL)
+    যখন (ref != ফাঁকা)
     {
-	if (ref->interp == interp)
-	    break;
-	if (ref->interp == NULL)
+	যদি (ref->interp == interp)
+	    বিরতি;
+	যদি (ref->interp == ফাঁকা)
 	    unused = ref;
-	ref = ref->next;
+	ref = ref->পরবর্তী;
     }
 
-    if (ref)
-	vim_snprintf(name, sizeof(name), "::vim::%s",
+    যদি (ref)
+	vim_snprintf(name, আকার(name), "::vim::%s",
 					Tcl_GetCommandName(interp, ref->cmd));
-    else
+    অন্যথা
     {
-	if (unused)
+	যদি (unused)
 	    ref = unused;
-	else
+	অন্যথা
 	{
-	    ref = (struct ref *)Tcl_Alloc(sizeof(struct ref));
-	    ref->interp = NULL;
-	    ref->next = (struct ref *)(*refstartP);
-	    (*refstartP) = (void *)ref;
+	    ref = (কাঠামো ref *)Tcl_Alloc(আকার(কাঠামো ref));
+	    ref->interp = ফাঁকা;
+	    ref->পরবর্তী = (কাঠামো ref *)(*refstartP);
+	    (*refstartP) = (শূন্য *)ref;
 	}
 
 	// This might break on some exotic systems...
-	vim_snprintf(name, sizeof(name), "::vim::%s_%lx",
+	vim_snprintf(name, আকার(name), "::vim::%s_%lx",
 					       prefix, (unsigned long)vimobj);
 	cmd = Tcl_CreateObjCommand(interp, name, proc,
-	    (ClientData)ref, (Tcl_CmdDeleteProc *)delref);
-	if (!cmd)
-	    return NULL;
+	    (Client_তথ্য)ref, (Tcl_CmdDeleteProc *)delref);
+	যদি (!cmd)
+	    ফেরত ফাঁকা;
 
 	ref->interp = interp;
 	ref->cmd = cmd;
-	ref->delcmd = NULL;
+	ref->delcmd = ফাঁকা;
 	ref->vimobj = vimobj;
     }
-    return name;
+    ফেরত name;
 }
 
-    static char *
+    স্থির অক্ষর *
 tclgetwindow(Tcl_Interp *interp, win_T *win)
 {
-    return tclgetref(interp, &(win->w_tcl_ref), "win", (void *)win, winselfcmd);
+    ফেরত tclgetref(interp, &(win->w_tcl_ref), "win", (শূন্য *)win, winselfcmd);
 }
 
-    static char *
+    স্থির অক্ষর *
 tclgetbuffer(Tcl_Interp *interp, buf_T *buf)
 {
-    return tclgetref(interp, &(buf->b_tcl_ref), "buf", (void *)buf, bufselfcmd);
+    ফেরত tclgetref(interp, &(buf->b_tcl_ref), "buf", (শূন্য *)buf, bufselfcmd);
 }
 
-    static int
+    স্থির পূর্ণসংখ্যা
 tclsetdelcmd(
     Tcl_Interp	*interp,
-    struct ref	*reflist,
-    void	*vimobj,
+    কাঠামো ref	*reflist,
+    শূন্য	*vimobj,
     Tcl_Obj	*delcmd)
 {
-    if (reflist == &refsdeleted)
+    যদি (reflist == &refsdeleted)
     {
-	Tcl_SetResult(interp, _("cannot register callback command: buffer/window is already being deleted"), TCL_STATIC);
-	return TCL_ERROR;
+	Tcl_Set_ফলাফল(interp, _("cannot register callback command: buffer/window is already being deleted"), TCL_STATIC);
+	ফেরত TCL_ERROR;
     }
 
-    while (reflist != NULL)
+    যখন (reflist != ফাঁকা)
     {
-	if (reflist->interp == interp && reflist->vimobj == vimobj)
+	যদি (reflist->interp == interp && reflist->vimobj == vimobj)
 	{
-	    if (reflist->delcmd)
-		Tcl_DecrRefCount(reflist->delcmd);
-	    Tcl_IncrRefCount(delcmd);
+	    যদি (reflist->delcmd)
+		Tcl_Decr_Ref_গুনতি(reflist->delcmd);
+	    Tcl_Incr_Ref_গুনতি(delcmd);
 	    reflist->delcmd = delcmd;
-	    return TCL_OK;
+	    ফেরত TCL_OK;
 	}
-	reflist = reflist->next;
+	reflist = reflist->পরবর্তী;
     }
     // This should never happen.  Famous last word?
     iemsg(e_tcl_fatal_error_reflist_corrupt_please_report_this);
-    Tcl_SetResult(interp, _("cannot register callback command: buffer/window reference not found"), TCL_STATIC);
-    return TCL_ERROR;
+    Tcl_Set_ফলাফল(interp, _("cannot register callback command: buffer/window reference not found"), TCL_STATIC);
+    ফেরত TCL_ERROR;
 }
 
 
@@ -1562,121 +1562,121 @@ tclsetdelcmd(
 //    I/O Channel
 ////////////////////////////////////////////
 
-    static int
-tcl_channel_close(ClientData instance, Tcl_Interp *interp UNUSED)
+    স্থির পূর্ণসংখ্যা
+tcl_channel_close(Client_তথ্য instance, Tcl_Interp *interp UNUSED)
 {
-    int		err = 0;
+    পূর্ণসংখ্যা		err = 0;
 
     // currently does nothing
 
-    if (instance != VIMOUT && instance != VIMERR)
+    যদি (instance != VIMOUT && instance != VIMERR)
     {
 	Tcl_SetErrno(EBADF);
 	err = EBADF;
     }
-    return err;
+    ফেরত err;
 }
 
-    static int
-tcl_channel_input(
-    ClientData	instance UNUSED,
-    char	*buf UNUSED,
-    int		bufsiz UNUSED,
-    int		*errptr)
+    স্থির পূর্ণসংখ্যা
+tcl_channel_প্রবেশ(
+    Client_তথ্য	instance UNUSED,
+    অক্ষর	*buf UNUSED,
+    পূর্ণসংখ্যা		bufsiz UNUSED,
+    পূর্ণসংখ্যা		*errptr)
 {
 
     // input is currently not supported
 
     Tcl_SetErrno(EINVAL);
-    if (errptr)
+    যদি (errptr)
 	*errptr = EINVAL;
-    return -1;
+    ফেরত -1;
 }
 
-    static int
+    স্থির পূর্ণসংখ্যা
 tcl_channel_output(
-    ClientData	instance,
-    const char	*buf,
-    int		bufsiz,
-    int		*errptr)
+    Client_তথ্য	instance,
+    ধ্রুবক অক্ষর	*buf,
+    পূর্ণসংখ্যা		bufsiz,
+    পূর্ণসংখ্যা		*errptr)
 {
     char_u	*str;
-    int		result;
+    পূর্ণসংখ্যা		ফলাফল;
 
     // The buffer is not guaranteed to be 0-terminated, and we don't if
     // there is enough room to add a '\0'.  So we have to create a copy
     // of the buffer...
     str = vim_strnsave((char_u *)buf, bufsiz);
-    if (!str)
+    যদি (!str)
     {
 	Tcl_SetErrno(ENOMEM);
-	if (errptr)
+	যদি (errptr)
 	    *errptr = ENOMEM;
-	return -1;
+	ফেরত -1;
     }
 
-    result = bufsiz;
-    if (instance == VIMOUT)
-	tclmsg((char *)str);
-    else
-    if (instance == VIMERR)
-	tclerrmsg((char *)str);
-    else
+    ফলাফল = bufsiz;
+    যদি (instance == VIMOUT)
+	tclmsg((অক্ষর *)str);
+    অন্যথা
+    যদি (instance == VIMERR)
+	tclerrmsg((অক্ষর *)str);
+    অন্যথা
     {
 	Tcl_SetErrno(EBADF);
-	if (errptr)
+	যদি (errptr)
 	    *errptr = EBADF;
-	result = -1;
+	ফলাফল = -1;
     }
     vim_free(str);
-    return result;
+    ফেরত ফলাফল;
 }
 
-    static void
-tcl_channel_watch(ClientData instance UNUSED, int mask UNUSED)
+    স্থির শূন্য
+tcl_channel_watch(Client_তথ্য instance UNUSED, পূর্ণসংখ্যা mask UNUSED)
 {
     Tcl_SetErrno(EINVAL);
 }
 
-    static int
+    স্থির পূর্ণসংখ্যা
 tcl_channel_gethandle(
-    ClientData	instance UNUSED,
-    int		direction UNUSED,
-    ClientData	*handleptr UNUSED)
+    Client_তথ্য	instance UNUSED,
+    পূর্ণসংখ্যা		direction UNUSED,
+    Client_তথ্য	*handleptr UNUSED)
 {
     Tcl_SetErrno(EINVAL);
-    return EINVAL;
+    ফেরত EINVAL;
 }
 
 
-static Tcl_ChannelType tcl_channel_type =
+স্থির Tcl_ChannelType tcl_channel_type =
 {
     "vimmessage",	// typeName
     TCL_CHANNEL_VERSION_2, // version
     tcl_channel_close,	// closeProc
-    tcl_channel_input,	// inputProc
+    tcl_channel_প্রবেশ,	// inputProc
     tcl_channel_output,	// outputProc
-    NULL,		// seekProc
-    NULL,		// setOptionProc
-    NULL,		// getOptionProc
+    ফাঁকা,		// seekProc
+    ফাঁকা,		// setOptionProc
+    ফাঁকা,		// getOptionProc
     tcl_channel_watch,	// watchProc
     tcl_channel_gethandle, // getHandleProc
-    NULL,		// close2Proc
-    NULL,		// blockModeProc
+    ফাঁকা,		// close2Proc
+    ফাঁকা,		// blockModeProc
 #ifdef TCL_CHANNEL_VERSION_2
-    NULL,		// flushProc
-    NULL,		// handlerProc
+    ফাঁকা,		// flushProc
+    ফাঁকা,		// handlerProc
 #endif
 // The following should not be necessary since TCL_CHANNEL_VERSION_2 was
 // set above
 #ifdef TCL_CHANNEL_VERSION_3
-    NULL,		// wideSeekProc
+    ফাঁকা,		// wideSeekProc
 #endif
 #ifdef TCL_CHANNEL_VERSION_4
-    NULL,		// threadActionProc
+    ফাঁকা,		// threadActionProc
 #endif
 #ifdef TCL_CHANNEL_VERSION_5
-    NULL		// truncateProc
+    ফাঁকা		// truncateProc
 #endif
 };
 
@@ -1684,11 +1684,11 @@ static Tcl_ChannelType tcl_channel_type =
 // Interface to vim
 //////////////////////////////////
 
-    static void
-tclupdatevars(void)
+    স্থির শূন্য
+tclupdatevars(শূন্য)
 {
-    char varname[VARNAME_SIZE];	// must be writeable
-    char *name;
+    অক্ষর varname[VARNAME_আকার];	// must be writeable
+    অক্ষর *name;
 
     strcpy(varname, VAR_RANGE1);
     Tcl_UpdateLinkedVar(tclinfo.interp, varname);
@@ -1712,24 +1712,24 @@ tclupdatevars(void)
 }
 
 
-    static int
+    স্থির পূর্ণসংখ্যা
 tclinit(exarg_T *eap)
 {
-    char varname[VARNAME_SIZE];	// Tcl_LinkVar requires writeable varname
-    char *name;
+    অক্ষর varname[VARNAME_আকার];	// Tcl_LinkVar requires writeable varname
+    অক্ষর *name;
 
 #ifdef DYNAMIC_TCL
-    if (!tcl_enabled(TRUE))
+    যদি (!tcl_enabled(TRUE))
     {
 	emsg(_(e_sorry_this_command_is_disabled_tcl_library_could_not_be_loaded));
-	return FAIL;
+	ফেরত FAIL;
     }
 #endif
 
-    if (!tclinfo.interp)
+    যদি (!tclinfo.interp)
     {
 	Tcl_Interp *interp;
-	static Tcl_Channel ch1, ch2;
+	স্থির Tcl_Channel ch1, ch2;
 
 	// Create replacement channels for stdout and stderr; this has to be
 	// done each time an interpreter is created since the channels are closed
@@ -1741,13 +1741,13 @@ tclinit(exarg_T *eap)
 
 	interp = Tcl_CreateInterp();
 	Tcl_Preserve(interp);
-	if (Tcl_Init(interp) == TCL_ERROR)
+	যদি (Tcl_Init(interp) == TCL_ERROR)
 	{
 	    Tcl_Release(interp);
 	    Tcl_DeleteInterp(interp);
-	    return FAIL;
+	    ফেরত FAIL;
 	}
-#if 0
+#যদি 0
 	// VIM sure is interactive
 	Tcl_SetVar(interp, "tcl_interactive", "1", TCL_GLOBAL_ONLY);
 #endif
@@ -1764,52 +1764,52 @@ tclinit(exarg_T *eap)
 	// replace standard Tcl exit command
 	Tcl_DeleteCommand(interp, "exit");
 	Tcl_CreateObjCommand(interp, "exit", exitcmd,
-	    (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+	    (Client_তথ্য)ফাঁকা, (Tcl_CmdDeleteProc *)ফাঁকা);
 
 	// new commands, in ::vim namespace
 	Tcl_CreateObjCommand(interp, "::vim::buffer", buffercmd,
-	    (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+	    (Client_তথ্য)ফাঁকা, (Tcl_CmdDeleteProc *)ফাঁকা);
 	Tcl_CreateObjCommand(interp, "::vim::window", windowcmd,
-	   (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+	   (Client_তথ্য)ফাঁকা, (Tcl_CmdDeleteProc *)ফাঁকা);
 	Tcl_CreateObjCommand(interp, "::vim::command", commandcmd,
-	   (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+	   (Client_তথ্য)ফাঁকা, (Tcl_CmdDeleteProc *)ফাঁকা);
 	Tcl_CreateObjCommand(interp, "::vim::beep", beepcmd,
-	   (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+	   (Client_তথ্য)ফাঁকা, (Tcl_CmdDeleteProc *)ফাঁকা);
 	Tcl_CreateObjCommand(interp, "::vim::option", optioncmd,
-	   (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+	   (Client_তথ্য)ফাঁকা, (Tcl_CmdDeleteProc *)ফাঁকা);
 	Tcl_CreateObjCommand(interp, "::vim::expr", exprcmd,
-	   (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL);
+	   (Client_তথ্য)ফাঁকা, (Tcl_CmdDeleteProc *)ফাঁকা);
 
 	// "lbase" variable
 	tclinfo.lbase = 1;
 	strcpy(varname, VAR_LBASE);
-	Tcl_LinkVar(interp, varname, (char *)&tclinfo.lbase, TCL_LINK_INT);
+	Tcl_LinkVar(interp, varname, (অক্ষর *)&tclinfo.lbase, TCL_LINK_INT);
 
 	// "range" variable
 	tclinfo.range_start = eap->line1;
 	strcpy(varname, VAR_RANGE1);
-	Tcl_LinkVar(interp, varname, (char *)&tclinfo.range_start, TCL_LINK_INT|TCL_LINK_READ_ONLY);
+	Tcl_LinkVar(interp, varname, (অক্ষর *)&tclinfo.range_start, TCL_LINK_INT|TCL_LINK_READ_ONLY);
 	strcpy(varname, VAR_RANGE2);
-	Tcl_LinkVar(interp, varname, (char *)&tclinfo.range_start, TCL_LINK_INT|TCL_LINK_READ_ONLY);
+	Tcl_LinkVar(interp, varname, (অক্ষর *)&tclinfo.range_start, TCL_LINK_INT|TCL_LINK_READ_ONLY);
 	tclinfo.range_end   = eap->line2;
 	strcpy(varname, VAR_RANGE3);
-	Tcl_LinkVar(interp, varname, (char *)&tclinfo.range_end, TCL_LINK_INT|TCL_LINK_READ_ONLY);
+	Tcl_LinkVar(interp, varname, (অক্ষর *)&tclinfo.range_end, TCL_LINK_INT|TCL_LINK_READ_ONLY);
 
 	// "current" variable
-	tclinfo.curbuf = Tcl_Alloc(VARNAME_SIZE);
-	tclinfo.curwin = Tcl_Alloc(VARNAME_SIZE);
+	tclinfo.curbuf = Tcl_Alloc(VARNAME_আকার);
+	tclinfo.curwin = Tcl_Alloc(VARNAME_আকার);
 	name = tclgetbuffer(interp, curbuf);
 	strcpy(tclinfo.curbuf, name);
 	strcpy(varname, VAR_CURBUF);
-	Tcl_LinkVar(interp, varname, (char *)&tclinfo.curbuf, TCL_LINK_STRING|TCL_LINK_READ_ONLY);
+	Tcl_LinkVar(interp, varname, (অক্ষর *)&tclinfo.curbuf, TCL_LINK_STRING|TCL_LINK_READ_ONLY);
 	name = tclgetwindow(interp, curwin);
 	strcpy(tclinfo.curwin, name);
 	strcpy(varname, VAR_CURWIN);
-	Tcl_LinkVar(interp, varname, (char *)&tclinfo.curwin, TCL_LINK_STRING|TCL_LINK_READ_ONLY);
+	Tcl_LinkVar(interp, varname, (অক্ষর *)&tclinfo.curwin, TCL_LINK_STRING|TCL_LINK_READ_ONLY);
 
 	tclinfo.interp = interp;
     }
-    else
+    অন্যথা
     {
 	// Interpreter already exists, just update variables
 	tclinfo.range_start = row2tcl(eap->line1);
@@ -1818,43 +1818,43 @@ tclinit(exarg_T *eap)
     }
 
     tclinfo.exitvalue = 0;
-    return OK;
+    ফেরত OK;
 }
 
-    static void
-tclerrmsg(char *text)
+    স্থির শূন্য
+tclerrmsg(অক্ষর *text)
 {
-    char *next;
+    অক্ষর *পরবর্তী;
 
-    while ((next=strchr(text, '\n')))
+    যখন ((পরবর্তী=strchr(text, '\n')))
     {
-	*next++ = '\0';
+	*পরবর্তী++ = '\0';
 	emsg(text);
-	text = next;
+	text = পরবর্তী;
     }
-    if (*text)
+    যদি (*text)
 	emsg(text);
 }
 
-    static void
-tclmsg(char *text)
+    স্থির শূন্য
+tclmsg(অক্ষর *text)
 {
-    char *next;
+    অক্ষর *পরবর্তী;
 
-    while ((next=strchr(text, '\n')))
+    যখন ((পরবর্তী=strchr(text, '\n')))
     {
-	*next++ = '\0';
-	msg(text);
-	text = next;
+	*পরবর্তী++ = '\0';
+	বার্তা(text);
+	text = পরবর্তী;
     }
-    if (*text)
-	msg(text);
+    যদি (*text)
+	বার্তা(text);
 }
 
-    static void
-tcldelthisinterp(void)
+    স্থির শূন্য
+tcldelthisinterp(শূন্য)
 {
-    if (!Tcl_InterpDeleted(tclinfo.interp))
+    যদি (!Tcl_InterpDeleted(tclinfo.interp))
 	Tcl_DeleteInterp(tclinfo.interp);
     Tcl_Release(tclinfo.interp);
     // The interpreter is now gets deleted.  All registered commands (esp.
@@ -1866,77 +1866,77 @@ tcldelthisinterp(void)
     // the effort.  Unused refs are recycled by other interpreters, and
     // all refs are free'd when the window/buffer gets closed by vim.
 
-    tclinfo.interp = NULL;
+    tclinfo.interp = ফাঁকা;
     Tcl_Free(tclinfo.curbuf);
     Tcl_Free(tclinfo.curwin);
-    tclinfo.curbuf = tclinfo.curwin = NULL;
+    tclinfo.curbuf = tclinfo.curwin = ফাঁকা;
 }
 
-    static int
-tclexit(int error)
+    স্থির পূর্ণসংখ্যা
+tclexit(পূর্ণসংখ্যা error)
 {
-    int newerr = OK;
+    পূর্ণসংখ্যা newerr = OK;
 
-    if (Tcl_InterpDeleted(tclinfo.interp)     // True if we intercepted Tcl's exit command
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION >= 5) || TCL_MAJOR_VERSION > 8
+    যদি (Tcl_InterpDeleted(tclinfo.interp)     // True if we intercepted Tcl's exit command
+#যদি (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION >= 5) || TCL_MAJOR_VERSION > 8
 	|| Tcl_LimitExceeded(tclinfo.interp)  // True if the interpreter cannot continue
 #endif
 	)
     {
-	char buf[50];
+	অক্ষর buf[50];
 
 	sprintf(buf, _(e_exit_code_nr), tclinfo.exitvalue);
 	tclerrmsg(buf);
-	if (tclinfo.exitvalue == 0)
+	যদি (tclinfo.exitvalue == 0)
 	{
 	    did_emsg = 0;
 	    newerr = OK;
 	}
-	else
+	অন্যথা
 	    newerr = FAIL;
 
 	tcldelthisinterp();
     }
-    else
+    অন্যথা
     {
-	char *result;
+	অক্ষর *ফলাফল;
 
-	result = (char *)Tcl_GetStringResult(tclinfo.interp);
-	if (error == TCL_OK)
+	ফলাফল = (অক্ষর *)Tcl_Get_String_ফলাফল(tclinfo.interp);
+	যদি (error == TCL_OK)
 	{
-	    tclmsg(result);
+	    tclmsg(ফলাফল);
 	    newerr = OK;
 	}
-	else
+	অন্যথা
 	{
-	    tclerrmsg(result);
+	    tclerrmsg(ফলাফল);
 	    newerr = FAIL;
 	}
     }
 
-    return newerr;
+    ফেরত newerr;
 }
 
 /*
  * ":tcl"
  */
-    void
+    শূন্য
 ex_tcl(exarg_T *eap)
 {
     char_u	*script;
-    int		err;
+    পূর্ণসংখ্যা		err;
 
     script = script_get(eap, eap->arg);
-    if (!eap->skip)
+    যদি (!eap->skip)
     {
 	err = tclinit(eap);
-	if (err == OK)
+	যদি (err == OK)
 	{
 	    Tcl_AllowExceptions(tclinfo.interp);
-	    if (script == NULL)
-		err = Tcl_Eval(tclinfo.interp, (char *)eap->arg);
-	    else
-		err = Tcl_Eval(tclinfo.interp, (char *)script);
+	    যদি (script == ফাঁকা)
+		err = Tcl_Eval(tclinfo.interp, (অক্ষর *)eap->arg);
+	    অন্যথা
+		err = Tcl_Eval(tclinfo.interp, (অক্ষর *)script);
 	    err = tclexit(err);
 	}
     }
@@ -1946,14 +1946,14 @@ ex_tcl(exarg_T *eap)
 /*
  * ":tclfile"
  */
-    void
+    শূন্য
 ex_tclfile(exarg_T *eap)
 {
-    char *file = (char *)eap->arg;
-    int err;
+    অক্ষর *file = (অক্ষর *)eap->arg;
+    পূর্ণসংখ্যা err;
 
     err = tclinit(eap);
-    if (err == OK)
+    যদি (err == OK)
     {
 	Tcl_AllowExceptions(tclinfo.interp);
 	err = Tcl_EvalFile(tclinfo.interp, file);
@@ -1964,157 +1964,157 @@ ex_tclfile(exarg_T *eap)
 /*
  * ":tcldo"
  */
-    void
+    শূন্য
 ex_tcldo(exarg_T *eap)
 {
-    char	*script, *line;
-    int		err, rs, re, lnum;
-    char	var_lnum[VARNAME_SIZE]; // must be writeable memory
-    char	var_line[VARNAME_SIZE];
-    linenr_T	first_line = 0;
-    linenr_T	last_line = 0;
+    অক্ষর	*script, *সারি;
+    পূর্ণসংখ্যা		err, rs, re, lnum;
+    অক্ষর	var_lnum[VARNAME_আকার]; // must be writeable memory
+    অক্ষর	var_সারি[VARNAME_আকার];
+    linenr_T	first_সারি = 0;
+    linenr_T	last_সারি = 0;
     buf_T	*was_curbuf = curbuf;
 
     rs = eap->line1;
     re = eap->line2;
-    script = (char *)eap->arg;
+    script = (অক্ষর *)eap->arg;
     strcpy(var_lnum, VAR_CURLNUM);
-    strcpy(var_line, VAR_CURLINE);
+    strcpy(var_সারি, VAR_CURLINE);
 
     err = tclinit(eap);
-    if (err != OK)
-	return;
+    যদি (err != OK)
+	ফেরত;
 
     lnum = row2tcl(rs);
-    Tcl_LinkVar(tclinfo.interp, var_lnum, (char *)&lnum, TCL_LINK_INT|TCL_LINK_READ_ONLY);
+    Tcl_LinkVar(tclinfo.interp, var_lnum, (অক্ষর *)&lnum, TCL_LINK_INT|TCL_LINK_READ_ONLY);
     err = TCL_OK;
-    if (u_save((linenr_T)(rs-1), (linenr_T)(re+1)) != OK)
+    যদি (u_save((linenr_T)(rs-1), (linenr_T)(re+1)) != OK)
     {
-	Tcl_SetResult(tclinfo.interp, _("cannot save undo information"), TCL_STATIC);
+	Tcl_Set_ফলাফল(tclinfo.interp, _("cannot save undo information"), TCL_STATIC);
 	err = TCL_ERROR;
     }
-    while (err == TCL_OK  &&  rs <= re)
+    যখন (err == TCL_OK  &&  rs <= re)
     {
-	if ((linenr_T)rs > curbuf->b_ml.ml_line_count)
-	    break;
-	line = (char *)ml_get_buf(curbuf, (linenr_T)rs, FALSE);
-	if (!line)
+	যদি ((linenr_T)rs > curbuf->b_ml.ml_সারি_গুনতি)
+	    বিরতি;
+	সারি = (অক্ষর *)ml_get_buf(curbuf, (linenr_T)rs, FALSE);
+	যদি (!সারি)
 	{
-	    Tcl_SetResult(tclinfo.interp, _("cannot get line"), TCL_STATIC);
+	    Tcl_Set_ফলাফল(tclinfo.interp, _("cannot get line"), TCL_STATIC);
 	    err = TCL_ERROR;
-	    break;
+	    বিরতি;
 	}
-	Tcl_SetVar(tclinfo.interp, var_line, line, 0);
+	Tcl_SetVar(tclinfo.interp, var_সারি, সারি, 0);
 	Tcl_AllowExceptions(tclinfo.interp);
 	err = Tcl_Eval(tclinfo.interp, script);
-	if (err != TCL_OK
+	যদি (err != TCL_OK
 	    || Tcl_InterpDeleted(tclinfo.interp)
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION >= 5) || TCL_MAJOR_VERSION > 8
+#যদি (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION >= 5) || TCL_MAJOR_VERSION > 8
 	    || Tcl_LimitExceeded(tclinfo.interp)
 #endif
 	    || curbuf != was_curbuf
-	    || (linenr_T)rs > curbuf->b_ml.ml_line_count)
-	    break;
-	line = (char *)Tcl_GetVar(tclinfo.interp, var_line, 0);
-	if (line)
+	    || (linenr_T)rs > curbuf->b_ml.ml_সারি_গুনতি)
+	    বিরতি;
+	সারি = (অক্ষর *)Tcl_GetVar(tclinfo.interp, var_সারি, 0);
+	যদি (সারি)
 	{
-	    if (ml_replace((linenr_T)rs, (char_u *)line, TRUE) != OK)
+	    যদি (ml_replace((linenr_T)rs, (char_u *)সারি, TRUE) != OK)
 	    {
-		Tcl_SetResult(tclinfo.interp, _("cannot replace line"), TCL_STATIC);
+		Tcl_Set_ফলাফল(tclinfo.interp, _("cannot replace line"), TCL_STATIC);
 		err = TCL_ERROR;
-		break;
+		বিরতি;
 	    }
-	    if (first_line == 0)
-		first_line = rs;
-	    last_line = rs;
+	    যদি (first_সারি == 0)
+		first_সারি = rs;
+	    last_সারি = rs;
 	}
 	++rs;
 	++lnum;
 	Tcl_UpdateLinkedVar(tclinfo.interp, var_lnum);
     }
-    if (first_line)
-	changed_lines(first_line, 0, last_line + 1, (long)0);
+    যদি (first_সারি)
+	changed_সারিগুলি(first_সারি, 0, last_সারি + 1, (long)0);
 
-    Tcl_UnsetVar(tclinfo.interp, var_line, 0);
+    Tcl_UnsetVar(tclinfo.interp, var_সারি, 0);
     Tcl_UnlinkVar(tclinfo.interp, var_lnum);
-    if (err == TCL_OK)
-	Tcl_ResetResult(tclinfo.interp);
+    যদি (err == TCL_OK)
+	Tcl_Reset_ফলাফল(tclinfo.interp);
 
-    (void)tclexit(err);
+    (শূন্য)tclexit(err);
 }
 
-    static void
-tcldelallrefs(struct ref *ref)
+    স্থির শূন্য
+tcldelallrefs(কাঠামো ref *ref)
 {
-    struct ref	*next;
-    int		err;
-    char	*result;
+    কাঠামো ref	*পরবর্তী;
+    পূর্ণসংখ্যা		err;
+    অক্ষর	*ফলাফল;
 
 #ifdef DYNAMIC_TCL
     // TODO: this code currently crashes Vim on exit
-    if (exiting)
-	return;
+    যদি (exiting)
+	ফেরত;
 #endif
 
-    while (ref != NULL)
+    যখন (ref != ফাঁকা)
     {
-	next = ref->next;
-	if (ref->interp)
+	পরবর্তী = ref->পরবর্তী;
+	যদি (ref->interp)
 	{
-	    if (ref->delcmd)
+	    যদি (ref->delcmd)
 	    {
 		err = Tcl_GlobalEvalObj(ref->interp, ref->delcmd);
-		if (err != TCL_OK)
+		যদি (err != TCL_OK)
 		{
-		    result = (char *)Tcl_GetStringResult(ref->interp);
-		    if (result)
-			tclerrmsg(result);
+		    ফলাফল = (অক্ষর *)Tcl_Get_String_ফলাফল(ref->interp);
+		    যদি (ফলাফল)
+			tclerrmsg(ফলাফল);
 		}
-		Tcl_DecrRefCount(ref->delcmd);
-		ref->delcmd = NULL;
+		Tcl_Decr_Ref_গুনতি(ref->delcmd);
+		ref->delcmd = ফাঁকা;
 	    }
 	    Tcl_DeleteCommandFromToken(ref->interp, ref->cmd);
 	}
-	Tcl_Free((char *)ref);
-	ref = next;
+	Tcl_Free((অক্ষর *)ref);
+	ref = পরবর্তী;
     }
 }
 
-    void
-tcl_buffer_free(buf_T *buf)
+    শূন্য
+tcl_বাফার_free(buf_T *buf)
 {
-    struct ref *reflist;
+    কাঠামো ref *reflist;
 
 #ifdef DYNAMIC_TCL
-    if (!stubs_initialized)	// Not using Tcl, nothing to do.
-	return;
+    যদি (!stubs_initialized)	// Not using Tcl, nothing to do.
+	ফেরত;
 #endif
 
-    reflist = (struct ref *)(buf->b_tcl_ref);
-    if (reflist != &refsdeleted)
+    reflist = (কাঠামো ref *)(buf->b_tcl_ref);
+    যদি (reflist != &refsdeleted)
     {
-	buf->b_tcl_ref = (void *)&refsdeleted;
+	buf->b_tcl_ref = (শূন্য *)&refsdeleted;
 	tcldelallrefs(reflist);
-	buf->b_tcl_ref = NULL;
+	buf->b_tcl_ref = ফাঁকা;
     }
 }
 
-    void
+    শূন্য
 tcl_window_free(win_T *win)
 {
-    struct ref *reflist;
+    কাঠামো ref *reflist;
 
 #ifdef DYNAMIC_TCL
-    if (!stubs_initialized)	// Not using Tcl, nothing to do.
-	return;
+    যদি (!stubs_initialized)	// Not using Tcl, nothing to do.
+	ফেরত;
 #endif
 
-    reflist = (struct ref*)(win->w_tcl_ref);
-    if (reflist != &refsdeleted)
+    reflist = (কাঠামো ref*)(win->w_tcl_ref);
+    যদি (reflist != &refsdeleted)
     {
-	win->w_tcl_ref = (void *)&refsdeleted;
+	win->w_tcl_ref = (শূন্য *)&refsdeleted;
 	tcldelallrefs(reflist);
-	win->w_tcl_ref = NULL;
+	win->w_tcl_ref = ফাঁকা;
     }
 }
 

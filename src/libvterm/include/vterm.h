@@ -5,21 +5,21 @@
 #define __VTERM_H__
 
 #ifdef __cplusplus
-extern "C" {
+বাহ্যিক "C" {
 #endif
 
-#include <stdlib.h>
+#অন্তর্ভাব <stdlib.h>
 
-#include "vterm_keycodes.h"
+#অন্তর্ভাব "vterm_keycodes.h"
 
 // VIM: use TRUE and FALSE instead of true and false
 #define TRUE 1
 #define FALSE 0
 
 // VIM: from stdint.h
-typedef unsigned char		uint8_t;
-typedef unsigned short		uint16_t;
-typedef unsigned int		uint32_t;
+প্রকারলেখ unsigned অক্ষর		uint8_t;
+প্রকারলেখ unsigned short		uint16_t;
+প্রকারলেখ unsigned পূর্ণসংখ্যা		uint32_t;
 
 // VIM: define max screen cols and rows
 #define VTERM_MAX_COLS 1000
@@ -37,14 +37,14 @@ typedef unsigned int		uint32_t;
  * you do */
 #define VTERM_MAX_CHARS_PER_CELL 6
 
-typedef struct VTerm VTerm;
-typedef struct VTermState VTermState;
-typedef struct VTermScreen VTermScreen;
+প্রকারলেখ কাঠামো VTerm VTerm;
+প্রকারলেখ কাঠামো VTermState VTermState;
+প্রকারলেখ কাঠামো VTermScreen VTermScreen;
 
 // Specifies a screen point.
-typedef struct {
-  int row;
-  int col;
+প্রকারলেখ কাঠামো {
+  পূর্ণসংখ্যা row;
+  পূর্ণসংখ্যা col;
 } VTermPos;
 
 /* some small utility functions; we can just keep these static here */
@@ -55,30 +55,30 @@ typedef struct {
  * Return  0  if "a" and "b" are equal
  * Return > 0 if "a" is after "b".
  */
-int vterm_pos_cmp(VTermPos a, VTermPos b);
+পূর্ণসংখ্যা vterm_pos_cmp(VTermPos a, VTermPos b);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE int vterm_pos_cmp(VTermPos a, VTermPos b)
+#যদি defined(DEFINE_INLINES) || USE_INLINE
+INLINE পূর্ণসংখ্যা vterm_pos_cmp(VTermPos a, VTermPos b)
 {
-  return (a.row == b.row) ? a.col - b.col : a.row - b.row;
+  ফেরত (a.row == b.row) ? a.col - b.col : a.row - b.row;
 }
 #endif
 
 // Specifies a rectangular screen area.
-typedef struct {
-  int start_row;
-  int end_row;
-  int start_col;
-  int end_col;
+প্রকারলেখ কাঠামো {
+  পূর্ণসংখ্যা start_row;
+  পূর্ণসংখ্যা end_row;
+  পূর্ণসংখ্যা start_col;
+  পূর্ণসংখ্যা end_col;
 } VTermRect;
 
 /* true if the rect contains the point */
-int vterm_rect_contains(VTermRect r, VTermPos p);
+পূর্ণসংখ্যা vterm_rect_contains(VTermRect r, VTermPos p);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE int vterm_rect_contains(VTermRect r, VTermPos p)
+#যদি defined(DEFINE_INLINES) || USE_INLINE
+INLINE পূর্ণসংখ্যা vterm_rect_contains(VTermRect r, VTermPos p)
 {
-  return p.row >= r.start_row && p.row < r.end_row &&
+  ফেরত p.row >= r.start_row && p.row < r.end_row &&
          p.col >= r.start_col && p.col < r.end_col;
 }
 #endif
@@ -86,10 +86,10 @@ INLINE int vterm_rect_contains(VTermRect r, VTermPos p)
 /* move a rect */
 // Move "rect" "row_delta" down and "col_delta" right.
 // Does not check boundaries.
-void vterm_rect_move(VTermRect *rect, int row_delta, int col_delta);
+শূন্য vterm_rect_move(VTermRect *rect, পূর্ণসংখ্যা row_delta, পূর্ণসংখ্যা col_delta);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE void vterm_rect_move(VTermRect *rect, int row_delta, int col_delta)
+#যদি defined(DEFINE_INLINES) || USE_INLINE
+INLINE শূন্য vterm_rect_move(VTermRect *rect, পূর্ণসংখ্যা row_delta, পূর্ণসংখ্যা col_delta)
 {
   rect->start_row += row_delta; rect->end_row += row_delta;
   rect->start_col += col_delta; rect->end_col += col_delta;
@@ -99,7 +99,7 @@ INLINE void vterm_rect_move(VTermRect *rect, int row_delta, int col_delta)
 /**
  * Bit-field describing the value of VTermColor.type
  */
-typedef enum {
+প্রকারলেখ গণনা {
   /**
    * If the lower bit of `type` is not set, the colour is 24-bit RGB.
    */
@@ -179,7 +179,7 @@ typedef enum {
 #define VTERM_COLOR_IS_INVALID(col) (!!((col)->type & VTERM_COLOR_INVALID))
 
 // VIM: this was a union, but that doesn't always work.
-typedef struct {
+প্রকারলেখ কাঠামো {
   /**
    * Tag indicating which member is actually valid.
    * Please use the `VTERM_COLOR_IS_*` test macros to check whether a
@@ -189,26 +189,26 @@ typedef struct {
 
   uint8_t red, green, blue;
 
-  uint8_t index;
+  uint8_t সূচক;
 } VTermColor;
 
 /**
  * Constructs a new VTermColor instance representing the given RGB values.
  */
-void vterm_color_rgb(VTermColor *col, uint8_t red, uint8_t green, uint8_t blue);
+শূন্য vterm_color_rgb(VTermColor *col, uint8_t red, uint8_t green, uint8_t blue);
 
 /**
  * Construct a new VTermColor instance representing an indexed color with the
  * given index.
  */
-void vterm_color_indexed(VTermColor *col, uint8_t idx);
+শূন্য vterm_color_indexed(VTermColor *col, uint8_t idx);
 
 /**
  * Compares two colours. Returns true if the colors are equal, false otherwise.
  */
-int vterm_color_is_equal(const VTermColor *a, const VTermColor *b);
+পূর্ণসংখ্যা vterm_color_is_equal(ধ্রুবক VTermColor *a, ধ্রুবক VTermColor *b);
 
-typedef enum {
+প্রকারলেখ গণনা {
   /* VTERM_VALUETYPE_NONE = 0 */
   VTERM_VALUETYPE_BOOL = 1,
   VTERM_VALUETYPE_INT,
@@ -216,23 +216,23 @@ typedef enum {
   VTERM_VALUETYPE_COLOR,
 
   VTERM_N_VALUETYPES
-} VTermValueType;
+} VTerm_মান_Type;
 
-typedef struct {
-  const char *str;
+প্রকারলেখ কাঠামো {
+  ধ্রুবক অক্ষর *str;
   size_t      len : 30;
-  unsigned int  initial : 1;
-  unsigned int  final : 1;
+  unsigned পূর্ণসংখ্যা  initial : 1;
+  unsigned পূর্ণসংখ্যা  final : 1;
 } VTermStringFragment;
 
-typedef union {
-  int boolean;
-  int number;
+প্রকারলেখ সংঘ {
+  পূর্ণসংখ্যা boolean;
+  পূর্ণসংখ্যা সংখ্যা;
   VTermStringFragment string;
   VTermColor color;
-} VTermValue;
+} VTerm_মান;
 
-typedef enum {
+প্রকারলেখ গণনা {
   /* VTERM_ATTR_NONE = 0 */
   VTERM_ATTR_BOLD = 1,   // bool:   1, 22
   VTERM_ATTR_UNDERLINE,  // number: 4, 21, 24
@@ -250,7 +250,7 @@ typedef enum {
   VTERM_N_ATTRS
 } VTermAttr;
 
-typedef enum {
+প্রকারলেখ গণনা {
   /* VTERM_PROP_NONE = 0 */
   VTERM_PROP_CURSORVISIBLE = 1, // bool
   VTERM_PROP_CURSORBLINK,       // bool
@@ -258,23 +258,23 @@ typedef enum {
   VTERM_PROP_TITLE,             // string
   VTERM_PROP_ICONNAME,          // string
   VTERM_PROP_REVERSE,           // bool
-  VTERM_PROP_CURSORSHAPE,       // number
-  VTERM_PROP_MOUSE,             // number
+  VTERM_PROP_CURSORSHAPE,       //সংখ্যা
+  VTERM_PROP_MOUSE,             //সংখ্যা
   VTERM_PROP_FOCUSREPORT,       // bool
   VTERM_PROP_CURSORCOLOR,       // VIM - string
 
   VTERM_N_PROPS
 } VTermProp;
 
-enum {
+গণনা {
   VTERM_PROP_CURSORSHAPE_BLOCK = 1,
   VTERM_PROP_CURSORSHAPE_UNDERLINE,
-  VTERM_PROP_CURSORSHAPE_BAR_LEFT,
+  VTERM_PROP_CURSORSHAPE_BAR_বাম,
 
   VTERM_N_PROP_CURSORSHAPES
 };
 
-enum {
+গণনা {
   VTERM_PROP_MOUSE_NONE = 0,
   VTERM_PROP_MOUSE_CLICK,
   VTERM_PROP_MOUSE_DRAG,
@@ -283,7 +283,7 @@ enum {
   VTERM_N_PROP_MOUSES
 };
 
-typedef enum {
+প্রকারলেখ গণনা {
   VTERM_SELECTION_CLIPBOARD = (1<<0),
   VTERM_SELECTION_PRIMARY   = (1<<1),
   VTERM_SELECTION_SECONDARY = (1<<2),
@@ -291,100 +291,100 @@ typedef enum {
   VTERM_SELECTION_CUT0      = (1<<4), /* also CUT1 .. CUT7 by bitshifting */
 } VTermSelectionMask;
 
-typedef struct {
-  const uint32_t *chars;
-  int             width;
-  unsigned int    protected_cell:1;  /* DECSCA-protected against DECSEL/DECSED */
-  unsigned int    dwl:1;             /* DECDWL or DECDHL double-width line */
-  unsigned int    dhl:2;             /* DECDHL double-height line (1=top 2=bottom) */
+প্রকারলেখ কাঠামো {
+  ধ্রুবক uint32_t *chars;
+  পূর্ণসংখ্যা             width;
+  unsigned পূর্ণসংখ্যা    protected_cell:1;  /* DECSCA-protected against DECSEL/DECSED */
+  unsigned পূর্ণসংখ্যা    dwl:1;             /* DECDWL or DECDHL double-width line */
+  unsigned পূর্ণসংখ্যা    dhl:2;             /* DECDHL double-height line (1=top 2=bottom) */
 } VTermGlyphInfo;
 
-typedef struct {
-  unsigned int    doublewidth:1;     /* DECDWL or DECDHL line */
-  unsigned int    doubleheight:2;    /* DECDHL line (1=top 2=bottom) */
-  unsigned int    continuation:1;    /* Line is a flow continuation of the previous */
-} VTermLineInfo;
+প্রকারলেখ কাঠামো {
+  unsigned পূর্ণসংখ্যা    doublewidth:1;     /* DECDWL or DECDHL line */
+  unsigned পূর্ণসংখ্যা    doubleheight:2;    /* DECDHL line (1=top 2=bottom) */
+  unsigned পূর্ণসংখ্যা    continuation:1;    /* Line is a flow continuation of the previous */
+} VTerm_সারি_Info;
 
 /* Copies of VTermState fields that the 'resize' callback might have reason to
  * edit. 'resize' callback gets total control of these fields and may
  * free-and-reallocate them if required. They will be copied back from the
  * struct after the callback has returned.
  */
-typedef struct {
+প্রকারলেখ কাঠামো {
   VTermPos pos;                /* current cursor position */
-  VTermLineInfo *lineinfos[2]; /* [1] may be NULL */
+  VTerm_সারি_Info *lineinfos[2]; /* [1] may be NULL */
 } VTermStateFields;
 
-typedef struct {
+প্রকারলেখ কাঠামো {
   /* libvterm relies on this memory to be zeroed out before it is returned
    * by the allocator. */
-  void *(*malloc)(size_t size, void *allocdata);
-  void  (*free)(void *ptr, void *allocdata);
+  শূন্য *(*malloc)(size_t আকার_2, শূন্য *allocdata);
+  শূন্য  (*মুক্ত)(শূন্য *ptr, শূন্য *allocdata);
 } VTermAllocatorFunctions;
 
-void vterm_check_version(int major, int minor);
+শূন্য vterm_check_version(পূর্ণসংখ্যা major, পূর্ণসংখ্যা minor);
 
-struct VTermBuilder {
-  int ver; /* currently unused but reserved for some sort of ABI version flag */
+কাঠামো VTermBuilder {
+  পূর্ণসংখ্যা ver; /* currently unused but reserved for some sort of ABI version flag */
 
-  int rows, cols;
+  পূর্ণসংখ্যা rows, cols;
 
-  const VTermAllocatorFunctions *allocator;
-  void *allocdata;
+  ধ্রুবক VTermAllocatorFunctions *allocator;
+  শূন্য *allocdata;
 
   /* Override default sizes for various structures */
   size_t outbuffer_len;  /* default: 4096 */
   size_t tmpbuffer_len;  /* default: 4096 */
 };
 
-VTerm *vterm_build(const struct VTermBuilder *builder);
+VTerm *vterm_build(ধ্রুবক কাঠামো VTermBuilder *builder);
 
 /* A convenient shortcut for default cases */
 // Allocate and initialize a new terminal with default allocators.
-VTerm *vterm_new(int rows, int cols);
+VTerm *vterm_new(পূর্ণসংখ্যা rows, পূর্ণসংখ্যা cols);
 /* These shortcuts are generally discouraged in favour of just using vterm_build() */
 
 // Allocate and initialize a new terminal with specified allocators.
-VTerm *vterm_new_with_allocator(int rows, int cols, VTermAllocatorFunctions *funcs, void *allocdata);
+VTerm *vterm_new_with_allocator(পূর্ণসংখ্যা rows, পূর্ণসংখ্যা cols, VTermAllocatorFunctions *funcs, শূন্য *allocdata);
 
 // Free and cleanup a terminal and all its data.
-void   vterm_free(VTerm* vt);
+শূন্য   vterm_free(VTerm* vt);
 
 // Get the current size of the terminal and store in "rowsp" and "colsp".
-void vterm_get_size(const VTerm *vt, int *rowsp, int *colsp);
+শূন্য vterm_get_আকার(ধ্রুবক VTerm *vt, পূর্ণসংখ্যা *rowsp, পূর্ণসংখ্যা *colsp);
 
-void vterm_set_size(VTerm *vt, int rows, int cols);
+শূন্য vterm_set_আকার(VTerm *vt, পূর্ণসংখ্যা rows, পূর্ণসংখ্যা cols);
 
-int  vterm_get_utf8(const VTerm *vt);
-void vterm_set_utf8(VTerm *vt, int is_utf8);
+পূর্ণসংখ্যা  vterm_get_utf8(ধ্রুবক VTerm *vt);
+শূন্য vterm_set_utf8(VTerm *vt, পূর্ণসংখ্যা is_utf8);
 
-size_t vterm_input_write(VTerm *vt, const char *bytes, size_t len);
+size_t vterm_প্রবেশ_write(VTerm *vt, ধ্রুবক অক্ষর *bytes, size_t len);
 
 /* Setting output callback will override the buffer logic */
-typedef void VTermOutputCallback(const char *s, size_t len, void *user);
-void vterm_output_set_callback(VTerm *vt, VTermOutputCallback *func, void *user);
+প্রকারলেখ শূন্য VTermOutputCallback(ধ্রুবক অক্ষর *s, size_t len, শূন্য *user);
+শূন্য vterm_output_set_callback(VTerm *vt, VTermOutputCallback *func, শূন্য *user);
 
 /* These buffer functions only work if output callback is NOT set
  * These are deprecated and will be removed in a later version */
-size_t vterm_output_get_buffer_size(const VTerm *vt);
-size_t vterm_output_get_buffer_current(const VTerm *vt);
-size_t vterm_output_get_buffer_remaining(const VTerm *vt);
+size_t vterm_output_get_বাফার_আকার(ধ্রুবক VTerm *vt);
+size_t vterm_output_get_বাফার_current(ধ্রুবক VTerm *vt);
+size_t vterm_output_get_বাফার_remaining(ধ্রুবক VTerm *vt);
 
 /* This too */
-size_t vterm_output_read(VTerm *vt, char *buffer, size_t len);
+size_t vterm_output_read(VTerm *vt, অক্ষর *বাফার, size_t len);
 
-int vterm_is_modify_other_keys(VTerm *vt);
-int vterm_is_kitty_keyboard(VTerm *vt);
-void vterm_keyboard_unichar(VTerm *vt, uint32_t c, VTermModifier mod);
-void vterm_keyboard_key(VTerm *vt, VTermKey key, VTermModifier mod);
+পূর্ণসংখ্যা vterm_is_modify_other_চাবিগুলি(VTerm *vt);
+পূর্ণসংখ্যা vterm_is_kitty_keyboard(VTerm *vt);
+শূন্য vterm_keyboard_unichar(VTerm *vt, uint32_t c, VTermModifier mod);
+শূন্য vterm_keyboard_চাবি(VTerm *vt, VTerm_চাবি চাবি, VTermModifier mod);
 
-void vterm_keyboard_start_paste(VTerm *vt);
-void vterm_keyboard_end_paste(VTerm *vt);
+শূন্য vterm_keyboard_start_paste(VTerm *vt);
+শূন্য vterm_keyboard_end_paste(VTerm *vt);
 
-void vterm_mouse_move(VTerm *vt, int row, int col, VTermModifier mod);
+শূন্য vterm_mouse_move(VTerm *vt, পূর্ণসংখ্যা row, পূর্ণসংখ্যা col, VTermModifier mod);
 // "button" is 1 for left, 2 for middle, 3 for right.
 // Button 4 is scroll wheel down, button 5 is scroll wheel up.
-void vterm_mouse_button(VTerm *vt, int button, int pressed, VTermModifier mod);
+শূন্য vterm_mouse_button(VTerm *vt, পূর্ণসংখ্যা button, পূর্ণসংখ্যা pressed, VTermModifier mod);
 
 // ------------
 // Parser layer
@@ -410,107 +410,107 @@ void vterm_mouse_button(VTerm *vt, int button, int pressed, VTermModifier mod);
 
 #define CSI_ARG_IS_MISSING(a) (CSI_ARG(a) == CSI_ARG_MISSING)
 #define CSI_ARG_OR(a,def)     (CSI_ARG(a) == CSI_ARG_MISSING ? (def) : CSI_ARG(a))
-#define CSI_ARG_COUNT(a)      (CSI_ARG(a) == CSI_ARG_MISSING || CSI_ARG(a) == 0 ? 1 : CSI_ARG(a))
+#define CSI_ARG_গুনতি(a)      (CSI_ARG(a) == CSI_ARG_MISSING || CSI_ARG(a) == 0 ? 1 : CSI_ARG(a))
 
-typedef struct {
-  int (*text)(const char *bytes, size_t len, void *user);
-  int (*control)(unsigned char control, void *user);
-  int (*escape)(const char *bytes, size_t len, void *user);
-  int (*csi)(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user);
-  int (*osc)(int command, VTermStringFragment frag, void *user);
-  int (*dcs)(const char *command, size_t commandlen, VTermStringFragment frag, void *user);
-  int (*apc)(VTermStringFragment frag, void *user);
-  int (*pm)(VTermStringFragment frag, void *user);
-  int (*sos)(VTermStringFragment frag, void *user);
-  int (*resize)(int rows, int cols, void *user);
+প্রকারলেখ কাঠামো {
+  পূর্ণসংখ্যা (*text)(ধ্রুবক অক্ষর *bytes, size_t len, শূন্য *user);
+  পূর্ণসংখ্যা (*control)(unsigned অক্ষর control, শূন্য *user);
+  পূর্ণসংখ্যা (*escape)(ধ্রুবক অক্ষর *bytes, size_t len, শূন্য *user);
+  পূর্ণসংখ্যা (*csi)(ধ্রুবক অক্ষর *leader, ধ্রুবক long args[], পূর্ণসংখ্যা argcount, ধ্রুবক অক্ষর *intermed, অক্ষর command, শূন্য *user);
+  পূর্ণসংখ্যা (*osc)(পূর্ণসংখ্যা command, VTermStringFragment frag, শূন্য *user);
+  পূর্ণসংখ্যা (*dcs)(ধ্রুবক অক্ষর *command, size_t commandlen, VTermStringFragment frag, শূন্য *user);
+  পূর্ণসংখ্যা (*apc)(VTermStringFragment frag, শূন্য *user);
+  পূর্ণসংখ্যা (*pm)(VTermStringFragment frag, শূন্য *user);
+  পূর্ণসংখ্যা (*sos)(VTermStringFragment frag, শূন্য *user);
+  পূর্ণসংখ্যা (*resize)(পূর্ণসংখ্যা rows, পূর্ণসংখ্যা cols, শূন্য *user);
 } VTermParserCallbacks;
 
-void  vterm_parser_set_callbacks(VTerm *vt, const VTermParserCallbacks *callbacks, void *user);
-void *vterm_parser_get_cbdata(VTerm *vt);
+শূন্য  vterm_parser_set_callbacks(VTerm *vt, ধ্রুবক VTermParserCallbacks *callbacks, শূন্য *user);
+শূন্য *vterm_parser_get_cbdata(VTerm *vt);
 
 /* Normally NUL, CAN, SUB and DEL are ignored. Setting this true causes them
  * to be emitted by the 'control' callback
  */
-void vterm_parser_set_emit_nul(VTerm *vt, int emit);
+শূন্য vterm_parser_set_emit_nul(VTerm *vt, পূর্ণসংখ্যা emit);
 
 // -----------
 // State layer
 // -----------
 
-typedef struct {
-  int (*putglyph)(VTermGlyphInfo *info, VTermPos pos, void *user);
-  int (*movecursor)(VTermPos pos, VTermPos oldpos, int visible, void *user);
-  int (*scrollrect)(VTermRect rect, int downward, int rightward, void *user);
-  int (*moverect)(VTermRect dest, VTermRect src, void *user);
-  int (*erase)(VTermRect rect, int selective, void *user);
-  int (*initpen)(void *user);
-  int (*setpenattr)(VTermAttr attr, VTermValue *val, void *user);
+প্রকারলেখ কাঠামো {
+  পূর্ণসংখ্যা (*putglyph)(VTermGlyphInfo *info, VTermPos pos, শূন্য *user);
+  পূর্ণসংখ্যা (*movecursor)(VTermPos pos, VTermPos oldpos, পূর্ণসংখ্যা visible, শূন্য *user);
+  পূর্ণসংখ্যা (*scrollrect)(VTermRect rect, পূর্ণসংখ্যা downward, পূর্ণসংখ্যা rightward, শূন্য *user);
+  পূর্ণসংখ্যা (*moverect)(VTermRect dest, VTermRect src, শূন্য *user);
+  পূর্ণসংখ্যা (*erase)(VTermRect rect, পূর্ণসংখ্যা selective, শূন্য *user);
+  পূর্ণসংখ্যা (*initpen)(শূন্য *user);
+  পূর্ণসংখ্যা (*setpenattr)(VTermAttr attr, VTerm_মান *val, শূন্য *user);
   // Callback for setting various properties.  Must return 1 if the property
   // was accepted, 0 otherwise.
-  int (*settermprop)(VTermProp prop, VTermValue *val, void *user);
-  int (*bell)(void *user);
-  int (*resize)(int rows, int cols, VTermStateFields *fields, void *user);
-  int (*setlineinfo)(int row, const VTermLineInfo *newinfo, const VTermLineInfo *oldinfo, void *user);
-  int (*sb_clear)(void *user);
+  পূর্ণসংখ্যা (*settermprop)(VTermProp prop, VTerm_মান *val, শূন্য *user);
+  পূর্ণসংখ্যা (*bell)(শূন্য *user);
+  পূর্ণসংখ্যা (*resize)(পূর্ণসংখ্যা rows, পূর্ণসংখ্যা cols, VTermStateFields *fields, শূন্য *user);
+  পূর্ণসংখ্যা (*setlineinfo)(পূর্ণসংখ্যা row, ধ্রুবক VTerm_সারি_Info *newinfo, ধ্রুবক VTerm_সারি_Info *oldinfo, শূন্য *user);
+  পূর্ণসংখ্যা (*sb_clear)(শূন্য *user);
   // ABI-compat only enabled if vterm_state_callbacks_has_premove() is invoked
-  int (*premove)(VTermRect dest, void *user);
+  পূর্ণসংখ্যা (*premove)(VTermRect dest, শূন্য *user);
 } VTermStateCallbacks;
 
 // VIM: added
-typedef struct {
+প্রকারলেখ কাঠামো {
   VTermPos pos;
-  int	   buttons;
-#define MOUSE_BUTTON_LEFT 0x01
-#define MOUSE_BUTTON_MIDDLE 0x02
-#define MOUSE_BUTTON_RIGHT 0x04
-  int      flags;
+  পূর্ণসংখ্যা	   buttons;
+#define MOUSE_BUTTON_বাম 0x01
+#define MOUSE_BUTTON_মধ্য 0x02
+#define MOUSE_BUTTON_ডান 0x04
+  পূর্ণসংখ্যা      flags;
 #define MOUSE_WANT_CLICK 0x01
 #define MOUSE_WANT_DRAG  0x02
 #define MOUSE_WANT_MOVE  0x04
   // useful to add protocol?
 } VTermMouseState;
 
-typedef struct {
-  int (*control)(unsigned char control, void *user);
-  int (*csi)(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user);
-  int (*osc)(int command, VTermStringFragment frag, void *user);
-  int (*dcs)(const char *command, size_t commandlen, VTermStringFragment frag, void *user);
-  int (*apc)(VTermStringFragment frag, void *user);
-  int (*pm)(VTermStringFragment frag, void *user);
-  int (*sos)(VTermStringFragment frag, void *user);
+প্রকারলেখ কাঠামো {
+  পূর্ণসংখ্যা (*control)(unsigned অক্ষর control, শূন্য *user);
+  পূর্ণসংখ্যা (*csi)(ধ্রুবক অক্ষর *leader, ধ্রুবক long args[], পূর্ণসংখ্যা argcount, ধ্রুবক অক্ষর *intermed, অক্ষর command, শূন্য *user);
+  পূর্ণসংখ্যা (*osc)(পূর্ণসংখ্যা command, VTermStringFragment frag, শূন্য *user);
+  পূর্ণসংখ্যা (*dcs)(ধ্রুবক অক্ষর *command, size_t commandlen, VTermStringFragment frag, শূন্য *user);
+  পূর্ণসংখ্যা (*apc)(VTermStringFragment frag, শূন্য *user);
+  পূর্ণসংখ্যা (*pm)(VTermStringFragment frag, শূন্য *user);
+  পূর্ণসংখ্যা (*sos)(VTermStringFragment frag, শূন্য *user);
 } VTermStateFallbacks;
 
-typedef struct {
-  int (*set)(VTermSelectionMask mask, VTermStringFragment frag, void *user);
-  int (*query)(VTermSelectionMask mask, void *user);
+প্রকারলেখ কাঠামো {
+  পূর্ণসংখ্যা (*set)(VTermSelectionMask mask, VTermStringFragment frag, শূন্য *user);
+  পূর্ণসংখ্যা (*query)(VTermSelectionMask mask, শূন্য *user);
 } VTermSelectionCallbacks;
 
 VTermState *vterm_obtain_state(VTerm *vt);
 
-void  vterm_state_set_callbacks(VTermState *state, const VTermStateCallbacks *callbacks, void *user);
-void *vterm_state_get_cbdata(VTermState *state);
+শূন্য  vterm_state_set_callbacks(VTermState *state, ধ্রুবক VTermStateCallbacks *callbacks, শূন্য *user);
+শূন্য *vterm_state_get_cbdata(VTermState *state);
 
-void vterm_state_callbacks_has_premove(VTermState *state);
+শূন্য vterm_state_callbacks_has_premove(VTermState *state);
 
-void  vterm_state_set_unrecognised_fallbacks(VTermState *state, const VTermStateFallbacks *fallbacks, void *user);
-void *vterm_state_get_unrecognised_fbdata(VTermState *state);
+শূন্য  vterm_state_set_unrecognised_fallbacks(VTermState *state, ধ্রুবক VTermStateFallbacks *fallbacks, শূন্য *user);
+শূন্য *vterm_state_get_unrecognised_fbdata(VTermState *state);
 
 // Initialize the state.
-void vterm_state_reset(VTermState *state, int hard);
+শূন্য vterm_state_reset(VTermState *state, পূর্ণসংখ্যা hard);
 
-void vterm_state_get_cursorpos(const VTermState *state, VTermPos *cursorpos);
+শূন্য vterm_state_get_cursorpos(ধ্রুবক VTermState *state, VTermPos *cursorpos);
 // VIM: added
-void vterm_state_get_mousestate(const VTermState *state, VTermMouseState *mousestate);
-void vterm_state_get_default_colors(const VTermState *state, VTermColor *default_fg, VTermColor *default_bg);
-void vterm_state_get_palette_color(const VTermState *state, int index, VTermColor *col);
-void vterm_state_set_default_colors(VTermState *state, const VTermColor *default_fg, const VTermColor *default_bg);
-void vterm_state_set_palette_color(VTermState *state, int index, const VTermColor *col);
-void vterm_state_set_bold_highbright(VTermState *state, int bold_is_highbright);
-int  vterm_state_get_penattr(const VTermState *state, VTermAttr attr, VTermValue *val);
-int  vterm_state_set_termprop(VTermState *state, VTermProp prop, VTermValue *val);
-void vterm_state_focus_in(VTermState *state);
-void vterm_state_focus_out(VTermState *state);
-const VTermLineInfo *vterm_state_get_lineinfo(const VTermState *state, int row);
+শূন্য vterm_state_get_mousestate(ধ্রুবক VTermState *state, VTermMouseState *mousestate);
+শূন্য vterm_state_get_default_colors(ধ্রুবক VTermState *state, VTermColor *default_fg, VTermColor *default_bg);
+শূন্য vterm_state_get_palette_color(ধ্রুবক VTermState *state, পূর্ণসংখ্যা সূচক, VTermColor *col);
+শূন্য vterm_state_set_default_colors(VTermState *state, ধ্রুবক VTermColor *default_fg, ধ্রুবক VTermColor *default_bg);
+শূন্য vterm_state_set_palette_color(VTermState *state, পূর্ণসংখ্যা সূচক, ধ্রুবক VTermColor *col);
+শূন্য vterm_state_set_bold_highbright(VTermState *state, পূর্ণসংখ্যা bold_is_highbright);
+পূর্ণসংখ্যা  vterm_state_get_penattr(ধ্রুবক VTermState *state, VTermAttr attr, VTerm_মান *val);
+পূর্ণসংখ্যা  vterm_state_set_termprop(VTermState *state, VTermProp prop, VTerm_মান *val);
+শূন্য vterm_state_focus_in(VTermState *state);
+শূন্য vterm_state_focus_out(VTermState *state);
+ধ্রুবক VTerm_সারি_Info *vterm_state_get_lineinfo(ধ্রুবক VTermState *state, পূর্ণসংখ্যা row);
 
 /**
  * Makes sure that the given color `col` is indeed an RGB colour. After this
@@ -522,68 +522,68 @@ const VTermLineInfo *vterm_state_get_lineinfo(const VTermState *state, int row);
  * @param col is a pointer at the VTermColor instance that should be converted
  * to an RGB colour.
  */
-void vterm_state_convert_color_to_rgb(const VTermState *state, VTermColor *col);
+শূন্য vterm_state_convert_color_to_rgb(ধ্রুবক VTermState *state, VTermColor *col);
 
-void vterm_state_set_selection_callbacks(VTermState *state, const VTermSelectionCallbacks *callbacks, void *user,
-    char *buffer, size_t buflen);
+শূন্য vterm_state_set_selection_callbacks(VTermState *state, ধ্রুবক VTermSelectionCallbacks *callbacks, শূন্য *user,
+    অক্ষর *বাফার, size_t buflen);
 
-void vterm_state_send_selection(VTermState *state, VTermSelectionMask mask, VTermStringFragment frag);
+শূন্য vterm_state_send_selection(VTermState *state, VTermSelectionMask mask, VTermStringFragment frag);
 
 // ------------
 // Screen layer
 // ------------
 
-typedef struct {
-    unsigned int bold      : 1;
-    unsigned int underline : 2;
-    unsigned int italic    : 1;
-    unsigned int blink     : 1;
-    unsigned int reverse   : 1;
-    unsigned int conceal   : 1;
-    unsigned int strike    : 1;
-    unsigned int font      : 4; /* 0 to 9 */
-    unsigned int dwl       : 1; /* On a DECDWL or DECDHL line */
-    unsigned int dhl       : 2; /* On a DECDHL line (1=top 2=bottom) */
-    unsigned int small     : 1;
-    unsigned int baseline  : 2;
+প্রকারলেখ কাঠামো {
+    unsigned পূর্ণসংখ্যা bold      : 1;
+    unsigned পূর্ণসংখ্যা underline : 2;
+    unsigned পূর্ণসংখ্যা italic    : 1;
+    unsigned পূর্ণসংখ্যা blink     : 1;
+    unsigned পূর্ণসংখ্যা reverse   : 1;
+    unsigned পূর্ণসংখ্যা conceal   : 1;
+    unsigned পূর্ণসংখ্যা strike    : 1;
+    unsigned পূর্ণসংখ্যা font      : 4; /* 0 to 9 */
+    unsigned পূর্ণসংখ্যা dwl       : 1; /* On a DECDWL or DECDHL line */
+    unsigned পূর্ণসংখ্যা dhl       : 2; /* On a DECDHL line (1=top 2=bottom) */
+    unsigned পূর্ণসংখ্যা small     : 1;
+    unsigned পূর্ণসংখ্যা baseline  : 2;
 } VTermScreenCellAttrs;
 
-enum {
+গণনা {
   VTERM_UNDERLINE_OFF,
   VTERM_UNDERLINE_SINGLE,
   VTERM_UNDERLINE_DOUBLE,
   VTERM_UNDERLINE_CURLY,
 };
 
-enum {
+গণনা {
   VTERM_BASELINE_NORMAL,
   VTERM_BASELINE_RAISE,
   VTERM_BASELINE_LOWER,
 };
 
-typedef struct {
+প্রকারলেখ কাঠামো {
   uint32_t chars[VTERM_MAX_CHARS_PER_CELL];
-  char     width;
+  অক্ষর     width;
   VTermScreenCellAttrs attrs;
   VTermColor fg, bg;
 } VTermScreenCell;
 
 // All fields are optional, NULL when not used.
-typedef struct {
-  int (*damage)(VTermRect rect, void *user);
-  int (*moverect)(VTermRect dest, VTermRect src, void *user);
-  int (*movecursor)(VTermPos pos, VTermPos oldpos, int visible, void *user);
-  int (*settermprop)(VTermProp prop, VTermValue *val, void *user);
-  int (*bell)(void *user);
-  int (*resize)(int rows, int cols, void *user);
+প্রকারলেখ কাঠামো {
+  পূর্ণসংখ্যা (*damage)(VTermRect rect, শূন্য *user);
+  পূর্ণসংখ্যা (*moverect)(VTermRect dest, VTermRect src, শূন্য *user);
+  পূর্ণসংখ্যা (*movecursor)(VTermPos pos, VTermPos oldpos, পূর্ণসংখ্যা visible, শূন্য *user);
+  পূর্ণসংখ্যা (*settermprop)(VTermProp prop, VTerm_মান *val, শূন্য *user);
+  পূর্ণসংখ্যা (*bell)(শূন্য *user);
+  পূর্ণসংখ্যা (*resize)(পূর্ণসংখ্যা rows, পূর্ণসংখ্যা cols, শূন্য *user);
   // A line was pushed off the top of the window.
   // "cells[cols]" contains the cells of that line.
   // Return value is unused.
-  int (*sb_pushline)(int cols, const VTermScreenCell *cells, void *user);
-  int (*sb_popline)(int cols, VTermScreenCell *cells, void *user);
-  int (*sb_clear)(void* user);
+  পূর্ণসংখ্যা (*sb_pushline)(পূর্ণসংখ্যা cols, ধ্রুবক VTermScreenCell *cells, শূন্য *user);
+  পূর্ণসংখ্যা (*sb_popline)(পূর্ণসংখ্যা cols, VTermScreenCell *cells, শূন্য *user);
+  পূর্ণসংখ্যা (*sb_clear)(শূন্য* user);
   /* ABI-compat this is only used if vterm_screen_callbacks_has_pushline4() is called */
-  int (*sb_pushline4)(int cols, const VTermScreenCell *cells, int continuation, void *user);
+  পূর্ণসংখ্যা (*sb_pushline4)(পূর্ণসংখ্যা cols, ধ্রুবক VTermScreenCell *cells, পূর্ণসংখ্যা continuation, শূন্য *user);
 } VTermScreenCallbacks;
 
 // Return the screen of the vterm.
@@ -593,15 +593,15 @@ VTermScreen *vterm_obtain_screen(VTerm *vt);
  * Install screen callbacks.  These are invoked when the screen contents is
  * changed.  "user" is passed into to the callback.
  */
-void  vterm_screen_set_callbacks(VTermScreen *screen, const VTermScreenCallbacks *callbacks, void *user);
-void *vterm_screen_get_cbdata(VTermScreen *screen);
+শূন্য  vterm_screen_set_callbacks(VTermScreen *screen, ধ্রুবক VTermScreenCallbacks *callbacks, শূন্য *user);
+শূন্য *vterm_screen_get_cbdata(VTermScreen *screen);
 
-void vterm_screen_callbacks_has_pushline4(VTermScreen *screen);
+শূন্য vterm_screen_callbacks_has_pushline4(VTermScreen *screen);
 
-void  vterm_screen_set_unrecognised_fallbacks(VTermScreen *screen, const VTermStateFallbacks *fallbacks, void *user);
-void *vterm_screen_get_unrecognised_fbdata(VTermScreen *screen);
+শূন্য  vterm_screen_set_unrecognised_fallbacks(VTermScreen *screen, ধ্রুবক VTermStateFallbacks *fallbacks, শূন্য *user);
+শূন্য *vterm_screen_get_unrecognised_fbdata(VTermScreen *screen);
 
-void vterm_screen_enable_reflow(VTermScreen *screen, int reflow);
+শূন্য vterm_screen_enable_reflow(VTermScreen *screen, পূর্ণসংখ্যা reflow);
 
 // Back-compat alias for the brief time it was in 0.3-RC1
 #define vterm_screen_set_reflow  vterm_screen_enable_reflow
@@ -609,33 +609,33 @@ void vterm_screen_enable_reflow(VTermScreen *screen, int reflow);
 // Enable support for using the alternate screen if "altscreen" is non-zero.
 // Before that switching to the alternate screen won't work.
 // Calling with "altscreen" zero has no effect.
-void vterm_screen_enable_altscreen(VTermScreen *screen, int altscreen);
+শূন্য vterm_screen_enable_altscreen(VTermScreen *screen, পূর্ণসংখ্যা altscreen);
 
-typedef enum {
+প্রকারলেখ গণনা {
   VTERM_DAMAGE_CELL,    /* every cell */
   VTERM_DAMAGE_ROW,     /* entire rows */
   VTERM_DAMAGE_SCREEN,  /* entire screen */
   VTERM_DAMAGE_SCROLL,  /* entire screen + scrollrect */
 
   VTERM_N_DAMAGES
-} VTermDamageSize;
+} VTerm_Damage_আকার;
 
 // Invoke the relevant callbacks to update the screen.
-void vterm_screen_flush_damage(VTermScreen *screen);
+শূন্য vterm_screen_flush_damage(VTermScreen *screen);
 
-void vterm_screen_set_damage_merge(VTermScreen *screen, VTermDamageSize size);
+শূন্য vterm_screen_set_damage_merge(VTermScreen *screen, VTerm_Damage_আকার আকার_2);
 
 /*
  * Reset the screen.  Also invokes vterm_state_reset().
  * Must be called before the terminal can be used.
  */
-void   vterm_screen_reset(VTermScreen *screen, int hard);
+শূন্য   vterm_screen_reset(VTermScreen *screen, পূর্ণসংখ্যা hard);
 
 /* Neither of these functions NUL-terminate the buffer */
-size_t vterm_screen_get_chars(const VTermScreen *screen, uint32_t *chars, size_t len, const VTermRect rect);
-size_t vterm_screen_get_text(const VTermScreen *screen, char *str, size_t len, const VTermRect rect);
+size_t vterm_screen_get_chars(ধ্রুবক VTermScreen *screen, uint32_t *chars, size_t len, ধ্রুবক VTermRect rect);
+size_t vterm_screen_get_text(ধ্রুবক VTermScreen *screen, অক্ষর *str, size_t len, ধ্রুবক VTermRect rect);
 
-typedef enum {
+প্রকারলেখ গণনা {
   VTERM_ATTR_BOLD_MASK       = 1 << 0,
   VTERM_ATTR_UNDERLINE_MASK  = 1 << 1,
   VTERM_ATTR_ITALIC_MASK     = 1 << 2,
@@ -652,42 +652,42 @@ typedef enum {
   VTERM_ALL_ATTRS_MASK = (1 << 12) - 1
 } VTermAttrMask;
 
-int vterm_screen_get_attrs_extent(const VTermScreen *screen, VTermRect *extent, VTermPos pos, VTermAttrMask attrs);
+পূর্ণসংখ্যা vterm_screen_get_attrs_extent(ধ্রুবক VTermScreen *screen, VTermRect *extent, VTermPos pos, VTermAttrMask attrs);
 
-int vterm_screen_get_cell(const VTermScreen *screen, VTermPos pos, VTermScreenCell *cell);
+পূর্ণসংখ্যা vterm_screen_get_cell(ধ্রুবক VTermScreen *screen, VTermPos pos, VTermScreenCell *cell);
 
-int vterm_screen_is_eol(const VTermScreen *screen, VTermPos pos);
+পূর্ণসংখ্যা vterm_screen_is_eol(ধ্রুবক VTermScreen *screen, VTermPos pos);
 
 /**
  * Same as vterm_state_convert_color_to_rgb(), but takes a `screen` instead of a `state`
  * instance.
  */
-void vterm_screen_convert_color_to_rgb(const VTermScreen *screen, VTermColor *col);
+শূন্য vterm_screen_convert_color_to_rgb(ধ্রুবক VTermScreen *screen, VTermColor *col);
 
 /**
  * Similar to vterm_state_set_default_colors(), but also resets colours in the
  * screen buffer(s)
  */
-void vterm_screen_set_default_colors(VTermScreen *screen, const VTermColor *default_fg, const VTermColor *default_bg);
+শূন্য vterm_screen_set_default_colors(VTermScreen *screen, ধ্রুবক VTermColor *default_fg, ধ্রুবক VTermColor *default_bg);
 
 // ---------
 // Utilities
 // ---------
 
-VTermValueType vterm_get_attr_type(VTermAttr attr);
-VTermValueType vterm_get_prop_type(VTermProp prop);
+VTerm_মান_Type vterm_get_attr_type(VTermAttr attr);
+VTerm_মান_Type vterm_get_prop_type(VTermProp prop);
 
-void vterm_scroll_rect(VTermRect rect,
-                       int downward,
-                       int rightward,
-                       int (*moverect)(VTermRect src, VTermRect dest, void *user),
-                       int (*eraserect)(VTermRect rect, int selective, void *user),
-                       void *user);
+শূন্য vterm_scroll_rect(VTermRect rect,
+                       পূর্ণসংখ্যা downward,
+                       পূর্ণসংখ্যা rightward,
+                       পূর্ণসংখ্যা (*moverect)(VTermRect src, VTermRect dest, শূন্য *user),
+                       পূর্ণসংখ্যা (*eraserect)(VTermRect rect, পূর্ণসংখ্যা selective, শূন্য *user),
+                       শূন্য *user);
 
-void vterm_copy_cells(VTermRect dest,
+শূন্য vterm_copy_cells(VTermRect dest,
                       VTermRect src,
-                      void (*copycell)(VTermPos dest, VTermPos src, void *user),
-                      void *user);
+                      শূন্য (*copycell)(VTermPos dest, VTermPos src, শূন্য *user),
+                      শূন্য *user);
 
 #ifdef __cplusplus
 }

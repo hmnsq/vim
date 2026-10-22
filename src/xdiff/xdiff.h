@@ -20,11 +20,11 @@
  *
  */
 
-#if !defined(XDIFF_H)
+#যদি !defined(XDIFF_H)
 #define XDIFF_H
 
 #ifdef __cplusplus
-extern "C" {
+বাহ্যিক "C" {
 #endif /* #ifdef __cplusplus */
 
 /* xpparm_t.flags */
@@ -39,7 +39,7 @@ extern "C" {
 			      XDF_IGNORE_WHITESPACE_AT_EOL | \
 			      XDF_IGNORE_CR_AT_EOL)
 
-#define XDF_IGNORE_BLANK_LINES (1 << 7)
+#define XDF_IGNORE_BLANK_সারিগুলি (1 << 7)
 
 #define XDF_PATIENCE_DIFF (1 << 14)
 #define XDF_HISTOGRAM_DIFF (1 << 15)
@@ -68,61 +68,61 @@ extern "C" {
 #define XDL_MERGE_DIFF3 1
 #define XDL_MERGE_ZEALOUS_DIFF3 2
 
-typedef struct s_mmfile {
-	char *ptr;
-	long size;
+প্রকারলেখ কাঠামো s_mmfile {
+	অক্ষর *ptr;
+	long আকার_2;
 } mmfile_t;
 
-typedef struct s_mmbuffer {
-	char *ptr;
-	long size;
+প্রকারলেখ কাঠামো s_mmbuffer {
+	অক্ষর *ptr;
+	long আকার_2;
 } mmbuffer_t;
 
-typedef struct s_xpparam {
+প্রকারলেখ কাঠামো s_xpparam {
 	unsigned long flags;
 
 	/* -I<regex> */
- #if 0  // unused by Vim
+ #যদি 0  // unused by Vim
 	regex_t **ignore_regex;
 	size_t ignore_regex_nr;
 #endif
 
 	/* See Documentation/diff-options.adoc. */
-	char **anchors;
+	অক্ষর **anchors;
 	size_t anchors_nr;
 } xpparam_t;
 
-typedef struct s_xdemitcb {
-	void *priv;
-	int (*out_hunk)(void *,
+প্রকারলেখ কাঠামো s_xdemitcb {
+	শূন্য *priv;
+	পূর্ণসংখ্যা (*out_hunk)(শূন্য *,
 			long old_begin, long old_nr,
 			long new_begin, long new_nr,
-			const char *func, long funclen);
-	int (*out_line)(void *, mmbuffer_t *, int);
+			ধ্রুবক অক্ষর *func, long funclen);
+	পূর্ণসংখ্যা (*out_সারি)(শূন্য *, mmbuffer_t *, পূর্ণসংখ্যা);
 } xdemitcb_t;
 
-typedef long (*find_func_t)(const char *line, long line_len, char *buffer, long buffer_size, void *priv);
+প্রকারলেখ long (*find_func_t)(ধ্রুবক অক্ষর *সারি, long সারি_len, অক্ষর *বাফার, long বাফার_আকার_3, শূন্য *priv);
 
-typedef int (*xdl_emit_hunk_consume_func_t)(long start_a, long count_a,
-					    long start_b, long count_b,
-					    void *cb_data);
+প্রকারলেখ পূর্ণসংখ্যা (*xdl_emit_hunk_consume_func_t)(long start_a, long গুনতি_a,
+					    long start_b, long গুনতি_b,
+					    শূন্য *cb_তথ্য_2);
 
-typedef struct s_xdemitconf {
+প্রকারলেখ কাঠামো s_xdemitconf {
 	long ctxlen;
 	long interhunkctxlen;
 	unsigned long flags;
 	find_func_t find_func;
-	void *find_func_priv;
+	শূন্য *find_func_priv;
 	xdl_emit_hunk_consume_func_t hunk_func;
 } xdemitconf_t;
 
-typedef struct s_bdiffparam {
+প্রকারলেখ কাঠামো s_bdiffparam {
 	long bsize;
 } bdiffparam_t;
 
 #ifdef VMS
 # include "[]vim.h"
-#else
+#অন্যথা
 # include "../vim.h"
 #endif
 
@@ -131,27 +131,27 @@ typedef struct s_bdiffparam {
 #define xdl_free(ptr) vim_free(ptr)
 #define xdl_realloc(ptr,x) vim_realloc((ptr),(x))
 
-void *xdl_mmfile_first(mmfile_t *mmf, long *size);
-long xdl_mmfile_size(mmfile_t *mmf);
+শূন্য *xdl_mmfile_first(mmfile_t *mmf, long *আকার_2);
+long xdl_mmfile_আকার(mmfile_t *mmf);
 
-int xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
-	     xdemitconf_t const *xecfg, xdemitcb_t *ecb);
+পূর্ণসংখ্যা xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t ধ্রুবক *xpp,
+	     xdemitconf_t ধ্রুবক *xecfg, xdemitcb_t *ecb);
 
-typedef struct s_xmparam {
+প্রকারলেখ কাঠামো s_xmparam {
 	xpparam_t xpp;
-	int marker_size;
-	int level;
-	int favor;
-	int style;
-	const char *ancestor;	/* label for orig */
-	const char *file1;	/* label for mf1 */
-	const char *file2;	/* label for mf2 */
+	পূর্ণসংখ্যা marker_আকার;
+	পূর্ণসংখ্যা level;
+	পূর্ণসংখ্যা favor;
+	পূর্ণসংখ্যা style;
+	ধ্রুবক অক্ষর *ancestor;	/* label for orig */
+	ধ্রুবক অক্ষর *file1;	/* label for mf1 */
+	ধ্রুবক অক্ষর *file2;	/* label for mf2 */
 } xmparam_t;
 
-#define DEFAULT_CONFLICT_MARKER_SIZE 7
+#define DEFAULT_CONFLICT_MARKER_আকার 7
 
-int xdl_merge(mmfile_t *orig, mmfile_t *mf1, mmfile_t *mf2,
-		xmparam_t const *xmp, mmbuffer_t *result);
+পূর্ণসংখ্যা xdl_merge(mmfile_t *orig, mmfile_t *mf1, mmfile_t *mf2,
+		xmparam_t ধ্রুবক *xmp, mmbuffer_t *ফলাফল);
 
 #ifdef __cplusplus
 }

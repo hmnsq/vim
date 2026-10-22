@@ -11,37 +11,37 @@
  * Text properties implementation.  See ":help text-properties".
  */
 
-#include "vim.h"
+#অন্তর্ভাব "vim.h"
 
-#if defined(FEAT_PROP_POPUP)
+#যদি defined(FEAT_PROP_POPUP)
 
-static void um_store_changes(unpacked_memline_T *um);
+স্থির শূন্য um_store_changes(unpacked_memline_T *um);
 
 /*
  * Free virtual text strings in a detached unpacked memline's props.
  */
-    static void
-um_free_vtext(textprop_T *props, int count)
+    স্থির শূন্য
+um_free_vtext(textprop_T *props, পূর্ণসংখ্যা গুনতি)
 {
-    for (int i = 0; i < count; ++i)
-	if (props[i].tp_flags & TP_FLAG_VTEXT_PTR)
+    জন্য (পূর্ণসংখ্যা i = 0; i < গুনতি; ++i)
+	যদি (props[i].tp_flags & TP_FLAG_VTEXT_PTR)
 	    VIM_CLEAR(props[i].u.tp_text);
 }
 
 /*
  * Free memory used by an unpacked memline.
  */
-    static void
+    স্থির শূন্য
 um_free(unpacked_memline_T *um)
 {
-    if (um->detached)
+    যদি (um->detached)
     {
 	VIM_CLEAR(um->text);
-	um_free_vtext(um->props, um->prop_count);
+	um_free_vtext(um->props, um->prop_গুনতি);
     }
     VIM_CLEAR(um->props);
-    um->prop_size = 0;
-    um->prop_count = 0;
+    um->prop_আকার = 0;
+    um->prop_গুনতি = 0;
     um->lnum = 0;
     um->detached = false;
 }
@@ -57,7 +57,7 @@ um_open(buf_T *buf)
 
     CLEAR_FIELD(um);
     um.buf = buf;
-    return um;
+    ফেরত um;
 }
 
 /*
@@ -67,88 +67,88 @@ um_open(buf_T *buf)
  * Returns true on success, false on error (um becomes closed).
  */
     bool
-um_goto_line(unpacked_memline_T *um, linenr_T lnum, int extra_props)
+um_goto_সারি(unpacked_memline_T *um, linenr_T lnum, পূর্ণসংখ্যা extra_props)
 {
-    char_u	*line;
+    char_u	*সারি;
     size_t	textlen;
     size_t	propdata_len;
-    int		proplen;
+    পূর্ণসংখ্যা		proplen;
 
-    if (um->buf == NULL)
-	return false;
+    যদি (um->buf == ফাঁকা)
+	ফেরত false;
 
     // Store changes to the current line if any.
-    if (um->lnum > 0 && um->detached)
+    যদি (um->lnum > 0 && um->detached)
 	um_store_changes(um);
     um_free(um);
 
-    if (lnum == 0)
-	return true;	// just unload
+    যদি (lnum == 0)
+	ফেরত true;	// just unload
 
-    line = ml_get_buf(um->buf, lnum, FALSE);
+    সারি = ml_get_buf(um->buf, lnum, FALSE);
     textlen = ml_get_buf_len(um->buf, lnum) + 1;
-    propdata_len = um->buf->b_ml.ml_line_len - textlen;
+    propdata_len = um->buf->b_ml.ml_সারি_len - textlen;
 
     um->lnum = lnum;
-    um->text_size = (colnr_T)textlen;
-    um->text = line;
+    um->text_আকার_2 = (colnr_T)textlen;
+    um->text = সারি;
 
-    if (propdata_len == 0)
-	return true;
+    যদি (propdata_len == 0)
+	ফেরত true;
 
     // New format: [prop_count (uint16)][textprop_T...][vtext...]
-    if (propdata_len < PROP_COUNT_SIZE + sizeof(textprop_T))
+    যদি (propdata_len < PROP_গুনতি_আকার + আকার(textprop_T))
     {
 	emsg(e_text_property_info_corrupted);
-	um->buf = NULL;
-	return false;
+	um->buf = ফাঁকা;
+	ফেরত false;
     }
 
-    uint16_t    prop_count;
-    char_u	    *count_ptr = line + textlen;
+    uint16_t    prop_গুনতি;
+    char_u	    *গুনতি_ptr = সারি + textlen;
     char_u	    *props_start;
 
-    mch_memmove(&prop_count, count_ptr, PROP_COUNT_SIZE);
-    if (!text_prop_count_valid(prop_count, propdata_len))
+    mch_memmove(&prop_গুনতি, গুনতি_ptr, PROP_গুনতি_আকার);
+    যদি (!text_prop_গুনতি_valid(prop_গুনতি, propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
-	um->buf = NULL;
-	return false;
+	um->buf = ফাঁকা;
+	ফেরত false;
     }
-    proplen = (int)prop_count;
-    props_start = count_ptr + PROP_COUNT_SIZE;
+    proplen = (পূর্ণসংখ্যা)prop_গুনতি;
+    props_start = গুনতি_ptr + PROP_গুনতি_আকার;
 
-    if (!text_prop_vtext_valid(props_start, proplen, propdata_len))
+    যদি (!text_prop_vtext_valid(props_start, proplen, propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
-	um->buf = NULL;
-	return false;
+	um->buf = ফাঁকা;
+	ফেরত false;
     }
 
     um->props = ALLOC_MULT(textprop_T, proplen + extra_props);
-    if (um->props == NULL)
+    যদি (um->props == ফাঁকা)
     {
-	um->buf = NULL;
-	return false;
+	um->buf = ফাঁকা;
+	ফেরত false;
     }
-    um->prop_size = proplen + extra_props;
-    um->prop_count = proplen;
-    mch_memmove(um->props, props_start, proplen * sizeof(textprop_T));
+    um->prop_আকার = proplen + extra_props;
+    um->prop_গুনতি = proplen;
+    mch_memmove(um->props, props_start, proplen * আকার(textprop_T));
 
     // Convert tp_text_offset to tp_text pointer for virtual text
     // props.
-    for (int i = 0; i < proplen; ++i)
+    জন্য (পূর্ণসংখ্যা i = 0; i < proplen; ++i)
     {
-	if (um->props[i].tp_id < 0 && um->props[i].u.tp_text_offset > 0)
+	যদি (um->props[i].tp_id < 0 && um->props[i].u.tp_text_offset > 0)
 	{
-	    um->props[i].u.tp_text = count_ptr + um->props[i].u.tp_text_offset;
+	    um->props[i].u.tp_text = গুনতি_ptr + um->props[i].u.tp_text_offset;
 	    um->props[i].tp_flags |= TP_FLAG_VTEXT_PTR;
 	}
-	else
-	    um->props[i].u.tp_text = NULL;
+	অন্যথা
+	    um->props[i].u.tp_text = ফাঁকা;
     }
 
-    return true;
+    ফেরত true;
 }
 
 /*
@@ -156,13 +156,13 @@ um_goto_line(unpacked_memline_T *um, linenr_T lnum, int extra_props)
  * Check um.buf != NULL for success.
  */
     unpacked_memline_T
-um_open_at(buf_T *buf, linenr_T lnum, int extra_props)
+um_open_at(buf_T *buf, linenr_T lnum, পূর্ণসংখ্যা extra_props)
 {
     unpacked_memline_T um = um_open(buf);
 
-    if (!um_goto_line(&um, lnum, extra_props))
-	um.buf = NULL;
-    return um;
+    যদি (!um_goto_সারি(&um, lnum, extra_props))
+	um.buf = ফাঁকা;
+    ফেরত um;
 }
 
 /*
@@ -170,43 +170,43 @@ um_open_at(buf_T *buf, linenr_T lnum, int extra_props)
  * strings to allocated memory (LOADED -> DETACHED).
  * Returns true on success.
  */
-    static bool
+    স্থির bool
 um_detach(unpacked_memline_T *um)
 {
     char_u  *newtext;
 
-    if (um->detached || um->buf == NULL)
-	return um->detached;
+    যদি (um->detached || um->buf == ফাঁকা)
+	ফেরত um->detached;
 
-    newtext = vim_strnsave(um->text, um->text_size - 1);
-    if (newtext == NULL)
+    newtext = vim_strnsave(um->text, um->text_আকার_2 - 1);
+    যদি (newtext == ফাঁকা)
     {
-	um->buf = NULL;
-	return false;
+	um->buf = ফাঁকা;
+	ফেরত false;
     }
     um->text = newtext;
 
-    for (int i = 0; i < um->prop_count; ++i)
+    জন্য (পূর্ণসংখ্যা i = 0; i < um->prop_গুনতি; ++i)
     {
-	if (um->props[i].tp_flags & TP_FLAG_VTEXT_PTR)
+	যদি (um->props[i].tp_flags & TP_FLAG_VTEXT_PTR)
 	{
 	    char_u *copy = vim_strsave(um->props[i].u.tp_text);
 
-	    if (copy == NULL)
+	    যদি (copy == ফাঁকা)
 	    {
-		for (int j = 0; j < i; ++j)
-		    if (um->props[j].tp_id < 0)
+		জন্য (পূর্ণসংখ্যা j = 0; j < i; ++j)
+		    যদি (um->props[j].tp_id < 0)
 			VIM_CLEAR(um->props[j].u.tp_text);
 		VIM_CLEAR(um->text);
-		um->buf = NULL;
-		return false;
+		um->buf = ফাঁকা;
+		ফেরত false;
 	    }
 	    um->props[i].u.tp_text = copy;
 	}
     }
 
     um->detached = true;
-    return true;
+    ফেরত true;
 }
 
 /*
@@ -216,64 +216,64 @@ um_detach(unpacked_memline_T *um)
     bool
 um_set_text(unpacked_memline_T *um, char_u *text)
 {
-    if (um->buf == NULL)
-	return false;
-    if (um->detached)
+    যদি (um->buf == ফাঁকা)
+	ফেরত false;
+    যদি (um->detached)
 	vim_free(um->text);
     um->text = text;
-    um->text_size = (colnr_T)STRLEN(text) + 1;
+    um->text_আকার_2 = (colnr_T)STRLEN(text) + 1;
     um->text_changed = true;
     um->detached = true;
-    return true;
+    ফেরত true;
 }
 
 /*
  * Ensure there is space for at least "needed" more properties.
  * Returns true on success.
  */
-    static bool
-um_grow_props(unpacked_memline_T *um, int needed)
+    স্থির bool
+um_grow_props(unpacked_memline_T *um, পূর্ণসংখ্যা needed)
 {
-    if (um->prop_count + needed <= um->prop_size)
-	return true;
+    যদি (um->prop_গুনতি + needed <= um->prop_আকার)
+	ফেরত true;
 
-    int	    new_size = um->prop_count + needed;
+    পূর্ণসংখ্যা	    new_আকার = um->prop_গুনতি + needed;
     textprop_T  *newprops = vim_realloc(um->props,
-					    new_size * sizeof(textprop_T));
-    if (newprops == NULL)
-	return false;
+					    new_আকার * আকার(textprop_T));
+    যদি (newprops == ফাঁকা)
+	ফেরত false;
     um->props = newprops;
-    um->prop_size = new_size;
+    um->prop_আকার = new_আকার;
 
-    return true;
+    ফেরত true;
 }
 
 /*
  * Add a property to the end of the props array without sorting.
  * For virtual text props, u.tp_text ownership is transferred.
  */
-    static void
+    স্থির শূন্য
 um_add_prop(unpacked_memline_T *um, textprop_T *prop)
 {
-    if (um->buf == NULL)
-	return;
-    if (!um->detached && !um_detach(um))
-	return;
-    if (!um_grow_props(um, 1))
+    যদি (um->buf == ফাঁকা)
+	ফেরত;
+    যদি (!um->detached && !um_detach(um))
+	ফেরত;
+    যদি (!um_grow_props(um, 1))
     {
-	um->buf = NULL;
-	return;
+	um->buf = ফাঁকা;
+	ফেরত;
     }
-    um->props[um->prop_count++] = *prop;
+    um->props[um->prop_গুনতি++] = *prop;
 }
 
 /*
  * Reverse the order of all properties.
  */
-    void
+    শূন্য
 um_reverse_props(unpacked_memline_T *um)
 {
-    for (int i = 0, j = um->prop_count - 1; i < j; ++i, --j)
+    জন্য (পূর্ণসংখ্যা i = 0, j = um->prop_গুনতি - 1; i < j; ++i, --j)
     {
 	textprop_T tmp = um->props[i];
 	um->props[i] = um->props[j];
@@ -287,45 +287,45 @@ um_reverse_props(unpacked_memline_T *um)
  * immediately in the DETACHED state.
  */
     unpacked_memline_T
-um_open_at_no_props(buf_T *buf, linenr_T lnum, int prop_count)
+um_open_at_no_props(buf_T *buf, linenr_T lnum, পূর্ণসংখ্যা prop_গুনতি)
 {
     unpacked_memline_T um;
 
     CLEAR_FIELD(um);
     um.buf = buf;
 
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count)
+    যদি (lnum < 1 || lnum > buf->b_ml.ml_সারি_গুনতি)
     {
-	um.buf = NULL;
-	return um;
+	um.buf = ফাঁকা;
+	ফেরত um;
     }
 
-    char_u *line = ml_get_buf(buf, lnum, FALSE);
-    char_u *text_copy = vim_strsave(line);
+    char_u *সারি = ml_get_buf(buf, lnum, FALSE);
+    char_u *text_copy = vim_strsave(সারি);
 
-    if (text_copy == NULL)
+    যদি (text_copy == ফাঁকা)
     {
-	um.buf = NULL;
-	return um;
+	um.buf = ফাঁকা;
+	ফেরত um;
     }
     um.lnum = lnum;
     um.text = text_copy;
-    um.text_size = (colnr_T)STRLEN(text_copy) + 1;
+    um.text_আকার_2 = (colnr_T)STRLEN(text_copy) + 1;
     um.detached = true;
 
-    if (prop_count > 0)
+    যদি (prop_গুনতি > 0)
     {
-	um.props = ALLOC_MULT(textprop_T, prop_count);
-	if (um.props == NULL)
+	um.props = ALLOC_MULT(textprop_T, prop_গুনতি);
+	যদি (um.props == ফাঁকা)
 	{
 	    vim_free(um.text);
-	    um.buf = NULL;
-	    return um;
+	    um.buf = ফাঁকা;
+	    ফেরত um;
 	}
-	um.prop_size = prop_count;
+	um.prop_আকার = prop_গুনতি;
     }
 
-    return um;
+    ফেরত um;
 }
 
 /*
@@ -333,31 +333,31 @@ um_open_at_no_props(buf_T *buf, linenr_T lnum, int prop_count)
  * Find a property on "lnum" in "buf" that matches "tp_id" and "tp_type",
  * and clear "flag_to_clear" (TP_FLAG_CONT_NEXT or TP_FLAG_CONT_PREV).
  */
-    static void
+    স্থির শূন্য
 clear_cont_flag_on_neighbor(buf_T *buf, linenr_T lnum,
-					int tp_id, int tp_type, int flag)
+					পূর্ণসংখ্যা tp_id, পূর্ণসংখ্যা tp_type, পূর্ণসংখ্যা flag)
 {
     unpacked_memline_T	neighbor;
 
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count)
-	return;
+    যদি (lnum < 1 || lnum > buf->b_ml.ml_সারি_গুনতি)
+	ফেরত;
 
     neighbor = um_open_at(buf, lnum, 0);
-    if (neighbor.buf == NULL)
-	return;
+    যদি (neighbor.buf == ফাঁকা)
+	ফেরত;
 
-    for (int i = 0; i < neighbor.prop_count; ++i)
+    জন্য (পূর্ণসংখ্যা i = 0; i < neighbor.prop_গুনতি; ++i)
     {
 	textprop_T *p = &neighbor.props[i];
 
-	if (p->tp_id == tp_id && p->tp_type == tp_type && (p->tp_flags & flag))
+	যদি (p->tp_id == tp_id && p->tp_type == tp_type && (p->tp_flags & flag))
 	{
-	    if (!neighbor.detached && !um_detach(&neighbor))
-		break;
+	    যদি (!neighbor.detached && !um_detach(&neighbor))
+		বিরতি;
 	    // Re-get pointer after detach.
 	    p = &neighbor.props[i];
 	    p->tp_flags &= ~flag;
-	    break;
+	    বিরতি;
 	}
     }
     um_close(&neighbor);
@@ -368,27 +368,27 @@ clear_cont_flag_on_neighbor(buf_T *buf, linenr_T lnum,
  * Automatically detaches if needed.
  * Also adjusts continuation flags on neighboring lines.
  */
-    void
-um_delete_prop(unpacked_memline_T *um, int index)
+    শূন্য
+um_delete_prop(unpacked_memline_T *um, পূর্ণসংখ্যা সূচক)
 {
     textprop_T *prop;
 
-    if (um->buf == NULL || index < 0 || index >= um->prop_count)
-	return;
-    if (!um->detached && !um_detach(um))
-	return;
+    যদি (um->buf == ফাঁকা || সূচক < 0 || সূচক >= um->prop_গুনতি)
+	ফেরত;
+    যদি (!um->detached && !um_detach(um))
+	ফেরত;
 
-    prop = &um->props[index];
+    prop = &um->props[সূচক];
 
     // Adjust continuation flags on neighboring lines before deleting.
-    if (prop->tp_flags & TP_FLAG_CONT_PREV)
+    যদি (prop->tp_flags & TP_FLAG_CONT_পূর্ব)
 	clear_cont_flag_on_neighbor(um->buf, um->lnum - 1,
-			       prop->tp_id, prop->tp_type, TP_FLAG_CONT_NEXT);
-    if (prop->tp_flags & TP_FLAG_CONT_NEXT)
+			       prop->tp_id, prop->tp_type, TP_FLAG_CONT_পরবর্তী);
+    যদি (prop->tp_flags & TP_FLAG_CONT_পরবর্তী)
 	clear_cont_flag_on_neighbor(um->buf, um->lnum + 1,
-			       prop->tp_id, prop->tp_type, TP_FLAG_CONT_PREV);
+			       prop->tp_id, prop->tp_type, TP_FLAG_CONT_পূর্ব);
 
-    if (prop->tp_flags & TP_FLAG_VTEXT_PTR)
+    যদি (prop->tp_flags & TP_FLAG_VTEXT_PTR)
 	VIM_CLEAR(prop->u.tp_text);
     prop->tp_flags |= TP_FLAG_DELETED;
 }
@@ -402,147 +402,147 @@ um_delete_prop(unpacked_memline_T *um, int index)
  * NOTE: Currently packs in the OLD format (no inline vtext) because
  * the read side has not been converted yet.
  */
-    static char_u *
-um_pack(unpacked_memline_T *um, int *packed_len)
+    স্থির char_u *
+um_pack(unpacked_memline_T *um, পূর্ণসংখ্যা *packed_len)
 {
-    uint16_t	live_count = 0;
-    int		vtext_size = 0;
-    int		total_len;
+    uint16_t	live_গুনতি = 0;
+    পূর্ণসংখ্যা		vtext_আকার = 0;
+    পূর্ণসংখ্যা		যোগ_len;
     char_u	*buf;
-    char_u	*count_dest;
+    char_u	*গুনতি_dest;
     char_u	*prop_dest;
     char_u	*vtext_dest;
 
-    for (int i = 0; i < um->prop_count; ++i)
+    জন্য (পূর্ণসংখ্যা i = 0; i < um->prop_গুনতি; ++i)
     {
 	textprop_T *prop = &um->props[i];
 
-	if (prop->tp_flags & TP_FLAG_DELETED)
-	    continue;
-	++live_count;
-	if (prop->tp_flags & TP_FLAG_VTEXT_PTR)
-	    vtext_size += prop->tp_len + 1;
+	যদি (prop->tp_flags & TP_FLAG_DELETED)
+	    চালু;
+	++live_গুনতি;
+	যদি (prop->tp_flags & TP_FLAG_VTEXT_PTR)
+	    vtext_আকার += prop->tp_len + 1;
     }
 
-    if (live_count == 0)
+    যদি (live_গুনতি == 0)
     {
 	// No properties: just text, no prop_count header.
-	total_len = um->text_size;
-	buf = alloc(total_len);
-	if (buf == NULL)
-	    return NULL;
-	*packed_len = total_len;
-	mch_memmove(buf, um->text, um->text_size);
-	return buf;
+	যোগ_len = um->text_আকার_2;
+	buf = alloc(যোগ_len);
+	যদি (buf == ফাঁকা)
+	    ফেরত ফাঁকা;
+	*packed_len = যোগ_len;
+	mch_memmove(buf, um->text, um->text_আকার_2);
+	ফেরত buf;
     }
 
     // Format: [text][NUL][prop_count][textprop_T...][vtext...]
-    total_len = um->text_size + (int)PROP_COUNT_SIZE
-		+ live_count * (int)sizeof(textprop_T) + vtext_size;
-    buf = alloc(total_len);
-    if (buf == NULL)
-	return NULL;
-    *packed_len = total_len;
+    যোগ_len = um->text_আকার_2 + (পূর্ণসংখ্যা)PROP_গুনতি_আকার
+		+ live_গুনতি * (পূর্ণসংখ্যা)আকার(textprop_T) + vtext_আকার;
+    buf = alloc(যোগ_len);
+    যদি (buf == ফাঁকা)
+	ফেরত ফাঁকা;
+    *packed_len = যোগ_len;
 
-    mch_memmove(buf, um->text, um->text_size);
+    mch_memmove(buf, um->text, um->text_আকার_2);
 
-    count_dest = buf + um->text_size;
-    mch_memmove(count_dest, &live_count, PROP_COUNT_SIZE);
+    গুনতি_dest = buf + um->text_আকার_2;
+    mch_memmove(গুনতি_dest, &live_গুনতি, PROP_গুনতি_আকার);
 
-    prop_dest = count_dest + PROP_COUNT_SIZE;
-    vtext_dest = prop_dest + live_count * sizeof(textprop_T);
+    prop_dest = গুনতি_dest + PROP_গুনতি_আকার;
+    vtext_dest = prop_dest + live_গুনতি * আকার(textprop_T);
 
-    for (int i = 0; i < um->prop_count; ++i)
+    জন্য (পূর্ণসংখ্যা i = 0; i < um->prop_গুনতি; ++i)
     {
 	textprop_T prop = um->props[i];
 
-	if (prop.tp_flags & TP_FLAG_DELETED)
-	    continue;
+	যদি (prop.tp_flags & TP_FLAG_DELETED)
+	    চালু;
 
-	if (prop.tp_id < 0 && (prop.tp_flags & TP_FLAG_VTEXT_PTR))
+	যদি (prop.tp_id < 0 && (prop.tp_flags & TP_FLAG_VTEXT_PTR))
 	{
-	    int copysize = prop.tp_len + 1;
+	    পূর্ণসংখ্যা copysize = prop.tp_len + 1;
 
 	    mch_memmove(vtext_dest, prop.u.tp_text, copysize);
-	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
+	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - গুনতি_dest);
 	    vtext_dest += copysize;
 	}
-	else
+	অন্যথা
 	    prop.u.tp_text_offset = 0;
 	prop.tp_flags &= ~(TP_FLAG_DELETED | TP_FLAG_VTEXT_PTR);
 
-	mch_memmove(prop_dest, &prop, sizeof(textprop_T));
-	prop_dest += sizeof(textprop_T);
+	mch_memmove(prop_dest, &prop, আকার(textprop_T));
+	prop_dest += আকার(textprop_T);
     }
 
-    return buf;
+    ফেরত buf;
 }
 
 /*
  * Store changes to the current line back into the buffer's memline.
  */
-    static void
+    স্থির শূন্য
 um_store_changes(unpacked_memline_T *um)
 {
     char_u  *packed;
-    int	    packed_len;
+    পূর্ণসংখ্যা	    packed_len;
 
-    if (!um->detached || um->buf == NULL || um->lnum == 0)
-	return;
+    যদি (!um->detached || um->buf == ফাঁকা || um->lnum == 0)
+	ফেরত;
 
     packed = um_pack(um, &packed_len);
-    if (packed == NULL)
+    যদি (packed == ফাঁকা)
     {
-	um->buf = NULL;
-	return;
+	um->buf = ফাঁকা;
+	ফেরত;
     }
 
     // Flush any other dirty line before setting ours.  ml_get_buf()
     // with will_change=TRUE will flush the current dirty line and set
     // up for our line.
-    if (um->buf->b_ml.ml_line_lnum != um->lnum)
+    যদি (um->buf->b_ml.ml_সারি_lnum != um->lnum)
 	ml_get_buf(um->buf, um->lnum, TRUE);
-    else if (!(um->buf->b_ml.ml_flags & ML_LINE_DIRTY))
-	(void)ml_get_buf(um->buf, um->lnum, TRUE);
+    অন্যথা যদি (!(um->buf->b_ml.ml_flags & ML_সারি_DIRTY))
+	(শূন্য)ml_get_buf(um->buf, um->lnum, TRUE);
 
     // Free the detached text and vtext before switching to packed.
     vim_free(um->text);
-    um_free_vtext(um->props, um->prop_count);
+    um_free_vtext(um->props, um->prop_গুনতি);
 
-    if (um->buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	vim_free(um->buf->b_ml.ml_line_ptr);
-    um->buf->b_ml.ml_line_ptr = packed;
-    um->buf->b_ml.ml_line_len = packed_len;
-    um->buf->b_ml.ml_flags |= ML_LINE_DIRTY;
+    যদি (um->buf->b_ml.ml_flags & (ML_সারি_DIRTY | ML_ALLOCATED))
+	vim_free(um->buf->b_ml.ml_সারি_ptr);
+    um->buf->b_ml.ml_সারি_ptr = packed;
+    um->buf->b_ml.ml_সারি_len = packed_len;
+    um->buf->b_ml.ml_flags |= ML_সারি_DIRTY;
 
     um->detached = false;
     um->text = packed;
-    um->text_size = (colnr_T)STRLEN(packed) + 1;
-    um->buf->b_ml.ml_line_textlen = um->text_size;
+    um->text_আকার_2 = (colnr_T)STRLEN(packed) + 1;
+    um->buf->b_ml.ml_সারি_textlen = um->text_আকার_2;
 }
 
 /*
  * Close an unpacked memline, storing any changes.
  */
-    void
+    শূন্য
 um_close(unpacked_memline_T *um)
 {
-    if (um->buf == NULL)
-	return;
-    if (um->detached && um->lnum > 0)
+    যদি (um->buf == ফাঁকা)
+	ফেরত;
+    যদি (um->detached && um->lnum > 0)
 	um_store_changes(um);
     um_free(um);
-    um->buf = NULL;
+    um->buf = ফাঁকা;
 }
 
 /*
  * Abort an unpacked memline, discarding any changes.
  */
-    void
+    শূন্য
 um_abort(unpacked_memline_T *um)
 {
     um_free(um);
-    um->buf = NULL;
+    um->buf = ফাঁকা;
 }
 
 /*
@@ -554,65 +554,65 @@ um_abort(unpacked_memline_T *um)
  */
 #define PT2HIKEY(p)  ((p)->pt_name)
 #define HIKEY2PT(p)   ((proptype_T *)((p) - offsetof(proptype_T, pt_name)))
-#define HI2PT(hi)      HIKEY2PT((hi)->hi_key)
+#define HI2PT(hi)      HIKEY2PT((hi)->hi_চাবি)
 
 // The global text property types.
-static hashtab_T *global_proptypes = NULL;
-static proptype_T **global_proparray = NULL;
+স্থির hashtab_T *global_proptypes = ফাঁকা;
+স্থির proptype_T **global_proparray = ফাঁকা;
 
 // The last used text property type ID.
-static int proptype_id = 0;
+স্থির পূর্ণসংখ্যা proptype_id = 0;
 
 /*
  * Find a property type by name, return the hashitem.
  * Returns NULL if the item can't be found.
  */
-    static hashitem_T *
+    স্থির hashitem_T *
 find_prop_type_hi(char_u *name, buf_T *buf)
 {
     hashtab_T	*ht;
     hashitem_T	*hi;
 
-    if (*name == NUL)
-	return NULL;
-    if (buf == NULL)
+    যদি (*name == NUL)
+	ফেরত ফাঁকা;
+    যদি (buf == ফাঁকা)
 	ht = global_proptypes;
-    else
+    অন্যথা
 	ht = buf->b_proptypes;
 
-    if (ht == NULL)
-	return NULL;
+    যদি (ht == ফাঁকা)
+	ফেরত ফাঁকা;
     hi = hash_find(ht, name);
-    if (HASHITEM_EMPTY(hi))
-	return NULL;
-    return hi;
+    যদি (HASHITEM_EMPTY(hi))
+	ফেরত ফাঁকা;
+    ফেরত hi;
 }
 
 /*
  * Like find_prop_type_hi() but return the property type.
  */
-    static proptype_T *
+    স্থির proptype_T *
 find_prop_type(char_u *name, buf_T *buf)
 {
     hashitem_T	*hi = find_prop_type_hi(name, buf);
 
-    if (hi == NULL)
-	return NULL;
-    return HI2PT(hi);
+    যদি (hi == ফাঁকা)
+	ফেরত ফাঁকা;
+    ফেরত HI2PT(hi);
 }
 
 /*
  * Get the prop type ID of "name".
  * When not found return zero.
  */
-    int
+    পূর্ণসংখ্যা
 find_prop_type_id(char_u *name, buf_T *buf)
 {
     proptype_T *pt = find_prop_type(name, buf);
 
-    if (pt == NULL)
-	return 0;
-    return pt->pt_id;
+    যদি (pt == ফাঁকা)
+	ফেরত 0;
+    ফেরত pt->pt_id;
 }
 
 /*
@@ -620,16 +620,16 @@ find_prop_type_id(char_u *name, buf_T *buf)
  * global types.
  * When not found gives an error message and returns NULL.
  */
-    static proptype_T *
+    স্থির proptype_T *
 lookup_prop_type(char_u *name, buf_T *buf)
 {
     proptype_T *type = find_prop_type(name, buf);
 
-    if (type == NULL)
-	type = find_prop_type(name, NULL);
-    if (type == NULL)
+    যদি (type == ফাঁকা)
+	type = find_prop_type(name, ফাঁকা);
+    যদি (type == ফাঁকা)
 	semsg(_(e_property_type_str_does_not_exist), name);
-    return type;
+    ফেরত type;
 }
 
 /*
@@ -639,50 +639,50 @@ lookup_prop_type(char_u *name, buf_T *buf)
  * If "bufnr" is valid or not present return OK.
  * When "arg" is not a dict or "bufnr" is invalid return FAIL.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 get_bufnr_from_arg(typval_T *arg, buf_T **buf)
 {
     dictitem_T	*di;
 
-    if (arg->v_type != VAR_DICT)
+    যদি (arg->v_type != VAR_DICT)
     {
 	emsg(_(e_dictionary_required));
-	return FAIL;
+	ফেরত FAIL;
     }
-    if (arg->vval.v_dict == NULL)
-	return OK;  // NULL dict is like an empty dict
+    যদি (arg->vval.v_dict == ফাঁকা)
+	ফেরত OK;  // NULL dict is like an empty dict
     di = dict_find(arg->vval.v_dict, (char_u *)"bufnr", -1);
-    if (di != NULL && (di->di_tv.v_type != VAR_NUMBER
-					      || di->di_tv.vval.v_number != 0))
+    যদি (di != ফাঁকা && (di->di_tv.v_type != VAR_সংখ্যা
+					      || di->di_tv.vval.v_সংখ্যা != 0))
     {
 	*buf = get_buf_arg(&di->di_tv);
-	if (*buf == NULL)
-	    return FAIL;
+	যদি (*buf == ফাঁকা)
+	    ফেরত FAIL;
     }
-    return OK;
+    ফেরত OK;
 }
 
 /*
  * prop_add({lnum}, {col}, {props})
  */
-    void
+    শূন্য
 f_prop_add(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	start_lnum;
     colnr_T	start_col;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+    যদি (in_vim9script()
+	    && (check_for_সংখ্যা_arg(argvars, 0) == FAIL
+		|| check_for_সংখ্যা_arg(argvars, 1) == FAIL
 		|| check_for_dict_arg(argvars, 2) == FAIL))
-	return;
+	ফেরত;
 
-    start_lnum = tv_get_number(&argvars[0]);
-    start_col = tv_get_number(&argvars[1]);
-    if (check_for_dict_arg(argvars, 2) == FAIL)
-	return;
+    start_lnum = tv_get_সংখ্যা(&argvars[0]);
+    start_col = tv_get_সংখ্যা(&argvars[1]);
+    যদি (check_for_dict_arg(argvars, 2) == FAIL)
+	ফেরত;
 
-    rettv->vval.v_number = prop_add_common(start_lnum, start_col,
+    rettv->vval.v_সংখ্যা = prop_add_common(start_lnum, start_col,
 				 argvars[2].vval.v_dict, curbuf, &argvars[2]);
 }
 
@@ -692,14 +692,14 @@ f_prop_add(typval_T *argvars, typval_T *rettv)
  * the buffer "buf" and assign identifier "id".
  * When "text" is not NULL store it as virtual text in the memline.
  */
-    static int
+    স্থির পূর্ণসংখ্যা
 prop_add_one(
 	buf_T		*buf,
 	char_u		*type_name,
-	int		id,
+	পূর্ণসংখ্যা		id,
 	char_u		*text_arg,
-	int		text_padding_left,
-	int		text_flags,
+	পূর্ণসংখ্যা		text_padding_বাম,
+	পূর্ণসংখ্যা		text_flags,
 	linenr_T	start_lnum,
 	linenr_T	end_lnum,
 	colnr_T		start_col,
@@ -707,92 +707,92 @@ prop_add_one(
 {
     proptype_T	*type;
     linenr_T	lnum;
-    int		proplen;
-    char_u	*props = NULL;
+    পূর্ণসংখ্যা		proplen;
+    char_u	*props = ফাঁকা;
     char_u	*newprops;
     size_t	textlen;
     char_u	*newtext;
-    int		i;
+    পূর্ণসংখ্যা		i;
     textprop_T	tmp_prop;
     char_u	*text = text_arg;
-    int		res = FAIL;
+    পূর্ণসংখ্যা		res = FAIL;
 
     type = lookup_prop_type(type_name, buf);
-    if (type == NULL)
-	goto theend;
+    যদি (type == ফাঁকা)
+	যাও theend;
 
-    if (start_lnum < 1 || start_lnum > buf->b_ml.ml_line_count)
+    যদি (start_lnum < 1 || start_lnum > buf->b_ml.ml_সারি_গুনতি)
     {
-	semsg(_(e_invalid_line_number_nr), (long)start_lnum);
-	goto theend;
+	semsg(_(e_invalid_সারি_সংখ্যা_nr), (long)start_lnum);
+	যাও theend;
     }
-    if (end_lnum < start_lnum || end_lnum > buf->b_ml.ml_line_count)
+    যদি (end_lnum < start_lnum || end_lnum > buf->b_ml.ml_সারি_গুনতি)
     {
-	semsg(_(e_invalid_line_number_nr), (long)end_lnum);
-	goto theend;
-    }
-
-    if (buf->b_ml.ml_mfp == NULL)
-    {
-	emsg(_(e_cannot_add_text_property_to_unloaded_buffer));
-	goto theend;
+	semsg(_(e_invalid_সারি_সংখ্যা_nr), (long)end_lnum);
+	যাও theend;
     }
 
-    if (text != NULL)
+    যদি (buf->b_ml.ml_mfp == ফাঁকা)
+    {
+	emsg(_(e_cannot_add_text_property_to_unloaded_বাফার));
+	যাও theend;
+    }
+
+    যদি (text != ফাঁকা)
     {
 	char_u	    *p;
 
 	// change any control character (Tab, Newline, etc.) to a Space to make
 	// it simpler to compute the size
-	for (p = text; *p != NUL; MB_PTR_ADV(p))
-	    if (*p < ' ')
+	জন্য (p = text; *p != NUL; MB_PTR_ADV(p))
+	    যদি (*p < ' ')
 		*p = ' ';
     }
 
-    for (lnum = start_lnum; lnum <= end_lnum; ++lnum)
+    জন্য (lnum = start_lnum; lnum <= end_lnum; ++lnum)
     {
 	colnr_T col;	    // start column use in tp_col
 	colnr_T sort_col;   // column where it appears
-	long	length;	    // in bytes
+	long	দৈর্ঘ্য;	    // in bytes
 
 	// Fetch the line to get the ml_line_len field updated.
 	proplen = get_text_props(buf, lnum, &props, TRUE);
 	textlen = ml_get_buf_len(buf, lnum) + 1;
 
 	// prop_count is a uint16_t; stop before proplen + 1 wraps to zero.
-	if (proplen >= 0xffff)
+	যদি (proplen >= 0xffff)
 	{
-	    emsg(_(e_too_many_text_properties_on_a_single_line));
-	    goto theend;
+	    emsg(_(e_too_many_text_properties_on_a_single_সারি));
+	    যাও theend;
 	}
 
-	if (lnum == start_lnum)
+	যদি (lnum == start_lnum)
 	    col = start_col;
-	else
+	অন্যথা
 	    col = 1;
-	if (col - 1 > (colnr_T)textlen && !(col == 0 && text_arg != NULL))
+	যদি (col - 1 > (colnr_T)textlen && !(col == 0 && text_arg != ফাঁকা))
 	{
-	    semsg(_(e_invalid_column_number_nr), (long)start_col);
-	    goto theend;
+	    semsg(_(e_invalid_column_সংখ্যা_nr), (long)start_col);
+	    যাও theend;
 	}
 	sort_col = col;
 
-	if (lnum == end_lnum)
-	    length = end_col - col;
-	else
-	    length = (int)textlen - col + 1;
-	if (length > (long)textlen)
-	    length = (int)textlen;	// can include the end-of-line
-	if (length < 0)
-	    length = 0;		// zero-width property
+	যদি (lnum == end_lnum)
+	    দৈর্ঘ্য = end_col - col;
+	অন্যথা
+	    দৈর্ঘ্য = (পূর্ণসংখ্যা)textlen - col + 1;
+	যদি (দৈর্ঘ্য > (long)textlen)
+	    দৈর্ঘ্য = (পূর্ণসংখ্যা)textlen;	// can include the end-of-line
+	যদি (দৈর্ঘ্য < 0)
+	    দৈর্ঘ্য = 0;		// zero-width property
 
-	if (text_arg != NULL)
+	যদি (text_arg != ফাঁকা)
 	{
-	    length = (long)STRLEN(text_arg);
-	    if (col == 0)
+	    দৈর্ঘ্য = (long)STRLEN(text_arg);
+	    যদি (col == 0)
 	    {
 		col = MAXCOL;	// before or after the line
-		if ((text_flags & TP_FLAG_ALIGN_ABOVE) == 0)
+		যদি ((text_flags & TP_FLAG_ALIGN_ABOVE) == 0)
 		    sort_col = MAXCOL;
 	    }
 	}
@@ -800,134 +800,134 @@ prop_add_one(
 	// Build the new property.
 	CLEAR_FIELD(tmp_prop);
 	tmp_prop.tp_col = col;
-	tmp_prop.tp_len = length;
+	tmp_prop.tp_len = দৈর্ঘ্য;
 	tmp_prop.tp_id = id;
 	tmp_prop.tp_type = type->pt_id;
 	tmp_prop.tp_flags = text_flags
-			    | (lnum > start_lnum ? TP_FLAG_CONT_PREV : 0)
-			    | (lnum < end_lnum ? TP_FLAG_CONT_NEXT : 0)
+			    | (lnum > start_lnum ? TP_FLAG_CONT_পূর্ব : 0)
+			    | (lnum < end_lnum ? TP_FLAG_CONT_পরবর্তী : 0)
 			    | ((type->pt_flags & PT_FLAG_INS_START_INCL)
 						     ? TP_FLAG_START_INCL : 0);
-	tmp_prop.tp_padleft = text_padding_left;
-	if (text_arg != NULL)
+	tmp_prop.tp_padleft = text_padding_বাম;
+	যদি (text_arg != ফাঁকা)
 	    tmp_prop.u.tp_text = text_arg;
 
 	// Find the index where to insert the new property.
-	for (i = 0; i < proplen; ++i)
+	জন্য (i = 0; i < proplen; ++i)
 	{
 	    textprop_T	existing;
 	    colnr_T	prop_col;
 
-	    mch_memmove(&existing, props + i * sizeof(textprop_T),
-							   sizeof(textprop_T));
+	    mch_memmove(&existing, props + i * আকার(textprop_T),
+							   আকার(textprop_T));
 	    prop_col = (existing.tp_flags & TP_FLAG_ALIGN_ABOVE)
 				? 0 : existing.tp_col;
-	    if (prop_col >= sort_col)
-		break;
+	    যদি (prop_col >= sort_col)
+		বিরতি;
 	}
 
 	// Compute the sizes for the new memline format:
 	//   [text][NUL][prop_count][textprop_T...][vtext...]
 	uint16_t	new_propcount = (uint16_t)(proplen + 1);
-	int		vtext_total = 0;
-	int		new_line_len;
-	char_u	*count_dest;
+	পূর্ণসংখ্যা		vtext_যোগ = 0;
+	পূর্ণসংখ্যা		new_সারি_len;
+	char_u	*গুনতি_dest;
 	char_u	*vtext_dest;
-	int		j;
+	পূর্ণসংখ্যা		j;
 
 	// Compute total vtext size from existing props.
-	for (j = 0; j < proplen; ++j)
+	জন্য (j = 0; j < proplen; ++j)
 	{
 	    textprop_T ep;
 
-	    mch_memmove(&ep, props + j * sizeof(textprop_T),
-							sizeof(textprop_T));
-	    if (ep.tp_id < 0 && ep.tp_len > 0)
-		vtext_total += ep.tp_len + 1;
+	    mch_memmove(&ep, props + j * আকার(textprop_T),
+							আকার(textprop_T));
+	    যদি (ep.tp_id < 0 && ep.tp_len > 0)
+		vtext_যোগ += ep.tp_len + 1;
 	}
 	// Add new vtext if this is a virtual text prop.
-	if (text_arg != NULL)
-	    vtext_total += length + 1;
+	যদি (text_arg != ফাঁকা)
+	    vtext_যোগ += দৈর্ঘ্য + 1;
 
-	new_line_len = (int)textlen + (int)PROP_COUNT_SIZE
-			+ new_propcount * (int)sizeof(textprop_T)
-			+ vtext_total;
-	newtext = alloc(new_line_len);
-	if (newtext == NULL)
-	    goto theend;
+	new_সারি_len = (পূর্ণসংখ্যা)textlen + (পূর্ণসংখ্যা)PROP_গুনতি_আকার
+			+ new_propcount * (পূর্ণসংখ্যা)আকার(textprop_T)
+			+ vtext_যোগ;
+	newtext = alloc(new_সারি_len);
+	যদি (newtext == ফাঁকা)
+	    যাও theend;
 
 	// Copy line text.
-	mch_memmove(newtext, buf->b_ml.ml_line_ptr, textlen);
+	mch_memmove(newtext, buf->b_ml.ml_সারি_ptr, textlen);
 
 	// Write prop_count.
-	count_dest = newtext + textlen;
-	mch_memmove(count_dest, &new_propcount, PROP_COUNT_SIZE);
+	গুনতি_dest = newtext + textlen;
+	mch_memmove(গুনতি_dest, &new_propcount, PROP_গুনতি_আকার);
 
 	// Write properties: [0..i-1] existing, [i] new, [i..proplen-1]
 	// existing.
-	newprops = count_dest + PROP_COUNT_SIZE;
-	if (i > 0)
-	    mch_memmove(newprops, props, sizeof(textprop_T) * i);
+	newprops = গুনতি_dest + PROP_গুনতি_আকার;
+	যদি (i > 0)
+	    mch_memmove(newprops, props, আকার(textprop_T) * i);
 	// new prop is written after vtext offsets are computed
-	if (i < proplen)
-	    mch_memmove(newprops + (i + 1) * sizeof(textprop_T),
-					props + i * sizeof(textprop_T),
-					sizeof(textprop_T) * (proplen - i));
+	যদি (i < proplen)
+	    mch_memmove(newprops + (i + 1) * আকার(textprop_T),
+					props + i * আকার(textprop_T),
+					আকার(textprop_T) * (proplen - i));
 
 	// Write vtext strings and set offsets.
-	vtext_dest = newprops + new_propcount * sizeof(textprop_T);
-	for (j = 0; j < new_propcount; ++j)
+	vtext_dest = newprops + new_propcount * আকার(textprop_T);
+	জন্য (j = 0; j < new_propcount; ++j)
 	{
 	    textprop_T ep;
 
-	    if (j == i)
-		continue;  // handle new prop separately below
-	    mch_memmove(&ep, newprops + j * sizeof(textprop_T),
-		    sizeof(textprop_T));
-	    if (ep.tp_id < 0 && ep.tp_len > 0)
+	    যদি (j == i)
+		চালু;  // handle new prop separately below
+	    mch_memmove(&ep, newprops + j * আকার(textprop_T),
+		    আকার(textprop_T));
+	    যদি (ep.tp_id < 0 && ep.tp_len > 0)
 	    {
 		// Copy existing vtext from old memline data.
-		char_u *old_count = (char_u *)props - PROP_COUNT_SIZE;
-		char_u *old_vtext = old_count + ep.u.tp_text_offset;
+		char_u *old_গুনতি_2 = (char_u *)props - PROP_গুনতি_আকার;
+		char_u *old_vtext = old_গুনতি_2 + ep.u.tp_text_offset;
 
 		mch_memmove(vtext_dest, old_vtext, ep.tp_len + 1);
-		ep.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
-		mch_memmove(newprops + j * sizeof(textprop_T), &ep,
-			sizeof(textprop_T));
+		ep.u.tp_text_offset = (colnr_T)(vtext_dest - গুনতি_dest);
+		mch_memmove(newprops + j * আকার(textprop_T), &ep,
+			আকার(textprop_T));
 		vtext_dest += ep.tp_len + 1;
 	    }
 	}
 
 	// Write new prop with vtext.
-	if (text_arg != NULL)
+	যদি (text_arg != ফাঁকা)
 	{
-	    int copysize = tmp_prop.tp_len + 1;
+	    পূর্ণসংখ্যা copysize = tmp_prop.tp_len + 1;
 
 	    mch_memmove(vtext_dest, text_arg, copysize);
 	    tmp_prop.u.tp_text_offset =
-				    (colnr_T)(vtext_dest - count_dest);
+				    (colnr_T)(vtext_dest - গুনতি_dest);
 	    vtext_dest += copysize;
 	}
-	else
+	অন্যথা
 	    tmp_prop.u.tp_text_offset = 0;
 
-	mch_memmove(newprops + i * sizeof(textprop_T), &tmp_prop,
-							sizeof(textprop_T));
+	mch_memmove(newprops + i * আকার(textprop_T), &tmp_prop,
+							আকার(textprop_T));
 
-	if (buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	    vim_free(buf->b_ml.ml_line_ptr);
-	buf->b_ml.ml_line_ptr = newtext;
-	buf->b_ml.ml_line_len = new_line_len;
-	buf->b_ml.ml_flags |= ML_LINE_DIRTY;
+	যদি (buf->b_ml.ml_flags & (ML_সারি_DIRTY | ML_ALLOCATED))
+	    vim_free(buf->b_ml.ml_সারি_ptr);
+	buf->b_ml.ml_সারি_ptr = newtext;
+	buf->b_ml.ml_সারি_len = new_সারি_len;
+	buf->b_ml.ml_flags |= ML_সারি_DIRTY;
     }
 
-    changed_line_display_buf(buf);
-    changed_lines_buf(buf, start_lnum, end_lnum + 1, 0);
+    changed_সারি_display_buf(buf);
+    changed_সারিগুলি_buf(buf, start_lnum, end_lnum + 1, 0);
     res = OK;
 
 theend:
     vim_free(text);
-    return res;
+    ফেরত res;
 }
 
 /*
@@ -937,102 +937,102 @@ theend:
  * Second argument is a List where each item is a List with the following
  * entries: [lnum, start_col, end_col]
  */
-    void
+    শূন্য
 f_prop_add_list(typval_T *argvars, typval_T *rettv UNUSED)
 {
     dict_T	*dict;
     char_u	*type_name;
     buf_T	*buf = curbuf;
-    int		id = 0;
+    পূর্ণসংখ্যা		id = 0;
     listitem_T	*li;
     list_T	*pos_list;
     linenr_T	start_lnum;
     colnr_T	start_col;
     linenr_T	end_lnum;
     colnr_T	end_col;
-    int		error = FALSE;
-    int		prev_did_emsg = did_emsg;
+    পূর্ণসংখ্যা		error = FALSE;
+    পূর্ণসংখ্যা		পূর্ব_did_emsg = did_emsg;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL
+    যদি (check_for_dict_arg(argvars, 0) == FAIL
 	    || check_for_list_arg(argvars, 1) == FAIL)
-	return;
+	ফেরত;
 
-    if (check_for_nonnull_list_arg(argvars, 1) == FAIL)
-	return;
+    যদি (check_for_nonnull_list_arg(argvars, 1) == FAIL)
+	ফেরত;
 
     dict = argvars[0].vval.v_dict;
-    if (dict == NULL || !dict_has_key(dict, "type"))
+    যদি (dict == ফাঁকা || !dict_has_চাবি(dict, "type"))
     {
 	emsg(_(e_missing_property_type_name));
-	return;
+	ফেরত;
     }
     type_name = dict_get_string(dict, "type", FALSE);
 
-    if (dict_has_key(dict, "id"))
+    যদি (dict_has_চাবি(dict, "id"))
     {
 	vimlong_T x;
-	x = dict_get_number(dict, "id");
-	if (x > INT_MAX || x  <= INT_MIN)
+	x = dict_get_সংখ্যা(dict, "id");
+	যদি (x > INT_MAX || x  <= INT_MIN)
 	{
 	    semsg(_(e_val_too_large), dict_get_string(dict, "id", FALSE));
-	    return;
+	    ফেরত;
 	}
-	id = (int)x;
+	id = (পূর্ণসংখ্যা)x;
     }
 
-    if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	return;
+    যদি (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	ফেরত;
 
     // This must be done _before_ we start adding properties because property
     // changes trigger buffer (memline) reorganisation, which needs this flag
     // to be correctly set.
     buf->b_has_textprop = true;  // this is never reset
-    FOR_ALL_LIST_ITEMS(argvars[1].vval.v_list, li)
+    FOR_ALL_LIST_বস্তুসমূহ(argvars[1].vval.v_list, li)
     {
-	if (li->li_tv.v_type != VAR_LIST || li->li_tv.vval.v_list == NULL)
+	যদি (li->li_tv.v_type != VAR_LIST || li->li_tv.vval.v_list == ফাঁকা)
 	{
 	    emsg(_(e_list_required));
-	    return;
+	    ফেরত;
 	}
 
 	pos_list = li->li_tv.vval.v_list;
 	start_lnum = list_find_nr(pos_list, 0L, &error);
-	if (!error)
+	যদি (!error)
 	    start_col = list_find_nr(pos_list, 1L, &error);
-	if (!error)
+	যদি (!error)
 	    end_lnum = list_find_nr(pos_list, 2L, &error);
-	if (!error)
+	যদি (!error)
 	    end_col = list_find_nr(pos_list, 3L, &error);
-	int this_id = id;
-	if (!error && pos_list->lv_len > 4)
+	পূর্ণসংখ্যা this_id = id;
+	যদি (!error && pos_list->lv_len > 4)
 	    this_id = list_find_nr(pos_list, 4L, &error);
-	if (error || start_lnum <= 0 || start_col <= 0
+	যদি (error || start_lnum <= 0 || start_col <= 0
 		  || end_lnum <= 0 || end_col <= 0)
 	{
-	    if (prev_did_emsg == did_emsg)
+	    যদি (পূর্ব_did_emsg == did_emsg)
 		emsg(_(e_invalid_argument));
-	    return;
+	    ফেরত;
 	}
-	if (prop_add_one(buf, type_name, this_id, NULL, 0, 0,
+	যদি (prop_add_one(buf, type_name, this_id, ফাঁকা, 0, 0,
 			     start_lnum, end_lnum, start_col, end_col) == FAIL)
-	    return;
+	    ফেরত;
     }
 
     redraw_buf_later(buf, UPD_VALID);
 }
 
 // Counter for virtual text property IDs (decremented for each new one).
-static int vt_id_counter = 0;
+স্থির পূর্ণসংখ্যা vt_id_গণক = 0;
 
 /*
  * Get the next ID to use for a textprop.
  */
-    static int
-get_textprop_id(void)
+    স্থির পূর্ণসংখ্যা
+get_textprop_id(শূন্য)
 {
-    if (vt_id_counter > 0)
-	vt_id_counter = 0;
-    return --vt_id_counter;
+    যদি (vt_id_গণক > 0)
+	vt_id_গণক = 0;
+    ফেরত --vt_id_গণক;
 }
 
 /*
@@ -1041,7 +1041,7 @@ get_textprop_id(void)
  * it is NULL for popup_create().
  * Returns the "id" used for "text" or zero.
  */
-    int
+    পূর্ণসংখ্যা
 prop_add_common(
 	linenr_T    start_lnum,
 	colnr_T	    start_col,
@@ -1053,156 +1053,156 @@ prop_add_common(
     colnr_T	end_col;
     char_u	*type_name;
     buf_T	*buf = default_buf;
-    int		id = 0;
-    char_u	*text = NULL;
-    int		text_padding_left = 0;
-    int		flags = 0;
+    পূর্ণসংখ্যা		id = 0;
+    char_u	*text = ফাঁকা;
+    পূর্ণসংখ্যা		text_padding_বাম = 0;
+    পূর্ণসংখ্যা		flags = 0;
 
-    if (dict == NULL || !dict_has_key(dict, "type"))
+    যদি (dict == ফাঁকা || !dict_has_চাবি(dict, "type"))
     {
 	emsg(_(e_missing_property_type_name));
-	goto theend;
+	যাও theend;
     }
     type_name = dict_get_string(dict, "type", FALSE);
 
-    if (dict_has_key(dict, "end_lnum"))
+    যদি (dict_has_চাবি(dict, "end_lnum"))
     {
-	end_lnum = dict_get_number(dict, "end_lnum");
-	if (end_lnum < start_lnum)
+	end_lnum = dict_get_সংখ্যা(dict, "end_lnum");
+	যদি (end_lnum < start_lnum)
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "end_lnum");
-	    goto theend;
+	    semsg(_(e_invalid_মান_for_argument_str), "end_lnum");
+	    যাও theend;
 	}
     }
-    else
+    অন্যথা
 	end_lnum = start_lnum;
 
-    if (dict_has_key(dict, "length"))
+    যদি (dict_has_চাবি(dict, "length"))
     {
-	long length = dict_get_number(dict, "length");
+	long দৈর্ঘ্য = dict_get_সংখ্যা(dict, "length");
 
-	if (length < 0 || end_lnum > start_lnum)
+	যদি (দৈর্ঘ্য < 0 || end_lnum > start_lnum)
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "length");
-	    goto theend;
+	    semsg(_(e_invalid_মান_for_argument_str), "length");
+	    যাও theend;
 	}
-	end_col = start_col + length;
+	end_col = start_col + দৈর্ঘ্য;
     }
-    else if (dict_has_key(dict, "end_col"))
+    অন্যথা যদি (dict_has_চাবি(dict, "end_col"))
     {
-	end_col = dict_get_number(dict, "end_col");
-	if (end_col <= 0)
+	end_col = dict_get_সংখ্যা(dict, "end_col");
+	যদি (end_col <= 0)
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "end_col");
-	    goto theend;
+	    semsg(_(e_invalid_মান_for_argument_str), "end_col");
+	    যাও theend;
 	}
     }
-    else if (start_lnum == end_lnum)
+    অন্যথা যদি (start_lnum == end_lnum)
 	end_col = start_col;
-    else
+    অন্যথা
 	end_col = 1;
 
-    if (dict_has_key(dict, "id"))
+    যদি (dict_has_চাবি(dict, "id"))
     {
 	vimlong_T x;
-	x = dict_get_number(dict, "id");
-	if (x > INT_MAX || x  <= INT_MIN)
+	x = dict_get_সংখ্যা(dict, "id");
+	যদি (x > INT_MAX || x  <= INT_MIN)
 	{
 	    semsg(_(e_val_too_large), dict_get_string(dict, "id", FALSE));
-	    goto theend;
+	    যাও theend;
 	}
-	id = (int)x;
+	id = (পূর্ণসংখ্যা)x;
     }
 
-    if (dict_has_key(dict, "text"))
+    যদি (dict_has_চাবি(dict, "text"))
     {
-	if (dict_has_key(dict, "length")
-		|| dict_has_key(dict, "end_col")
-		|| dict_has_key(dict, "end_lnum"))
+	যদি (dict_has_চাবি(dict, "length")
+		|| dict_has_চাবি(dict, "end_col")
+		|| dict_has_চাবি(dict, "end_lnum"))
 	{
-	    emsg(_(e_cannot_use_length_endcol_and_endlnum_with_text));
-	    goto theend;
+	    emsg(_(e_cannot_use_দৈর্ঘ্য_endcol_and_endlnum_with_text));
+	    যাও theend;
 	}
 
 	text = dict_get_string(dict, "text", TRUE);
-	if (text == NULL)
-	    goto theend;
+	যদি (text == ফাঁকা)
+	    যাও theend;
 	// use a default length of 1 to make multiple props show up
 	end_col = start_col + 1;
 
-	if (dict_has_key(dict, "text_align"))
+	যদি (dict_has_চাবি(dict, "text_align"))
 	{
 	    char_u *p = dict_get_string(dict, "text_align", FALSE);
 
-	    if (p == NULL)
-		goto theend;
-	    if (start_col != 0)
+	    যদি (p == ফাঁকা)
+		যাও theend;
+	    যদি (start_col != 0)
 	    {
 		emsg(_(e_can_only_use_text_align_when_column_is_zero));
-		goto theend;
+		যাও theend;
 	    }
-	    if (STRCMP(p, "right") == 0)
-		flags |= TP_FLAG_ALIGN_RIGHT;
-	    else if (STRCMP(p, "above") == 0)
+	    যদি (STRCMP(p, "right") == 0)
+		flags |= TP_FLAG_ALIGN_ডান;
+	    অন্যথা যদি (STRCMP(p, "above") == 0)
 		flags |= TP_FLAG_ALIGN_ABOVE;
-	    else if (STRCMP(p, "below") == 0)
+	    অন্যথা যদি (STRCMP(p, "below") == 0)
 		flags |= TP_FLAG_ALIGN_BELOW;
-	    else if (STRCMP(p, "after") != 0)
+	    অন্যথা যদি (STRCMP(p, "after") != 0)
 	    {
-		semsg(_(e_invalid_value_for_argument_str_str), "text_align", p);
-		goto theend;
+		semsg(_(e_invalid_মান_for_argument_str_str), "text_align", p);
+		যাও theend;
 	    }
 	}
 
-	if (dict_has_key(dict, "text_padding_left"))
+	যদি (dict_has_চাবি(dict, "text_padding_left"))
 	{
-	    text_padding_left = dict_get_number(dict, "text_padding_left");
-	    if (text_padding_left < 0)
+	    text_padding_বাম = dict_get_সংখ্যা(dict, "text_padding_left");
+	    যদি (text_padding_বাম < 0)
 	    {
 		semsg(_(e_argument_must_be_positive_str), "text_padding_left");
-		goto theend;
+		যাও theend;
 	    }
 	}
 
-	if (dict_has_key(dict, "text_wrap"))
+	যদি (dict_has_চাবি(dict, "text_wrap"))
 	{
 	    char_u *p = dict_get_string(dict, "text_wrap", FALSE);
 
-	    if (p == NULL)
-		goto theend;
-	    if (STRCMP(p, "wrap") == 0)
+	    যদি (p == ফাঁকা)
+		যাও theend;
+	    যদি (STRCMP(p, "wrap") == 0)
 		flags |= TP_FLAG_WRAP;
-	    else if (STRCMP(p, "truncate") != 0)
+	    অন্যথা যদি (STRCMP(p, "truncate") != 0)
 	    {
-		semsg(_(e_invalid_value_for_argument_str_str), "text_wrap", p);
-		goto theend;
+		semsg(_(e_invalid_মান_for_argument_str_str), "text_wrap", p);
+		যাও theend;
 	    }
 	}
     }
 
     // Column must be 1 or more for a normal text property; when "text" is
     // present zero means it goes after the line.
-    if (start_col < (text == NULL ? 1 : 0))
+    যদি (start_col < (text == ফাঁকা ? 1 : 0))
     {
-	semsg(_(e_invalid_column_number_nr), (long)start_col);
-	goto theend;
+	semsg(_(e_invalid_column_সংখ্যা_nr), (long)start_col);
+	যাও theend;
     }
-    if (start_col > 0 && text_padding_left > 0)
+    যদি (start_col > 0 && text_padding_বাম > 0)
     {
-	emsg(_(e_can_only_use_left_padding_when_column_is_zero));
-	goto theend;
+	emsg(_(e_can_only_use_বাম_padding_when_column_is_zero));
+	যাও theend;
     }
 
-    if (dict_arg != NULL && get_bufnr_from_arg(dict_arg, &buf) == FAIL)
-	goto theend;
+    যদি (dict_arg != ফাঁকা && get_bufnr_from_arg(dict_arg, &buf) == FAIL)
+	যাও theend;
 
-    if (text != NULL)
+    যদি (text != ফাঁকা)
 	// Always assign an internal negative id; ignore any user-provided id.
 	id = get_textprop_id();
-    else if (id < 0)
+    অন্যথা যদি (id < 0)
     {
 	emsg(_(e_cannot_use_negative_id));
-	goto theend;
+	যাও theend;
     }
 
     // This must be done _before_ we add the property because property changes
@@ -1210,15 +1210,15 @@ prop_add_common(
     // correctly set.
     buf->b_has_textprop = true;  // this is never reset
 
-    prop_add_one(buf, type_name, id, text, text_padding_left, flags,
+    prop_add_one(buf, type_name, id, text, text_padding_বাম, flags,
 				    start_lnum, end_lnum, start_col, end_col);
-    text = NULL;
+    text = ফাঁকা;
 
     redraw_buf_later(buf, UPD_VALID);
 
 theend:
     vim_free(text);
-    return id;
+    ফেরত id;
 }
 
 /*
@@ -1227,48 +1227,48 @@ theend:
  * first one in "props" (note that it is not aligned, therefore the char_u
  * pointer).
  */
-    int
-get_text_props(buf_T *buf, linenr_T lnum, char_u **props, int will_change)
+    পূর্ণসংখ্যা
+get_text_props(buf_T *buf, linenr_T lnum, char_u **props, পূর্ণসংখ্যা will_change)
 {
     char_u	*text;
     size_t	textlen;
     size_t	propdata_len;
-    uint16_t	prop_count;
+    uint16_t	prop_গুনতি;
 
     // Be quick when no text property types have been defined for the buffer,
     // unless we are adding one.
-    if ((!buf->b_has_textprop && !will_change) || buf->b_ml.ml_mfp == NULL)
-	return 0;
+    যদি ((!buf->b_has_textprop && !will_change) || buf->b_ml.ml_mfp == ফাঁকা)
+	ফেরত 0;
 
     // Fetch the line to get the ml_line_len field updated.
     text = ml_get_buf(buf, lnum, will_change);
     textlen = ml_get_buf_len(buf, lnum) + 1;
-    propdata_len = buf->b_ml.ml_line_len - textlen;
-    if (propdata_len == 0)
-	return 0;
+    propdata_len = buf->b_ml.ml_সারি_len - textlen;
+    যদি (propdata_len == 0)
+	ফেরত 0;
 
     // Format: [prop_count (uint16)][textprop_T...][vtext...]
     // Lines without properties have no prop data at all.
     // prop_count is never zero.
-    if (propdata_len < PROP_COUNT_SIZE + sizeof(textprop_T))
+    যদি (propdata_len < PROP_গুনতি_আকার + আকার(textprop_T))
     {
 	emsg(e_text_property_info_corrupted);
-	return 0;
+	ফেরত 0;
     }
-    mch_memmove(&prop_count, text + textlen, PROP_COUNT_SIZE);
-    if (!text_prop_count_valid(prop_count, propdata_len))
+    mch_memmove(&prop_গুনতি, text + textlen, PROP_গুনতি_আকার);
+    যদি (!text_prop_গুনতি_valid(prop_গুনতি, propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
-	return 0;
+	ফেরত 0;
     }
-    if (!text_prop_vtext_valid(text + textlen + PROP_COUNT_SIZE,
-					   (int)prop_count, propdata_len))
+    যদি (!text_prop_vtext_valid(text + textlen + PROP_গুনতি_আকার,
+					   (পূর্ণসংখ্যা)prop_গুনতি, propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
-	return 0;
+	ফেরত 0;
     }
-    *props = text + textlen + PROP_COUNT_SIZE;
-    return (int)prop_count;
+    *props = text + textlen + PROP_গুনতি_আকার;
+    ফেরত (পূর্ণসংখ্যা)prop_গুনতি;
 }
 
 /*
@@ -1276,34 +1276,34 @@ get_text_props(buf_T *buf, linenr_T lnum, char_u **props, int will_change)
  * line "lnum".  A "right" aligned property also goes below after a "below" or
  * other "right" aligned property.
  */
-    int
-prop_count_above_below(buf_T *buf, linenr_T lnum)
+    পূর্ণসংখ্যা
+prop_গুনতি_above_below(buf_T *buf, linenr_T lnum)
 {
     char_u	*props;
-    int		count = get_text_props(buf, lnum, &props, FALSE);
-    int		result = 0;
+    পূর্ণসংখ্যা		গুনতি = get_text_props(buf, lnum, &props, FALSE);
+    পূর্ণসংখ্যা		ফলাফল = 0;
     textprop_T	prop;
-    int		i;
-    int		next_right_goes_below = FALSE;
+    পূর্ণসংখ্যা		i;
+    পূর্ণসংখ্যা		পরবর্তী_ডান_goes_below = FALSE;
 
-    if (count == 0)
-	return 0;
-    for (i = 0; i < count; ++i)
+    যদি (গুনতি == 0)
+	ফেরত 0;
+    জন্য (i = 0; i < গুনতি; ++i)
     {
-	mch_memmove(&prop, props + i * sizeof(prop), sizeof(prop));
-	if (prop.tp_col == MAXCOL && text_prop_type_valid(buf, &prop))
+	mch_memmove(&prop, props + i * আকার(prop), আকার(prop));
+	যদি (prop.tp_col == MAXCOL && text_prop_type_valid(buf, &prop))
 	{
-	    if ((prop.tp_flags & (TP_FLAG_ALIGN_ABOVE | TP_FLAG_ALIGN_BELOW))
-		    || (next_right_goes_below
-				     && (prop.tp_flags & TP_FLAG_ALIGN_RIGHT)))
+	    যদি ((prop.tp_flags & (TP_FLAG_ALIGN_ABOVE | TP_FLAG_ALIGN_BELOW))
+		    || (পরবর্তী_ডান_goes_below
+				     && (prop.tp_flags & TP_FLAG_ALIGN_ডান)))
 	    {
-		++result;
+		++ফলাফল;
 	    }
-	    else if (prop.tp_flags & TP_FLAG_ALIGN_RIGHT)
-		next_right_goes_below = TRUE;
+	    অন্যথা যদি (prop.tp_flags & TP_FLAG_ALIGN_ডান)
+		পরবর্তী_ডান_goes_below = TRUE;
 	}
     }
-    return result;
+    ফেরত ফলাফল;
 }
 
 /**
@@ -1313,44 +1313,44 @@ prop_count_above_below(buf_T *buf, linenr_T lnum)
  * When "last_line" is FALSE then text properties after the line are not
  * counted.
  */
-    int
-count_props(linenr_T lnum, int only_starting, int last_line)
+    পূর্ণসংখ্যা
+গুনতি_props(linenr_T lnum, পূর্ণসংখ্যা only_starting, পূর্ণসংখ্যা last_সারি)
 {
     char_u	*props;
-    int		proplen = get_text_props(curbuf, lnum, &props, 0);
-    int		result = proplen;
+    পূর্ণসংখ্যা		proplen = get_text_props(curbuf, lnum, &props, 0);
+    পূর্ণসংখ্যা		ফলাফল = proplen;
     textprop_T	prop;
 
-    for (int i = 0; i < proplen; ++i)
+    জন্য (পূর্ণসংখ্যা i = 0; i < proplen; ++i)
     {
-	mch_memmove(&prop, props + i * sizeof(prop), sizeof(prop));
+	mch_memmove(&prop, props + i * আকার(prop), আকার(prop));
 	// A prop is dropped when in the first line and it continues from the
 	// previous line, or when not in the last line and it is virtual text
 	// after the line.
-	if ((only_starting && (prop.tp_flags & TP_FLAG_CONT_PREV))
-		|| (!last_line && prop.tp_col == MAXCOL))
-	    --result;
+	যদি ((only_starting && (prop.tp_flags & TP_FLAG_CONT_পূর্ব))
+		|| (!last_সারি && prop.tp_col == MAXCOL))
+	    --ফলাফল;
     }
-    return result;
+    ফেরত ফলাফল;
 }
 
-static textprop_T	*text_prop_compare_props;
-static buf_T		*text_prop_compare_buf;
+স্থির textprop_T	*text_prop_compare_props;
+স্থির buf_T		*text_prop_compare_buf;
 
 /*
  * Score for sorting on position of the text property: 0: above,
  * 1: after (default), 2: right, 3: below (comes last)
  */
-    static int
-text_prop_order(int flags)
+    স্থির পূর্ণসংখ্যা
+text_prop_order(পূর্ণসংখ্যা flags)
 {
-    if (flags & TP_FLAG_ALIGN_ABOVE)
-	return 0;
-    if (flags & TP_FLAG_ALIGN_RIGHT)
-	return 2;
-    if (flags & TP_FLAG_ALIGN_BELOW)
-	return 3;
-    return 1;
+    যদি (flags & TP_FLAG_ALIGN_ABOVE)
+	ফেরত 0;
+    যদি (flags & TP_FLAG_ALIGN_ডান)
+	ফেরত 2;
+    যদি (flags & TP_FLAG_ALIGN_BELOW)
+	ফেরত 3;
+    ফেরত 1;
 }
 
 /*
@@ -1358,73 +1358,73 @@ text_prop_order(int flags)
  * Return 1 if "s1" has priority over "s2", -1 if the other way around, zero if
  * both have the same priority.
  */
-    static int
-text_prop_compare(const void *s1, const void *s2)
+    স্থির পূর্ণসংখ্যা
+text_prop_compare(ধ্রুবক শূন্য *s1, ধ্রুবক শূন্য *s2)
 {
-    int  idx1, idx2;
+    পূর্ণসংখ্যা  idx1, idx2;
     textprop_T	*tp1, *tp2;
     proptype_T  *pt1, *pt2;
     colnr_T col1, col2;
 
-    idx1 = *(int *)s1;
-    idx2 = *(int *)s2;
+    idx1 = *(পূর্ণসংখ্যা *)s1;
+    idx2 = *(পূর্ণসংখ্যা *)s2;
     tp1 = &text_prop_compare_props[idx1];
     tp2 = &text_prop_compare_props[idx2];
     col1 = tp1->tp_col;
     col2 = tp2->tp_col;
 
     // property that inserts text has priority over one that doesn't
-    if ((tp1->tp_id < 0) != (tp2->tp_id < 0))
-	return tp1->tp_id < 0 ? 1 : -1;
+    যদি ((tp1->tp_id < 0) != (tp2->tp_id < 0))
+	ফেরত tp1->tp_id < 0 ? 1 : -1;
 
-    if (col1 == MAXCOL || col2 == MAXCOL)
+    যদি (col1 == MAXCOL || col2 == MAXCOL)
     {
-	int order1 = text_prop_order(tp1->tp_flags);
-	int order2 = text_prop_order(tp2->tp_flags);
+	পূর্ণসংখ্যা order1 = text_prop_order(tp1->tp_flags);
+	পূর্ণসংখ্যা order2 = text_prop_order(tp2->tp_flags);
 
 	// sort on order where it is added
-	if (order1 != order2)
-	    return order1 < order2 ? 1 : -1;
+	যদি (order1 != order2)
+	    ফেরত order1 < order2 ? 1 : -1;
     }
 
     // check highest priority, defined by the type
     pt1 = text_prop_type_by_id(text_prop_compare_buf, tp1->tp_type);
     pt2 = text_prop_type_by_id(text_prop_compare_buf, tp2->tp_type);
-    if (pt1 != pt2)
+    যদি (pt1 != pt2)
     {
-	if (pt1 == NULL)
-	    return -1;
-	if (pt2 == NULL)
-	    return 1;
-	if (pt1->pt_priority != pt2->pt_priority)
-	    return pt1->pt_priority > pt2->pt_priority ? 1 : -1;
+	যদি (pt1 == ফাঁকা)
+	    ফেরত -1;
+	যদি (pt2 == ফাঁকা)
+	    ফেরত 1;
+	যদি (pt1->pt_priority != pt2->pt_priority)
+	    ফেরত pt1->pt_priority > pt2->pt_priority ? 1 : -1;
     }
 
     // same priority, one that starts first wins
-    if (col1 != col2)
-	return col1 < col2 ? 1 : -1;
+    যদি (col1 != col2)
+	ফেরত col1 < col2 ? 1 : -1;
 
     // for a property with text the id can be used as tie breaker
-    if (tp1->tp_id < 0)
-	return tp1->tp_id > tp2->tp_id ? 1 : -1;
+    যদি (tp1->tp_id < 0)
+	ফেরত tp1->tp_id > tp2->tp_id ? 1 : -1;
 
-    return 0;
+    ফেরত 0;
 }
 
 /*
  * Sort "count" text properties using an array if indexes "idxs" into the list
  * of text props "props" for buffer "buf".
  */
-    void
+    শূন্য
 sort_text_props(
 	buf_T	    *buf,
 	textprop_T  *props,
-	int	    *idxs,
-	int	    count)
+	পূর্ণসংখ্যা	    *idxs,
+	পূর্ণসংখ্যা	    গুনতি)
 {
     text_prop_compare_buf = buf;
     text_prop_compare_props = props;
-    qsort((void *)idxs, (size_t)count, sizeof(int), text_prop_compare);
+    qsort((শূন্য *)idxs, (size_t)গুনতি, আকার(পূর্ণসংখ্যা), text_prop_compare);
 }
 
 /*
@@ -1432,39 +1432,39 @@ sort_text_props(
  * "wp"'s buffer.  Match "id" when it is > 0.  Returns false when not found.
  */
     bool
-find_prop_in_lines(
+find_prop_in_সারিগুলি(
 	win_T	    *wp,
-	int	    type_id,
-	int	    id,
+	পূর্ণসংখ্যা	    type_id,
+	পূর্ণসংখ্যা	    id,
 	textprop_T  *prop,
 	linenr_T    *found_lnum,
 	linenr_T    first_lnum,
 	linenr_T    last_lnum)
 {
-    if (text_prop_type_by_id(wp->w_buffer, type_id) == NULL)
-	return false;
+    যদি (text_prop_type_by_id(wp->w_বাফার, type_id) == ফাঁকা)
+	ফেরত false;
 
-    if (first_lnum < 1)
+    যদি (first_lnum < 1)
 	first_lnum = 1;
-    if (last_lnum > wp->w_buffer->b_ml.ml_line_count)
-	last_lnum = wp->w_buffer->b_ml.ml_line_count;
+    যদি (last_lnum > wp->w_বাফার->b_ml.ml_সারি_গুনতি)
+	last_lnum = wp->w_বাফার->b_ml.ml_সারি_গুনতি;
 
-    for (linenr_T lnum = first_lnum; lnum <= last_lnum; ++lnum)
+    জন্য (linenr_T lnum = first_lnum; lnum <= last_lnum; ++lnum)
     {
 	char_u	*props;
-	int	count = get_text_props(wp->w_buffer, lnum, &props, FALSE);
-	for (int i = 0; i < count; ++i)
+	পূর্ণসংখ্যা	গুনতি = get_text_props(wp->w_বাফার, lnum, &props, FALSE);
+	জন্য (পূর্ণসংখ্যা i = 0; i < গুনতি; ++i)
 	{
-	    mch_memmove(prop, props + i * sizeof(textprop_T),
-							   sizeof(textprop_T));
-	    if (prop->tp_type == type_id && (id <= 0 || prop->tp_id == id))
+	    mch_memmove(prop, props + i * আকার(textprop_T),
+							   আকার(textprop_T));
+	    যদি (prop->tp_type == type_id && (id <= 0 || prop->tp_id == id))
 	    {
 		*found_lnum = lnum;
-		return true;
+		ফেরত true;
 	    }
 	}
     }
-    return false;
+    ফেরত false;
 }
 
 /*
@@ -1475,14 +1475,14 @@ find_prop_in_lines(
     bool
 find_visible_prop(
 	win_T	    *wp,
-	int	    type_id,
-	int	    id,
+	পূর্ণসংখ্যা	    type_id,
+	পূর্ণসংখ্যা	    id,
 	textprop_T  *prop,
 	linenr_T    *found_lnum)
 {
     // w_botline may not have been updated yet.
     validate_botline_win(wp);
-    return find_prop_in_lines(wp, type_id, id, prop, found_lnum,
+    ফেরত find_prop_in_সারিগুলি(wp, type_id, id, prop, found_lnum,
 					  wp->w_topline, wp->w_botline - 1);
 }
 
@@ -1493,82 +1493,82 @@ find_visible_prop(
  * For virtual text props, u.tp_text must point to the vtext string.
  * Only works for the current buffer.
  */
-    static void
-set_text_props(linenr_T lnum, textprop_T *tps, int count)
+    স্থির শূন্য
+set_text_props(linenr_T lnum, textprop_T *tps, পূর্ণসংখ্যা গুনতি)
 {
     char_u  *text;
     char_u  *newtext;
-    int	    textlen;
+    পূর্ণসংখ্যা	    textlen;
 
     text = ml_get(lnum);
     textlen = ml_get_len(lnum) + 1;
 
-    if (count == 0)
+    যদি (গুনতি == 0)
     {
 	// No properties: just text.
 	newtext = alloc(textlen);
-	if (newtext == NULL)
-	    return;
+	যদি (newtext == ফাঁকা)
+	    ফেরত;
 	mch_memmove(newtext, text, textlen);
-	if (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	    vim_free(curbuf->b_ml.ml_line_ptr);
-	curbuf->b_ml.ml_line_ptr = newtext;
-	curbuf->b_ml.ml_line_len = textlen;
-	curbuf->b_ml.ml_flags |= ML_LINE_DIRTY;
+	যদি (curbuf->b_ml.ml_flags & (ML_সারি_DIRTY | ML_ALLOCATED))
+	    vim_free(curbuf->b_ml.ml_সারি_ptr);
+	curbuf->b_ml.ml_সারি_ptr = newtext;
+	curbuf->b_ml.ml_সারি_len = textlen;
+	curbuf->b_ml.ml_flags |= ML_সারি_DIRTY;
     }
-    else
+    অন্যথা
     {
 	// Build new format: [text][NUL][prop_count][props...][vtext...]
-	uint16_t    prop_count = (uint16_t)count;
-	int	    vtext_size = 0;
-	int	    total_len;
-	char_u	    *count_dest;
+	uint16_t    prop_গুনতি = (uint16_t)গুনতি;
+	পূর্ণসংখ্যা	    vtext_আকার = 0;
+	পূর্ণসংখ্যা	    যোগ_len;
+	char_u	    *গুনতি_dest;
 	char_u	    *prop_dest;
 	char_u	    *vtext_dest;
-	int	    i;
+	পূর্ণসংখ্যা	    i;
 
-	for (i = 0; i < count; ++i)
-	    if (tps[i].tp_flags & TP_FLAG_VTEXT_PTR)
-		vtext_size += tps[i].tp_len + 1;
+	জন্য (i = 0; i < গুনতি; ++i)
+	    যদি (tps[i].tp_flags & TP_FLAG_VTEXT_PTR)
+		vtext_আকার += tps[i].tp_len + 1;
 
-	total_len = textlen + (int)PROP_COUNT_SIZE
-		    + count * (int)sizeof(textprop_T) + vtext_size;
-	newtext = alloc(total_len);
-	if (newtext == NULL)
-	    return;
+	যোগ_len = textlen + (পূর্ণসংখ্যা)PROP_গুনতি_আকার
+		    + গুনতি * (পূর্ণসংখ্যা)আকার(textprop_T) + vtext_আকার;
+	newtext = alloc(যোগ_len);
+	যদি (newtext == ফাঁকা)
+	    ফেরত;
 	mch_memmove(newtext, text, textlen);
 
-	count_dest = newtext + textlen;
-	mch_memmove(count_dest, &prop_count, PROP_COUNT_SIZE);
+	গুনতি_dest = newtext + textlen;
+	mch_memmove(গুনতি_dest, &prop_গুনতি, PROP_গুনতি_আকার);
 
-	prop_dest = count_dest + PROP_COUNT_SIZE;
-	vtext_dest = prop_dest + count * sizeof(textprop_T);
+	prop_dest = গুনতি_dest + PROP_গুনতি_আকার;
+	vtext_dest = prop_dest + গুনতি * আকার(textprop_T);
 
-	for (i = 0; i < count; ++i)
+	জন্য (i = 0; i < গুনতি; ++i)
 	{
 	    textprop_T prop = tps[i];
 
-	    if (prop.tp_flags & TP_FLAG_VTEXT_PTR)
+	    যদি (prop.tp_flags & TP_FLAG_VTEXT_PTR)
 	    {
-		int copysize = prop.tp_len + 1;
+		পূর্ণসংখ্যা copysize = prop.tp_len + 1;
 
 		mch_memmove(vtext_dest, prop.u.tp_text, copysize);
 		vim_free(tps[i].u.tp_text);
-		tps[i].u.tp_text = NULL;
-		prop.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
+		tps[i].u.tp_text = ফাঁকা;
+		prop.u.tp_text_offset = (colnr_T)(vtext_dest - গুনতি_dest);
 		vtext_dest += copysize;
 	    }
-	    else
+	    অন্যথা
 		prop.u.tp_text_offset = 0;
-	    mch_memmove(prop_dest, &prop, sizeof(textprop_T));
-	    prop_dest += sizeof(textprop_T);
+	    mch_memmove(prop_dest, &prop, আকার(textprop_T));
+	    prop_dest += আকার(textprop_T);
 	}
 
-	if (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	    vim_free(curbuf->b_ml.ml_line_ptr);
-	curbuf->b_ml.ml_line_ptr = newtext;
-	curbuf->b_ml.ml_line_len = total_len;
-	curbuf->b_ml.ml_flags |= ML_LINE_DIRTY;
+	যদি (curbuf->b_ml.ml_flags & (ML_সারি_DIRTY | ML_ALLOCATED))
+	    vim_free(curbuf->b_ml.ml_সারি_ptr);
+	curbuf->b_ml.ml_সারি_ptr = newtext;
+	curbuf->b_ml.ml_সারি_len = যোগ_len;
+	curbuf->b_ml.ml_flags |= ML_সারি_DIRTY;
     }
 }
 
@@ -1583,105 +1583,105 @@ set_text_props(linenr_T lnum, textprop_T *tps, int count)
  * of the text including NUL.  "*new_len" is set to the new total length.
  */
     char_u *
-props_add_count_header(char_u *line, int line_len, int textlen, int *new_len)
+props_add_গুনতি_header(char_u *সারি, পূর্ণসংখ্যা সারি_len, পূর্ণসংখ্যা textlen, পূর্ণসংখ্যা *new_len)
 {
-    int		prop_bytes = line_len - textlen;
-    uint16_t	prop_count;
-    int		vtext_size = 0;
-    int		total;
+    পূর্ণসংখ্যা		prop_bytes = সারি_len - textlen;
+    uint16_t	prop_গুনতি;
+    পূর্ণসংখ্যা		vtext_আকার = 0;
+    পূর্ণসংখ্যা		যোগ;
     char_u	*newline;
-    char_u	*count_dest;
+    char_u	*গুনতি_dest;
     char_u	*prop_dest;
     char_u	*vtext_dest;
-    int		i;
+    পূর্ণসংখ্যা		i;
 
-    if (prop_bytes <= 0 || prop_bytes % sizeof(textprop_T) != 0)
+    যদি (prop_bytes <= 0 || prop_bytes % আকার(textprop_T) != 0)
     {
-	*new_len = line_len;
-	return NULL;
+	*new_len = সারি_len;
+	ফেরত ফাঁকা;
     }
-    prop_count = (uint16_t)(prop_bytes / sizeof(textprop_T));
+    prop_গুনতি = (uint16_t)(prop_bytes / আকার(textprop_T));
 
     // Calculate total vtext size.
-    for (i = 0; i < (int)prop_count; ++i)
+    জন্য (i = 0; i < (পূর্ণসংখ্যা)prop_গুনতি; ++i)
     {
 	textprop_T prop;
 
-	mch_memmove(&prop, line + textlen + i * sizeof(textprop_T),
-							sizeof(textprop_T));
-	if (prop.tp_flags & TP_FLAG_VTEXT_PTR)
-	    vtext_size += prop.tp_len + 1;
+	mch_memmove(&prop, সারি + textlen + i * আকার(textprop_T),
+							আকার(textprop_T));
+	যদি (prop.tp_flags & TP_FLAG_VTEXT_PTR)
+	    vtext_আকার += prop.tp_len + 1;
     }
 
-    total = textlen + (int)PROP_COUNT_SIZE + prop_bytes + vtext_size;
-    newline = alloc(total);
-    if (newline == NULL)
-	return NULL;
-    *new_len = total;
+    যোগ = textlen + (পূর্ণসংখ্যা)PROP_গুনতি_আকার + prop_bytes + vtext_আকার;
+    newline = alloc(যোগ);
+    যদি (newline == ফাঁকা)
+	ফেরত ফাঁকা;
+    *new_len = যোগ;
 
-    mch_memmove(newline, line, textlen);
-    count_dest = newline + textlen;
-    mch_memmove(count_dest, &prop_count, PROP_COUNT_SIZE);
-    prop_dest = count_dest + PROP_COUNT_SIZE;
+    mch_memmove(newline, সারি, textlen);
+    গুনতি_dest = newline + textlen;
+    mch_memmove(গুনতি_dest, &prop_গুনতি, PROP_গুনতি_আকার);
+    prop_dest = গুনতি_dest + PROP_গুনতি_আকার;
     vtext_dest = prop_dest + prop_bytes;
 
-    for (i = 0; i < (int)prop_count; ++i)
+    জন্য (i = 0; i < (পূর্ণসংখ্যা)prop_গুনতি; ++i)
     {
 	textprop_T prop;
 
-	mch_memmove(&prop, line + textlen + i * sizeof(textprop_T),
-							sizeof(textprop_T));
-	if (prop.tp_flags & TP_FLAG_VTEXT_PTR)
+	mch_memmove(&prop, সারি + textlen + i * আকার(textprop_T),
+							আকার(textprop_T));
+	যদি (prop.tp_flags & TP_FLAG_VTEXT_PTR)
 	{
-	    int copysize = prop.tp_len + 1;
+	    পূর্ণসংখ্যা copysize = prop.tp_len + 1;
 
 	    mch_memmove(vtext_dest, prop.u.tp_text, copysize);
 	    vim_free(prop.u.tp_text);
-	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
+	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - গুনতি_dest);
 	    vtext_dest += copysize;
 	}
-	else
+	অন্যথা
 	    prop.u.tp_text_offset = 0;
-	mch_memmove(prop_dest + i * sizeof(textprop_T), &prop,
-							sizeof(textprop_T));
+	mch_memmove(prop_dest + i * আকার(textprop_T), &prop,
+							আকার(textprop_T));
     }
-    return newline;
+    ফেরত newline;
 }
 
 /*
  * Add "text_props" with "text_prop_count" text properties to line "lnum".
  */
-    void
-add_text_props(linenr_T lnum, textprop_T *text_props, int text_prop_count)
+    শূন্য
+add_text_props(linenr_T lnum, textprop_T *text_props, পূর্ণসংখ্যা text_prop_গুনতি)
 {
     unpacked_memline_T	um;
-    int			i;
+    পূর্ণসংখ্যা			i;
 
-    um = um_open_at(curbuf, lnum, text_prop_count);
-    if (um.buf == NULL)
-	return;
-    if (!um_detach(&um))
+    um = um_open_at(curbuf, lnum, text_prop_গুনতি);
+    যদি (um.buf == ফাঁকা)
+	ফেরত;
+    যদি (!um_detach(&um))
     {
 	um_abort(&um);
-	return;
+	ফেরত;
     }
 
     // Grow props array if needed.
-    if (um.prop_count + text_prop_count > um.prop_size)
+    যদি (um.prop_গুনতি + text_prop_গুনতি > um.prop_আকার)
     {
 	textprop_T *newprops = vim_realloc(um.props,
-		(um.prop_count + text_prop_count) * sizeof(textprop_T));
-	if (newprops == NULL)
+		(um.prop_গুনতি + text_prop_গুনতি) * আকার(textprop_T));
+	যদি (newprops == ফাঁকা)
 	{
 	    um_abort(&um);
-	    return;
+	    ফেরত;
 	}
 	um.props = newprops;
-	um.prop_size = um.prop_count + text_prop_count;
+	um.prop_আকার = um.prop_গুনতি + text_prop_গুনতি;
     }
 
-    for (i = 0; i < text_prop_count; ++i)
-	um.props[um.prop_count++] = text_props[i];
+    জন্য (i = 0; i < text_prop_গুনতি; ++i)
+	um.props[um.prop_গুনতি++] = text_props[i];
 
     um_close(&um);
 }
@@ -1689,120 +1689,120 @@ add_text_props(linenr_T lnum, textprop_T *text_props, int text_prop_count)
 /*
  * Function passed to qsort() for sorting proptype_T on pt_id.
  */
-    static int
-compare_pt(const void *s1, const void *s2)
+    স্থির পূর্ণসংখ্যা
+compare_pt(ধ্রুবক শূন্য *s1, ধ্রুবক শূন্য *s2)
 {
     proptype_T	*tp1 = *(proptype_T **)s1;
     proptype_T	*tp2 = *(proptype_T **)s2;
 
-    return tp1->pt_id == tp2->pt_id ? 0 : tp1->pt_id < tp2->pt_id ? -1 : 1;
+    ফেরত tp1->pt_id == tp2->pt_id ? 0 : tp1->pt_id < tp2->pt_id ? -1 : 1;
 }
 
-    static proptype_T *
-find_type_by_id(hashtab_T *ht, proptype_T ***array, int id)
+    স্থির proptype_T *
+find_type_by_id(hashtab_T *ht, proptype_T ***array, পূর্ণসংখ্যা id)
 {
-    int low = 0;
-    int high;
+    পূর্ণসংখ্যা নিচের = 0;
+    পূর্ণসংখ্যা উপরের;
 
-    if (ht == NULL || ht->ht_used == 0)
-	return NULL;
+    যদি (ht == ফাঁকা || ht->ht_used == 0)
+	ফেরত ফাঁকা;
 
     // Make the lookup faster by creating an array with pointers to
     // hashtable entries, sorted on pt_id.
-    if (*array == NULL)
+    যদি (*array == ফাঁকা)
     {
 	long	    todo;
 	hashitem_T  *hi;
-	int	    i = 0;
+	পূর্ণসংখ্যা	    i = 0;
 
 	*array = ALLOC_MULT(proptype_T *, ht->ht_used);
-	if (*array == NULL)
-	    return NULL;
+	যদি (*array == ফাঁকা)
+	    ফেরত ফাঁকা;
 	todo = (long)ht->ht_used;
-	FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+	FOR_ALL_HASHTAB_বস্তুসমূহ(ht, hi, todo)
 	{
-	    if (!HASHITEM_EMPTY(hi))
+	    যদি (!HASHITEM_EMPTY(hi))
 	    {
 		(*array)[i++] = HI2PT(hi);
 		--todo;
 	    }
 	}
-	qsort((void *)*array, ht->ht_used, sizeof(proptype_T *), compare_pt);
+	qsort((শূন্য *)*array, ht->ht_used, আকার(proptype_T *), compare_pt);
     }
 
     // binary search in the sorted array
-    high = ht->ht_used;
-    while (high > low)
+    উপরের = ht->ht_used;
+    যখন (উপরের > নিচের)
     {
-	int m = (high + low) / 2;
+	পূর্ণসংখ্যা m = (উপরের + নিচের) / 2;
 
-	if ((*array)[m]->pt_id == id)
-	    return (*array)[m];
-	if ((*array)[m]->pt_id > id)
-	    high = m;
-	else
-	    low = m + 1;
+	যদি ((*array)[m]->pt_id == id)
+	    ফেরত (*array)[m];
+	যদি ((*array)[m]->pt_id > id)
+	    উপরের = m;
+	অন্যথা
+	    নিচের = m + 1;
     }
-    return NULL;
+    ফেরত ফাঁকা;
 }
 
 /*
  * Fill 'dict' with text properties in 'prop'.
  */
-    static void
+    স্থির শূন্য
 prop_fill_dict(dict_T *dict, textprop_T *prop, buf_T *buf)
 {
     proptype_T *pt;
-    int buflocal = TRUE;
-    int virtualtext_prop = prop->tp_id < 0;
+    পূর্ণসংখ্যা buflocal = TRUE;
+    পূর্ণসংখ্যা virtualtext_prop = prop->tp_id < 0;
 
-    dict_add_number(dict, "col", (prop->tp_col == MAXCOL) ? 0 : prop->tp_col);
-    if (!virtualtext_prop)
+    dict_add_সংখ্যা(dict, "col", (prop->tp_col == MAXCOL) ? 0 : prop->tp_col);
+    যদি (!virtualtext_prop)
     {
-	dict_add_number(dict, "length", prop->tp_len);
-	dict_add_number(dict, "id", prop->tp_id);
+	dict_add_সংখ্যা(dict, "length", prop->tp_len);
+	dict_add_সংখ্যা(dict, "id", prop->tp_id);
     }
-    dict_add_number(dict, "start", !(prop->tp_flags & TP_FLAG_CONT_PREV));
-    dict_add_number(dict, "end", !(prop->tp_flags & TP_FLAG_CONT_NEXT));
+    dict_add_সংখ্যা(dict, "start", !(prop->tp_flags & TP_FLAG_CONT_পূর্ব));
+    dict_add_সংখ্যা(dict, "end", !(prop->tp_flags & TP_FLAG_CONT_পরবর্তী));
 
     pt = find_type_by_id(buf->b_proptypes, &buf->b_proparray, prop->tp_type);
-    if (pt == NULL)
+    যদি (pt == ফাঁকা)
     {
 	pt = find_type_by_id(global_proptypes, &global_proparray,
 								prop->tp_type);
 	buflocal = FALSE;
     }
-    if (pt != NULL)
+    যদি (pt != ফাঁকা)
 	dict_add_string(dict, "type", pt->pt_name);
 
-    if (buflocal)
-	dict_add_number(dict, "type_bufnr", buf->b_fnum);
-    else
-	dict_add_number(dict, "type_bufnr", 0);
-    if (virtualtext_prop)
+    যদি (buflocal)
+	dict_add_সংখ্যা(dict, "type_bufnr", buf->b_fnum);
+    অন্যথা
+	dict_add_সংখ্যা(dict, "type_bufnr", 0);
+    যদি (virtualtext_prop)
     {
-	string_T    text_align = {NULL, 0};
+	string_T    text_align = {ফাঁকা, 0};
 
 	// virtual text property - u.tp_text must be set by caller
 	dict_add_string(dict, "text", prop->u.tp_text);
 
 	// text_align
-	if (prop->tp_flags & TP_FLAG_ALIGN_RIGHT)
+	যদি (prop->tp_flags & TP_FLAG_ALIGN_ডান)
 	    STR_LITERAL_SET(text_align, "right");
-	else if (prop->tp_flags & TP_FLAG_ALIGN_ABOVE)
+	অন্যথা যদি (prop->tp_flags & TP_FLAG_ALIGN_ABOVE)
 	    STR_LITERAL_SET(text_align, "above");
-	else if (prop->tp_flags & TP_FLAG_ALIGN_BELOW)
+	অন্যথা যদি (prop->tp_flags & TP_FLAG_ALIGN_BELOW)
 	    STR_LITERAL_SET(text_align, "below");
-	if (text_align.string != NULL)
+	যদি (text_align.string != ফাঁকা)
 	    dict_add_string_len(dict, "text_align",
-		text_align.string, (int)text_align.length);
+		text_align.string, (পূর্ণসংখ্যা)text_align.দৈর্ঘ্য);
 
 	// text_wrap
-	if (prop->tp_flags & TP_FLAG_WRAP)
+	যদি (prop->tp_flags & TP_FLAG_WRAP)
 	    dict_add_string_len(dict, "text_wrap",
 		(char_u *)"wrap", STRLEN_LITERAL("wrap"));
-	if (prop->tp_padleft != 0)
-	    dict_add_number(dict, "text_padding_left", prop->tp_padleft);
+	যদি (prop->tp_padleft != 0)
+	    dict_add_সংখ্যা(dict, "text_padding_left", prop->tp_padleft);
     }
 }
 
@@ -1811,14 +1811,14 @@ prop_fill_dict(dict_T *dict, textprop_T *prop, buf_T *buf)
  * Returns NULL if not found.
  */
     proptype_T *
-text_prop_type_by_id(buf_T *buf, int id)
+text_prop_type_by_id(buf_T *buf, পূর্ণসংখ্যা id)
 {
     proptype_T *type;
 
     type = find_type_by_id(buf->b_proptypes, &buf->b_proparray, id);
-    if (type == NULL)
+    যদি (type == ফাঁকা)
 	type = find_type_by_id(global_proptypes, &global_proparray, id);
-    return type;
+    ফেরত type;
 }
 
 /*
@@ -1827,218 +1827,218 @@ text_prop_type_by_id(buf_T *buf, int id)
     bool
 text_prop_type_valid(buf_T *buf, textprop_T *prop)
 {
-    return text_prop_type_by_id(buf, prop->tp_type) != NULL;
+    ফেরত text_prop_type_by_id(buf, prop->tp_type) != ফাঁকা;
 }
 
 /*
  * prop_clear({lnum} [, {lnum_end} [, {bufnr}]])
  */
-    void
+    শূন্য
 f_prop_clear(typval_T *argvars, typval_T *rettv UNUSED)
 {
     linenr_T start;
     linenr_T end;
     linenr_T lnum;
     buf_T    *buf = curbuf;
-    int	    did_clear = FALSE;
+    পূর্ণসংখ্যা	    did_clear = FALSE;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+    যদি (in_vim9script()
+	    && (check_for_সংখ্যা_arg(argvars, 0) == FAIL
+		|| check_for_opt_সংখ্যা_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_dict_arg(argvars, 2) == FAIL)))
-	return;
+	ফেরত;
 
-    start = tv_get_number(&argvars[0]);
+    start = tv_get_সংখ্যা(&argvars[0]);
     end = start;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    যদি (argvars[1].v_type != VAR_UNKNOWN)
     {
-	end = tv_get_number(&argvars[1]);
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	end = tv_get_সংখ্যা(&argvars[1]);
+	যদি (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    if (get_bufnr_from_arg(&argvars[2], &buf) == FAIL)
-		return;
+	    যদি (get_bufnr_from_arg(&argvars[2], &buf) == FAIL)
+		ফেরত;
 	}
     }
-    if (start < 1 || end < 1)
+    যদি (start < 1 || end < 1)
     {
 	emsg(_(e_invalid_range));
-	return;
+	ফেরত;
     }
 
     {
 	unpacked_memline_T um = um_open(buf);
 
-	for (lnum = start; lnum <= end; ++lnum)
+	জন্য (lnum = start; lnum <= end; ++lnum)
 	{
-	    int idx;
+	    পূর্ণসংখ্যা idx;
 
-	    if (lnum > buf->b_ml.ml_line_count)
-		break;
-	    if (!um_goto_line(&um, lnum, 0))
-		break;
-	    if (um.prop_count > 0)
+	    যদি (lnum > buf->b_ml.ml_সারি_গুনতি)
+		বিরতি;
+	    যদি (!um_goto_সারি(&um, lnum, 0))
+		বিরতি;
+	    যদি (um.prop_গুনতি > 0)
 	    {
 		did_clear = TRUE;
-		for (idx = um.prop_count - 1; idx >= 0; --idx)
+		জন্য (idx = um.prop_গুনতি - 1; idx >= 0; --idx)
 		    um_delete_prop(&um, idx);
 	    }
 	}
 	um_close(&um);
     }
-    if (did_clear)
+    যদি (did_clear)
 	redraw_buf_later(buf, UPD_NOT_VALID);
 }
 
 /*
  * prop_find({props} [, {direction}])
  */
-    void
+    শূন্য
 f_prop_find(typval_T *argvars, typval_T *rettv)
 {
     pos_T       *cursor = &curwin->w_cursor;
     dict_T      *dict;
     buf_T       *buf = curbuf;
     dictitem_T  *di;
-    int		lnum_start;
-    int		start_pos_has_prop = 0;
-    int		seen_end = FALSE;
-    int		id = 0;
-    int		id_found = FALSE;
-    int		type_id = -1;
-    int		skipstart = FALSE;
-    int		lnum = -1;
-    int		col = -1;
-    int		dir = FORWARD;    // FORWARD == 1, BACKWARD == -1
-    int		both;
+    পূর্ণসংখ্যা		lnum_start;
+    পূর্ণসংখ্যা		start_pos_has_prop = 0;
+    পূর্ণসংখ্যা		seen_end = FALSE;
+    পূর্ণসংখ্যা		id = 0;
+    পূর্ণসংখ্যা		id_found = FALSE;
+    পূর্ণসংখ্যা		type_id = -1;
+    পূর্ণসংখ্যা		skipstart = FALSE;
+    পূর্ণসংখ্যা		lnum = -1;
+    পূর্ণসংখ্যা		col = -1;
+    পূর্ণসংখ্যা		dir = FORWARD;    // FORWARD == 1, BACKWARD == -1
+    পূর্ণসংখ্যা		both;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_dict_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	ফেরত;
 
-    if (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
-	return;
+    যদি (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
+	ফেরত;
     dict = argvars[0].vval.v_dict;
 
-    if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	return;
-    if (buf->b_ml.ml_mfp == NULL)
-	return;
+    যদি (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	ফেরত;
+    যদি (buf->b_ml.ml_mfp == ফাঁকা)
+	ফেরত;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    যদি (argvars[1].v_type != VAR_UNKNOWN)
     {
 	char_u      *dir_s = tv_get_string(&argvars[1]);
 
-	if (*dir_s == 'b')
+	যদি (*dir_s == 'b')
 	    dir = BACKWARD;
-	else if (*dir_s != 'f')
+	অন্যথা যদি (*dir_s != 'f')
 	{
 	    emsg(_(e_invalid_argument));
-	    return;
+	    ফেরত;
 	}
     }
 
     di = dict_find(dict, (char_u *)"lnum", -1);
-    if (di != NULL)
-	lnum = tv_get_number(&di->di_tv);
+    যদি (di != ফাঁকা)
+	lnum = tv_get_সংখ্যা(&di->di_tv);
 
     di = dict_find(dict, (char_u *)"col", -1);
-    if (di != NULL)
-	col = tv_get_number(&di->di_tv);
+    যদি (di != ফাঁকা)
+	col = tv_get_সংখ্যা(&di->di_tv);
 
-    if (lnum == -1)
+    যদি (lnum == -1)
     {
 	lnum = cursor->lnum;
 	col = cursor->col + 1;
     }
-    else if (col == -1)
+    অন্যথা যদি (col == -1)
 	col = 1;
 
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count)
+    যদি (lnum < 1 || lnum > buf->b_ml.ml_সারি_গুনতি)
     {
 	emsg(_(e_invalid_range));
-	return;
+	ফেরত;
     }
 
     skipstart = dict_get_bool(dict, "skipstart", 0);
 
-    if (dict_has_key(dict, "id"))
+    যদি (dict_has_চাবি(dict, "id"))
     {
-	id = dict_get_number(dict, "id");
+	id = dict_get_সংখ্যা(dict, "id");
 	id_found = TRUE;
     }
-    if (dict_has_key(dict, "type"))
+    যদি (dict_has_চাবি(dict, "type"))
     {
 	char_u	    *name = dict_get_string(dict, "type", FALSE);
 	proptype_T  *type = lookup_prop_type(name, buf);
 
-	if (type == NULL)
-	    return;
+	যদি (type == ফাঁকা)
+	    ফেরত;
 	type_id = type->pt_id;
     }
     both = dict_get_bool(dict, "both", FALSE);
-    if (!id_found && type_id == -1)
+    যদি (!id_found && type_id == -1)
     {
 	emsg(_(e_need_at_least_one_of_id_or_type));
-	return;
+	ফেরত;
     }
-    if (both && (!id_found || type_id == -1))
+    যদি (both && (!id_found || type_id == -1))
     {
 	emsg(_(e_need_id_and_type_or_types_with_both));
-	return;
+	ফেরত;
     }
 
     lnum_start = lnum;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    যদি (rettv_dict_alloc(rettv) == FAIL)
+	ফেরত;
 
-    while (1)
+    যখন (1)
     {
 	char_u	*prop_start_ptr;
-	int	count = get_text_props(buf, lnum, &prop_start_ptr, FALSE);
-	int	    i;
+	পূর্ণসংখ্যা	গুনতি = get_text_props(buf, lnum, &prop_start_ptr, FALSE);
+	পূর্ণসংখ্যা	    i;
 	textprop_T  prop;
-	int	    prop_start;
-	int	    prop_end;
+	পূর্ণসংখ্যা	    prop_start;
+	পূর্ণসংখ্যা	    prop_end;
 
-	for (i = dir == BACKWARD ? count - 1 : 0; i >= 0 && i < count; i += dir)
+	জন্য (i = dir == BACKWARD ? গুনতি - 1 : 0; i >= 0 && i < গুনতি; i += dir)
 	{
-	    mch_memmove(&prop, prop_start_ptr + i * sizeof(textprop_T),
-							   sizeof(textprop_T));
+	    mch_memmove(&prop, prop_start_ptr + i * আকার(textprop_T),
+							   আকার(textprop_T));
 	    // Convert offset to pointer for virtual text props.
-	    if (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
+	    যদি (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
 	    {
-		prop.u.tp_text = (prop_start_ptr - PROP_COUNT_SIZE)
+		prop.u.tp_text = (prop_start_ptr - PROP_গুনতি_আকার)
 						    + prop.u.tp_text_offset;
 		prop.tp_flags |= TP_FLAG_VTEXT_PTR;
 	    }
-	    else
-		prop.u.tp_text = NULL;
+	    অন্যথা
+		prop.u.tp_text = ফাঁকা;
 
 	    // For the very first line try to find the first property before or
 	    // after `col`, depending on the search direction.
-	    if (lnum == lnum_start)
+	    যদি (lnum == lnum_start)
 	    {
 		bool is_floating_vtext = prop.tp_id < 0
 		    && prop.tp_col == MAXCOL;
-		if (dir == BACKWARD)
+		যদি (dir == BACKWARD)
 		{
 		    // Virtual text with MAXCOL always matches any column
-		    if (!is_floating_vtext && prop.tp_col > col)
-			continue;
+		    যদি (!is_floating_vtext && prop.tp_col > col)
+			চালু;
 		}
-		else if (!is_floating_vtext
+		অন্যথা যদি (!is_floating_vtext
 		    && prop.tp_col + prop.tp_len - (prop.tp_len != 0) < col)
-		    continue;
+		    চালু;
 	    }
-	    if (both ? prop.tp_id == id && prop.tp_type == type_id
+	    যদি (both ? prop.tp_id == id && prop.tp_type == type_id
 		     : (id_found && prop.tp_id == id)
 						    || prop.tp_type == type_id)
 	    {
 		// Check if the starting position has text props.
-		if (lnum_start == lnum
+		যদি (lnum_start == lnum
 			&& col >= prop.tp_col
 			&& (col <= prop.tp_col + prop.tp_len
 							 - (prop.tp_len != 0)))
@@ -2046,48 +2046,48 @@ f_prop_find(typval_T *argvars, typval_T *rettv)
 
 		// The property was not continued from last line, it starts on
 		// this line.
-		prop_start = !(prop.tp_flags & TP_FLAG_CONT_PREV);
+		prop_start = !(prop.tp_flags & TP_FLAG_CONT_পূর্ব);
 		// The property does not continue on the next line, it ends on
 		// this line.
-		prop_end = !(prop.tp_flags & TP_FLAG_CONT_NEXT);
-		if (!prop_start && prop_end && dir == FORWARD)
+		prop_end = !(prop.tp_flags & TP_FLAG_CONT_পরবর্তী);
+		যদি (!prop_start && prop_end && dir == FORWARD)
 		    seen_end = 1;
 
 		// Skip lines without the start flag.
-		if (!prop_start)
+		যদি (!prop_start)
 		{
 		    // Always search backwards for start when search started
 		    // on a prop and we're not skipping.
-		    if (start_pos_has_prop && !skipstart)
+		    যদি (start_pos_has_prop && !skipstart)
 			dir = BACKWARD;
-		    continue;
+		    চালু;
 		}
 
 		// If skipstart is true, skip the prop at start pos (even if
 		// continued from another line).
-		if (start_pos_has_prop && skipstart && !seen_end)
+		যদি (start_pos_has_prop && skipstart && !seen_end)
 		{
 		    start_pos_has_prop = 0;
-		    continue;
+		    চালু;
 		}
 
 		prop_fill_dict(rettv->vval.v_dict, &prop, buf);
-		dict_add_number(rettv->vval.v_dict, "lnum", lnum);
+		dict_add_সংখ্যা(rettv->vval.v_dict, "lnum", lnum);
 
-		return;
+		ফেরত;
 	    }
 	}
 
-	if (dir > 0)
+	যদি (dir > 0)
 	{
-	    if (lnum >= buf->b_ml.ml_line_count)
-		break;
+	    যদি (lnum >= buf->b_ml.ml_সারি_গুনতি)
+		বিরতি;
 	    lnum++;
 	}
-	else
+	অন্যথা
 	{
-	    if (lnum <= 1)
-		break;
+	    যদি (lnum <= 1)
+		বিরতি;
 	    lnum--;
 	}
     }
@@ -2096,16 +2096,16 @@ f_prop_find(typval_T *argvars, typval_T *rettv)
 /*
  * Returns TRUE if 'type_or_id' is in the 'types_or_ids' list.
  */
-    static int
-prop_type_or_id_in_list(int *types_or_ids, int len, int type_or_id)
+    স্থির পূর্ণসংখ্যা
+prop_type_or_id_in_list(পূর্ণসংখ্যা *types_or_ids, পূর্ণসংখ্যা len, পূর্ণসংখ্যা type_or_id)
 {
-    int i;
+    পূর্ণসংখ্যা i;
 
-    for (i = 0; i < len; i++)
-	if (types_or_ids[i] == type_or_id)
-	    return TRUE;
+    জন্য (i = 0; i < len; i++)
+	যদি (types_or_ids[i] == type_or_id)
+	    ফেরত TRUE;
 
-    return FALSE;
+    ফেরত FALSE;
 }
 
 /*
@@ -2117,51 +2117,51 @@ prop_type_or_id_in_list(int *types_or_ids, int len, int type_or_id)
  * If 'add_lnum' is TRUE, then add the line number also to the text property
  * dictionary.
  */
-    static void
-get_props_in_line(
+    স্থির শূন্য
+get_props_in_সারি(
 	buf_T		*buf,
 	linenr_T	lnum,
-	int		*prop_types,
-	int		prop_types_len,
-	int		*prop_ids,
-	int		prop_ids_len,
+	পূর্ণসংখ্যা		*prop_types,
+	পূর্ণসংখ্যা		prop_types_len,
+	পূর্ণসংখ্যা		*prop_ids,
+	পূর্ণসংখ্যা		prop_ids_len,
 	list_T		*retlist,
-	int		add_lnum)
+	পূর্ণসংখ্যা		add_lnum)
 {
     char_u	*props;
-    int		count;
-    int		i;
+    পূর্ণসংখ্যা		গুনতি;
+    পূর্ণসংখ্যা		i;
     textprop_T	prop;
 
-    count = get_text_props(buf, lnum, &props, FALSE);
-    for (i = 0; i < count; ++i)
+    গুনতি = get_text_props(buf, lnum, &props, FALSE);
+    জন্য (i = 0; i < গুনতি; ++i)
     {
-	mch_memmove(&prop, props + i * sizeof(textprop_T),
-		sizeof(textprop_T));
+	mch_memmove(&prop, props + i * আকার(textprop_T),
+		আকার(textprop_T));
 	// Convert offset to pointer for virtual text props.
-	if (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
+	যদি (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
 	{
-	    prop.u.tp_text = (props - PROP_COUNT_SIZE)
+	    prop.u.tp_text = (props - PROP_গুনতি_আকার)
 						+ prop.u.tp_text_offset;
 	    prop.tp_flags |= TP_FLAG_VTEXT_PTR;
 	}
-	else
-	    prop.u.tp_text = NULL;
-	if ((prop_types == NULL
+	অন্যথা
+	    prop.u.tp_text = ফাঁকা;
+	যদি ((prop_types == ফাঁকা
 		    || prop_type_or_id_in_list(prop_types, prop_types_len,
 			prop.tp_type))
-		&& (prop_ids == NULL
+		&& (prop_ids == ফাঁকা
 		    || prop_type_or_id_in_list(prop_ids, prop_ids_len,
 								 prop.tp_id)))
 	{
 	    dict_T *d = dict_alloc();
 
-	    if (d == NULL)
-		break;
+	    যদি (d == ফাঁকা)
+		বিরতি;
 	    prop_fill_dict(d, &prop, buf);
-	    if (add_lnum)
-		dict_add_number(d, "lnum", lnum);
-	    if (list_append_dict(retlist, d) == FAIL)
+	    যদি (add_lnum)
+		dict_add_সংখ্যা(d, "lnum", lnum);
+	    যদি (list_append_dict(retlist, d) == FAIL)
 		dict_unref(d);
 	}
     }
@@ -2172,45 +2172,45 @@ get_props_in_line(
  * identifiers. Returns a pointer to the allocated array. Returns NULL on
  * error. 'num_types' is set to the number of returned property types.
  */
-    static int *
-get_prop_types_from_names(list_T *l, buf_T *buf, int *num_types)
+    স্থির পূর্ণসংখ্যা *
+get_prop_types_from_names(list_T *l, buf_T *buf, পূর্ণসংখ্যা *অঙ্ক_types)
 {
-    int		*prop_types;
+    পূর্ণসংখ্যা		*prop_types;
     listitem_T	*li;
-    int		i;
+    পূর্ণসংখ্যা		i;
     char_u	*name;
     proptype_T	*type;
 
-    *num_types = 0;
+    *অঙ্ক_types = 0;
 
-    prop_types = ALLOC_MULT(int, list_len(l));
-    if (prop_types == NULL)
-	return NULL;
+    prop_types = ALLOC_MULT(পূর্ণসংখ্যা, list_len(l));
+    যদি (prop_types == ফাঁকা)
+	ফেরত ফাঁকা;
 
     i = 0;
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_বস্তুসমূহ(l, li)
     {
-	if (li->li_tv.v_type != VAR_STRING)
+	যদি (li->li_tv.v_type != VAR_STRING)
 	{
 	    emsg(_(e_string_required));
-	    goto errret;
+	    যাও errret;
 	}
 	name = li->li_tv.vval.v_string;
-	if (name == NULL)
-	    goto errret;
+	যদি (name == ফাঁকা)
+	    যাও errret;
 
 	type = lookup_prop_type(name, buf);
-	if (type == NULL)
-	    goto errret;
+	যদি (type == ফাঁকা)
+	    যাও errret;
 	prop_types[i++] = type->pt_id;
     }
 
-    *num_types = i;
-    return prop_types;
+    *অঙ্ক_types = i;
+    ফেরত prop_types;
 
 errret:
     VIM_CLEAR(prop_types);
-    return NULL;
+    ফেরত ফাঁকা;
 }
 
 /*
@@ -2218,135 +2218,135 @@ errret:
  * identifiers.  Returns a pointer to the allocated array. Returns NULL on
  * error. 'num_ids' is set to the number of returned property identifiers.
  */
-    static int *
-get_prop_ids_from_list(list_T *l, int *num_ids)
+    স্থির পূর্ণসংখ্যা *
+get_prop_ids_from_list(list_T *l, পূর্ণসংখ্যা *অঙ্ক_ids)
 {
-    int		*prop_ids;
+    পূর্ণসংখ্যা		*prop_ids;
     listitem_T	*li;
-    int		i = 0;
-    int		id;
-    int		error;
+    পূর্ণসংখ্যা		i = 0;
+    পূর্ণসংখ্যা		id;
+    পূর্ণসংখ্যা		error;
 
-    *num_ids = 0;
+    *অঙ্ক_ids = 0;
 
-    prop_ids = ALLOC_MULT(int, list_len(l));
-    if (prop_ids == NULL)
-	return NULL;
+    prop_ids = ALLOC_MULT(পূর্ণসংখ্যা, list_len(l));
+    যদি (prop_ids == ফাঁকা)
+	ফেরত ফাঁকা;
 
     CHECK_LIST_MATERIALIZE(l);
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_বস্তুসমূহ(l, li)
     {
 	error = FALSE;
-	id = tv_get_number_chk(&li->li_tv, &error);
-	if (error)
-	    goto errret;
+	id = tv_get_সংখ্যা_chk(&li->li_tv, &error);
+	যদি (error)
+	    যাও errret;
 
 	prop_ids[i++] = id;
     }
 
-    *num_ids = i;
-    return prop_ids;
+    *অঙ্ক_ids = i;
+    ফেরত prop_ids;
 
 errret:
     VIM_CLEAR(prop_ids);
-    return NULL;
+    ফেরত ফাঁকা;
 }
 
 /*
  * prop_list({lnum} [, {bufnr}])
  */
-    void
+    শূন্য
 f_prop_list(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum;
     linenr_T	start_lnum;
     linenr_T	end_lnum;
     buf_T	*buf = curbuf;
-    int		add_lnum = FALSE;
-    int		*prop_types = NULL;
-    int		prop_types_len = 0;
-    int		*prop_ids = NULL;
-    int		prop_ids_len = 0;
+    পূর্ণসংখ্যা		add_lnum = FALSE;
+    পূর্ণসংখ্যা		*prop_types = ফাঁকা;
+    পূর্ণসংখ্যা		prop_types_len = 0;
+    পূর্ণসংখ্যা		*prop_ids = ফাঁকা;
+    পূর্ণসংখ্যা		prop_ids_len = 0;
     list_T	*l;
     dictitem_T	*di;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    যদি (in_vim9script()
+	    && (check_for_সংখ্যা_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	ফেরত;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    যদি (rettv_list_alloc(rettv) == FAIL)
+	ফেরত;
 
     // default: get text properties on current line
-    start_lnum = tv_get_number(&argvars[0]);
+    start_lnum = tv_get_সংখ্যা(&argvars[0]);
     end_lnum = start_lnum;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    যদি (argvars[1].v_type != VAR_UNKNOWN)
     {
 	dict_T *d;
 
-	if (check_for_dict_arg(argvars, 1) == FAIL)
-	    return;
+	যদি (check_for_dict_arg(argvars, 1) == FAIL)
+	    ফেরত;
 	d = argvars[1].vval.v_dict;
 
-	if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	    return;
+	যদি (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	    ফেরত;
 
-	if (d != NULL && (di = dict_find(d, (char_u *)"end_lnum", -1)) != NULL)
+	যদি (d != ফাঁকা && (di = dict_find(d, (char_u *)"end_lnum", -1)) != ফাঁকা)
 	{
-	    if (di->di_tv.v_type != VAR_NUMBER)
+	    যদি (di->di_tv.v_type != VAR_সংখ্যা)
 	    {
-		emsg(_(e_number_required));
-		return;
+		emsg(_(e_সংখ্যা_required));
+		ফেরত;
 	    }
-	    end_lnum = tv_get_number(&di->di_tv);
-	    if (end_lnum < 0)
+	    end_lnum = tv_get_সংখ্যা(&di->di_tv);
+	    যদি (end_lnum < 0)
 		// negative end_lnum is used as an offset from the last buffer
-		// line
-		end_lnum = buf->b_ml.ml_line_count + end_lnum + 1;
-	    else if (end_lnum > buf->b_ml.ml_line_count)
-		end_lnum = buf->b_ml.ml_line_count;
+		//সারি
+		end_lnum = buf->b_ml.ml_সারি_গুনতি + end_lnum + 1;
+	    অন্যথা যদি (end_lnum > buf->b_ml.ml_সারি_গুনতি)
+		end_lnum = buf->b_ml.ml_সারি_গুনতি;
 	    add_lnum = TRUE;
 	}
-	if (d != NULL && (di = dict_find(d, (char_u *)"types", -1)) != NULL)
+	যদি (d != ফাঁকা && (di = dict_find(d, (char_u *)"types", -1)) != ফাঁকা)
 	{
-	    if (di->di_tv.v_type != VAR_LIST)
+	    যদি (di->di_tv.v_type != VAR_LIST)
 	    {
 		emsg(_(e_list_required));
-		return;
+		ফেরত;
 	    }
 
 	    l = di->di_tv.vval.v_list;
-	    if (l != NULL && list_len(l) > 0)
+	    যদি (l != ফাঁকা && list_len(l) > 0)
 	    {
 		prop_types = get_prop_types_from_names(l, buf, &prop_types_len);
-		if (prop_types == NULL)
-		    return;
+		যদি (prop_types == ফাঁকা)
+		    ফেরত;
 	    }
 	}
-	if (d != NULL && (di = dict_find(d, (char_u *)"ids", -1)) != NULL)
+	যদি (d != ফাঁকা && (di = dict_find(d, (char_u *)"ids", -1)) != ফাঁকা)
 	{
-	    if (di->di_tv.v_type != VAR_LIST)
+	    যদি (di->di_tv.v_type != VAR_LIST)
 	    {
 		emsg(_(e_list_required));
-		goto errret;
+		যাও errret;
 	    }
 
 	    l = di->di_tv.vval.v_list;
-	    if (l != NULL && list_len(l) > 0)
+	    যদি (l != ফাঁকা && list_len(l) > 0)
 	    {
 		prop_ids = get_prop_ids_from_list(l, &prop_ids_len);
-		if (prop_ids == NULL)
-		    goto errret;
+		যদি (prop_ids == ফাঁকা)
+		    যাও errret;
 	    }
 	}
     }
-    if (start_lnum < 1 || start_lnum > buf->b_ml.ml_line_count
+    যদি (start_lnum < 1 || start_lnum > buf->b_ml.ml_সারি_গুনতি
 		|| end_lnum < 1 || end_lnum < start_lnum)
 	emsg(_(e_invalid_range));
-    else
-	for (lnum = start_lnum; lnum <= end_lnum; lnum++)
-	    get_props_in_line(buf, lnum, prop_types, prop_types_len,
+    অন্যথা
+	জন্য (lnum = start_lnum; lnum <= end_lnum; lnum++)
+	    get_props_in_সারি(buf, lnum, prop_types, prop_types_len,
 		    prop_ids, prop_ids_len,
 		    rettv->vval.v_list, add_lnum);
 
@@ -2358,7 +2358,7 @@ errret:
 /*
  * prop_remove({props} [, {lnum} [, {lnum_end}]])
  */
-    void
+    শূন্য
 f_prop_remove(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	start = 1;
@@ -2368,161 +2368,161 @@ f_prop_remove(typval_T *argvars, typval_T *rettv)
     linenr_T	last_changed = 0;
     dict_T	*dict;
     buf_T	*buf = curbuf;
-    int		do_all;
-    int		id = -MAXCOL;
-    int		type_id = -1;	    // for a single "type"
-    int		*type_ids = NULL;   // array, for a list of "types", allocated
-    int		num_type_ids = 0;   // number of elements in "type_ids"
-    int		both;
+    পূর্ণসংখ্যা		do_all;
+    পূর্ণসংখ্যা		id = -MAXCOL;
+    পূর্ণসংখ্যা		type_id = -1;	    // for a single "type"
+    পূর্ণসংখ্যা		*type_ids = ফাঁকা;   // array, for a list of "types", allocated
+    পূর্ণসংখ্যা		অঙ্ক_type_ids = 0;   // number of elements in "type_ids"
+    পূর্ণসংখ্যা		both;
 
-    rettv->vval.v_number = 0;
+    rettv->vval.v_সংখ্যা = 0;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_dict_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+		|| check_for_opt_সংখ্যা_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_সংখ্যা_arg(argvars, 2) == FAIL)))
+	ফেরত;
 
-    if (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
-	return;
+    যদি (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
+	ফেরত;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    যদি (argvars[1].v_type != VAR_UNKNOWN)
     {
-	start = tv_get_number(&argvars[1]);
+	start = tv_get_সংখ্যা(&argvars[1]);
 	end = start;
-	if (argvars[2].v_type != VAR_UNKNOWN)
-	    end = tv_get_number(&argvars[2]);
-	if (start < 1 || end < 1)
+	যদি (argvars[2].v_type != VAR_UNKNOWN)
+	    end = tv_get_সংখ্যা(&argvars[2]);
+	যদি (start < 1 || end < 1)
 	{
 	    emsg(_(e_invalid_range));
-	    return;
+	    ফেরত;
 	}
     }
 
     dict = argvars[0].vval.v_dict;
-    if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	return;
-    if (buf->b_ml.ml_mfp == NULL)
-	return;
+    যদি (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	ফেরত;
+    যদি (buf->b_ml.ml_mfp == ফাঁকা)
+	ফেরত;
 
     do_all = dict_get_bool(dict, "all", FALSE);
 
-    if (dict_has_key(dict, "id"))
-	id = dict_get_number(dict, "id");
+    যদি (dict_has_চাবি(dict, "id"))
+	id = dict_get_সংখ্যা(dict, "id");
 
     // if a specific type was supplied "type": check that (and ignore "types".
     // Otherwise check against the list of "types".
-    if (dict_has_key(dict, "type"))
+    যদি (dict_has_চাবি(dict, "type"))
     {
 	char_u	    *name = dict_get_string(dict, "type", FALSE);
 	proptype_T  *type = lookup_prop_type(name, buf);
 
-	if (type == NULL)
-	    return;
+	যদি (type == ফাঁকা)
+	    ফেরত;
 	type_id = type->pt_id;
     }
-    if (dict_has_key(dict, "types"))
+    যদি (dict_has_চাবি(dict, "types"))
     {
 	typval_T types;
-	listitem_T *li = NULL;
+	listitem_T *li = ফাঁকা;
 
 	dict_get_tv(dict, "types", &types);
-	if (types.v_type == VAR_LIST && types.vval.v_list->lv_len > 0)
+	যদি (types.v_type == VAR_LIST && types.vval.v_list->lv_len > 0)
 	{
-	    type_ids = alloc( sizeof(int) * types.vval.v_list->lv_len );
+	    type_ids = alloc( আকার(পূর্ণসংখ্যা) * types.vval.v_list->lv_len );
 
-	    FOR_ALL_LIST_ITEMS(types.vval.v_list, li)
+	    FOR_ALL_LIST_বস্তুসমূহ(types.vval.v_list, li)
 	    {
 		proptype_T *prop_type;
 
-		if (li->li_tv.v_type != VAR_STRING)
-		    continue;
+		যদি (li->li_tv.v_type != VAR_STRING)
+		    চালু;
 
 		prop_type = lookup_prop_type(li->li_tv.vval.v_string, buf);
 
-		if (!prop_type)
-		    goto cleanup_prop_remove;
+		যদি (!prop_type)
+		    যাও cleanup_prop_remove;
 
-		type_ids[num_type_ids++] = prop_type->pt_id;
+		type_ids[অঙ্ক_type_ids++] = prop_type->pt_id;
 	    }
 	}
     }
     both = dict_get_bool(dict, "both", FALSE);
 
-    if (id == -MAXCOL && (type_id == -1 && num_type_ids == 0))
+    যদি (id == -MAXCOL && (type_id == -1 && অঙ্ক_type_ids == 0))
     {
 	emsg(_(e_need_at_least_one_of_id_or_type));
-	goto cleanup_prop_remove;
+	যাও cleanup_prop_remove;
     }
-    if (both && (id == -MAXCOL || (type_id == -1 && num_type_ids == 0)))
+    যদি (both && (id == -MAXCOL || (type_id == -1 && অঙ্ক_type_ids == 0)))
     {
 	emsg(_(e_need_id_and_type_or_types_with_both));
-	goto cleanup_prop_remove;
+	যাও cleanup_prop_remove;
     }
-    if (type_id != -1 && num_type_ids > 0)
+    যদি (type_id != -1 && অঙ্ক_type_ids > 0)
     {
 	emsg(_(e_cannot_specify_both_type_and_types));
-	goto cleanup_prop_remove;
+	যাও cleanup_prop_remove;
     }
 
-    if (end == 0)
-	end = buf->b_ml.ml_line_count;
+    যদি (end == 0)
+	end = buf->b_ml.ml_সারি_গুনতি;
 
     {
 	unpacked_memline_T um = um_open(buf);
 
-	for (lnum = start; lnum <= end; ++lnum)
+	জন্য (lnum = start; lnum <= end; ++lnum)
 	{
-	    int idx;
+	    পূর্ণসংখ্যা idx;
 
-	    if (lnum > buf->b_ml.ml_line_count)
-		break;
-	    if (!um_goto_line(&um, lnum, 0))
-		break;
+	    যদি (lnum > buf->b_ml.ml_সারি_গুনতি)
+		বিরতি;
+	    যদি (!um_goto_সারি(&um, lnum, 0))
+		বিরতি;
 
-	    for (idx = 0; idx < um.prop_count; ++idx)
+	    জন্য (idx = 0; idx < um.prop_গুনতি; ++idx)
 	    {
 		textprop_T  *prop = &um.props[idx];
-		int	    matches_id = 0;
-		int	    matches_type = 0;
+		পূর্ণসংখ্যা	    matches_id = 0;
+		পূর্ণসংখ্যা	    matches_type = 0;
 
-		if (prop->tp_flags & TP_FLAG_DELETED)
-		    continue;
+		যদি (prop->tp_flags & TP_FLAG_DELETED)
+		    চালু;
 
 		matches_id = prop->tp_id == id;
-		if (num_type_ids > 0)
+		যদি (অঙ্ক_type_ids > 0)
 		{
-		    int idx2;
+		    পূর্ণসংখ্যা idx2;
 
-		    for (idx2 = 0; !matches_type && idx2 < num_type_ids;
+		    জন্য (idx2 = 0; !matches_type && idx2 < অঙ্ক_type_ids;
 								      ++idx2)
 			matches_type = prop->tp_type == type_ids[idx2];
 		}
-		else
+		অন্যথা
 		    matches_type = prop->tp_type == type_id;
 
-		if (both ? matches_id && matches_type
+		যদি (both ? matches_id && matches_type
 			 : matches_id || matches_type)
 		{
 		    um_delete_prop(&um, idx);
 
-		    if (first_changed == 0)
+		    যদি (first_changed == 0)
 			first_changed = lnum;
 		    last_changed = lnum;
-		    ++rettv->vval.v_number;
-		    if (!do_all)
-			break;
+		    ++rettv->vval.v_সংখ্যা;
+		    যদি (!do_all)
+			বিরতি;
 		}
 	    }
 	}
 	um_close(&um);
     }
 
-    if (first_changed > 0)
+    যদি (first_changed > 0)
     {
-	changed_line_display_buf(buf);
-	changed_lines_buf(buf, first_changed, last_changed + 1, 0);
+	changed_সারি_display_buf(buf);
+	changed_সারিগুলি_buf(buf, first_changed, last_changed + 1, 0);
 	redraw_buf_later(buf, UPD_VALID);
     }
 
@@ -2533,135 +2533,135 @@ cleanup_prop_remove:
 /*
  * Common for f_prop_type_add() and f_prop_type_change().
  */
-    static void
-prop_type_set(typval_T *argvars, int add)
+    স্থির শূন্য
+prop_type_set(typval_T *argvars, পূর্ণসংখ্যা add)
 {
     char_u	*name;
-    buf_T	*buf = NULL;
+    buf_T	*buf = ফাঁকা;
     dict_T	*dict;
     dictitem_T  *di;
     proptype_T	*prop;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_dict_arg(argvars, 1) == FAIL))
-	return;
+	ফেরত;
 
     name = tv_get_string(&argvars[0]);
-    if (*name == NUL)
+    যদি (*name == NUL)
     {
 	semsg(_(e_invalid_argument_str), "\"\"");
-	return;
+	ফেরত;
     }
 
-    if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	return;
+    যদি (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	ফেরত;
     dict = argvars[1].vval.v_dict;
 
     prop = find_prop_type(name, buf);
-    if (add)
+    যদি (add)
     {
 	hashtab_T **htp;
 
-	if (prop != NULL)
+	যদি (prop != ফাঁকা)
 	{
 	    semsg(_(e_property_type_str_already_defined), name);
-	    return;
+	    ফেরত;
 	}
 	prop = alloc_clear(offsetof(proptype_T, pt_name) + STRLEN(name) + 1);
-	if (prop == NULL)
-	    return;
+	যদি (prop == ফাঁকা)
+	    ফেরত;
 	STRCPY(prop->pt_name, name);
 	prop->pt_id = ++proptype_id;
 	prop->pt_flags = PT_FLAG_COMBINE;
-	if (buf == NULL)
+	যদি (buf == ফাঁকা)
 	{
 	    htp = &global_proptypes;
 	    VIM_CLEAR(global_proparray);
 	}
-	else
+	অন্যথা
 	{
 	    htp = &buf->b_proptypes;
 	    VIM_CLEAR(buf->b_proparray);
 	}
-	if (*htp == NULL)
+	যদি (*htp == ফাঁকা)
 	{
 	    *htp = ALLOC_ONE(hashtab_T);
-	    if (*htp == NULL)
+	    যদি (*htp == ফাঁকা)
 	    {
 		vim_free(prop);
-		return;
+		ফেরত;
 	    }
 	    hash_init(*htp);
 	}
 	hash_add(*htp, PT2HIKEY(prop), "prop type");
     }
-    else
+    অন্যথা
     {
-	if (prop == NULL)
+	যদি (prop == ফাঁকা)
 	{
 	    semsg(_(e_property_type_str_does_not_exist), name);
-	    return;
+	    ফেরত;
 	}
     }
 
-    if (dict != NULL)
+    যদি (dict != ফাঁকা)
     {
 	di = dict_find(dict, (char_u *)"highlight", -1);
-	if (di != NULL)
+	যদি (di != ফাঁকা)
 	{
 	    char_u	*highlight;
-	    int		hl_id = 0;
+	    পূর্ণসংখ্যা		hl_id = 0;
 
 	    highlight = dict_get_string(dict, "highlight", FALSE);
-	    if (highlight != NULL && *highlight != NUL)
+	    যদি (highlight != ফাঁকা && *highlight != NUL)
 		hl_id = syn_name2id(highlight);
-	    if (hl_id <= 0)
+	    যদি (hl_id <= 0)
 	    {
 		semsg(_(e_unknown_highlight_group_name_str),
-			highlight == NULL ? (char_u *)"" : highlight);
-		return;
+			highlight == ফাঁকা ? (char_u *)"" : highlight);
+		ফেরত;
 	    }
 	    prop->pt_hl_id = hl_id;
 	}
 
 	di = dict_find(dict, (char_u *)"combine", -1);
-	if (di != NULL)
+	যদি (di != ফাঁকা)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    যদি (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_COMBINE;
-	    else
+	    অন্যথা
 		prop->pt_flags &= ~PT_FLAG_COMBINE;
 	}
 
 	di = dict_find(dict, (char_u *)"override", -1);
-	if (di != NULL)
+	যদি (di != ফাঁকা)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    যদি (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_OVERRIDE;
-	    else
+	    অন্যথা
 		prop->pt_flags &= ~PT_FLAG_OVERRIDE;
 	}
 
 	di = dict_find(dict, (char_u *)"priority", -1);
-	if (di != NULL)
-	    prop->pt_priority = tv_get_number(&di->di_tv);
+	যদি (di != ফাঁকা)
+	    prop->pt_priority = tv_get_সংখ্যা(&di->di_tv);
 
 	di = dict_find(dict, (char_u *)"start_incl", -1);
-	if (di != NULL)
+	যদি (di != ফাঁকা)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    যদি (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_INS_START_INCL;
-	    else
+	    অন্যথা
 		prop->pt_flags &= ~PT_FLAG_INS_START_INCL;
 	}
 
 	di = dict_find(dict, (char_u *)"end_incl", -1);
-	if (di != NULL)
+	যদি (di != ফাঁকা)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    যদি (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_INS_END_INCL;
-	    else
+	    অন্যথা
 		prop->pt_flags &= ~PT_FLAG_INS_END_INCL;
 	}
     }
@@ -2670,7 +2670,7 @@ prop_type_set(typval_T *argvars, int add)
 /*
  * prop_type_add({name}, {props})
  */
-    void
+    শূন্য
 f_prop_type_add(typval_T *argvars, typval_T *rettv UNUSED)
 {
     prop_type_set(argvars, TRUE);
@@ -2679,7 +2679,7 @@ f_prop_type_add(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * prop_type_change({name}, {props})
  */
-    void
+    শূন্য
 f_prop_type_change(typval_T *argvars, typval_T *rettv UNUSED)
 {
     prop_type_set(argvars, FALSE);
@@ -2688,44 +2688,44 @@ f_prop_type_change(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * prop_type_delete({name} [, {bufnr}])
  */
-    void
+    শূন্য
 f_prop_type_delete(typval_T *argvars, typval_T *rettv UNUSED)
 {
     char_u	*name;
-    buf_T	*buf = NULL;
+    buf_T	*buf = ফাঁকা;
     hashitem_T	*hi;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	ফেরত;
 
     name = tv_get_string(&argvars[0]);
-    if (*name == NUL)
+    যদি (*name == NUL)
     {
 	semsg(_(e_invalid_argument_str), "\"\"");
-	return;
+	ফেরত;
     }
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    যদি (argvars[1].v_type != VAR_UNKNOWN)
     {
-	if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	    return;
+	যদি (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	    ফেরত;
     }
 
     hi = find_prop_type_hi(name, buf);
-    if (hi == NULL)
-	return;
+    যদি (hi == ফাঁকা)
+	ফেরত;
 
     hashtab_T	*ht;
     proptype_T	*prop = HI2PT(hi);
 
-    if (buf == NULL)
+    যদি (buf == ফাঁকা)
     {
 	ht = global_proptypes;
 	VIM_CLEAR(global_proparray);
     }
-    else
+    অন্যথা
     {
 	ht = buf->b_proptypes;
 	VIM_CLEAR(buf->b_proparray);
@@ -2735,72 +2735,72 @@ f_prop_type_delete(typval_T *argvars, typval_T *rettv UNUSED)
 
     // currently visible text properties will disappear
     redraw_all_later(UPD_CLEAR);
-    changed_window_setting_buf(buf == NULL ? curbuf : buf);
+    changed_window_setting_buf(buf == ফাঁকা ? curbuf : buf);
 }
 
 /*
  * prop_type_get({name} [, {props}])
  */
-    void
+    শূন্য
 f_prop_type_get(typval_T *argvars, typval_T *rettv)
 {
     char_u *name;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	ফেরত;
 
     name = tv_get_string(&argvars[0]);
-    if (*name == NUL)
+    যদি (*name == NUL)
     {
 	semsg(_(e_invalid_argument_str), "\"\"");
-	return;
+	ফেরত;
     }
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    যদি (rettv_dict_alloc(rettv) == FAIL)
+	ফেরত;
 
-    proptype_T  *prop = NULL;
-    buf_T	    *buf = NULL;
+    proptype_T  *prop = ফাঁকা;
+    buf_T	    *buf = ফাঁকা;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    যদি (argvars[1].v_type != VAR_UNKNOWN)
     {
-	if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	    return;
+	যদি (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	    ফেরত;
     }
 
     prop = find_prop_type(name, buf);
-    if (prop == NULL)
-	return;
+    যদি (prop == ফাঁকা)
+	ফেরত;
 
     dict_T *d = rettv->vval.v_dict;
 
-    if (prop->pt_hl_id > 0)
+    যদি (prop->pt_hl_id > 0)
 	dict_add_string(d, "highlight", syn_id2name(prop->pt_hl_id));
-    dict_add_number(d, "priority", prop->pt_priority);
-    dict_add_number(d, "combine",
+    dict_add_সংখ্যা(d, "priority", prop->pt_priority);
+    dict_add_সংখ্যা(d, "combine",
 	    (prop->pt_flags & PT_FLAG_COMBINE) ? 1 : 0);
-    dict_add_number(d, "override",
+    dict_add_সংখ্যা(d, "override",
 	    (prop->pt_flags & PT_FLAG_OVERRIDE) ? 1 : 0);
-    dict_add_number(d, "start_incl",
+    dict_add_সংখ্যা(d, "start_incl",
 	    (prop->pt_flags & PT_FLAG_INS_START_INCL) ? 1 : 0);
-    dict_add_number(d, "end_incl",
+    dict_add_সংখ্যা(d, "end_incl",
 	    (prop->pt_flags & PT_FLAG_INS_END_INCL) ? 1 : 0);
-    if (buf != NULL)
-	dict_add_number(d, "bufnr", buf->b_fnum);
+    যদি (buf != ফাঁকা)
+	dict_add_সংখ্যা(d, "bufnr", buf->b_fnum);
 }
 
-    static void
+    স্থির শূন্য
 list_types(hashtab_T *ht, list_T *l)
 {
     long	todo;
     hashitem_T	*hi;
 
     todo = (long)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    FOR_ALL_HASHTAB_বস্তুসমূহ(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	যদি (!HASHITEM_EMPTY(hi))
 	{
 	    proptype_T *prop = HI2PT(hi);
 
@@ -2813,47 +2813,47 @@ list_types(hashtab_T *ht, list_T *l)
 /*
  * prop_type_list([{bufnr}])
  */
-    void
+    শূন্য
 f_prop_type_list(typval_T *argvars, typval_T *rettv)
 {
-    buf_T *buf = NULL;
+    buf_T *buf = ফাঁকা;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    যদি (rettv_list_alloc(rettv) == FAIL)
+	ফেরত;
 
-    if (in_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
+	ফেরত;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    যদি (argvars[0].v_type != VAR_UNKNOWN)
     {
-	if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	    return;
+	যদি (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	    ফেরত;
     }
-    if (buf == NULL)
+    যদি (buf == ফাঁকা)
     {
-	if (global_proptypes != NULL)
+	যদি (global_proptypes != ফাঁকা)
 	    list_types(global_proptypes, rettv->vval.v_list);
     }
-    else if (buf->b_proptypes != NULL)
+    অন্যথা যদি (buf->b_proptypes != ফাঁকা)
 	list_types(buf->b_proptypes, rettv->vval.v_list);
 }
 
 /*
  * Free all property types in "ht".
  */
-    static void
+    স্থির শূন্য
 clear_ht_prop_types(hashtab_T *ht)
 {
     long	todo;
     hashitem_T	*hi;
 
-    if (ht == NULL)
-	return;
+    যদি (ht == ফাঁকা)
+	ফেরত;
 
     todo = (long)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    FOR_ALL_HASHTAB_বস্তুসমূহ(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	যদি (!HASHITEM_EMPTY(hi))
 	{
 	    proptype_T *prop = HI2PT(hi);
 
@@ -2866,15 +2866,15 @@ clear_ht_prop_types(hashtab_T *ht)
     vim_free(ht);
 }
 
-#if defined(EXITFREE)
+#যদি defined(EXITFREE)
 /*
  * Free all global property types.
  */
-    void
-clear_global_prop_types(void)
+    শূন্য
+clear_global_prop_types(শূন্য)
 {
     clear_ht_prop_types(global_proptypes);
-    global_proptypes = NULL;
+    global_proptypes = ফাঁকা;
     VIM_CLEAR(global_proparray);
 }
 #endif
@@ -2882,19 +2882,19 @@ clear_global_prop_types(void)
 /*
  * Free all property types for "buf".
  */
-    void
+    শূন্য
 clear_buf_prop_types(buf_T *buf)
 {
     clear_ht_prop_types(buf->b_proptypes);
-    buf->b_proptypes = NULL;
+    buf->b_proptypes = ফাঁকা;
     VIM_CLEAR(buf->b_proparray);
 }
 
 // Struct used to return two values from adjust_prop().
-typedef struct
+প্রকারলেখ কাঠামো
 {
-    int dirty;	    // if the property was changed
-    int can_drop;   // whether after this change, the prop may be removed
+    পূর্ণসংখ্যা dirty;	    // if the property was changed
+    পূর্ণসংখ্যা can_drop;   // whether after this change, the prop may be removed
 } adjustres_T;
 
 /*
@@ -2906,101 +2906,101 @@ typedef struct
  * APC_SUBSTITUTE:	Text is replaced, not inserted.
  * APC_INDENT:		Text is inserted before virtual text prop
  */
-    static adjustres_T
+    স্থির adjustres_T
 adjust_prop(
 	textprop_T  *prop,
 	colnr_T	    col,
-	int	    added,
-	int	    flags)
+	পূর্ণসংখ্যা	    added,
+	পূর্ণসংখ্যা	    flags)
 {
     proptype_T	*pt;
-    int		start_incl;
-    int		end_incl;
-    int		droppable;
+    পূর্ণসংখ্যা		start_incl;
+    পূর্ণসংখ্যা		end_incl;
+    পূর্ণসংখ্যা		droppable;
     adjustres_T res = {TRUE, FALSE};
 
     // prop after end of the line doesn't move
-    if (prop->tp_col == MAXCOL)
+    যদি (prop->tp_col == MAXCOL)
     {
 	res.dirty = FALSE;
-	return res;
+	ফেরত res;
     }
 
     pt = text_prop_type_by_id(curbuf, prop->tp_type);
-    start_incl = (pt != NULL && (pt->pt_flags & PT_FLAG_INS_START_INCL))
+    start_incl = (pt != ফাঁকা && (pt->pt_flags & PT_FLAG_INS_START_INCL))
 				|| (flags & APC_SUBSTITUTE)
-				|| (prop->tp_flags & TP_FLAG_CONT_PREV);
-    if (prop->tp_id < 0 && (flags & APC_INDENT))
+				|| (prop->tp_flags & TP_FLAG_CONT_পূর্ব);
+    যদি (prop->tp_id < 0 && (flags & APC_INDENT))
 	// when inserting indent just before a character with virtual text
 	// shift the text property
 	start_incl = FALSE;
-    end_incl = (pt != NULL && (pt->pt_flags & PT_FLAG_INS_END_INCL))
-				|| (prop->tp_flags & TP_FLAG_CONT_NEXT);
+    end_incl = (pt != ফাঁকা && (pt->pt_flags & PT_FLAG_INS_END_INCL))
+				|| (prop->tp_flags & TP_FLAG_CONT_পরবর্তী);
     // do not drop zero-width props if they later can increase in size
     droppable = !(start_incl || end_incl);
 
-    if (added > 0)
+    যদি (added > 0)
     {
-	if (col + 1 <= prop->tp_col
+	যদি (col + 1 <= prop->tp_col
 		- (start_incl || (prop->tp_len == 0 && end_incl)))
 	    // Change is entirely before the text property: Only shift
 	    prop->tp_col += added;
-	else if (col + 1 < prop->tp_col + prop->tp_len + end_incl
+	অন্যথা যদি (col + 1 < prop->tp_col + prop->tp_len + end_incl
 		&& prop->tp_id >= 0)  // don't change length for virtual text
 	    // Insertion was inside text property
 	    prop->tp_len += added;
     }
-    else if (prop->tp_col > col + 1)
+    অন্যথা যদি (prop->tp_col > col + 1)
     {
-	if (prop->tp_col + added < col + 1)
+	যদি (prop->tp_col + added < col + 1)
 	{
-	    if (prop->tp_id < 0)
+	    যদি (prop->tp_id < 0)
 	    {
 		// Inline virtual text swallowed by the deletion.
 		res.can_drop = TRUE;
 	    }
-	    else
+	    অন্যথা
 	    {
 		prop->tp_len += (prop->tp_col - 1 - col) + added;
 		prop->tp_col = col + 1;
-		if (prop->tp_len <= 0)
+		যদি (prop->tp_len <= 0)
 		{
 		    prop->tp_len = 0;
 		    // Multiline properties with no text left should
 		    // also be dropped.
 		    res.can_drop = droppable
 			|| (prop->tp_flags
-				& (TP_FLAG_CONT_PREV | TP_FLAG_CONT_NEXT));
+				& (TP_FLAG_CONT_পূর্ব | TP_FLAG_CONT_পরবর্তী));
 		}
 	    }
 	}
-	else
+	অন্যথা
 	    prop->tp_col += added;
     }
-    else if (prop->tp_len > 0 && prop->tp_col + prop->tp_len > col
+    অন্যথা যদি (prop->tp_len > 0 && prop->tp_col + prop->tp_len > col
 	    && prop->tp_id >= 0)  // don't change length for virtual text
     {
-	if (added <= -MAXCOL)
+	যদি (added <= -MAXCOL)
 	    // Delete everything from col to end of line.
 	    prop->tp_len = col - (prop->tp_col - 1);
-	else
+	অন্যথা
 	{
-	    int after = col - added - (prop->tp_col - 1 + prop->tp_len);
+	    পূর্ণসংখ্যা after = col - added - (prop->tp_col - 1 + prop->tp_len);
 
 	    prop->tp_len += after > 0 ? added + after : added;
 	}
 	// A multiline property with no text left on this line
 	// should also be dropped.  When TP_FLAG_CONT_NEXT is set,
 	// tp_len == 1 means only the newline remains.
-	if (prop->tp_len <= 0 || ((prop->tp_flags & TP_FLAG_CONT_NEXT)
+	যদি (prop->tp_len <= 0 || ((prop->tp_flags & TP_FLAG_CONT_পরবর্তী)
 		    && prop->tp_len <= 1))
 	    res.can_drop = droppable || (prop->tp_flags
-			& (TP_FLAG_CONT_PREV | TP_FLAG_CONT_NEXT));
+			& (TP_FLAG_CONT_পূর্ব | TP_FLAG_CONT_পরবর্তী));
     }
-    else
+    অন্যথা
 	res.dirty = FALSE;
 
-    return res;
+    ফেরত res;
 }
 
 /*
@@ -3015,68 +3015,68 @@ adjust_prop(
  * Caller is expected to check b_has_textprop and "bytes_added" being non-zero.
  * Returns TRUE when props were changed.
  */
-    int
+    পূর্ণসংখ্যা
 adjust_prop_columns(
 	linenr_T    lnum,
 	colnr_T	    col,
-	int	    bytes_added,
-	int	    flags)
+	পূর্ণসংখ্যা	    bytes_added,
+	পূর্ণসংখ্যা	    flags)
 {
     unpacked_memline_T um;
-    int		dirty = FALSE;
-    int		ri;
+    পূর্ণসংখ্যা		dirty = FALSE;
+    পূর্ণসংখ্যা		ri;
 
-    if (text_prop_frozen > 0)
-	return FALSE;
+    যদি (text_prop_frozen > 0)
+	ফেরত FALSE;
 
     um = um_open_at(curbuf, lnum, 0);
-    if (um.buf == NULL || um.prop_count == 0)
+    যদি (um.buf == ফাঁকা || um.prop_গুনতি == 0)
     {
 	um_abort(&um);
-	return FALSE;
+	ফেরত FALSE;
     }
 
-    for (ri = 0; ri < um.prop_count; ++ri)
+    জন্য (ri = 0; ri < um.prop_গুনতি; ++ri)
     {
 	textprop_T	*prop = &um.props[ri];
 	adjustres_T	res;
 
 	res = adjust_prop(prop, col, bytes_added, flags);
-	if (res.dirty)
+	যদি (res.dirty)
 	{
-	    if (!dirty)
+	    যদি (!dirty)
 	    {
 		// Detach before u_savesub() so that all text and vtext
 		// pointers are allocated copies, immune to memline
 		// changes caused by u_savesub().
-		if (!um.detached && !um_detach(&um))
+		যদি (!um.detached && !um_detach(&um))
 		{
 		    um_abort(&um);
-		    return FALSE;
+		    ফেরত FALSE;
 		}
 		// Re-get prop pointer after detach (array may move).
 		prop = &um.props[ri];
 
-		if ((flags & APC_SAVE_FOR_UNDO)
+		যদি ((flags & APC_SAVE_FOR_UNDO)
 					       && u_savesub(lnum) == FAIL)
 		{
 		    um_abort(&um);
-		    return FALSE;
+		    ফেরত FALSE;
 		}
 	    }
 	    dirty = TRUE;
 	}
-	if (res.can_drop)
+	যদি (res.can_drop)
 	{
 	    um_delete_prop(&um, ri);
-	    continue;
+	    চালু;
 	}
     }
-    if (dirty)
+    যদি (dirty)
 	um_close(&um);
-    else
+    অন্যথা
 	um_abort(&um);
-    return dirty;
+    ফেরত dirty;
 }
 
 /*
@@ -3087,127 +3087,127 @@ adjust_prop_columns(
  * "deleted" is the number of bytes deleted.
  * "at_eol" is true if the split is after the end of the line.
  */
-    void
+    শূন্য
 adjust_props_for_split(
 	linenr_T    lnum_props,
-	linenr_T    lnum_top,
-	int	    kept,
-	int	    deleted,
-	int	    at_eol)
+	linenr_T    lnum_শীর্ষ,
+	পূর্ণসংখ্যা	    kept,
+	পূর্ণসংখ্যা	    deleted,
+	পূর্ণসংখ্যা	    at_eol)
 {
     char_u	*props;
-    int		count;
+    পূর্ণসংখ্যা		গুনতি;
     garray_T    prevprop;
     garray_T    nextprop;
-    int		skipped = kept + deleted;
+    পূর্ণসংখ্যা		skipped = kept + deleted;
 
-    if (!curbuf->b_has_textprop)
-	return;
+    যদি (!curbuf->b_has_textprop)
+	ফেরত;
 
     // Get the text properties from "lnum_props".
-    count = get_text_props(curbuf, lnum_props, &props, FALSE);
-    ga_init2(&prevprop, sizeof(textprop_T), 10);
-    ga_init2(&nextprop, sizeof(textprop_T), 10);
+    গুনতি = get_text_props(curbuf, lnum_props, &props, FALSE);
+    ga_init2(&prevprop, আকার(textprop_T), 10);
+    ga_init2(&nextprop, আকার(textprop_T), 10);
 
     // count_ptr points to the prop_count field in the memline.
-    char_u *count_ptr = props - PROP_COUNT_SIZE;
+    char_u *গুনতি_ptr = props - PROP_গুনতি_আকার;
 
     // Keep the relevant ones in the first line, reducing the length if needed.
     // Copy the ones that include the split to the second line.
     // Move the ones after the split to the second line.
-    for (int i = 0; i < count; ++i)
+    জন্য (পূর্ণসংখ্যা i = 0; i < গুনতি; ++i)
     {
 	textprop_T  prop;
 	proptype_T *pt;
-	int	    start_incl, end_incl;
-	int	    cont_prev, cont_next;
-	int	    prop_col;
+	পূর্ণসংখ্যা	    start_incl, end_incl;
+	পূর্ণসংখ্যা	    cont_পূর্ব, cont_পরবর্তী;
+	পূর্ণসংখ্যা	    prop_col;
 
 	// copy the prop to an aligned structure
-	mch_memmove(&prop, props + i * sizeof(textprop_T), sizeof(textprop_T));
+	mch_memmove(&prop, props + i * আকার(textprop_T), আকার(textprop_T));
 
 	// Convert offset to pointer and copy for virtual text props.
 	// Must copy because set_text_props() may invalidate memline data.
-	if (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
+	যদি (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
 	{
-	    prop.u.tp_text = vim_strsave(count_ptr + prop.u.tp_text_offset);
+	    prop.u.tp_text = vim_strsave(গুনতি_ptr + prop.u.tp_text_offset);
 	    prop.tp_flags |= TP_FLAG_VTEXT_PTR;
 	}
-	else
-	    prop.u.tp_text = NULL;
+	অন্যথা
+	    prop.u.tp_text = ফাঁকা;
 
 	pt = text_prop_type_by_id(curbuf, prop.tp_type);
-	start_incl = (pt != NULL && (pt->pt_flags & PT_FLAG_INS_START_INCL));
-	end_incl = (pt != NULL && (pt->pt_flags & PT_FLAG_INS_END_INCL));
+	start_incl = (pt != ফাঁকা && (pt->pt_flags & PT_FLAG_INS_START_INCL));
+	end_incl = (pt != ফাঁকা && (pt->pt_flags & PT_FLAG_INS_END_INCL));
 
 	// a text prop "above" behaves like it is on the first text column
 	prop_col = (prop.tp_flags & TP_FLAG_ALIGN_ABOVE) ? 1 : prop.tp_col;
 
-	if (prop_col == MAXCOL)
+	যদি (prop_col == MAXCOL)
 	{
-	    cont_prev = at_eol;
-	    cont_next = !at_eol;
+	    cont_পূর্ব = at_eol;
+	    cont_পরবর্তী = !at_eol;
 	}
-	else
+	অন্যথা
 	{
 	    // Floating virtual text (tp_col == MAXCOL) should not use
 	    // tp_len for continuation since tp_len holds the vtext
 	    // string length.
-	    int is_floating_vtext = (prop.tp_id < 0
+	    পূর্ণসংখ্যা is_floating_vtext = (prop.tp_id < 0
 						&& prop.tp_col == MAXCOL);
 
-	    cont_prev = prop_col + !start_incl <= kept;
-	    if (is_floating_vtext)
-		cont_next = FALSE;
-	    else
-		cont_next = skipped <= prop_col + prop.tp_len - !end_incl;
+	    cont_পূর্ব = prop_col + !start_incl <= kept;
+	    যদি (is_floating_vtext)
+		cont_পরবর্তী = FALSE;
+	    অন্যথা
+		cont_পরবর্তী = skipped <= prop_col + prop.tp_len - !end_incl;
 	}
 	// when a prop has text it is never copied
-	if (prop.tp_id < 0 && cont_next)
-	    cont_prev = FALSE;
+	যদি (prop.tp_id < 0 && cont_পরবর্তী)
+	    cont_পূর্ব = FALSE;
 
-	if (cont_prev && ga_grow(&prevprop, 1) == OK)
+	যদি (cont_পূর্ব && ga_grow(&prevprop, 1) == OK)
 	{
-	    textprop_T *p = ((textprop_T *)prevprop.ga_data) + prevprop.ga_len;
-	    int is_vtext = (prop.tp_id < 0);
+	    textprop_T *p = ((textprop_T *)prevprop.ga_তথ্য) + prevprop.ga_len;
+	    পূর্ণসংখ্যা is_vtext = (prop.tp_id < 0);
 
 	    *p = prop;
 	    ++prevprop.ga_len;
-	    if (!is_vtext && p->tp_col + p->tp_len >= kept)
+	    যদি (!is_vtext && p->tp_col + p->tp_len >= kept)
 		p->tp_len = kept - p->tp_col;
-	    if (cont_next)
-		p->tp_flags |= TP_FLAG_CONT_NEXT;
+	    যদি (cont_পরবর্তী)
+		p->tp_flags |= TP_FLAG_CONT_পরবর্তী;
 	}
 
 	// Only add the property to the next line if the length is bigger than
 	// zero.
-	if (cont_next && ga_grow(&nextprop, 1) == OK)
+	যদি (cont_পরবর্তী && ga_grow(&nextprop, 1) == OK)
 	{
-	    textprop_T *p = ((textprop_T *)nextprop.ga_data) + nextprop.ga_len;
-	    int is_vtext = (prop.tp_id < 0);
+	    textprop_T *p = ((textprop_T *)nextprop.ga_তথ্য) + nextprop.ga_len;
+	    পূর্ণসংখ্যা is_vtext = (prop.tp_id < 0);
 
 	    *p = prop;
 	    ++nextprop.ga_len;
-	    if (p->tp_col != MAXCOL)
+	    যদি (p->tp_col != MAXCOL)
 	    {
-		if (p->tp_col > skipped)
+		যদি (p->tp_col > skipped)
 		    p->tp_col -= skipped - 1;
-		else
+		অন্যথা
 		{
-		    if (!is_vtext)
+		    যদি (!is_vtext)
 			p->tp_len -= skipped - p->tp_col;
 		    p->tp_col = 1;
 		}
 	    }
-	    if (cont_prev)
-		p->tp_flags |= TP_FLAG_CONT_PREV;
+	    যদি (cont_পূর্ব)
+		p->tp_flags |= TP_FLAG_CONT_পূর্ব;
 	}
     }
 
-    set_text_props(lnum_top, (textprop_T *)prevprop.ga_data,
+    set_text_props(lnum_শীর্ষ, (textprop_T *)prevprop.ga_তথ্য,
 							    prevprop.ga_len);
     ga_clear(&prevprop);
-    set_text_props(lnum_top + 1, (textprop_T *)nextprop.ga_data,
+    set_text_props(lnum_শীর্ষ + 1, (textprop_T *)nextprop.ga_তথ্য,
 							    nextprop.ga_len);
     ga_clear(&nextprop);
 }
@@ -3217,55 +3217,55 @@ adjust_props_for_split(
  * Properties are added in reverse order; caller should call
  * um_reverse_props() after all lines are processed.
  */
-    void
+    শূন্য
 prepend_joined_props(
 	unpacked_memline_T  *um,
 	linenr_T	    lnum,
-	int		    last_line,
+	পূর্ণসংখ্যা		    last_সারি,
 	long		    col,
-	int		    removed)
+	পূর্ণসংখ্যা		    removed)
 {
     unpacked_memline_T	r_um;
 
-    if (um->buf == NULL)
-	return;
+    যদি (um->buf == ফাঁকা)
+	ফেরত;
 
     r_um = um_open_at(um->buf, lnum, 0);
-    if (r_um.buf == NULL)
-	return;
-    if (!um_detach(&r_um))
+    যদি (r_um.buf == ফাঁকা)
+	ফেরত;
+    যদি (!um_detach(&r_um))
     {
 	um_abort(&r_um);
-	return;
+	ফেরত;
     }
 
-    for (int i = r_um.prop_count - 1; i >= 0; --i)
+    জন্য (পূর্ণসংখ্যা i = r_um.prop_গুনতি - 1; i >= 0; --i)
     {
 	textprop_T  *prop = &r_um.props[i];
-	int	    end;
+	পূর্ণসংখ্যা	    end;
 
-	if (prop->tp_col == MAXCOL && !last_line)
-	    continue;  // drop floating text for non-last lines
-	end = !(prop->tp_flags & TP_FLAG_CONT_NEXT);
+	যদি (prop->tp_col == MAXCOL && !last_সারি)
+	    চালু;  // drop floating text for non-last lines
+	end = !(prop->tp_flags & TP_FLAG_CONT_পরবর্তী);
 
 	adjust_prop(prop, 0, -removed, 0);
 	adjust_prop(prop, -1, col, 0);
 
-	if (last_line || end)
+	যদি (last_সারি || end)
 	{
 	    um_add_prop(um, prop);
-	    prop->u.tp_text = NULL;  // ownership transferred
+	    prop->u.tp_text = ফাঁকা;  // ownership transferred
 	}
-	else
+	অন্যথা
 	{
 	    // Search for continuing prop in um.
 	    bool    found = false;
 
-	    for (int j = 0; j < um->prop_count; ++j)
+	    জন্য (পূর্ণসংখ্যা j = 0; j < um->prop_গুনতি; ++j)
 	    {
 		textprop_T *op = &um->props[j];
 
-		if ((op->tp_flags & TP_FLAG_CONT_PREV)
+		যদি ((op->tp_flags & TP_FLAG_CONT_পূর্ব)
 			&& op->tp_id == prop->tp_id
 			&& op->tp_type == prop->tp_type)
 		{
@@ -3273,10 +3273,10 @@ prepend_joined_props(
 		    op->tp_len += op->tp_col - prop->tp_col;
 		    op->tp_col = prop->tp_col;
 		    op->tp_flags = prop->tp_flags;
-		    break;
+		    বিরতি;
 		}
 	    }
-	    if (!found)
+	    যদি (!found)
 		internal_error("text property above joined line not found");
 	}
     }
@@ -3286,18 +3286,18 @@ prepend_joined_props(
 /*
  * Remember in "gap" that "flag" was cleared on "prop", on the line "which".
  */
-    static void
-remember_cleared_prop(garray_T *gap, int which, textprop_T *prop, int flag)
+    স্থির শূন্য
+remember_cleared_prop(garray_T *gap, পূর্ণসংখ্যা which, textprop_T *prop, পূর্ণসংখ্যা flag)
 {
     undoprop_T	*up;
 
-    if (which == UNDOPROP_NONE)
-	return;
-    if (gap->ga_itemsize == 0)
-	ga_init2(gap, sizeof(undoprop_T), 4);
-    if (ga_grow(gap, 1) == FAIL)
-	return;
-    up = (undoprop_T *)gap->ga_data + gap->ga_len++;
+    যদি (which == UNDOPROP_NONE)
+	ফেরত;
+    যদি (gap->ga_itemsize == 0)
+	ga_init2(gap, আকার(undoprop_T), 4);
+    যদি (ga_grow(gap, 1) == FAIL)
+	ফেরত;
+    up = (undoprop_T *)gap->ga_তথ্য + gap->ga_len++;
     up->up_which = which;
     up->up_type = prop->tp_type;
     up->up_id = prop->tp_id;
@@ -3311,99 +3311,99 @@ remember_cleared_prop(garray_T *gap, int which, textprop_T *prop, int flag)
  * is cleared on the line above is remembered in "gap" as "above_which", on
  * the line below as "below_which".
  */
-    void
+    শূন্য
 adjust_props_for_undo(
 	buf_T	    *buf,
 	linenr_T    lnum,
 	garray_T    *gap,
-	int	    above_which,
-	int	    below_which)
+	পূর্ণসংখ্যা	    above_which,
+	পূর্ণসংখ্যা	    below_which)
 {
     unpacked_memline_T	above;
     unpacked_memline_T	below;
-    bool		*paired = NULL;
+    bool		*paired = ফাঁকা;
     bool		above_changed = false;
     bool		below_changed = false;
-    bool		cont_next = false;
+    bool		cont_পরবর্তী = false;
 
-    if (!buf->b_has_textprop || lnum < 1 || lnum >= buf->b_ml.ml_line_count)
-	return;
+    যদি (!buf->b_has_textprop || lnum < 1 || lnum >= buf->b_ml.ml_সারি_গুনতি)
+	ফেরত;
 
     above = um_open_at(buf, lnum, 0);
-    if (above.buf == NULL)
-	return;
-    for (int i = 0; i < above.prop_count; ++i)
-	if (above.props[i].tp_flags & TP_FLAG_CONT_NEXT)
-	    cont_next = true;
+    যদি (above.buf == ফাঁকা)
+	ফেরত;
+    জন্য (পূর্ণসংখ্যা i = 0; i < above.prop_গুনতি; ++i)
+	যদি (above.props[i].tp_flags & TP_FLAG_CONT_পরবর্তী)
+	    cont_পরবর্তী = true;
     // Loading the line below may invalidate the text of "above", copy it when
     // it may have to be stored.
-    if (cont_next && !um_detach(&above))
+    যদি (cont_পরবর্তী && !um_detach(&above))
     {
 	um_abort(&above);
-	return;
+	ফেরত;
     }
 
     below = um_open_at(buf, lnum + 1, 0);
-    if (below.buf == NULL)
+    যদি (below.buf == ফাঁকা)
     {
 	um_abort(&above);
-	return;
+	ফেরত;
     }
-    if (below.prop_count > 0)
+    যদি (below.prop_গুনতি > 0)
     {
-	paired = ALLOC_CLEAR_MULT(bool, below.prop_count);
-	if (paired == NULL)
-	    goto theend;
+	paired = ALLOC_CLEAR_MULT(bool, below.prop_গুনতি);
+	যদি (paired == ফাঁকা)
+	    যাও theend;
     }
 
-    for (int i = 0; i < above.prop_count; ++i)
+    জন্য (পূর্ণসংখ্যা i = 0; i < above.prop_গুনতি; ++i)
     {
 	textprop_T  *prop = &above.props[i];
 	bool	    found = false;
 
-	if (!(prop->tp_flags & TP_FLAG_CONT_NEXT))
-	    continue;
-	for (int j = 0; j < below.prop_count; ++j)
+	যদি (!(prop->tp_flags & TP_FLAG_CONT_পরবর্তী))
+	    চালু;
+	জন্য (পূর্ণসংখ্যা j = 0; j < below.prop_গুনতি; ++j)
 	{
-	    textprop_T *next = &below.props[j];
+	    textprop_T *পরবর্তী = &below.props[j];
 
-	    if (!paired[j] && (next->tp_flags & TP_FLAG_CONT_PREV)
-		    && next->tp_id == prop->tp_id
-		    && next->tp_type == prop->tp_type)
+	    যদি (!paired[j] && (পরবর্তী->tp_flags & TP_FLAG_CONT_পূর্ব)
+		    && পরবর্তী->tp_id == prop->tp_id
+		    && পরবর্তী->tp_type == prop->tp_type)
 	    {
 		paired[j] = true;
 		found = true;
-		break;
+		বিরতি;
 	    }
 	}
-	if (!found)
+	যদি (!found)
 	{
-	    prop->tp_flags &= ~TP_FLAG_CONT_NEXT;
+	    prop->tp_flags &= ~TP_FLAG_CONT_পরবর্তী;
 	    above_changed = true;
-	    remember_cleared_prop(gap, above_which, prop, TP_FLAG_CONT_NEXT);
+	    remember_cleared_prop(gap, above_which, prop, TP_FLAG_CONT_পরবর্তী);
 	}
     }
 
-    for (int j = 0; j < below.prop_count; ++j)
+    জন্য (পূর্ণসংখ্যা j = 0; j < below.prop_গুনতি; ++j)
     {
-	if (!(below.props[j].tp_flags & TP_FLAG_CONT_PREV) || paired[j])
-	    continue;
-	if (!below.detached && !um_detach(&below))
-	    break;
-	below.props[j].tp_flags &= ~TP_FLAG_CONT_PREV;
+	যদি (!(below.props[j].tp_flags & TP_FLAG_CONT_পূর্ব) || paired[j])
+	    চালু;
+	যদি (!below.detached && !um_detach(&below))
+	    বিরতি;
+	below.props[j].tp_flags &= ~TP_FLAG_CONT_পূর্ব;
 	below_changed = true;
 	remember_cleared_prop(gap, below_which, &below.props[j],
-							   TP_FLAG_CONT_PREV);
+							   TP_FLAG_CONT_পূর্ব);
     }
 
 theend:
-    if (below_changed)
+    যদি (below_changed)
 	um_close(&below);
-    else
+    অন্যথা
 	um_abort(&below);
-    if (above_changed)
+    যদি (above_changed)
 	um_close(&above);
-    else
+    অন্যথা
 	um_abort(&above);
     vim_free(paired);
 }
@@ -3413,58 +3413,58 @@ theend:
  * those cleared when the undo block was applied the other way.  A property
  * that is no longer there is skipped.
  */
-    void
+    শূন্য
 restore_props_for_undo(
 	buf_T	    *buf,
 	linenr_T    lnum,
 	garray_T    *gap,
-	int	    which)
+	পূর্ণসংখ্যা	    which)
 {
     unpacked_memline_T	um;
     bool		changed = false;
 
-    if (!buf->b_has_textprop || gap->ga_len == 0 || lnum < 1
-					  || lnum > buf->b_ml.ml_line_count)
-	return;
+    যদি (!buf->b_has_textprop || gap->ga_len == 0 || lnum < 1
+					  || lnum > buf->b_ml.ml_সারি_গুনতি)
+	ফেরত;
     um = um_open_at(buf, lnum, 0);
-    if (um.buf == NULL)
-	return;
-    for (int r = 0; r < gap->ga_len; ++r)
+    যদি (um.buf == ফাঁকা)
+	ফেরত;
+    জন্য (পূর্ণসংখ্যা r = 0; r < gap->ga_len; ++r)
     {
-	undoprop_T  *up = (undoprop_T *)gap->ga_data + r;
+	undoprop_T  *up = (undoprop_T *)gap->ga_তথ্য + r;
 
-	if (up->up_which != which)
-	    continue;
-	for (int i = 0; i < um.prop_count; ++i)
+	যদি (up->up_which != which)
+	    চালু;
+	জন্য (পূর্ণসংখ্যা i = 0; i < um.prop_গুনতি; ++i)
 	{
 	    textprop_T *prop = &um.props[i];
 
-	    if (prop->tp_type != up->up_type || prop->tp_id != up->up_id
+	    যদি (prop->tp_type != up->up_type || prop->tp_id != up->up_id
 		    || prop->tp_col != up->up_col
 		    || (prop->tp_flags & up->up_flag))
-		continue;
-	    if (!um.detached && !um_detach(&um))
-		goto theend;
+		চালু;
+	    যদি (!um.detached && !um_detach(&um))
+		যাও theend;
 	    um.props[i].tp_flags |= up->up_flag;
 	    changed = true;
-	    break;
+	    বিরতি;
 	}
     }
 
 theend:
-    if (changed)
+    যদি (changed)
 	um_close(&um);
-    else
+    অন্যথা
 	um_abort(&um);
 }
 
     bool
-text_prop_count_valid(int prop_count, size_t propdata_len)
+text_prop_গুনতি_valid(পূর্ণসংখ্যা prop_গুনতি, size_t propdata_len)
 {
-    if (propdata_len < PROP_COUNT_SIZE)
-	return false;
-    return (size_t)prop_count * sizeof(textprop_T)
-		    <= propdata_len - PROP_COUNT_SIZE;
+    যদি (propdata_len < PROP_গুনতি_আকার)
+	ফেরত false;
+    ফেরত (size_t)prop_গুনতি * আকার(textprop_T)
+		    <= propdata_len - PROP_গুনতি_আকার;
 }
 
 /*
@@ -3473,21 +3473,21 @@ text_prop_count_valid(int prop_count, size_t propdata_len)
  * "props" may be unaligned.
  */
     bool
-text_prop_vtext_valid(char_u *props, int prop_count, size_t propdata_len)
+text_prop_vtext_valid(char_u *props, পূর্ণসংখ্যা prop_গুনতি, size_t propdata_len)
 {
-    for (int i = 0; i < prop_count; ++i)
+    জন্য (পূর্ণসংখ্যা i = 0; i < prop_গুনতি; ++i)
     {
 	textprop_T  prop;
 
-	mch_memmove(&prop, props + (size_t)i * sizeof(textprop_T),
-							  sizeof(textprop_T));
-	if (prop.tp_id >= 0 || prop.u.tp_text_offset <= 0)
-	    continue;
-	if (prop.tp_len < 0 || (size_t)prop.u.tp_text_offset
+	mch_memmove(&prop, props + (size_t)i * আকার(textprop_T),
+							  আকার(textprop_T));
+	যদি (prop.tp_id >= 0 || prop.u.tp_text_offset <= 0)
+	    চালু;
+	যদি (prop.tp_len < 0 || (size_t)prop.u.tp_text_offset
 				+ (size_t)prop.tp_len + 1 > propdata_len)
-	    return false;
+	    ফেরত false;
     }
-    return true;
+    ফেরত true;
 }
 
 #endif // FEAT_PROP_POPUP
