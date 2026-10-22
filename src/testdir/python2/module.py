@@ -1,2 +1,2 @@
-import before_1
+استورد before_1
 dir = '2'

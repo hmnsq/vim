@@ -1,7 +1,7 @@
 #ifndef __VTERM_INPUT_H__
 #define __VTERM_INPUT_H__
 
-typedef enum {
+تعريفنوع تعداد {
   VTERM_MOD_NONE  = 0x00,
   VTERM_MOD_SHIFT = 0x01,
   VTERM_MOD_ALT   = 0x02,
@@ -11,7 +11,7 @@ typedef enum {
 } VTermModifier;
 
 // The order here must match keycodes[] in src/keyboard.c!
-typedef enum {
+تعريفنوع تعداد {
   VTERM_KEY_NONE,
 
   VTERM_KEY_ENTER,

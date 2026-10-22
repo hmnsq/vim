@@ -10,8 +10,8 @@
  * Win32 machine-dependent things.
  */
 
-#include "os_dos.h"		// common MS-DOS and Win32 stuff
-#include <direct.h>		// for _mkdir()
+#ضمن "os_dos.h"		// common MS-DOS and Win32 stuff
+#ضمن <direct.h>		// for _mkdir()
 
 #define BINARY_FILE_IO
 #define USE_EXE_NAME		// use argv[0] for $VIM
@@ -51,10 +51,10 @@
 #define HAVE_ACL
 
 #define USE_FNAME_CASE		// adjust case of file names
-#if !defined(FEAT_CLIPBOARD)
+#𐤀𐤌 !defined(FEAT_CLIPBOARD)
 # define FEAT_CLIPBOARD		// include clipboard support
 #endif
-#if defined(__DATE__) && defined(__TIME__)
+#𐤀𐤌 defined(__DATE__) && defined(__TIME__)
 # define HAVE_DATE_TIME
 #endif
 #ifndef FEAT_GUI_MSWIN		// GUI works different
@@ -65,7 +65,7 @@
 
 #define HAVE_PUTENV		// at least Bcc 5.2 and MSC have it
 
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+#𐤀𐤌 defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
 # define NO_CONSOLE		// don't include console-only code
 #endif
 
@@ -75,10 +75,10 @@
 
 #define FNAME_ILLEGAL "\"*?><|" // illegal characters in a file name
 
-#include <signal.h>
-#include <stdlib.h>
-#include <time.h>
-#include <sys/types.h>
+#ضمن <signal.h>
+#ضمن <stdlib.h>
+#ضمن <time.h>
+#ضمن <sys/types.h>
 
 #ifndef STRICT
 # define STRICT
@@ -89,9 +89,9 @@
 
 // Must include winsock2.h before windows.h since it conflicts with winsock.h
 // (included in windows.h).
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <windows.h>
+#ضمن <winsock2.h>
+#ضمن <ws2tcpip.h>
+#ضمن <windows.h>
 
 // Weird: rpcndr.h defines "small" to "char", which causes trouble
 #undef small
@@ -100,7 +100,7 @@
 # define SM_CXPADDEDBORDER     92
 #endif
 
-typedef void (*sighandler_T)(int, int);
+تعريفنوع فراغ (*sighandler_T)(صحيح, صحيح);
 
 /*
  * Win32 has plenty of memory, use large buffers
@@ -146,12 +146,12 @@ typedef void (*sighandler_T)(int, int);
  * This is usually defined in the DDK, copy the definition here to avoid
  * adding it as a dependence only for a single structure.
  */
-typedef struct _REPARSE_DATA_BUFFER {
+تعريفنوع بنية _REPARSE_DATA_BUFFER {
     ULONG  ReparseTag;
     USHORT ReparseDataLength;
     USHORT Reserved;
-    union {
-	struct {
+    اتحاد {
+	بنية {
 	    USHORT SubstituteNameOffset;
 	    USHORT SubstituteNameLength;
 	    USHORT PrintNameOffset;
@@ -159,17 +159,17 @@ typedef struct _REPARSE_DATA_BUFFER {
 	    ULONG  Flags;
 	    WCHAR  PathBuffer[1];
 	} SymbolicLinkReparseBuffer;
-	struct {
+	بنية {
 	    USHORT SubstituteNameOffset;
 	    USHORT SubstituteNameLength;
 	    USHORT PrintNameOffset;
 	    USHORT PrintNameLength;
 	    WCHAR  PathBuffer[1];
 	} MountPointReparseBuffer;
-	struct {
+	بنية {
 	    UCHAR DataBuffer[1];
 	} GenericReparseBuffer;
-	struct
+	بنية
 	{
 	    ULONG StringCount;
 	    WCHAR StringList[1];
@@ -202,14 +202,14 @@ typedef struct _REPARSE_DATA_BUFFER {
 # define TRACE4(sz, p1, p2, p3, p4) Trace(_T(sz), p1, p2, p3, p4)
 
 // In debug version, writes trace messages to debug stream
-void __cdecl
-Trace(char *pszFormat, ...);
+فراغ __cdecl
+Trace(حرف *pszFormat, ...);
 
-#else // !_DEBUG
+#وإلا // !_DEBUG
 
   // These macros should all compile away to nothing
-# define ASSERT(f)		((void)0)
-# define TRACE			1 ? (void)0 : (void)printf
+# define ASSERT(f)		((فراغ)0)
+# define TRACE			1 ? (فراغ)0 : (فراغ)printf
 # define TRACE0(sz)
 # define TRACE1(sz, p1)
 # define TRACE2(sz, p1, p2)
@@ -220,15 +220,15 @@ Trace(char *pszFormat, ...);
 
 
 #define ASSERT_POINTER(p, type) \
-    ASSERT(((p) != NULL)  &&  IsValidAddress((p), sizeof(type), FALSE))
+    ASSERT(((p) != عدم)  &&  IsValidAddress((p), حجم(type), FALSE))
 
 #define ASSERT_NULL_OR_POINTER(p, type) \
-    ASSERT(((p) == NULL)  ||  IsValidAddress((p), sizeof(type), FALSE))
+    ASSERT(((p) == عدم)  ||  IsValidAddress((p), حجم(type), FALSE))
 
 #ifndef HAVE_SETENV
 # define HAVE_SETENV
 #endif
-#define mch_getenv(x) (char_u *)getenv((char *)(x))
+#define mch_getenv(x) (char_u *)getenv((حرف *)(x))
 #define vim_mkdir(x, y) mch_mkdir(x)
 
 // Windows Version
@@ -236,4 +236,4 @@ Trace(char *pszFormat, ...);
     (((major) << 24) | ((minor) << 16) | (build))
 
 // The Windows CRT does not declare strptime(); Vim provides it in strptime.c.
-char *strptime(const char *buf, const char *fmt, struct tm *tm);
+حرف *strptime(ثابت حرف *buf, ثابت حرف *fmt, بنية tm *tm);

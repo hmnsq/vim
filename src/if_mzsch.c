@@ -21,20 +21,20 @@
  * 3. I don't use K&R-style functions. Anyways, MzScheme headers are ANSI.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#include "if_mzsch.h"
+#ضمن "if_mzsch.h"
 
 // Only do the following when the feature is enabled.  Needed for "make
 // depend".
-#if defined(FEAT_MZSCHEME)
+#𐤀𐤌 defined(FEAT_MZSCHEME)
 
 /*
  * scheme_register_tls_space is only available on 32-bit Windows until
  * racket-6.3.  See
  * http://docs.racket-lang.org/inside/im_memoryalloc.html?q=scheme_register_tls_space
  */
-#if MZSCHEME_VERSION_MAJOR >= 500 && defined(MSWIN) \
+#𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 500 && defined(MSWIN) \
 	&& defined(USE_THREAD_LOCAL) \
 	&& (!defined(_WIN64) || MZSCHEME_VERSION_MAJOR >= 603)
 # define HAVE_TLS_SPACE 1
@@ -44,7 +44,7 @@
  * Since version 4.x precise GC requires trampolined startup.
  * Futures and places in version 5.x need it too.
  */
-#if defined(MZ_PRECISE_GC) && MZSCHEME_VERSION_MAJOR >= 400 \
+#𐤀𐤌 defined(MZ_PRECISE_GC) && MZSCHEME_VERSION_MAJOR >= 400 \
     || MZSCHEME_VERSION_MAJOR >= 500 \
 	&& (defined(MZ_USE_FUTURES) || defined(MZ_USE_PLACES))
 # define TRAMPOLINED_MZVIM_STARTUP
@@ -54,7 +54,7 @@
 #define SCHEME_VIMBUFFERP(obj)  SAME_TYPE(SCHEME_TYPE(obj), mz_buffer_type)
 #define SCHEME_VIMWINDOWP(obj)  SAME_TYPE(SCHEME_TYPE(obj), mz_window_type)
 
-typedef struct
+تعريفنوع بنية
 {
     Scheme_Object   so;
     buf_T	    *buf;
@@ -62,7 +62,7 @@ typedef struct
 
 #define INVALID_BUFFER_VALUE ((buf_T *)(-1))
 
-typedef struct
+تعريفنوع بنية
 {
     Scheme_Object   so;
     win_T	    *win;
@@ -73,17 +73,17 @@ typedef struct
 /*
  * Prims that form MzScheme Vim interface
  */
-typedef struct
+تعريفنوع بنية
 {
     Scheme_Closed_Prim	*prim;
-    char	*name;
-    int		mina;	// arity information
-    int		maxa;
+    حرف	*name;
+    صحيح		mina;	// arity information
+    صحيح		maxa;
 } Vim_Prim;
 
-typedef struct
+تعريفنوع بنية
 {
-    char	    *name;
+    حرف	    *name;
     Scheme_Object   *port;
 } Port_Info;
 
@@ -98,270 +98,270 @@ typedef struct
  *========================================================================
  */
 #ifdef HAVE_SANDBOX
-static Scheme_Object *sandbox_file_guard(int, Scheme_Object **);
-static Scheme_Object *sandbox_network_guard(int, Scheme_Object **);
-static void sandbox_check(void);
+ساكن Scheme_Object *sandbox_file_guard(صحيح, Scheme_Object **);
+ساكن Scheme_Object *sandbox_network_guard(صحيح, Scheme_Object **);
+ساكن فراغ sandbox_check(فراغ);
 #endif
 //  Buffer-related commands
-static Scheme_Object *buffer_new(buf_T *buf);
-static Scheme_Object *get_buffer_by_num(void *, int, Scheme_Object **);
-static vim_mz_buffer *get_vim_curr_buffer(void);
+ساكن Scheme_Object *buffer_new(buf_T *buf);
+ساكن Scheme_Object *get_buffer_by_num(فراغ *, صحيح, Scheme_Object **);
+ساكن vim_mz_buffer *get_vim_curr_buffer(فراغ);
 
 //  Window-related commands
-static Scheme_Object *window_new(win_T *win);
-static vim_mz_window *get_vim_curr_window(void);
+ساكن Scheme_Object *window_new(win_T *win);
+ساكن vim_mz_window *get_vim_curr_window(فراغ);
 
 /*
  *========================================================================
  *  Internal Function Prototypes
  *========================================================================
  */
-static int vim_error_check(void);
-static int do_mzscheme_command(exarg_T *, void *, Scheme_Closed_Prim *what);
-static int startup_mzscheme(void);
-static char *string_to_line(Scheme_Object *obj);
-#if MZSCHEME_VERSION_MAJOR >= 501
+ساكن صحيح vim_error_check(فراغ);
+ساكن صحيح do_mzscheme_command(exarg_T *, فراغ *, Scheme_Closed_Prim *what);
+ساكن صحيح startup_mzscheme(فراغ);
+ساكن حرف *string_to_line(Scheme_Object *obj);
+#𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 501
 # define OUTPUT_LEN_TYPE intptr_t
-#else
+#وإلا
 # define OUTPUT_LEN_TYPE long
 #endif
-static void do_output(char *mesg, OUTPUT_LEN_TYPE len);
-static void do_printf(char *format, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
-static void do_flush(void);
-static Scheme_Object *_apply_thunk_catch_exceptions(
+ساكن فراغ do_output(حرف *mesg, OUTPUT_LEN_TYPE len);
+ساكن فراغ do_printf(حرف *format, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
+ساكن فراغ do_flush(فراغ);
+ساكن Scheme_Object *_apply_thunk_catch_exceptions(
 	Scheme_Object *, Scheme_Object **);
-static Scheme_Object *extract_exn_message(Scheme_Object *v);
-static Scheme_Object *do_eval(void *, int noargc, Scheme_Object **noargv);
-static Scheme_Object *do_load(void *, int noargc, Scheme_Object **noargv);
-static void register_vim_exn(void);
-static vim_mz_buffer *get_buffer_arg(const char *fname, int argnum,
-	int argc, Scheme_Object **argv);
-static vim_mz_window *get_window_arg(const char *fname, int argnum,
-	int argc, Scheme_Object **argv);
-static int line_in_range(linenr_T, buf_T *);
-static void check_line_range(linenr_T, buf_T *);
-static void mz_fix_cursor(int lo, int hi, int extra);
+ساكن Scheme_Object *extract_exn_message(Scheme_Object *v);
+ساكن Scheme_Object *do_eval(فراغ *, صحيح noargc, Scheme_Object **noargv);
+ساكن Scheme_Object *do_load(فراغ *, صحيح noargc, Scheme_Object **noargv);
+ساكن فراغ register_vim_exn(فراغ);
+ساكن vim_mz_buffer *get_buffer_arg(ثابت حرف *fname, صحيح argnum,
+	صحيح argc, Scheme_Object **argv);
+ساكن vim_mz_window *get_window_arg(ثابت حرف *fname, صحيح argnum,
+	صحيح argc, Scheme_Object **argv);
+ساكن صحيح line_in_range(linenr_T, buf_T *);
+ساكن فراغ check_line_range(linenr_T, buf_T *);
+ساكن فراغ mz_fix_cursor(صحيح lo, صحيح hi, صحيح extra);
 
-static int eval_with_exn_handling(void *, Scheme_Closed_Prim *,
+ساكن صحيح eval_with_exn_handling(فراغ *, Scheme_Closed_Prim *,
 	    Scheme_Object **ret);
-static void make_modules(void);
-static void init_exn_catching_apply(void);
-static int mzscheme_env_main(Scheme_Env *env, int argc, char **argv);
-static int mzscheme_init(void);
+ساكن فراغ make_modules(فراغ);
+ساكن فراغ init_exn_catching_apply(فراغ);
+ساكن صحيح mzscheme_env_main(Scheme_Env *env, صحيح argc, حرف **argv);
+ساكن صحيح mzscheme_init(فراغ);
 #ifdef FEAT_EVAL
-static Scheme_Object *vim_to_mzscheme(typval_T *vim_value);
-static Scheme_Object *vim_to_mzscheme_impl(typval_T *vim_value, int depth,
+ساكن Scheme_Object *vim_to_mzscheme(typval_T *vim_value);
+ساكن Scheme_Object *vim_to_mzscheme_impl(typval_T *vim_value, صحيح depth,
 	Scheme_Hash_Table *visited);
-static int mzscheme_to_vim(Scheme_Object *obj, typval_T *tv);
-static int mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
+ساكن صحيح mzscheme_to_vim(Scheme_Object *obj, typval_T *tv);
+ساكن صحيح mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, صحيح depth,
 	Scheme_Hash_Table *visited);
-static Scheme_Object *vim_funcref(void *data, int argc, Scheme_Object **argv);
+ساكن Scheme_Object *vim_funcref(فراغ *data, صحيح argc, Scheme_Object **argv);
 #endif
 
 #ifdef MZ_PRECISE_GC
-static int buffer_size_proc(void *obj UNUSED)
+ساكن صحيح buffer_size_proc(فراغ *obj UNUSED)
 {
-    return gcBYTES_TO_WORDS(sizeof(vim_mz_buffer));
+    أرجع gcBYTES_TO_WORDS(حجم(vim_mz_buffer));
 }
-static int buffer_mark_proc(void *obj)
+ساكن صحيح buffer_mark_proc(فراغ *obj)
 {
-    return buffer_size_proc(obj);
+    أرجع buffer_size_proc(obj);
 }
-static int buffer_fixup_proc(void *obj)
+ساكن صحيح buffer_fixup_proc(فراغ *obj)
 {
     // apparently not needed as the object will be uncollectable while
     // the buffer is alive
     // vim_mz_buffer* buf = (vim_mz_buffer*) obj;
     // buf->buf->b_mzscheme_ref = GC_fixup_self(obj);
 
-    return buffer_size_proc(obj);
+    أرجع buffer_size_proc(obj);
 }
-static int window_size_proc(void *obj UNUSED)
+ساكن صحيح window_size_proc(فراغ *obj UNUSED)
 {
-    return gcBYTES_TO_WORDS(sizeof(vim_mz_window));
+    أرجع gcBYTES_TO_WORDS(حجم(vim_mz_window));
 }
-static int window_mark_proc(void *obj)
+ساكن صحيح window_mark_proc(فراغ *obj)
 {
-    return window_size_proc(obj);
+    أرجع window_size_proc(obj);
 }
-static int window_fixup_proc(void *obj)
+ساكن صحيح window_fixup_proc(فراغ *obj)
 {
     // apparently not needed as the object will be uncollectable while
     // the window is alive
     // vim_mz_window* win = (vim_mz_window*) obj;
     // win->win->w_mzscheme_ref = GC_fixup_self(obj);
     //
-    return window_size_proc(obj);
+    أرجع window_size_proc(obj);
 }
 // with precise GC, w_mzscheme_ref and b_mzscheme_ref are immobile boxes
 // containing pointers to a window/buffer
 // with conservative GC these are simply pointers
 # define WINDOW_REF(win) *(vim_mz_window **)((win)->w_mzscheme_ref)
 # define BUFFER_REF(buf) *(vim_mz_buffer **)((buf)->b_mzscheme_ref)
-#else
+#وإلا
 # define WINDOW_REF(win) (vim_mz_window *)((win)->w_mzscheme_ref)
 # define BUFFER_REF(buf) (vim_mz_buffer *)((buf)->b_mzscheme_ref)
 #endif
 
-#if defined(DYNAMIC_MZSCHEME)
-static Scheme_Object *dll_scheme_eof;
-static Scheme_Object *dll_scheme_false;
-static Scheme_Object *dll_scheme_void;
-static Scheme_Object *dll_scheme_null;
-static Scheme_Object *dll_scheme_true;
+#𐤀𐤌 defined(DYNAMIC_MZSCHEME)
+ساكن Scheme_Object *dll_scheme_eof;
+ساكن Scheme_Object *dll_scheme_false;
+ساكن Scheme_Object *dll_scheme_void;
+ساكن Scheme_Object *dll_scheme_null;
+ساكن Scheme_Object *dll_scheme_true;
 
-static Scheme_Thread **dll_scheme_current_thread_ptr;
+ساكن Scheme_Thread **dll_scheme_current_thread_ptr;
 
-static void (**dll_scheme_console_printf_ptr)(char *str, ...);
-static void (**dll_scheme_console_output_ptr)(char *str, OUTPUT_LEN_TYPE len);
-static void (**dll_scheme_notify_multithread_ptr)(int on);
+ساكن فراغ (**dll_scheme_console_printf_ptr)(حرف *str, ...);
+ساكن فراغ (**dll_scheme_console_output_ptr)(حرف *str, OUTPUT_LEN_TYPE len);
+ساكن فراغ (**dll_scheme_notify_multithread_ptr)(صحيح on);
 
-static void *(*dll_GC_malloc)(size_t size_in_bytes);
-static void *(*dll_GC_malloc_atomic)(size_t size_in_bytes);
-static Scheme_Env *(*dll_scheme_basic_env)(void);
-static void (*dll_scheme_check_threads)(void);
-static void (*dll_scheme_register_static)(void *ptr, long size);
-static void (*dll_scheme_set_stack_base)(void *base, int no_auto_statics);
-static void (*dll_scheme_add_global)(const char *name, Scheme_Object *val,
+ساكن فراغ *(*dll_GC_malloc)(size_t size_in_bytes);
+ساكن فراغ *(*dll_GC_malloc_atomic)(size_t size_in_bytes);
+ساكن Scheme_Env *(*dll_scheme_basic_env)(فراغ);
+ساكن فراغ (*dll_scheme_check_threads)(فراغ);
+ساكن فراغ (*dll_scheme_register_static)(فراغ *ptr, long size);
+ساكن فراغ (*dll_scheme_set_stack_base)(فراغ *base, صحيح no_auto_statics);
+ساكن فراغ (*dll_scheme_add_global)(ثابت حرف *name, Scheme_Object *val,
 	Scheme_Env *env);
-static void (*dll_scheme_add_global_symbol)(Scheme_Object *name,
+ساكن فراغ (*dll_scheme_add_global_symbol)(Scheme_Object *name,
 	Scheme_Object *val, Scheme_Env *env);
-static Scheme_Object *(*dll_scheme_apply)(Scheme_Object *rator, int num_rands,
+ساكن Scheme_Object *(*dll_scheme_apply)(Scheme_Object *rator, صحيح num_rands,
 	Scheme_Object **rands);
-static Scheme_Object *(*dll_scheme_builtin_value)(const char *name);
-# if MZSCHEME_VERSION_MAJOR >= 299
-static Scheme_Object *(*dll_scheme_byte_string_to_char_string)(Scheme_Object *s);
-static Scheme_Object *(*dll_scheme_make_path)(const char *chars);
+ساكن Scheme_Object *(*dll_scheme_builtin_value)(ثابت حرف *name);
+# 𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 299
+ساكن Scheme_Object *(*dll_scheme_byte_string_to_char_string)(Scheme_Object *s);
+ساكن Scheme_Object *(*dll_scheme_make_path)(ثابت حرف *chars);
 # endif
-static void (*dll_scheme_close_input_port)(Scheme_Object *port);
-static void (*dll_scheme_count_lines)(Scheme_Object *port);
-# if MZSCHEME_VERSION_MAJOR < 360
-static Scheme_Object *(*dll_scheme_current_continuation_marks)(void);
-# else
-static Scheme_Object *(*dll_scheme_current_continuation_marks)(Scheme_Object *prompt_tag);
+ساكن فراغ (*dll_scheme_close_input_port)(Scheme_Object *port);
+ساكن فراغ (*dll_scheme_count_lines)(Scheme_Object *port);
+# 𐤀𐤌 MZSCHEME_VERSION_MAJOR < 360
+ساكن Scheme_Object *(*dll_scheme_current_continuation_marks)(فراغ);
+# وإلا
+ساكن Scheme_Object *(*dll_scheme_current_continuation_marks)(Scheme_Object *prompt_tag);
 # endif
-static void (*dll_scheme_display)(Scheme_Object *obj, Scheme_Object *port);
-static char *(*dll_scheme_display_to_string)(Scheme_Object *obj, OUTPUT_LEN_TYPE *len);
-static int (*dll_scheme_eq)(Scheme_Object *obj1, Scheme_Object *obj2);
-static Scheme_Object *(*dll_scheme_do_eval)(Scheme_Object *obj,
-	int _num_rands, Scheme_Object **rands, int val);
-static void (*dll_scheme_dont_gc_ptr)(void *p);
-static Scheme_Object *(*dll_scheme_eval)(Scheme_Object *obj, Scheme_Env *env);
-static Scheme_Object *(*dll_scheme_eval_string)(const char *str,
+ساكن فراغ (*dll_scheme_display)(Scheme_Object *obj, Scheme_Object *port);
+ساكن حرف *(*dll_scheme_display_to_string)(Scheme_Object *obj, OUTPUT_LEN_TYPE *len);
+ساكن صحيح (*dll_scheme_eq)(Scheme_Object *obj1, Scheme_Object *obj2);
+ساكن Scheme_Object *(*dll_scheme_do_eval)(Scheme_Object *obj,
+	صحيح _num_rands, Scheme_Object **rands, صحيح val);
+ساكن فراغ (*dll_scheme_dont_gc_ptr)(فراغ *p);
+ساكن Scheme_Object *(*dll_scheme_eval)(Scheme_Object *obj, Scheme_Env *env);
+ساكن Scheme_Object *(*dll_scheme_eval_string)(ثابت حرف *str,
 	Scheme_Env *env);
-static Scheme_Object *(*dll_scheme_eval_string_all)(const char *str,
-	Scheme_Env *env, int all);
-static void (*dll_scheme_finish_primitive_module)(Scheme_Env *env);
-# if MZSCHEME_VERSION_MAJOR < 299
-static char *(*dll_scheme_format)(char *format, int flen, int argc,
+ساكن Scheme_Object *(*dll_scheme_eval_string_all)(ثابت حرف *str,
+	Scheme_Env *env, صحيح all);
+ساكن فراغ (*dll_scheme_finish_primitive_module)(Scheme_Env *env);
+# 𐤀𐤌 MZSCHEME_VERSION_MAJOR < 299
+ساكن حرف *(*dll_scheme_format)(حرف *format, صحيح flen, صحيح argc,
 	Scheme_Object **argv, long *rlen);
-# else
-static char *(*dll_scheme_format_utf8)(char *format, int flen, int argc,
+# وإلا
+ساكن حرف *(*dll_scheme_format_utf8)(حرف *format, صحيح flen, صحيح argc,
 	Scheme_Object **argv, OUTPUT_LEN_TYPE *rlen);
-static Scheme_Object *(*dll_scheme_get_param)(Scheme_Config *c, int pos);
+ساكن Scheme_Object *(*dll_scheme_get_param)(Scheme_Config *c, صحيح pos);
 # endif
-static void (*dll_scheme_gc_ptr_ok)(void *p);
-# if MZSCHEME_VERSION_MAJOR < 299
-static char *(*dll_scheme_get_sized_string_output)(Scheme_Object *,
+ساكن فراغ (*dll_scheme_gc_ptr_ok)(فراغ *p);
+# 𐤀𐤌 MZSCHEME_VERSION_MAJOR < 299
+ساكن حرف *(*dll_scheme_get_sized_string_output)(Scheme_Object *,
 	long *len);
-# else
-static char *(*dll_scheme_get_sized_byte_string_output)(Scheme_Object *,
+# وإلا
+ساكن حرف *(*dll_scheme_get_sized_byte_string_output)(Scheme_Object *,
 	OUTPUT_LEN_TYPE *len);
 # endif
-static Scheme_Object *(*dll_scheme_intern_symbol)(const char *name);
-static Scheme_Object *(*dll_scheme_lookup_global)(Scheme_Object *symbol,
+ساكن Scheme_Object *(*dll_scheme_intern_symbol)(ثابت حرف *name);
+ساكن Scheme_Object *(*dll_scheme_lookup_global)(Scheme_Object *symbol,
 	Scheme_Env *env);
-static Scheme_Object *(*dll_scheme_make_closed_prim_w_arity)
-    (Scheme_Closed_Prim *prim, void *data, const char *name, mzshort mina,
+ساكن Scheme_Object *(*dll_scheme_make_closed_prim_w_arity)
+    (Scheme_Closed_Prim *prim, فراغ *data, ثابت حرف *name, mzshort mina,
      mzshort maxa);
-static Scheme_Object *(*dll_scheme_make_integer_value)(long i);
-static Scheme_Object *(*dll_scheme_make_pair)(Scheme_Object *car,
+ساكن Scheme_Object *(*dll_scheme_make_integer_value)(long i);
+ساكن Scheme_Object *(*dll_scheme_make_pair)(Scheme_Object *car,
 	Scheme_Object *cdr);
-static Scheme_Object *(*dll_scheme_make_prim_w_arity)(Scheme_Prim *prim,
-	const char *name, mzshort mina, mzshort maxa);
-# if MZSCHEME_VERSION_MAJOR < 299
-static Scheme_Object *(*dll_scheme_make_string)(const char *chars);
-static Scheme_Object *(*dll_scheme_make_string_output_port)();
-# else
-static Scheme_Object *(*dll_scheme_make_byte_string)(const char *chars);
-static Scheme_Object *(*dll_scheme_make_byte_string_output_port)();
+ساكن Scheme_Object *(*dll_scheme_make_prim_w_arity)(Scheme_Prim *prim,
+	ثابت حرف *name, mzshort mina, mzshort maxa);
+# 𐤀𐤌 MZSCHEME_VERSION_MAJOR < 299
+ساكن Scheme_Object *(*dll_scheme_make_string)(ثابت حرف *chars);
+ساكن Scheme_Object *(*dll_scheme_make_string_output_port)();
+# وإلا
+ساكن Scheme_Object *(*dll_scheme_make_byte_string)(ثابت حرف *chars);
+ساكن Scheme_Object *(*dll_scheme_make_byte_string_output_port)();
 # endif
-static Scheme_Object *(*dll_scheme_make_struct_instance)(Scheme_Object *stype,
-	int argc, Scheme_Object **argv);
-static Scheme_Object **(*dll_scheme_make_struct_names)(Scheme_Object *base,
-	Scheme_Object *field_names, int flags, int *count_out);
-static Scheme_Object *(*dll_scheme_make_struct_type)(Scheme_Object *base,
-	Scheme_Object *parent, Scheme_Object *inspector, int num_fields,
-	int num_uninit_fields, Scheme_Object *uninit_val,
+ساكن Scheme_Object *(*dll_scheme_make_struct_instance)(Scheme_Object *stype,
+	صحيح argc, Scheme_Object **argv);
+ساكن Scheme_Object **(*dll_scheme_make_struct_names)(Scheme_Object *base,
+	Scheme_Object *field_names, صحيح flags, صحيح *count_out);
+ساكن Scheme_Object *(*dll_scheme_make_struct_type)(Scheme_Object *base,
+	Scheme_Object *parent, Scheme_Object *inspector, صحيح num_fields,
+	صحيح num_uninit_fields, Scheme_Object *uninit_val,
 	Scheme_Object *properties
-# if MZSCHEME_VERSION_MAJOR >= 299
+# 𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 299
 	, Scheme_Object *guard
 # endif
 	);
-static Scheme_Object **(*dll_scheme_make_struct_values)(
-	Scheme_Object *struct_type, Scheme_Object **names, int count,
-	int flags);
-static Scheme_Type (*dll_scheme_make_type)(const char *name);
-static Scheme_Object *(*dll_scheme_make_vector)(int size,
+ساكن Scheme_Object **(*dll_scheme_make_struct_values)(
+	Scheme_Object *struct_type, Scheme_Object **names, صحيح count,
+	صحيح flags);
+ساكن Scheme_Type (*dll_scheme_make_type)(ثابت حرف *name);
+ساكن Scheme_Object *(*dll_scheme_make_vector)(صحيح size,
 	Scheme_Object *fill);
-static void *(*dll_scheme_malloc_fail_ok)(void *(*f)(size_t), size_t);
-static Scheme_Object *(*dll_scheme_open_input_file)(const char *name,
-	const char *who);
-static Scheme_Env *(*dll_scheme_primitive_module)(Scheme_Object *name,
+ساكن فراغ *(*dll_scheme_malloc_fail_ok)(فراغ *(*f)(size_t), size_t);
+ساكن Scheme_Object *(*dll_scheme_open_input_file)(ثابت حرف *name,
+	ثابت حرف *who);
+ساكن Scheme_Env *(*dll_scheme_primitive_module)(Scheme_Object *name,
 	Scheme_Env *for_env);
-static int (*dll_scheme_proper_list_length)(Scheme_Object *list);
-static void (*dll_scheme_raise)(Scheme_Object *exn);
-static Scheme_Object *(*dll_scheme_read)(Scheme_Object *port);
-static void (*dll_scheme_signal_error)(const char *msg, ...);
-static void (*dll_scheme_wrong_type)(const char *name, const char *expected,
-	int which, int argc, Scheme_Object **argv);
-# if MZSCHEME_VERSION_MAJOR >= 299
-static void (*dll_scheme_set_param)(Scheme_Config *c, int pos,
+ساكن صحيح (*dll_scheme_proper_list_length)(Scheme_Object *list);
+ساكن فراغ (*dll_scheme_raise)(Scheme_Object *exn);
+ساكن Scheme_Object *(*dll_scheme_read)(Scheme_Object *port);
+ساكن فراغ (*dll_scheme_signal_error)(ثابت حرف *msg, ...);
+ساكن فراغ (*dll_scheme_wrong_type)(ثابت حرف *name, ثابت حرف *expected,
+	صحيح which, صحيح argc, Scheme_Object **argv);
+# 𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 299
+ساكن فراغ (*dll_scheme_set_param)(Scheme_Config *c, صحيح pos,
 	Scheme_Object *o);
-static Scheme_Config *(*dll_scheme_current_config)(void);
-static Scheme_Object *(*dll_scheme_char_string_to_byte_string)
+ساكن Scheme_Config *(*dll_scheme_current_config)(فراغ);
+ساكن Scheme_Object *(*dll_scheme_char_string_to_byte_string)
     (Scheme_Object *s);
-static Scheme_Object *(*dll_scheme_char_string_to_path)
+ساكن Scheme_Object *(*dll_scheme_char_string_to_path)
     (Scheme_Object *s);
-static void *(*dll_scheme_set_collects_path)(Scheme_Object *p);
+ساكن فراغ *(*dll_scheme_set_collects_path)(Scheme_Object *p);
 # endif
-static Scheme_Hash_Table *(*dll_scheme_make_hash_table)(int type);
-static void (*dll_scheme_hash_set)(Scheme_Hash_Table *table,
+ساكن Scheme_Hash_Table *(*dll_scheme_make_hash_table)(صحيح type);
+ساكن فراغ (*dll_scheme_hash_set)(Scheme_Hash_Table *table,
 	Scheme_Object *key, Scheme_Object *value);
-static Scheme_Object *(*dll_scheme_hash_get)(Scheme_Hash_Table *table,
+ساكن Scheme_Object *(*dll_scheme_hash_get)(Scheme_Hash_Table *table,
 	Scheme_Object *key);
-static Scheme_Object *(*dll_scheme_make_double)(double d);
-static Scheme_Object *(*dll_scheme_make_sized_byte_string)(char *chars,
-	long len, int copy);
-static Scheme_Object *(*dll_scheme_namespace_require)(Scheme_Object *req);
-static Scheme_Object *(*dll_scheme_dynamic_wind)(void (*pre)(void *), Scheme_Object *(* volatile act)(void *), void (* volatile post)(void *), Scheme_Object *(*jmp_handler)(void *), void * volatile data);
+ساكن Scheme_Object *(*dll_scheme_make_double)(مزدوج d);
+ساكن Scheme_Object *(*dll_scheme_make_sized_byte_string)(حرف *chars,
+	long len, صحيح copy);
+ساكن Scheme_Object *(*dll_scheme_namespace_require)(Scheme_Object *req);
+ساكن Scheme_Object *(*dll_scheme_dynamic_wind)(فراغ (*pre)(فراغ *), Scheme_Object *(* متطاير act)(فراغ *), فراغ (* متطاير post)(فراغ *), Scheme_Object *(*jmp_handler)(فراغ *), فراغ * متطاير data);
 # ifdef MZ_PRECISE_GC
-static void *(*dll_GC_malloc_one_tagged)(size_t size_in_bytes);
-static void (*dll_GC_register_traversers)(short tag, Size_Proc size, Mark_Proc mark, Fixup_Proc fixup, int is_constant_size, int is_atomic);
+ساكن فراغ *(*dll_GC_malloc_one_tagged)(size_t size_in_bytes);
+ساكن فراغ (*dll_GC_register_traversers)(short tag, Size_Proc size, Mark_Proc mark, Fixup_Proc fixup, صحيح is_constant_size, صحيح is_atomic);
 # endif
-# if MZSCHEME_VERSION_MAJOR >= 400
-static void (*dll_scheme_init_collection_paths)(Scheme_Env *global_env, Scheme_Object *extra_dirs);
-static void **(*dll_scheme_malloc_immobile_box)(void *p);
-static void (*dll_scheme_free_immobile_box)(void **b);
+# 𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 400
+ساكن فراغ (*dll_scheme_init_collection_paths)(Scheme_Env *global_env, Scheme_Object *extra_dirs);
+ساكن فراغ **(*dll_scheme_malloc_immobile_box)(فراغ *p);
+ساكن فراغ (*dll_scheme_free_immobile_box)(فراغ **b);
 # endif
-# if MZSCHEME_VERSION_MAJOR >= 500
+# 𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 500
 #  ifdef TRAMPOLINED_MZVIM_STARTUP
-static int (*dll_scheme_main_setup)(int no_auto_statics, Scheme_Env_Main _main, int argc, char **argv);
-#   if defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || MZSCHEME_VERSION_MAJOR >= 603
-static void (*dll_scheme_register_tls_space)(void *tls_space, int _tls_index);
+ساكن صحيح (*dll_scheme_main_setup)(صحيح no_auto_statics, Scheme_Env_Main _main, صحيح argc, حرف **argv);
+#   𐤀𐤌 defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || MZSCHEME_VERSION_MAJOR >= 603
+ساكن فراغ (*dll_scheme_register_tls_space)(فراغ *tls_space, صحيح _tls_index);
 #   endif
 #  endif
-#  if defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || defined(IMPLEMENT_THREAD_LOCAL_EXTERNALLY_VIA_PROC)
-static Thread_Local_Variables *(*dll_scheme_external_get_thread_local_variables)(void);
+#  𐤀𐤌 defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || defined(IMPLEMENT_THREAD_LOCAL_EXTERNALLY_VIA_PROC)
+ساكن Thread_Local_Variables *(*dll_scheme_external_get_thread_local_variables)(فراغ);
 #  endif
 # endif
-# if MZSCHEME_VERSION_MAJOR >= 600
-static void (*dll_scheme_embedded_load)(intptr_t len, const char *s, int predefined);
-static void (*dll_scheme_register_embedded_load)(intptr_t len, const char *s);
-static void (*dll_scheme_set_config_path)(Scheme_Object *p);
+# 𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 600
+ساكن فراغ (*dll_scheme_embedded_load)(intptr_t len, ثابت حرف *s, صحيح predefined);
+ساكن فراغ (*dll_scheme_register_embedded_load)(intptr_t len, ثابت حرف *s);
+ساكن فراغ (*dll_scheme_set_config_path)(Scheme_Object *p);
 # endif
 
-# if defined(DYNAMIC_MZSCHEME)
+# 𐤀𐤌 defined(DYNAMIC_MZSCHEME)
 
 // arrays are imported directly
 #  define scheme_eof dll_scheme_eof
@@ -371,7 +371,7 @@ static void (*dll_scheme_set_config_path)(Scheme_Object *p);
 #  define scheme_true dll_scheme_true
 
 // pointers are GetProcAddress'ed as pointers to pointer
-#  if !defined(USE_THREAD_LOCAL) && !defined(LINK_EXTENSIONS_BY_TABLE)
+#  𐤀𐤌 !defined(USE_THREAD_LOCAL) && !defined(LINK_EXTENSIONS_BY_TABLE)
 #   define scheme_current_thread (*dll_scheme_current_thread_ptr)
 #  endif
 #  define scheme_console_printf (*dll_scheme_console_printf_ptr)
@@ -387,7 +387,7 @@ static void (*dll_scheme_set_config_path)(Scheme_Object *p);
 #  define scheme_apply dll_scheme_apply
 #  define scheme_basic_env dll_scheme_basic_env
 #  define scheme_builtin_value dll_scheme_builtin_value
-#  if MZSCHEME_VERSION_MAJOR >= 299
+#  𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 299
 #   define scheme_byte_string_to_char_string dll_scheme_byte_string_to_char_string
 #   define scheme_make_path dll_scheme_make_path
 #  endif
@@ -405,15 +405,15 @@ static void (*dll_scheme_set_config_path)(Scheme_Object *p);
 #  define scheme_eval_string dll_scheme_eval_string
 #  define scheme_eval_string_all dll_scheme_eval_string_all
 #  define scheme_finish_primitive_module dll_scheme_finish_primitive_module
-#  if MZSCHEME_VERSION_MAJOR < 299
+#  𐤀𐤌 MZSCHEME_VERSION_MAJOR < 299
 #   define scheme_format dll_scheme_format
-#  else
+#  وإلا
 #   define scheme_format_utf8 dll_scheme_format_utf8
 #  endif
 #  define scheme_gc_ptr_ok dll_scheme_gc_ptr_ok
-#  if MZSCHEME_VERSION_MAJOR < 299
+#  𐤀𐤌 MZSCHEME_VERSION_MAJOR < 299
 #   define scheme_get_sized_byte_string_output dll_scheme_get_sized_string_output
-#  else
+#  وإلا
 #   define scheme_get_sized_byte_string_output \
     dll_scheme_get_sized_byte_string_output
 #   define scheme_get_param dll_scheme_get_param
@@ -424,10 +424,10 @@ static void (*dll_scheme_set_config_path)(Scheme_Object *p);
 #  define scheme_make_integer_value dll_scheme_make_integer_value
 #  define scheme_make_pair dll_scheme_make_pair
 #  define scheme_make_prim_w_arity dll_scheme_make_prim_w_arity
-#  if MZSCHEME_VERSION_MAJOR < 299
+#  𐤀𐤌 MZSCHEME_VERSION_MAJOR < 299
 #   define scheme_make_byte_string dll_scheme_make_string
 #   define scheme_make_byte_string_output_port dll_scheme_make_string_output_port
-#  else
+#  وإلا
 #   define scheme_make_byte_string dll_scheme_make_byte_string
 #   define scheme_make_byte_string_output_port \
     dll_scheme_make_byte_string_output_port
@@ -448,7 +448,7 @@ static void (*dll_scheme_set_config_path)(Scheme_Object *p);
 #  define scheme_set_stack_base dll_scheme_set_stack_base
 #  define scheme_signal_error dll_scheme_signal_error
 #  define scheme_wrong_type dll_scheme_wrong_type
-#  if MZSCHEME_VERSION_MAJOR >= 299
+#  𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 299
 #   define scheme_set_param dll_scheme_set_param
 #   define scheme_current_config dll_scheme_current_config
 #   define scheme_char_string_to_byte_string \
@@ -468,10 +468,10 @@ static void (*dll_scheme_set_config_path)(Scheme_Object *p);
 #   define GC_malloc_one_tagged dll_GC_malloc_one_tagged
 #   define GC_register_traversers dll_GC_register_traversers
 #  endif
-#  if MZSCHEME_VERSION_MAJOR >= 400
+#  𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 400
 #   ifdef TRAMPOLINED_MZVIM_STARTUP
 #    define scheme_main_setup dll_scheme_main_setup
-#    if defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || MZSCHEME_VERSION_MAJOR >= 603
+#    𐤀𐤌 defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || MZSCHEME_VERSION_MAJOR >= 603
 #     define scheme_register_tls_space dll_scheme_register_tls_space
 #    endif
 #   endif
@@ -479,20 +479,20 @@ static void (*dll_scheme_set_config_path)(Scheme_Object *p);
 #   define scheme_malloc_immobile_box dll_scheme_malloc_immobile_box
 #   define scheme_free_immobile_box dll_scheme_free_immobile_box
 #  endif
-#  if MZSCHEME_VERSION_MAJOR >= 600
+#  𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 600
 #   define scheme_embedded_load dll_scheme_embedded_load
 #   define scheme_register_embedded_load dll_scheme_register_embedded_load
 #   define scheme_set_config_path dll_scheme_set_config_path
 #  endif
 
 #  ifndef PROTO
-#   if MZSCHEME_VERSION_MAJOR >= 500
-#    if defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || defined(IMPLEMENT_THREAD_LOCAL_EXTERNALLY_VIA_PROC)
+#   𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 500
+#    𐤀𐤌 defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || defined(IMPLEMENT_THREAD_LOCAL_EXTERNALLY_VIA_PROC)
 // define as function for macro in schthread.h
 Thread_Local_Variables *
-scheme_external_get_thread_local_variables(void)
+scheme_external_get_thread_local_variables(فراغ)
 {
-    return dll_scheme_external_get_thread_local_variables();
+    أرجع dll_scheme_external_get_thread_local_variables();
 }
 #    endif
 #   endif
@@ -500,221 +500,221 @@ scheme_external_get_thread_local_variables(void)
 
 # endif
 
-typedef struct
+تعريفنوع بنية
 {
-    char    *name;
-    void    **ptr;
+    حرف    *name;
+    فراغ    **ptr;
 } Thunk_Info;
 
-static Thunk_Info mzgc_imports[] = {
-    {"GC_malloc", (void **)&dll_GC_malloc},
-    {"GC_malloc_atomic", (void **)&dll_GC_malloc_atomic},
-    {NULL, NULL}};
+ساكن Thunk_Info mzgc_imports[] = {
+    {"GC_malloc", (فراغ **)&dll_GC_malloc},
+    {"GC_malloc_atomic", (فراغ **)&dll_GC_malloc_atomic},
+    {عدم, عدم}};
 
-static Thunk_Info mzsch_imports[] = {
-    {"scheme_eof", (void **)&dll_scheme_eof},
-    {"scheme_false", (void **)&dll_scheme_false},
-    {"scheme_void", (void **)&dll_scheme_void},
-    {"scheme_null", (void **)&dll_scheme_null},
-    {"scheme_true", (void **)&dll_scheme_true},
-# if !defined(USE_THREAD_LOCAL) && !defined(LINK_EXTENSIONS_BY_TABLE)
-    {"scheme_current_thread", (void **)&dll_scheme_current_thread_ptr},
+ساكن Thunk_Info mzsch_imports[] = {
+    {"scheme_eof", (فراغ **)&dll_scheme_eof},
+    {"scheme_false", (فراغ **)&dll_scheme_false},
+    {"scheme_void", (فراغ **)&dll_scheme_void},
+    {"scheme_null", (فراغ **)&dll_scheme_null},
+    {"scheme_true", (فراغ **)&dll_scheme_true},
+# 𐤀𐤌 !defined(USE_THREAD_LOCAL) && !defined(LINK_EXTENSIONS_BY_TABLE)
+    {"scheme_current_thread", (فراغ **)&dll_scheme_current_thread_ptr},
 # endif
-    {"scheme_console_printf", (void **)&dll_scheme_console_printf_ptr},
-    {"scheme_console_output", (void **)&dll_scheme_console_output_ptr},
+    {"scheme_console_printf", (فراغ **)&dll_scheme_console_printf_ptr},
+    {"scheme_console_output", (فراغ **)&dll_scheme_console_output_ptr},
     {"scheme_notify_multithread",
-	(void **)&dll_scheme_notify_multithread_ptr},
-    {"scheme_add_global", (void **)&dll_scheme_add_global},
-    {"scheme_add_global_symbol", (void **)&dll_scheme_add_global_symbol},
-    {"scheme_apply", (void **)&dll_scheme_apply},
-    {"scheme_basic_env", (void **)&dll_scheme_basic_env},
-# if MZSCHEME_VERSION_MAJOR >= 299
-    {"scheme_byte_string_to_char_string", (void **)&dll_scheme_byte_string_to_char_string},
-    {"scheme_make_path", (void **)&dll_scheme_make_path},
+	(فراغ **)&dll_scheme_notify_multithread_ptr},
+    {"scheme_add_global", (فراغ **)&dll_scheme_add_global},
+    {"scheme_add_global_symbol", (فراغ **)&dll_scheme_add_global_symbol},
+    {"scheme_apply", (فراغ **)&dll_scheme_apply},
+    {"scheme_basic_env", (فراغ **)&dll_scheme_basic_env},
+# 𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 299
+    {"scheme_byte_string_to_char_string", (فراغ **)&dll_scheme_byte_string_to_char_string},
+    {"scheme_make_path", (فراغ **)&dll_scheme_make_path},
 # endif
-    {"scheme_builtin_value", (void **)&dll_scheme_builtin_value},
-    {"scheme_check_threads", (void **)&dll_scheme_check_threads},
-    {"scheme_close_input_port", (void **)&dll_scheme_close_input_port},
-    {"scheme_count_lines", (void **)&dll_scheme_count_lines},
+    {"scheme_builtin_value", (فراغ **)&dll_scheme_builtin_value},
+    {"scheme_check_threads", (فراغ **)&dll_scheme_check_threads},
+    {"scheme_close_input_port", (فراغ **)&dll_scheme_close_input_port},
+    {"scheme_count_lines", (فراغ **)&dll_scheme_count_lines},
     {"scheme_current_continuation_marks",
-	(void **)&dll_scheme_current_continuation_marks},
-    {"scheme_display", (void **)&dll_scheme_display},
-    {"scheme_display_to_string", (void **)&dll_scheme_display_to_string},
-    {"scheme_do_eval", (void **)&dll_scheme_do_eval},
-    {"scheme_dont_gc_ptr", (void **)&dll_scheme_dont_gc_ptr},
-    {"scheme_eq", (void **)&dll_scheme_eq},
-    {"scheme_eval", (void **)&dll_scheme_eval},
-    {"scheme_eval_string", (void **)&dll_scheme_eval_string},
-    {"scheme_eval_string_all", (void **)&dll_scheme_eval_string_all},
+	(فراغ **)&dll_scheme_current_continuation_marks},
+    {"scheme_display", (فراغ **)&dll_scheme_display},
+    {"scheme_display_to_string", (فراغ **)&dll_scheme_display_to_string},
+    {"scheme_do_eval", (فراغ **)&dll_scheme_do_eval},
+    {"scheme_dont_gc_ptr", (فراغ **)&dll_scheme_dont_gc_ptr},
+    {"scheme_eq", (فراغ **)&dll_scheme_eq},
+    {"scheme_eval", (فراغ **)&dll_scheme_eval},
+    {"scheme_eval_string", (فراغ **)&dll_scheme_eval_string},
+    {"scheme_eval_string_all", (فراغ **)&dll_scheme_eval_string_all},
     {"scheme_finish_primitive_module",
-	(void **)&dll_scheme_finish_primitive_module},
-# if MZSCHEME_VERSION_MAJOR < 299
-    {"scheme_format", (void **)&dll_scheme_format},
-# else
-    {"scheme_format_utf8", (void **)&dll_scheme_format_utf8},
-    {"scheme_get_param", (void **)&dll_scheme_get_param},
+	(فراغ **)&dll_scheme_finish_primitive_module},
+# 𐤀𐤌 MZSCHEME_VERSION_MAJOR < 299
+    {"scheme_format", (فراغ **)&dll_scheme_format},
+# وإلا
+    {"scheme_format_utf8", (فراغ **)&dll_scheme_format_utf8},
+    {"scheme_get_param", (فراغ **)&dll_scheme_get_param},
 # endif
-    {"scheme_gc_ptr_ok", (void **)&dll_scheme_gc_ptr_ok},
-# if MZSCHEME_VERSION_MAJOR < 299
+    {"scheme_gc_ptr_ok", (فراغ **)&dll_scheme_gc_ptr_ok},
+# 𐤀𐤌 MZSCHEME_VERSION_MAJOR < 299
     {"scheme_get_sized_string_output",
-	(void **)&dll_scheme_get_sized_string_output},
-# else
+	(فراغ **)&dll_scheme_get_sized_string_output},
+# وإلا
     {"scheme_get_sized_byte_string_output",
-	(void **)&dll_scheme_get_sized_byte_string_output},
+	(فراغ **)&dll_scheme_get_sized_byte_string_output},
 # endif
-    {"scheme_intern_symbol", (void **)&dll_scheme_intern_symbol},
-    {"scheme_lookup_global", (void **)&dll_scheme_lookup_global},
+    {"scheme_intern_symbol", (فراغ **)&dll_scheme_intern_symbol},
+    {"scheme_lookup_global", (فراغ **)&dll_scheme_lookup_global},
     {"scheme_make_closed_prim_w_arity",
-	(void **)&dll_scheme_make_closed_prim_w_arity},
-    {"scheme_make_integer_value", (void **)&dll_scheme_make_integer_value},
-    {"scheme_make_pair", (void **)&dll_scheme_make_pair},
-    {"scheme_make_prim_w_arity", (void **)&dll_scheme_make_prim_w_arity},
-# if MZSCHEME_VERSION_MAJOR < 299
-    {"scheme_make_string", (void **)&dll_scheme_make_string},
+	(فراغ **)&dll_scheme_make_closed_prim_w_arity},
+    {"scheme_make_integer_value", (فراغ **)&dll_scheme_make_integer_value},
+    {"scheme_make_pair", (فراغ **)&dll_scheme_make_pair},
+    {"scheme_make_prim_w_arity", (فراغ **)&dll_scheme_make_prim_w_arity},
+# 𐤀𐤌 MZSCHEME_VERSION_MAJOR < 299
+    {"scheme_make_string", (فراغ **)&dll_scheme_make_string},
     {"scheme_make_string_output_port",
-	(void **)&dll_scheme_make_string_output_port},
-# else
-    {"scheme_make_byte_string", (void **)&dll_scheme_make_byte_string},
+	(فراغ **)&dll_scheme_make_string_output_port},
+# وإلا
+    {"scheme_make_byte_string", (فراغ **)&dll_scheme_make_byte_string},
     {"scheme_make_byte_string_output_port",
-	(void **)&dll_scheme_make_byte_string_output_port},
+	(فراغ **)&dll_scheme_make_byte_string_output_port},
 # endif
     {"scheme_make_struct_instance",
-	(void **)&dll_scheme_make_struct_instance},
-    {"scheme_make_struct_names", (void **)&dll_scheme_make_struct_names},
-    {"scheme_make_struct_type", (void **)&dll_scheme_make_struct_type},
-    {"scheme_make_struct_values", (void **)&dll_scheme_make_struct_values},
-    {"scheme_make_type", (void **)&dll_scheme_make_type},
-    {"scheme_make_vector", (void **)&dll_scheme_make_vector},
-    {"scheme_malloc_fail_ok", (void **)&dll_scheme_malloc_fail_ok},
-    {"scheme_open_input_file", (void **)&dll_scheme_open_input_file},
-    {"scheme_primitive_module", (void **)&dll_scheme_primitive_module},
-    {"scheme_proper_list_length", (void **)&dll_scheme_proper_list_length},
-    {"scheme_raise", (void **)&dll_scheme_raise},
-    {"scheme_read", (void **)&dll_scheme_read},
-    {"scheme_register_static", (void **)&dll_scheme_register_static},
-    {"scheme_set_stack_base", (void **)&dll_scheme_set_stack_base},
-    {"scheme_signal_error", (void **)&dll_scheme_signal_error},
-    {"scheme_wrong_type", (void **)&dll_scheme_wrong_type},
-# if MZSCHEME_VERSION_MAJOR >= 299
-    {"scheme_set_param", (void **)&dll_scheme_set_param},
-    {"scheme_current_config", (void **)&dll_scheme_current_config},
+	(فراغ **)&dll_scheme_make_struct_instance},
+    {"scheme_make_struct_names", (فراغ **)&dll_scheme_make_struct_names},
+    {"scheme_make_struct_type", (فراغ **)&dll_scheme_make_struct_type},
+    {"scheme_make_struct_values", (فراغ **)&dll_scheme_make_struct_values},
+    {"scheme_make_type", (فراغ **)&dll_scheme_make_type},
+    {"scheme_make_vector", (فراغ **)&dll_scheme_make_vector},
+    {"scheme_malloc_fail_ok", (فراغ **)&dll_scheme_malloc_fail_ok},
+    {"scheme_open_input_file", (فراغ **)&dll_scheme_open_input_file},
+    {"scheme_primitive_module", (فراغ **)&dll_scheme_primitive_module},
+    {"scheme_proper_list_length", (فراغ **)&dll_scheme_proper_list_length},
+    {"scheme_raise", (فراغ **)&dll_scheme_raise},
+    {"scheme_read", (فراغ **)&dll_scheme_read},
+    {"scheme_register_static", (فراغ **)&dll_scheme_register_static},
+    {"scheme_set_stack_base", (فراغ **)&dll_scheme_set_stack_base},
+    {"scheme_signal_error", (فراغ **)&dll_scheme_signal_error},
+    {"scheme_wrong_type", (فراغ **)&dll_scheme_wrong_type},
+# 𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 299
+    {"scheme_set_param", (فراغ **)&dll_scheme_set_param},
+    {"scheme_current_config", (فراغ **)&dll_scheme_current_config},
     {"scheme_char_string_to_byte_string",
-	(void **)&dll_scheme_char_string_to_byte_string},
-    {"scheme_char_string_to_path", (void **)&dll_scheme_char_string_to_path},
-    {"scheme_set_collects_path", (void **)&dll_scheme_set_collects_path},
+	(فراغ **)&dll_scheme_char_string_to_byte_string},
+    {"scheme_char_string_to_path", (فراغ **)&dll_scheme_char_string_to_path},
+    {"scheme_set_collects_path", (فراغ **)&dll_scheme_set_collects_path},
 # endif
-    {"scheme_make_hash_table", (void **)&dll_scheme_make_hash_table},
-    {"scheme_hash_set", (void **)&dll_scheme_hash_set},
-    {"scheme_hash_get", (void **)&dll_scheme_hash_get},
-    {"scheme_make_double", (void **)&dll_scheme_make_double},
-    {"scheme_make_sized_byte_string", (void **)&dll_scheme_make_sized_byte_string},
-    {"scheme_namespace_require", (void **)&dll_scheme_namespace_require},
-    {"scheme_dynamic_wind", (void **)&dll_scheme_dynamic_wind},
+    {"scheme_make_hash_table", (فراغ **)&dll_scheme_make_hash_table},
+    {"scheme_hash_set", (فراغ **)&dll_scheme_hash_set},
+    {"scheme_hash_get", (فراغ **)&dll_scheme_hash_get},
+    {"scheme_make_double", (فراغ **)&dll_scheme_make_double},
+    {"scheme_make_sized_byte_string", (فراغ **)&dll_scheme_make_sized_byte_string},
+    {"scheme_namespace_require", (فراغ **)&dll_scheme_namespace_require},
+    {"scheme_dynamic_wind", (فراغ **)&dll_scheme_dynamic_wind},
 # ifdef MZ_PRECISE_GC
-    {"GC_malloc_one_tagged", (void **)&dll_GC_malloc_one_tagged},
-    {"GC_register_traversers", (void **)&dll_GC_register_traversers},
+    {"GC_malloc_one_tagged", (فراغ **)&dll_GC_malloc_one_tagged},
+    {"GC_register_traversers", (فراغ **)&dll_GC_register_traversers},
 # endif
-# if MZSCHEME_VERSION_MAJOR >= 400
+# 𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 400
 #  ifdef TRAMPOLINED_MZVIM_STARTUP
-    {"scheme_main_setup", (void **)&dll_scheme_main_setup},
-#   if defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || MZSCHEME_VERSION_MAJOR >= 603
-    {"scheme_register_tls_space", (void **)&dll_scheme_register_tls_space},
+    {"scheme_main_setup", (فراغ **)&dll_scheme_main_setup},
+#   𐤀𐤌 defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || MZSCHEME_VERSION_MAJOR >= 603
+    {"scheme_register_tls_space", (فراغ **)&dll_scheme_register_tls_space},
 #   endif
 #  endif
-    {"scheme_init_collection_paths", (void **)&dll_scheme_init_collection_paths},
-    {"scheme_malloc_immobile_box", (void **)&dll_scheme_malloc_immobile_box},
-    {"scheme_free_immobile_box", (void **)&dll_scheme_free_immobile_box},
+    {"scheme_init_collection_paths", (فراغ **)&dll_scheme_init_collection_paths},
+    {"scheme_malloc_immobile_box", (فراغ **)&dll_scheme_malloc_immobile_box},
+    {"scheme_free_immobile_box", (فراغ **)&dll_scheme_free_immobile_box},
 # endif
-# if MZSCHEME_VERSION_MAJOR >= 500
-#  if defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || defined(IMPLEMENT_THREAD_LOCAL_EXTERNALLY_VIA_PROC)
-    {"scheme_external_get_thread_local_variables", (void **)&dll_scheme_external_get_thread_local_variables},
+# 𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 500
+#  𐤀𐤌 defined(IMPLEMENT_THREAD_LOCAL_VIA_WIN_TLS) || defined(IMPLEMENT_THREAD_LOCAL_EXTERNALLY_VIA_PROC)
+    {"scheme_external_get_thread_local_variables", (فراغ **)&dll_scheme_external_get_thread_local_variables},
 #  endif
 # endif
-# if MZSCHEME_VERSION_MAJOR >= 600
-    {"scheme_embedded_load", (void **)&dll_scheme_embedded_load},
-    {"scheme_register_embedded_load", (void **)&dll_scheme_register_embedded_load},
-    {"scheme_set_config_path", (void **)&dll_scheme_set_config_path},
+# 𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 600
+    {"scheme_embedded_load", (فراغ **)&dll_scheme_embedded_load},
+    {"scheme_register_embedded_load", (فراغ **)&dll_scheme_register_embedded_load},
+    {"scheme_set_config_path", (فراغ **)&dll_scheme_set_config_path},
 # endif
-    {NULL, NULL}};
+    {عدم, عدم}};
 
-static HINSTANCE hMzGC = 0;
-static HINSTANCE hMzSch = 0;
+ساكن HINSTANCE hMzGC = 0;
+ساكن HINSTANCE hMzSch = 0;
 
-static void dynamic_mzscheme_end(void);
-static int mzscheme_runtime_link_init(char *sch_dll, char *gc_dll,
-	int verbose);
+ساكن فراغ dynamic_mzscheme_end(فراغ);
+ساكن صحيح mzscheme_runtime_link_init(حرف *sch_dll, حرف *gc_dll,
+	صحيح verbose);
 
-    static int
-mzscheme_runtime_link_init(char *sch_dll, char *gc_dll, int verbose)
+    ساكن صحيح
+mzscheme_runtime_link_init(حرف *sch_dll, حرف *gc_dll, صحيح verbose)
 {
-    Thunk_Info *thunk = NULL;
+    Thunk_Info *thunk = عدم;
 
-    if (hMzGC && hMzSch)
-	return OK;
+    𐤀𐤌 (hMzGC && hMzSch)
+	أرجع OK;
     hMzSch = vimLoadLib(sch_dll);
     hMzGC = vimLoadLib(gc_dll);
 
-    if (!hMzGC)
+    𐤀𐤌 (!hMzGC)
     {
-	if (verbose)
+	𐤀𐤌 (verbose)
 	    semsg(_(e_could_not_load_library_str_str), gc_dll, GetWin32Error());
-	return FAIL;
+	أرجع FAIL;
     }
 
-    if (!hMzSch)
+    𐤀𐤌 (!hMzSch)
     {
-	if (verbose)
+	𐤀𐤌 (verbose)
 	    semsg(_(e_could_not_load_library_str_str), sch_dll, GetWin32Error());
-	return FAIL;
+	أرجع FAIL;
     }
 
-    for (thunk = mzsch_imports; thunk->name; thunk++)
+    لكل (thunk = mzsch_imports; thunk->name; thunk++)
     {
-	if ((*thunk->ptr =
-		    (void *)GetProcAddress(hMzSch, thunk->name)) == NULL)
+	𐤀𐤌 ((*thunk->ptr =
+		    (فراغ *)GetProcAddress(hMzSch, thunk->name)) == عدم)
 	{
 	    FreeLibrary(hMzSch);
 	    hMzSch = 0;
 	    FreeLibrary(hMzGC);
 	    hMzGC = 0;
-	    if (verbose)
+	    𐤀𐤌 (verbose)
 		semsg(_(e_could_not_load_library_function_str), thunk->name);
-	    return FAIL;
+	    أرجع FAIL;
 	}
     }
-    for (thunk = mzgc_imports; thunk->name; thunk++)
+    لكل (thunk = mzgc_imports; thunk->name; thunk++)
     {
-	if ((*thunk->ptr =
-		    (void *)GetProcAddress(hMzGC, thunk->name)) == NULL)
+	𐤀𐤌 ((*thunk->ptr =
+		    (فراغ *)GetProcAddress(hMzGC, thunk->name)) == عدم)
 	{
 	    FreeLibrary(hMzSch);
 	    hMzSch = 0;
 	    FreeLibrary(hMzGC);
 	    hMzGC = 0;
-	    if (verbose)
+	    𐤀𐤌 (verbose)
 		semsg(_(e_could_not_load_library_function_str), thunk->name);
-	    return FAIL;
+	    أرجع FAIL;
 	}
     }
-    return OK;
+    أرجع OK;
 }
 
-    int
-mzscheme_enabled(int verbose)
+    صحيح
+mzscheme_enabled(صحيح verbose)
 {
-    return mzscheme_runtime_link_init(
-	    (char *)p_mzschemedll, (char *)p_mzschemegcdll, verbose) == OK;
+    أرجع mzscheme_runtime_link_init(
+	    (حرف *)p_mzschemedll, (حرف *)p_mzschemegcdll, verbose) == OK;
 }
 
-    static void
-dynamic_mzscheme_end(void)
+    ساكن فراغ
+dynamic_mzscheme_end(فراغ)
 {
-    if (hMzSch)
+    𐤀𐤌 (hMzSch)
     {
 	FreeLibrary(hMzSch);
 	hMzSch = 0;
     }
-    if (hMzGC)
+    𐤀𐤌 (hMzGC)
     {
 	FreeLibrary(hMzGC);
 	hMzGC = 0;
@@ -722,37 +722,37 @@ dynamic_mzscheme_end(void)
 }
 #endif // DYNAMIC_MZSCHEME
 
-#if MZSCHEME_VERSION_MAJOR < 299
+#𐤀𐤌 MZSCHEME_VERSION_MAJOR < 299
 # define GUARANTEED_STRING_ARG(proc, num) GUARANTEE_STRING(proc, num)
-#else
-    static Scheme_Object *
-guaranteed_byte_string_arg(char *proc, int num, int argc, Scheme_Object **argv)
+#وإلا
+    ساكن Scheme_Object *
+guaranteed_byte_string_arg(حرف *proc, صحيح num, صحيح argc, Scheme_Object **argv)
 {
-    if (SCHEME_BYTE_STRINGP(argv[num]))
+    𐤀𐤌 (SCHEME_BYTE_STRINGP(argv[num]))
     {
-	return argv[num];
+	أرجع argv[num];
     }
-    else if (SCHEME_CHAR_STRINGP(argv[num]))
+    وإلا 𐤀𐤌 (SCHEME_CHAR_STRINGP(argv[num]))
     {
-	Scheme_Object *tmp = NULL;
+	Scheme_Object *tmp = عدم;
 	MZ_GC_DECL_REG(2);
 	MZ_GC_VAR_IN_REG(0, argv[num]);
 	MZ_GC_VAR_IN_REG(1, tmp);
 	MZ_GC_REG();
 	tmp = scheme_char_string_to_byte_string(argv[num]);
 	MZ_GC_UNREG();
-	return tmp;
+	أرجع tmp;
     }
-    else
+    وإلا
 	scheme_wrong_type(proc, "string", num, argc, argv);
     // unreachable
-    return scheme_void;
+    أرجع scheme_void;
 }
 # define GUARANTEED_STRING_ARG(proc, num) guaranteed_byte_string_arg(proc, num, argc, argv)
 #endif
 
 // need to put it here for dynamic stuff to work
-#if defined(INCLUDE_MZSCHEME_BASE)
+#𐤀𐤌 defined(INCLUDE_MZSCHEME_BASE)
 # include "mzscheme_base.c"
 #endif
 
@@ -762,59 +762,59 @@ guaranteed_byte_string_arg(char *proc, int num, int argc, Scheme_Object **argv)
  *========================================================================
  */
 
-static Scheme_Type mz_buffer_type;
-static Scheme_Type mz_window_type;
+ساكن Scheme_Type mz_buffer_type;
+ساكن Scheme_Type mz_window_type;
 
-static int initialized = FALSE;
+ساكن صحيح initialized = FALSE;
 #ifdef DYNAMIC_MZSCHEME
-static int disabled = FALSE;
+ساكن صحيح disabled = FALSE;
 #endif
-static int load_base_module_failed = FALSE;
+ساكن صحيح load_base_module_failed = FALSE;
 
 // global environment
-static Scheme_Env    *environment = NULL;
+ساكن Scheme_Env    *environment = عدم;
 // output/error handlers
-static Scheme_Object *curout = NULL;
-static Scheme_Object *curerr = NULL;
+ساكن Scheme_Object *curout = عدم;
+ساكن Scheme_Object *curerr = عدم;
 // exn:vim exception
-static Scheme_Object *exn_catching_apply = NULL;
-static Scheme_Object *exn_p = NULL;
-static Scheme_Object *exn_message = NULL;
-static Scheme_Object *vim_exn = NULL; // Vim Error exception
+ساكن Scheme_Object *exn_catching_apply = عدم;
+ساكن Scheme_Object *exn_p = عدم;
+ساكن Scheme_Object *exn_message = عدم;
+ساكن Scheme_Object *vim_exn = عدم; // Vim Error exception
 
-#if !defined(MZ_PRECISE_GC) || MZSCHEME_VERSION_MAJOR < 400
-static void *stack_base = NULL;
+#𐤀𐤌 !defined(MZ_PRECISE_GC) || MZSCHEME_VERSION_MAJOR < 400
+ساكن فراغ *stack_base = عدم;
 #endif
 
-static long range_start;
-static long range_end;
+ساكن long range_start;
+ساكن long range_end;
 
 // MzScheme threads scheduling stuff
-static int mz_threads_allow = 0;
+ساكن صحيح mz_threads_allow = 0;
 
-#if defined(FEAT_GUI_MSWIN)
-static void CALLBACK timer_proc(HWND, UINT, UINT_PTR, DWORD);
-static UINT timer_id = 0;
-#elif defined(FEAT_GUI_GTK)
-static gboolean timer_proc(gpointer);
-static guint timer_id = 0;
-#elif defined(FEAT_GUI_MOTIF)
-static void timer_proc(XtPointer, XtIntervalId *);
-static XtIntervalId timer_id = (XtIntervalId)0;
+#𐤀𐤌 defined(FEAT_GUI_MSWIN)
+ساكن فراغ CALLBACK timer_proc(HWND, UINT, UINT_PTR, DWORD);
+ساكن UINT timer_id = 0;
+#وإلاإذا defined(FEAT_GUI_GTK)
+ساكن gboolean timer_proc(gpointer);
+ساكن guint timer_id = 0;
+#وإلاإذا defined(FEAT_GUI_MOTIF)
+ساكن فراغ timer_proc(XtPointer, XtIntervalId *);
+ساكن XtIntervalId timer_id = (XtIntervalId)0;
 #endif
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL) // Win32 console and Unix
-    void
-mzvim_check_threads(void)
+#𐤀𐤌 !defined(FEAT_GUI_MSWIN) || defined(VIMDLL) // Win32 console and Unix
+    فراغ
+mzvim_check_threads(فراغ)
 {
     // Last time MzScheme threads were scheduled
-    static time_t mz_last_time = 0;
+    ساكن time_t mz_last_time = 0;
 
-    if (mz_threads_allow && p_mzq > 0)
+    𐤀𐤌 (mz_threads_allow && p_mzq > 0)
     {
-	time_t now = time(NULL);
+	time_t now = time(عدم);
 
-	if ((now - mz_last_time) * 1000 > p_mzq)
+	𐤀𐤌 ((now - mz_last_time) * 1000 > p_mzq)
 	{
 	    mz_last_time = now;
 	    scheme_check_threads();
@@ -823,54 +823,54 @@ mzvim_check_threads(void)
 }
 #endif
 
-#if defined(MZSCHEME_GUI_THREADS)
-static void setup_timer(void);
-static void remove_timer(void);
+#𐤀𐤌 defined(MZSCHEME_GUI_THREADS)
+ساكن فراغ setup_timer(فراغ);
+ساكن فراغ remove_timer(فراغ);
 
 // timers are presented in GUI only
-# if defined(FEAT_GUI_MSWIN)
-    static void CALLBACK
+# 𐤀𐤌 defined(FEAT_GUI_MSWIN)
+    ساكن فراغ CALLBACK
 timer_proc(
     HWND	hwnd UNUSED,
     UINT	uMsg UNUSED,
     UINT_PTR	idEvent UNUSED,
     DWORD	dwTime UNUSED)
 # elif defined(FEAT_GUI_GTK)
-    static gboolean
+    ساكن gboolean
 timer_proc(gpointer data UNUSED)
 # elif defined(FEAT_GUI_MOTIF)
-    static void
+    ساكن فراغ
 timer_proc(XtPointer timed_out UNUSED, XtIntervalId *interval_id UNUSED)
 # endif
 {
     scheme_check_threads();
-# if defined(FEAT_GUI_GTK)
-    return TRUE; // continue receiving notifications
+# 𐤀𐤌 defined(FEAT_GUI_GTK)
+    أرجع TRUE; // continue receiving notifications
 # elif defined(FEAT_GUI_MOTIF)
     // renew timeout
-    if (mz_threads_allow && p_mzq > 0)
+    𐤀𐤌 (mz_threads_allow && p_mzq > 0)
 	timer_id = XtAppAddTimeOut(app_context, p_mzq,
-		timer_proc, NULL);
+		timer_proc, عدم);
 # endif
 }
 
-    static void
-setup_timer(void)
+    ساكن فراغ
+setup_timer(فراغ)
 {
-# if defined(FEAT_GUI_MSWIN)
-    timer_id = SetTimer(NULL, 0, p_mzq, timer_proc);
+# 𐤀𐤌 defined(FEAT_GUI_MSWIN)
+    timer_id = SetTimer(عدم, 0, p_mzq, timer_proc);
 # elif defined(FEAT_GUI_GTK)
-    timer_id = g_timeout_add((guint)p_mzq, (GSourceFunc)timer_proc, NULL);
+    timer_id = g_timeout_add((guint)p_mzq, (GSourceFunc)timer_proc, عدم);
 # elif defined(FEAT_GUI_MOTIF)
-    timer_id = XtAppAddTimeOut(app_context, p_mzq, timer_proc, NULL);
+    timer_id = XtAppAddTimeOut(app_context, p_mzq, timer_proc, عدم);
 # endif
 }
 
-    static void
-remove_timer(void)
+    ساكن فراغ
+remove_timer(فراغ)
 {
-# if defined(FEAT_GUI_MSWIN)
-    KillTimer(NULL, timer_id);
+# 𐤀𐤌 defined(FEAT_GUI_MSWIN)
+    KillTimer(عدم, timer_id);
 # elif defined(FEAT_GUI_GTK)
     g_source_remove(timer_id);
 # elif defined(FEAT_GUI_MOTIF)
@@ -881,52 +881,52 @@ remove_timer(void)
 
 #endif // MZSCHEME_GUI_THREADS
 
-    char *
+    حرف *
 did_set_mzquantum(optset_T *args UNUSED)
 {
-#if defined(MZSCHEME_GUI_THREADS)
+#𐤀𐤌 defined(MZSCHEME_GUI_THREADS)
     // reset timer
-    if (timer_id != 0)
+    𐤀𐤌 (timer_id != 0)
 	remove_timer();
-    if (mz_threads_allow && p_mzq > 0 && gui.in_use)
+    𐤀𐤌 (mz_threads_allow && p_mzq > 0 && gui.in_use)
 	setup_timer();
 #endif
-    return NULL;
+    أرجع عدم;
 }
 
-    static void
-notify_multithread(int on)
+    ساكن فراغ
+notify_multithread(صحيح on)
 {
     mz_threads_allow = on;
 #ifdef MZSCHEME_GUI_THREADS
-    if (on && timer_id == 0 && p_mzq > 0 && gui.in_use)
+    𐤀𐤌 (on && timer_id == 0 && p_mzq > 0 && gui.in_use)
 	setup_timer();
-    if (!on && timer_id != 0)
+    𐤀𐤌 (!on && timer_id != 0)
 	remove_timer();
 #endif
 }
 
-    void
-mzscheme_end(void)
+    فراغ
+mzscheme_end(فراغ)
 {
     // We can not unload the DLL.  Racket's thread might be still alive.
-#if 0
+#𐤀𐤌 0
 # ifdef DYNAMIC_MZSCHEME
     dynamic_mzscheme_end();
 # endif
 #endif
 }
 
-#if HAVE_TLS_SPACE && !defined(VIMDLL)
-# if defined(_MSC_VER)
-static __declspec(thread) void *tls_space;
-extern intptr_t _tls_index;
+#𐤀𐤌 HAVE_TLS_SPACE && !defined(VIMDLL)
+# 𐤀𐤌 defined(_MSC_VER)
+ساكن __declspec(thread) فراغ *tls_space;
+خارجي intptr_t _tls_index;
 # elif defined(__MINGW32__)
-static __thread void *tls_space;
-extern intptr_t _tls_index;
-# else
-static THREAD_LOCAL void *tls_space;
-static intptr_t _tls_index = 0;
+ساكن __thread فراغ *tls_space;
+خارجي intptr_t _tls_index;
+# وإلا
+ساكن THREAD_LOCAL فراغ *tls_space;
+ساكن intptr_t _tls_index = 0;
 # endif
 #endif
 
@@ -935,91 +935,91 @@ static intptr_t _tls_index = 0;
  * We may call scheme_main_setup() which calls mzscheme_env_main() which then
  * trampolines into vim_main2(), which never returns.
  */
-    int
-mzscheme_main(void)
+    صحيح
+mzscheme_main(فراغ)
 {
-    int	    argc = 0;
-    char    *argv = NULL;
+    صحيح	    argc = 0;
+    حرف    *argv = عدم;
 
 #ifdef DYNAMIC_MZSCHEME
     /*
      * Racket requires trampolined startup.  We can not load it later.
      * If dynamic dll loading is failed, disable it.
      */
-    if (!mzscheme_enabled(FALSE))
+    𐤀𐤌 (!mzscheme_enabled(FALSE))
     {
 	disabled = TRUE;
-	return vim_main2();
+	أرجع vim_main2();
     }
 #endif
 #ifdef HAVE_TLS_SPACE
 # ifdef VIMDLL
-    void **ptls_space;
+    فراغ **ptls_space;
     intptr_t tls_index;
-    void (*pget_tls_info)(void ***ptls_space, intptr_t *ptls_index);
+    فراغ (*pget_tls_info)(فراغ ***ptls_space, intptr_t *ptls_index);
 
     // Get the address of get_tls_info() from (g)vim.exe.
-    pget_tls_info = (void *)GetProcAddress(
-				GetModuleHandle(NULL), "get_tls_info");
-    if (pget_tls_info == NULL)
+    pget_tls_info = (فراغ *)GetProcAddress(
+				GetModuleHandle(عدم), "get_tls_info");
+    𐤀𐤌 (pget_tls_info == عدم)
     {
 	disabled = TRUE;
-	return vim_main2();
+	أرجع vim_main2();
     }
     pget_tls_info(&ptls_space, &tls_index);
     scheme_register_tls_space(ptls_space, tls_index);
-# else
+# وإلا
     scheme_register_tls_space(&tls_space, _tls_index);
 # endif
 #endif
 #ifdef TRAMPOLINED_MZVIM_STARTUP
-    return scheme_main_setup(TRUE, mzscheme_env_main, argc, &argv);
-#else
-    return mzscheme_env_main(NULL, argc, &argv);
+    أرجع scheme_main_setup(TRUE, mzscheme_env_main, argc, &argv);
+#وإلا
+    أرجع mzscheme_env_main(عدم, argc, &argv);
 #endif
 }
 
-    static int
-mzscheme_env_main(Scheme_Env *env, int argc UNUSED, char **argv UNUSED)
+    ساكن صحيح
+mzscheme_env_main(Scheme_Env *env, صحيح argc UNUSED, حرف **argv UNUSED)
 {
 #ifdef TRAMPOLINED_MZVIM_STARTUP
     // Scheme has created the environment for us
     environment = env;
-#else
+#وإلا
 # ifdef MZ_PRECISE_GC
-    Scheme_Object   *dummy = NULL;
+    Scheme_Object   *dummy = عدم;
     MZ_GC_DECL_REG(1);
     MZ_GC_VAR_IN_REG(0, dummy);
 
     stack_base = &__gc_var_stack__;
-# else
-    int dummy = 0;
-    stack_base = (void *)&dummy;
+# وإلا
+    صحيح dummy = 0;
+    stack_base = (فراغ *)&dummy;
 # endif
 #endif
 
     vim_main2();
     // not reached, vim_main2() will loop until exit()
 
-    return 0;
+    أرجع 0;
 }
 
-    static Scheme_Object*
-load_base_module(void *data)
+    ساكن Scheme_Object*
+load_base_module(فراغ *data)
 {
-    scheme_namespace_require(scheme_intern_symbol((char *)data));
-    return scheme_null;
+    scheme_namespace_require(scheme_intern_symbol((حرف *)data));
+    أرجع scheme_null;
 }
 
-    static Scheme_Object *
-load_base_module_on_error(void *data UNUSED)
+    ساكن Scheme_Object *
+load_base_module_on_error(فراغ *data UNUSED)
 {
     load_base_module_failed = TRUE;
-    return scheme_null;
+    أرجع scheme_null;
 }
 
-    static int
-startup_mzscheme(void)
+    ساكن صحيح
+startup_mzscheme(فراغ)
 {
 #ifndef TRAMPOLINED_MZVIM_STARTUP
     scheme_set_stack_base(stack_base, 1);
@@ -1046,10 +1046,10 @@ startup_mzscheme(void)
 #endif
 
     // setup 'current-library-collection-paths' parameter
-#if MZSCHEME_VERSION_MAJOR >= 299
+#𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 299
     {
-	Scheme_Object *coll_path = NULL;
-	int mustfree = FALSE;
+	Scheme_Object *coll_path = عدم;
+	صحيح mustfree = FALSE;
 	char_u *s;
 
 	MZ_GC_DECL_REG(1);
@@ -1057,33 +1057,33 @@ startup_mzscheme(void)
 	MZ_GC_REG();
 	// workaround for dynamic loading on windows
 	s = vim_getenv((char_u *)"PLTCOLLECTS", &mustfree);
-	if (s != NULL)
+	𐤀𐤌 (s != عدم)
 	{
-	    coll_path = scheme_make_path((char *)s);
+	    coll_path = scheme_make_path((حرف *)s);
 	    MZ_GC_CHECK();
-	    if (mustfree)
+	    𐤀𐤌 (mustfree)
 		vim_free(s);
 	}
 # ifdef MZSCHEME_COLLECTS
-	if (coll_path == NULL)
+	𐤀𐤌 (coll_path == عدم)
 	{
 	    coll_path = scheme_make_path(MZSCHEME_COLLECTS);
 	    MZ_GC_CHECK();
 	}
 # endif
-	if (coll_path != NULL)
+	𐤀𐤌 (coll_path != عدم)
 	{
 	    scheme_set_collects_path(coll_path);
 	    MZ_GC_CHECK();
 	}
 	MZ_GC_UNREG();
     }
-#else
+#وإلا
 # ifdef MZSCHEME_COLLECTS
     {
-	Scheme_Object	*coll_string = NULL;
-	Scheme_Object	*coll_pair = NULL;
-	Scheme_Config	*config = NULL;
+	Scheme_Object	*coll_string = عدم;
+	Scheme_Object	*coll_pair = عدم;
+	Scheme_Config	*config = عدم;
 
 	MZ_GC_DECL_REG(3);
 	MZ_GC_VAR_IN_REG(0, coll_string);
@@ -1103,10 +1103,10 @@ startup_mzscheme(void)
 # endif
 #endif
 
-#if MZSCHEME_VERSION_MAJOR >= 600
+#𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 600
     {
-	Scheme_Object *config_path = NULL;
-	int mustfree = FALSE;
+	Scheme_Object *config_path = عدم;
+	صحيح mustfree = FALSE;
 	char_u *s;
 
 	MZ_GC_DECL_REG(1);
@@ -1114,21 +1114,21 @@ startup_mzscheme(void)
 	MZ_GC_REG();
 	// workaround for dynamic loading on windows
 	s = vim_getenv((char_u *)"PLTCONFIGDIR", &mustfree);
-	if (s != NULL)
+	𐤀𐤌 (s != عدم)
 	{
-	    config_path = scheme_make_path((char *)s);
+	    config_path = scheme_make_path((حرف *)s);
 	    MZ_GC_CHECK();
-	    if (mustfree)
+	    𐤀𐤌 (mustfree)
 		vim_free(s);
 	}
 # ifdef MZSCHEME_CONFIGDIR
-	if (config_path == NULL)
+	𐤀𐤌 (config_path == عدم)
 	{
 	    config_path = scheme_make_path(MZSCHEME_CONFIGDIR);
 	    MZ_GC_CHECK();
 	}
 # endif
-	if (config_path != NULL)
+	𐤀𐤌 (config_path != عدم)
 	{
 	    scheme_set_config_path(config_path);
 	    MZ_GC_CHECK();
@@ -1137,7 +1137,7 @@ startup_mzscheme(void)
     }
 #endif
 
-#if MZSCHEME_VERSION_MAJOR >= 400
+#𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 400
     scheme_init_collection_paths(environment, scheme_null);
 #endif
 
@@ -1147,15 +1147,15 @@ startup_mzscheme(void)
      */
     {
 	// use error handler to avoid abort
-	scheme_dynamic_wind(NULL, load_base_module, NULL,
+	scheme_dynamic_wind(عدم, load_base_module, عدم,
 				    load_base_module_on_error, "racket/base");
-	if (load_base_module_failed)
+	𐤀𐤌 (load_base_module_failed)
 	{
 	    load_base_module_failed = FALSE;
-	    scheme_dynamic_wind(NULL, load_base_module, NULL,
+	    scheme_dynamic_wind(عدم, load_base_module, عدم,
 				    load_base_module_on_error, "scheme/base");
-	    if (load_base_module_failed)
-		return -1;
+	    𐤀𐤌 (load_base_module_failed)
+		أرجع -1;
 	}
     }
 
@@ -1169,14 +1169,14 @@ startup_mzscheme(void)
 
 #ifdef HAVE_SANDBOX
     {
-	Scheme_Object	*make_security_guard = NULL;
+	Scheme_Object	*make_security_guard = عدم;
 	MZ_GC_DECL_REG(1);
 	MZ_GC_VAR_IN_REG(0, make_security_guard);
 	MZ_GC_REG();
 
-# if MZSCHEME_VERSION_MAJOR < 400
+# 𐤀𐤌 MZSCHEME_VERSION_MAJOR < 400
 	{
-	    Scheme_Object	*make_security_guard_symbol = NULL;
+	    Scheme_Object	*make_security_guard_symbol = عدم;
 	    MZ_GC_DECL_REG(1);
 	    MZ_GC_VAR_IN_REG(0, make_security_guard_symbol);
 	    MZ_GC_REG();
@@ -1186,17 +1186,17 @@ startup_mzscheme(void)
 		    make_security_guard_symbol, environment);
 	    MZ_GC_UNREG();
 	}
-# else
+# وإلا
 	make_security_guard = scheme_builtin_value("make-security-guard");
 	MZ_GC_CHECK();
 # endif
 
 	// setup sandbox guards
-	if (make_security_guard != NULL)
+	𐤀𐤌 (make_security_guard != عدم)
 	{
-	    Scheme_Object   *args[3] = {NULL, NULL, NULL};
-	    Scheme_Object   *guard = NULL;
-	    Scheme_Config   *config = NULL;
+	    Scheme_Object   *args[3] = {عدم, عدم, عدم};
+	    Scheme_Object   *guard = عدم;
+	    Scheme_Config   *config = عدم;
 	    MZ_GC_DECL_REG(5);
 	    MZ_GC_ARRAY_VAR_IN_REG(0, args, 3);
 	    MZ_GC_VAR_IN_REG(3, guard);
@@ -1241,34 +1241,34 @@ startup_mzscheme(void)
      */
     scheme_notify_multithread = notify_multithread;
 
-    return 0;
+    أرجع 0;
 }
 
 /*
  * This routine is called for each new invocation of MzScheme
  * to make sure things are properly initialized.
  */
-    static int
-mzscheme_init(void)
+    ساكن صحيح
+mzscheme_init(فراغ)
 {
-    if (!initialized)
+    𐤀𐤌 (!initialized)
     {
 #ifdef DYNAMIC_MZSCHEME
-	if (disabled || !mzscheme_enabled(TRUE))
+	𐤀𐤌 (disabled || !mzscheme_enabled(TRUE))
 	{
 	    emsg(_(e_sorry_this_command_is_disabled_the_mzscheme_libraries_could_not_be_loaded));
-	    return -1;
+	    أرجع -1;
 	}
 #endif
-	if (load_base_module_failed || startup_mzscheme())
+	𐤀𐤌 (load_base_module_failed || startup_mzscheme())
 	{
 	    emsg(_(e_sorry_this_command_is_disabled_the_mzscheme_racket_base_module_could_not_be_loaded));
-	    return -1;
+	    أرجع -1;
 	}
 	initialized = TRUE;
     }
     {
-	Scheme_Config	*config = NULL;
+	Scheme_Config	*config = عدم;
 	MZ_GC_DECL_REG(1);
 	MZ_GC_VAR_IN_REG(0, config);
 	MZ_GC_REG();
@@ -1286,7 +1286,7 @@ mzscheme_init(void)
 	MZ_GC_UNREG();
     }
 
-    return 0;
+    أرجع 0;
 }
 
 /*
@@ -1298,15 +1298,15 @@ mzscheme_init(void)
 /*
  * Evaluate command with exception handling
  */
-    static int
+    ساكن صحيح
 eval_with_exn_handling(
-    void		*data,
+    فراغ		*data,
     Scheme_Closed_Prim	*what,
     Scheme_Object	**ret)
 {
-    Scheme_Object   *value = NULL;
-    Scheme_Object   *exn = NULL;
-    Scheme_Object   *prim = NULL;
+    Scheme_Object   *value = عدم;
+    Scheme_Object   *exn = عدم;
+    Scheme_Object   *prim = عدم;
 
     MZ_GC_DECL_REG(3);
     MZ_GC_VAR_IN_REG(0, value);
@@ -1319,11 +1319,11 @@ eval_with_exn_handling(
     value = _apply_thunk_catch_exceptions(prim, &exn);
     MZ_GC_CHECK();
 
-    if (!value)
+    𐤀𐤌 (!value)
     {
 	value = extract_exn_message(exn);
 	// Got an exn?
-	if (value)
+	𐤀𐤌 (value)
 	{
 	    scheme_display(value, curerr);   //  Send to stderr-vim
 	    MZ_GC_CHECK();
@@ -1331,13 +1331,13 @@ eval_with_exn_handling(
 	}
 	MZ_GC_UNREG();
 	// `raise' was called on some arbitrary value
-	return FAIL;
+	أرجع FAIL;
     }
 
-    if (ret != NULL)	// if pointer to retval supported give it up
+    𐤀𐤌 (ret != عدم)	// if pointer to retval supported give it up
 	*ret = value;
     // Print any result, as long as it's not a void
-    else if (!SCHEME_VOIDP(value))
+    وإلا 𐤀𐤌 (!SCHEME_VOIDP(value))
     {
 	scheme_display(value, curout);  // Send to stdout-vim
 	MZ_GC_CHECK();
@@ -1345,34 +1345,34 @@ eval_with_exn_handling(
 
     do_flush();
     MZ_GC_UNREG();
-    return OK;
+    أرجع OK;
 }
 
 /*
  * :mzscheme
  */
-    static int
-do_mzscheme_command(exarg_T *eap, void *data, Scheme_Closed_Prim *what)
+    ساكن صحيح
+do_mzscheme_command(exarg_T *eap, فراغ *data, Scheme_Closed_Prim *what)
 {
-    if (mzscheme_init())
-	return FAIL;
+    𐤀𐤌 (mzscheme_init())
+	أرجع FAIL;
 
     range_start = eap->line1;
     range_end = eap->line2;
 
-    return eval_with_exn_handling(data, what, NULL);
+    أرجع eval_with_exn_handling(data, what, عدم);
 }
 
 /*
  * Routine called by VIM when deleting a buffer
  */
-    void
+    فراغ
 mzscheme_buffer_free(buf_T *buf)
 {
-    if (buf->b_mzscheme_ref == NULL)
-	return;
+    𐤀𐤌 (buf->b_mzscheme_ref == عدم)
+	أرجع;
 
-    vim_mz_buffer *bp = NULL;
+    vim_mz_buffer *bp = عدم;
     MZ_GC_DECL_REG(1);
     MZ_GC_VAR_IN_REG(0, bp);
     MZ_GC_REG();
@@ -1381,10 +1381,10 @@ mzscheme_buffer_free(buf_T *buf)
     bp->buf = INVALID_BUFFER_VALUE;
 #ifdef MZ_PRECISE_GC
     scheme_free_immobile_box(buf->b_mzscheme_ref);
-#else
+#وإلا
     scheme_gc_ptr_ok(bp);
 #endif
-    buf->b_mzscheme_ref = NULL;
+    buf->b_mzscheme_ref = عدم;
     MZ_GC_CHECK();
     MZ_GC_UNREG();
 }
@@ -1392,13 +1392,13 @@ mzscheme_buffer_free(buf_T *buf)
 /*
  * Routine called by VIM when deleting a Window
  */
-    void
+    فراغ
 mzscheme_window_free(win_T *win)
 {
-    if (win->w_mzscheme_ref == NULL)
-	return;
+    𐤀𐤌 (win->w_mzscheme_ref == عدم)
+	أرجع;
 
-    vim_mz_window *wp = NULL;
+    vim_mz_window *wp = عدم;
     MZ_GC_DECL_REG(1);
     MZ_GC_VAR_IN_REG(0, wp);
     MZ_GC_REG();
@@ -1406,10 +1406,10 @@ mzscheme_window_free(win_T *win)
     wp->win = INVALID_WINDOW_VALUE;
 #ifdef MZ_PRECISE_GC
     scheme_free_immobile_box(win->w_mzscheme_ref);
-#else
+#وإلا
     scheme_gc_ptr_ok(wp);
 #endif
-    win->w_mzscheme_ref = NULL;
+    win->w_mzscheme_ref = عدم;
     MZ_GC_CHECK();
     MZ_GC_UNREG();
 }
@@ -1417,30 +1417,30 @@ mzscheme_window_free(win_T *win)
 /*
  * ":mzscheme" (or ":mz")
  */
-    void
+    فراغ
 ex_mzscheme(exarg_T *eap)
 {
     char_u	*script;
 
     script = script_get(eap, eap->arg);
-    if (eap->skip)
-	return;
+    𐤀𐤌 (eap->skip)
+	أرجع;
 
-    if (script == NULL)
+    𐤀𐤌 (script == عدم)
 	do_mzscheme_command(eap, eap->arg, do_eval);
-    else
+    وإلا
     {
 	do_mzscheme_command(eap, script, do_eval);
 	vim_free(script);
     }
 }
 
-    static Scheme_Object *
-do_load(void *data, int noargc UNUSED, Scheme_Object **noargv UNUSED)
+    ساكن Scheme_Object *
+do_load(فراغ *data, صحيح noargc UNUSED, Scheme_Object **noargv UNUSED)
 {
-    Scheme_Object   *expr = NULL;
-    Scheme_Object   *result = NULL;
-    char	    *file = NULL;
+    Scheme_Object   *expr = عدم;
+    Scheme_Object   *result = عدم;
+    حرف	    *file = عدم;
     Port_Info	    *pinfo = (Port_Info *)data;
 
     MZ_GC_DECL_REG(3);
@@ -1449,7 +1449,7 @@ do_load(void *data, int noargc UNUSED, Scheme_Object **noargv UNUSED)
     MZ_GC_VAR_IN_REG(2, file);
     MZ_GC_REG();
 
-    file = (char *)scheme_malloc_fail_ok(scheme_malloc_atomic, MAXPATHL + 1);
+    file = (حرف *)scheme_malloc_fail_ok(scheme_malloc_atomic, MAXPATHL + 1);
     MZ_GC_CHECK();
 
     // make Vim expansion
@@ -1460,7 +1460,7 @@ do_load(void *data, int noargc UNUSED, Scheme_Object **noargv UNUSED)
     MZ_GC_CHECK();
 
     // Like REPL but print only last result
-    while (!SCHEME_EOFP(expr = scheme_read(pinfo->port)))
+    طالما (!SCHEME_EOFP(expr = scheme_read(pinfo->port)))
     {
 	result = scheme_eval(expr, environment);
 	MZ_GC_CHECK();
@@ -1469,26 +1469,26 @@ do_load(void *data, int noargc UNUSED, Scheme_Object **noargv UNUSED)
     // errors will be caught in do_mzscheme_command and ex_mzfile
     scheme_close_input_port(pinfo->port);
     MZ_GC_CHECK();
-    pinfo->port = NULL;
+    pinfo->port = عدم;
     MZ_GC_UNREG();
-    return result;
+    أرجع result;
 }
 
 /*
  * :mzfile
  */
-    void
+    فراغ
 ex_mzfile(exarg_T *eap)
 {
-    Port_Info	pinfo = {NULL, NULL};
+    Port_Info	pinfo = {عدم, عدم};
 
     MZ_GC_DECL_REG(1);
     MZ_GC_VAR_IN_REG(0, pinfo.port);
     MZ_GC_REG();
 
-    pinfo.name = (char *)eap->arg;
-    if (do_mzscheme_command(eap, &pinfo, do_load) != OK
-	    && pinfo.port != NULL)	// looks like port was not closed
+    pinfo.name = (حرف *)eap->arg;
+    𐤀𐤌 (do_mzscheme_command(eap, &pinfo, do_load) != OK
+	    && pinfo.port != عدم)	// looks like port was not closed
     {
 	scheme_close_input_port(pinfo.port);
 	MZ_GC_CHECK();
@@ -1503,13 +1503,13 @@ ex_mzfile(exarg_T *eap)
  * Matthew Flatt's "Inside PLT MzScheme" document.
  *========================================================================
  */
-    static void
-init_exn_catching_apply(void)
+    ساكن فراغ
+init_exn_catching_apply(فراغ)
 {
-    if (exn_catching_apply)
-	return;
+    𐤀𐤌 (exn_catching_apply)
+	أرجع;
 
-    char *e =
+    حرف *e =
 	"(lambda (thunk) "
 	"(with-handlers ([void (lambda (exn) (cons #f exn))]) "
 	"(cons #t (thunk))))";
@@ -1527,7 +1527,7 @@ init_exn_catching_apply(void)
  * no exception, otherwise returning NULL and setting *exn to the raised
  * value (usually an exn structure).
  */
-    static Scheme_Object *
+    ساكن Scheme_Object *
 _apply_thunk_catch_exceptions(Scheme_Object *f, Scheme_Object **exn)
 {
     Scheme_Object *v;
@@ -1535,28 +1535,28 @@ _apply_thunk_catch_exceptions(Scheme_Object *f, Scheme_Object **exn)
     v = _scheme_apply(exn_catching_apply, 1, &f);
     // v is a pair: (cons #t value) or (cons #f exn)
 
-    if (SCHEME_TRUEP(SCHEME_CAR(v)))
-	return SCHEME_CDR(v);
-    else
+    𐤀𐤌 (SCHEME_TRUEP(SCHEME_CAR(v)))
+	أرجع SCHEME_CDR(v);
+    وإلا
     {
 	*exn = SCHEME_CDR(v);
-	return NULL;
+	أرجع عدم;
     }
 }
 
-    static Scheme_Object *
+    ساكن Scheme_Object *
 extract_exn_message(Scheme_Object *v)
 {
-    if (SCHEME_TRUEP(_scheme_apply(exn_p, 1, &v)))
-	return _scheme_apply(exn_message, 1, &v);
-    else
-	return NULL; // Not an exn structure
+    𐤀𐤌 (SCHEME_TRUEP(_scheme_apply(exn_p, 1, &v)))
+	أرجع _scheme_apply(exn_message, 1, &v);
+    وإلا
+	أرجع عدم; // Not an exn structure
 }
 
-    static Scheme_Object *
-do_eval(void *s, int noargc UNUSED, Scheme_Object **noargv UNUSED)
+    ساكن Scheme_Object *
+do_eval(فراغ *s, صحيح noargc UNUSED, Scheme_Object **noargv UNUSED)
 {
-    return scheme_eval_string_all((char *)s, environment, TRUE);
+    أرجع scheme_eval_string_all((حرف *)s, environment, TRUE);
 }
 
 /*
@@ -1564,66 +1564,66 @@ do_eval(void *s, int noargc UNUSED, Scheme_Object **noargv UNUSED)
  *  3.  MzScheme I/O Handlers
  *========================================================================
  */
-    static void
-do_intrnl_output(char *mesg, int error)
+    ساكن فراغ
+do_intrnl_output(حرف *mesg, صحيح error)
 {
-    char *p, *prev;
+    حرف *p, *prev;
 
     prev = mesg;
     p = strchr(prev, '\n');
-    while (p)
+    طالما (p)
     {
 	*p = '\0';
-	if (error)
+	𐤀𐤌 (error)
 	    emsg(prev);
-	else
+	وإلا
 	    msg(prev);
 	prev = p + 1;
 	p = strchr(prev, '\n');
     }
 
-    if (error)
+    𐤀𐤌 (error)
 	emsg(prev);
-    else
+    وإلا
 	msg(prev);
 }
 
-    static void
-do_output(char *mesg, OUTPUT_LEN_TYPE len UNUSED)
+    ساكن فراغ
+do_output(حرف *mesg, OUTPUT_LEN_TYPE len UNUSED)
 {
     // TODO: use len, the string may not be NUL terminated
     do_intrnl_output(mesg, 0);
 }
 
-    static void
-do_err_output(char *mesg)
+    ساكن فراغ
+do_err_output(حرف *mesg)
 {
     do_intrnl_output(mesg, 1);
 }
 
-    static void
-do_printf(char *format, ...)
+    ساكن فراغ
+do_printf(حرف *format, ...)
 {
     do_intrnl_output(format, 1);
 }
 
-    static void
-do_flush(void)
+    ساكن فراغ
+do_flush(فراغ)
 {
-    char *buff;
+    حرف *buff;
     OUTPUT_LEN_TYPE length;
 
     buff = scheme_get_sized_byte_string_output(curerr, &length);
     MZ_GC_CHECK();
-    if (length)
+    𐤀𐤌 (length)
     {
 	do_err_output(buff);
-	return;
+	أرجع;
     }
 
     buff = scheme_get_sized_byte_string_output(curout, &length);
     MZ_GC_CHECK();
-    if (length)
+    𐤀𐤌 (length)
 	do_output(buff, length);
 }
 
@@ -1636,45 +1636,45 @@ do_flush(void)
 /*
  * (command {command-string})
  */
-    static Scheme_Object *
-vim_command(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+vim_command(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	*prim = (Vim_Prim *)data;
-    Scheme_Object *cmd = NULL;
+    Scheme_Object *cmd = عدم;
     MZ_GC_DECL_REG(1);
     MZ_GC_VAR_IN_REG(0, cmd);
     MZ_GC_REG();
     cmd = GUARANTEED_STRING_ARG(prim->name, 0);
 
     // may be use do_cmdline_cmd?
-    do_cmdline(BYTE_STRING_VALUE(cmd), NULL, NULL, DOCMD_NOWAIT|DOCMD_VERBOSE);
+    do_cmdline(BYTE_STRING_VALUE(cmd), عدم, عدم, DOCMD_NOWAIT|DOCMD_VERBOSE);
     update_screen(UPD_VALID);
 
     MZ_GC_UNREG();
     raise_if_error();
-    return scheme_void;
+    أرجع scheme_void;
 }
 
 /*
  * (eval {expr-string})
  */
-    static Scheme_Object *
-vim_eval(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
+    ساكن Scheme_Object *
+vim_eval(فراغ *data UNUSED, صحيح argc UNUSED, Scheme_Object **argv UNUSED)
 {
 #ifdef FEAT_EVAL
     Vim_Prim		*prim = (Vim_Prim *)data;
-    Scheme_Object	*result = NULL;
+    Scheme_Object	*result = عدم;
     typval_T		*vim_result;
-    Scheme_Object *expr = NULL;
+    Scheme_Object *expr = عدم;
     MZ_GC_DECL_REG(2);
     MZ_GC_VAR_IN_REG(0, result);
     MZ_GC_VAR_IN_REG(1, expr);
     MZ_GC_REG();
     expr = GUARANTEED_STRING_ARG(prim->name, 0);
 
-    vim_result = eval_expr(BYTE_STRING_VALUE(expr), NULL);
+    vim_result = eval_expr(BYTE_STRING_VALUE(expr), عدم);
 
-    if (vim_result == NULL)
+    𐤀𐤌 (vim_result == عدم)
 	raise_vim_exn(_("invalid expression"));
 
     result = vim_to_mzscheme(vim_result);
@@ -1682,60 +1682,60 @@ vim_eval(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
     free_tv(vim_result);
 
     MZ_GC_UNREG();
-    return result;
-#else
+    أرجع result;
+#وإلا
     raise_vim_exn(_("expressions disabled at compile time"));
     // unreachable
-    return scheme_false;
+    أرجع scheme_false;
 #endif
 }
 
 /*
  * (range-start)
  */
-    static Scheme_Object *
+    ساكن Scheme_Object *
 get_range_start(
-    void		*data UNUSED,
-    int			argc UNUSED,
+    فراغ		*data UNUSED,
+    صحيح			argc UNUSED,
     Scheme_Object	**argv UNUSED)
 {
-    return scheme_make_integer(range_start);
+    أرجع scheme_make_integer(range_start);
 }
 
 /*
  * (range-end)
  */
-    static Scheme_Object *
-get_range_end(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
+    ساكن Scheme_Object *
+get_range_end(فراغ *data UNUSED, صحيح argc UNUSED, Scheme_Object **argv UNUSED)
 {
-    return scheme_make_integer(range_end);
+    أرجع scheme_make_integer(range_end);
 }
 
 /*
  * (beep)
  */
-    static Scheme_Object *
-mzscheme_beep(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
+    ساكن Scheme_Object *
+mzscheme_beep(فراغ *data UNUSED, صحيح argc UNUSED, Scheme_Object **argv UNUSED)
 {
     vim_beep(BO_LANG);
-    return scheme_void;
+    أرجع scheme_void;
 }
 
-static Scheme_Object *M_global = NULL;
+ساكن Scheme_Object *M_global = عدم;
 
 /*
  * (get-option {option-name}) [buffer/window]
  */
-    static Scheme_Object *
-get_option(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+get_option(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     long	    value;
-    char	    *strval;
+    حرف	    *strval;
     getoption_T	    rc;
-    Scheme_Object   *rval = NULL;
-    Scheme_Object   *name = NULL;
-    int		    scope = 0;
+    Scheme_Object   *rval = عدم;
+    Scheme_Object   *name = عدم;
+    صحيح		    scope = 0;
     buf_T	    *save_curb = curbuf;
     win_T	    *save_curw = curwin;
 
@@ -1746,23 +1746,23 @@ get_option(void *data, int argc, Scheme_Object **argv)
 
     name = GUARANTEED_STRING_ARG(prim->name, 0);
 
-    if (argc > 1)
+    𐤀𐤌 (argc > 1)
     {
-	if (M_global == NULL)
+	𐤀𐤌 (M_global == عدم)
 	{
 	    MZ_REGISTER_STATIC(M_global);
 	    M_global = scheme_intern_symbol("global");
 	    MZ_GC_CHECK();
 	}
 
-	if (argv[1] == M_global)
+	𐤀𐤌 (argv[1] == M_global)
 	    scope = OPT_GLOBAL;
-	else if (SCHEME_VIMBUFFERP(argv[1]))
+	وإلا 𐤀𐤌 (SCHEME_VIMBUFFERP(argv[1]))
 	{
 	    curbuf = get_valid_buffer(argv[1]);
 	    scope = OPT_LOCAL;
 	}
-	else if (SCHEME_VIMWINDOWP(argv[1]))
+	وإلا 𐤀𐤌 (SCHEME_VIMWINDOWP(argv[1]))
 	{
 	    win_T *win = get_valid_window(argv[1]);
 
@@ -1770,84 +1770,84 @@ get_option(void *data, int argc, Scheme_Object **argv)
 	    curbuf = win->w_buffer;
 	    scope = OPT_LOCAL;
 	}
-	else
+	وإلا
 	    scheme_wrong_type(prim->name, "vim-buffer/window", 1, argc, argv);
     }
 
     rc = get_option_value(BYTE_STRING_VALUE(name), &value, (char_u **)&strval,
-								  NULL, scope);
+								  عدم, scope);
     curbuf = save_curb;
     curwin = save_curw;
 
-    switch (rc)
+    بدل (rc)
     {
-    case gov_bool:
-    case gov_number:
+    حالة gov_bool:
+    حالة gov_number:
 	MZ_GC_UNREG();
-	return scheme_make_integer_value(value);
-    case gov_string:
+	أرجع scheme_make_integer_value(value);
+    حالة gov_string:
 	rval = scheme_make_byte_string(strval);
 	MZ_GC_CHECK();
 	vim_free(strval);
 	MZ_GC_UNREG();
-	return rval;
-    case gov_hidden_bool:
-    case gov_hidden_number:
-    case gov_hidden_string:
+	أرجع rval;
+    حالة gov_hidden_bool:
+    حالة gov_hidden_number:
+    حالة gov_hidden_string:
 	MZ_GC_UNREG();
 	raise_vim_exn(_("hidden option"));
 	//NOTREACHED
-    case gov_unknown:
+    حالة gov_unknown:
 	MZ_GC_UNREG();
 	raise_vim_exn(_("unknown option"));
 	//NOTREACHED
     }
     // unreachable
-    return scheme_void;
+    أرجع scheme_void;
 }
 
 /*
  * (set-option {option-changing-string} [buffer/window])
  */
-    static Scheme_Object *
-set_option(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+set_option(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
-    char_u	*command = NULL;
-    int		scope = 0;
+    char_u	*command = عدم;
+    صحيح		scope = 0;
     buf_T	*save_curb = curbuf;
     win_T	*save_curw = curwin;
     Vim_Prim	*prim = (Vim_Prim *)data;
-    Scheme_Object *cmd = NULL;
+    Scheme_Object *cmd = عدم;
 
     MZ_GC_DECL_REG(1);
     MZ_GC_VAR_IN_REG(0, cmd);
     MZ_GC_REG();
     cmd = GUARANTEED_STRING_ARG(prim->name, 0);
 
-    if (argc > 1)
+    𐤀𐤌 (argc > 1)
     {
-	if (M_global == NULL)
+	𐤀𐤌 (M_global == عدم)
 	{
 	    MZ_REGISTER_STATIC(M_global);
 	    M_global = scheme_intern_symbol("global");
 	    MZ_GC_CHECK();
 	}
 
-	if (argv[1] == M_global)
+	𐤀𐤌 (argv[1] == M_global)
 	    scope = OPT_GLOBAL;
-	else if (SCHEME_VIMBUFFERP(argv[1]))
+	وإلا 𐤀𐤌 (SCHEME_VIMBUFFERP(argv[1]))
 	{
 	    curbuf = get_valid_buffer(argv[1]);
 	    scope = OPT_LOCAL;
 	}
-	else if (SCHEME_VIMWINDOWP(argv[1]))
+	وإلا 𐤀𐤌 (SCHEME_VIMWINDOWP(argv[1]))
 	{
 	    win_T *win = get_valid_window(argv[1]);
 	    curwin = win;
 	    curbuf = win->w_buffer;
 	    scope = OPT_LOCAL;
 	}
-	else
+	وإلا
 	    scheme_wrong_type(prim->name, "vim-buffer/window", 1, argc, argv);
     }
 
@@ -1860,7 +1860,7 @@ set_option(void *data, int argc, Scheme_Object **argv)
     curbuf = save_curb;
     curwin = save_curw;
     raise_if_error();
-    return scheme_void;
+    أرجع scheme_void;
 }
 
 /*
@@ -1872,34 +1872,34 @@ set_option(void *data, int argc, Scheme_Object **argv)
 /*
  * (curr-win)
  */
-    static Scheme_Object *
-get_curr_win(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
+    ساكن Scheme_Object *
+get_curr_win(فراغ *data UNUSED, صحيح argc UNUSED, Scheme_Object **argv UNUSED)
 {
-    return (Scheme_Object *)get_vim_curr_window();
+    أرجع (Scheme_Object *)get_vim_curr_window();
 }
 
 /*
  * (win-count)
  */
-    static Scheme_Object *
+    ساكن Scheme_Object *
 get_window_count(
-    void		*data UNUSED,
-    int			argc UNUSED,
+    فراغ		*data UNUSED,
+    صحيح			argc UNUSED,
     Scheme_Object	**argv UNUSED)
 {
-    int	    n = 0;
+    صحيح	    n = 0;
     win_T   *w;
 
     FOR_ALL_WINDOWS(w)
 	++n;
-    return scheme_make_integer(n);
+    أرجع scheme_make_integer(n);
 }
 
 /*
  * (get-win-list [buffer])
  */
-    static Scheme_Object *
-get_window_list(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+get_window_list(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf;
@@ -1909,20 +1909,20 @@ get_window_list(void *data, int argc, Scheme_Object **argv)
     buf = get_buffer_arg(prim->name, 0, argc, argv);
     list = scheme_null;
 
-    for ( ; w != NULL; w = w->w_next)
-	if (w->w_buffer == buf->buf)
+    لكل ( ; w != عدم; w = w->w_next)
+	𐤀𐤌 (w->w_buffer == buf->buf)
 	{
 	    list = scheme_make_pair(window_new(w), list);
 	    MZ_GC_CHECK();
 	}
 
-    return list;
+    أرجع list;
 }
 
-    static Scheme_Object *
+    ساكن Scheme_Object *
 window_new(win_T *win)
 {
-    vim_mz_window *self = NULL;
+    vim_mz_window *self = عدم;
 
     MZ_GC_DECL_REG(1);
     MZ_GC_VAR_IN_REG(0, self);
@@ -1934,15 +1934,15 @@ window_new(win_T *win)
     // On a win_free() we set the Scheme object's win_T *field
     // to an invalid value. We trap all uses of a window
     // object, and reject them if the win_T *field is invalid.
-    if (win->w_mzscheme_ref != NULL)
-	return (Scheme_Object *)WINDOW_REF(win);
+    𐤀𐤌 (win->w_mzscheme_ref != عدم)
+	أرجع (Scheme_Object *)WINDOW_REF(win);
 
     MZ_GC_REG();
-    self = scheme_malloc_fail_ok(scheme_malloc_tagged, sizeof(vim_mz_window));
+    self = scheme_malloc_fail_ok(scheme_malloc_tagged, حجم(vim_mz_window));
     CLEAR_POINTER(self);
 #ifdef MZ_PRECISE_GC
-    win->w_mzscheme_ref = scheme_malloc_immobile_box(NULL);
-#else
+    win->w_mzscheme_ref = scheme_malloc_immobile_box(عدم);
+#وإلا
     scheme_dont_gc_ptr(self);	// because win isn't visible to GC
 #endif
     MZ_GC_CHECK();
@@ -1952,81 +1952,81 @@ window_new(win_T *win)
     self->so.type = mz_window_type;
 
     MZ_GC_UNREG();
-    return (Scheme_Object *)self;
+    أرجع (Scheme_Object *)self;
 }
 
 /*
  * (get-win-num [window])
  */
-    static Scheme_Object *
-get_window_num(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
+    ساكن Scheme_Object *
+get_window_num(فراغ *data UNUSED, صحيح argc UNUSED, Scheme_Object **argv UNUSED)
 {
-    int		nr = 1;
+    صحيح		nr = 1;
     Vim_Prim	*prim = (Vim_Prim *)data;
     win_T	*win = get_window_arg(prim->name, 0, argc, argv)->win;
     win_T	*wp;
 
-    for (wp = firstwin; wp != win; wp = wp->w_next)
+    لكل (wp = firstwin; wp != win; wp = wp->w_next)
 	++nr;
 
-    return scheme_make_integer(nr);
+    أرجع scheme_make_integer(nr);
 }
 
 /*
  * (get-win-by-num {windownum})
  */
-    static Scheme_Object *
-get_window_by_num(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+get_window_by_num(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	*prim = (Vim_Prim *)data;
     win_T	*win = firstwin;
-    int		fnum;
+    صحيح		fnum;
 
     fnum = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
-    if (fnum < 1)
+    𐤀𐤌 (fnum < 1)
 	scheme_signal_error(_("window index is out of range"));
 
-    for ( ; win != NULL; win = win->w_next, --fnum)
-	if (fnum == 1)	    // to be 1-based
-	    return window_new(win);
+    لكل ( ; win != عدم; win = win->w_next, --fnum)
+	𐤀𐤌 (fnum == 1)	    // to be 1-based
+	    أرجع window_new(win);
 
-    return scheme_false;
+    أرجع scheme_false;
 }
 
 /*
  * (get-win-buffer [window])
  */
-    static Scheme_Object *
-get_window_buffer(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+get_window_buffer(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_window   *win = get_window_arg(prim->name, 0, argc, argv);
 
-    return buffer_new(win->win->w_buffer);
+    أرجع buffer_new(win->win->w_buffer);
 }
 
 /*
  * (get-win-height [window])
  */
-    static Scheme_Object *
-get_window_height(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+get_window_height(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_window   *win = get_window_arg(prim->name, 0, argc, argv);
 
-    return scheme_make_integer(win->win->w_height);
+    أرجع scheme_make_integer(win->win->w_height);
 }
 
 /*
  * (set-win-height {height} [window])
  */
-    static Scheme_Object *
-set_window_height(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+set_window_height(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_window   *win;
     win_T	    *savewin;
-    int		    height;
+    صحيح		    height;
 
     win = get_window_arg(prim->name, 1, argc, argv);
     height = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
@@ -2041,31 +2041,31 @@ set_window_height(void *data, int argc, Scheme_Object **argv)
     curwin = savewin;
 
     raise_if_error();
-    return scheme_void;
+    أرجع scheme_void;
 }
 
 /*
  * (get-win-width [window])
  */
-    static Scheme_Object *
-get_window_width(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+get_window_width(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_window   *win = get_window_arg(prim->name, 0, argc, argv);
 
-    return scheme_make_integer(win->win->w_width);
+    أرجع scheme_make_integer(win->win->w_width);
 }
 
 /*
  * (set-win-width {width} [window])
  */
-    static Scheme_Object *
-set_window_width(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+set_window_width(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_window   *win;
     win_T	    *savewin;
-    int		    width = 0;
+    صحيح		    width = 0;
 
     win = get_window_arg(prim->name, 1, argc, argv);
     width = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
@@ -2080,14 +2080,14 @@ set_window_width(void *data, int argc, Scheme_Object **argv)
     curwin = savewin;
 
     raise_if_error();
-    return scheme_void;
+    أرجع scheme_void;
 }
 
 /*
  * (get-cursor [window]) -> (line . col)
  */
-    static Scheme_Object *
-get_cursor(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+get_cursor(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_window   *win;
@@ -2095,15 +2095,15 @@ get_cursor(void *data, int argc, Scheme_Object **argv)
 
     win = get_window_arg(prim->name, 0, argc, argv);
     pos = win->win->w_cursor;
-    return scheme_make_pair(scheme_make_integer_value((long)pos.lnum),
+    أرجع scheme_make_pair(scheme_make_integer_value((long)pos.lnum),
 		    scheme_make_integer_value((long)pos.col + 1));
 }
 
 /*
  * (set-cursor (line . col) [window])
  */
-    static Scheme_Object *
-set_cursor(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+set_cursor(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_window   *win;
@@ -2116,7 +2116,7 @@ set_cursor(void *data, int argc, Scheme_Object **argv)
     win = get_window_arg(prim->name, 1, argc, argv);
     GUARANTEE_PAIR(prim->name, 0);
 
-    if (!SCHEME_INTP(SCHEME_CAR(argv[0]))
+    𐤀𐤌 (!SCHEME_INTP(SCHEME_CAR(argv[0]))
 	    || !SCHEME_INTP(SCHEME_CDR(argv[0])))
 	scheme_wrong_type(prim->name, "integer pair", 0, argc, argv);
 
@@ -2132,7 +2132,7 @@ set_cursor(void *data, int argc, Scheme_Object **argv)
     update_screen(UPD_VALID);
 
     raise_if_error();
-    return scheme_void;
+    أرجع scheme_void;
 }
 /*
  *===========================================================================
@@ -2143,13 +2143,13 @@ set_cursor(void *data, int argc, Scheme_Object **argv)
 /*
  * (open-buff {filename})
  */
-    static Scheme_Object *
-mzscheme_open_buffer(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+mzscheme_open_buffer(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
-    int		    num = 0;
-    Scheme_Object   *onum = NULL;
-    Scheme_Object   *buf = NULL;
+    صحيح		    num = 0;
+    Scheme_Object   *onum = عدم;
+    Scheme_Object   *buf = عدم;
     Scheme_Object   *fname;
 
     MZ_GC_DECL_REG(3);
@@ -2165,44 +2165,44 @@ mzscheme_open_buffer(void *data, int argc, Scheme_Object **argv)
     // TODO make open existing file
     num = buflist_add(BYTE_STRING_VALUE(fname), BLN_LISTED | BLN_CURBUF);
 
-    if (num == 0)
+    𐤀𐤌 (num == 0)
 	raise_vim_exn(_("couldn't open buffer"));
 
     onum = scheme_make_integer(num);
     buf = get_buffer_by_num(data, 1, &onum);
     MZ_GC_UNREG();
-    return buf;
+    أرجع buf;
 }
 
 /*
  * (get-buff-by-num {buffernum})
  */
-    static Scheme_Object *
-get_buffer_by_num(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+get_buffer_by_num(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	*prim = (Vim_Prim *)data;
     buf_T	*buf;
-    int		fnum;
+    صحيح		fnum;
 
     fnum = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
 
     FOR_ALL_BUFFERS(buf)
-	if (buf->b_fnum == fnum)
-	    return buffer_new(buf);
+	𐤀𐤌 (buf->b_fnum == fnum)
+	    أرجع buffer_new(buf);
 
-    return scheme_false;
+    أرجع scheme_false;
 }
 
 /*
  * (get-buff-by-name {buffername})
  */
-    static Scheme_Object *
-get_buffer_by_name(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+get_buffer_by_name(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	*prim = (Vim_Prim *)data;
     buf_T	*buf;
-    Scheme_Object *buffer = NULL;
-    Scheme_Object *fname = NULL;
+    Scheme_Object *buffer = عدم;
+    Scheme_Object *fname = عدم;
 
     MZ_GC_DECL_REG(2);
     MZ_GC_VAR_IN_REG(0, buffer);
@@ -2213,13 +2213,13 @@ get_buffer_by_name(void *data, int argc, Scheme_Object **argv)
 
     FOR_ALL_BUFFERS(buf)
     {
-	if (buf->b_ffname == NULL || buf->b_sfname == NULL)
+	𐤀𐤌 (buf->b_ffname == عدم || buf->b_sfname == عدم)
 	    // empty string
 	{
-	    if (BYTE_STRING_VALUE(fname)[0] == NUL)
+	    𐤀𐤌 (BYTE_STRING_VALUE(fname)[0] == NUL)
 		buffer = buffer_new(buf);
 	}
-	else if (!fnamecmp(buf->b_ffname, BYTE_STRING_VALUE(fname))
+	وإلا 𐤀𐤌 (!fnamecmp(buf->b_ffname, BYTE_STRING_VALUE(fname))
 		|| !fnamecmp(buf->b_sfname, BYTE_STRING_VALUE(fname)))
 	{
 	    // either short or long filename matches
@@ -2228,95 +2228,95 @@ get_buffer_by_name(void *data, int argc, Scheme_Object **argv)
     }
 
     MZ_GC_UNREG();
-    return buffer;
+    أرجع buffer;
 }
 
 /*
  * (get-next-buff [buffer])
  */
-    static Scheme_Object *
-get_next_buffer(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+get_next_buffer(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	*prim = (Vim_Prim *)data;
     buf_T	*buf = get_buffer_arg(prim->name, 0, argc, argv)->buf;
 
-    if (buf->b_next == NULL)
-	return scheme_false;
-    else
-	return buffer_new(buf->b_next);
+    𐤀𐤌 (buf->b_next == عدم)
+	أرجع scheme_false;
+    وإلا
+	أرجع buffer_new(buf->b_next);
 }
 
 /*
  * (get-prev-buff [buffer])
  */
-    static Scheme_Object *
-get_prev_buffer(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+get_prev_buffer(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	*prim = (Vim_Prim *)data;
     buf_T	*buf = get_buffer_arg(prim->name, 0, argc, argv)->buf;
 
-    if (buf->b_prev == NULL)
-	return scheme_false;
-    else
-	return buffer_new(buf->b_prev);
+    𐤀𐤌 (buf->b_prev == عدم)
+	أرجع scheme_false;
+    وإلا
+	أرجع buffer_new(buf->b_prev);
 }
 
 /*
  * (get-buff-num [buffer])
  */
-    static Scheme_Object *
-get_buffer_num(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+get_buffer_num(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf = get_buffer_arg(prim->name, 0, argc, argv);
 
-    return scheme_make_integer(buf->buf->b_fnum);
+    أرجع scheme_make_integer(buf->buf->b_fnum);
 }
 
 /*
  * (buff-count)
  */
-    static Scheme_Object *
+    ساكن Scheme_Object *
 get_buffer_count(
-    void		*data UNUSED,
-    int			argc UNUSED,
+    فراغ		*data UNUSED,
+    صحيح			argc UNUSED,
     Scheme_Object	**argv UNUSED)
 {
     buf_T   *b;
-    int	    n = 0;
+    صحيح	    n = 0;
 
     FOR_ALL_BUFFERS(b) ++n;
-    return scheme_make_integer(n);
+    أرجع scheme_make_integer(n);
 }
 
 /*
  * (get-buff-name [buffer])
  */
-    static Scheme_Object *
-get_buffer_name(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+get_buffer_name(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf = get_buffer_arg(prim->name, 0, argc, argv);
 
-    return scheme_make_byte_string((char *)buf->buf->b_ffname);
+    أرجع scheme_make_byte_string((حرف *)buf->buf->b_ffname);
 }
 
 /*
  * (curr-buff)
  */
-    static Scheme_Object *
+    ساكن Scheme_Object *
 get_curr_buffer(
-    void		*data UNUSED,
-    int			argc UNUSED,
+    فراغ		*data UNUSED,
+    صحيح			argc UNUSED,
     Scheme_Object	**argv UNUSED)
 {
-    return (Scheme_Object *)get_vim_curr_buffer();
+    أرجع (Scheme_Object *)get_vim_curr_buffer();
 }
 
-    static Scheme_Object *
+    ساكن Scheme_Object *
 buffer_new(buf_T *buf)
 {
-    vim_mz_buffer *self = NULL;
+    vim_mz_buffer *self = عدم;
 
     MZ_GC_DECL_REG(1);
     MZ_GC_VAR_IN_REG(0, self);
@@ -2324,15 +2324,15 @@ buffer_new(buf_T *buf)
     // We need to handle deletion of buffers underneath us.
     // If we add a "b_mzscheme_ref" field to the buf_T structure,
     // then we can get at it in buf_freeall() in vim.
-    if (buf->b_mzscheme_ref)
-	return (Scheme_Object *)BUFFER_REF(buf);
+    𐤀𐤌 (buf->b_mzscheme_ref)
+	أرجع (Scheme_Object *)BUFFER_REF(buf);
 
     MZ_GC_REG();
-    self = scheme_malloc_fail_ok(scheme_malloc_tagged, sizeof(vim_mz_buffer));
+    self = scheme_malloc_fail_ok(scheme_malloc_tagged, حجم(vim_mz_buffer));
     CLEAR_POINTER(self);
 #ifdef MZ_PRECISE_GC
-    buf->b_mzscheme_ref = scheme_malloc_immobile_box(NULL);
-#else
+    buf->b_mzscheme_ref = scheme_malloc_immobile_box(عدم);
+#وإلا
     scheme_dont_gc_ptr(self);	// because buf isn't visible to GC
 #endif
     MZ_GC_CHECK();
@@ -2342,7 +2342,7 @@ buffer_new(buf_T *buf)
     self->so.type = mz_buffer_type;
 
     MZ_GC_UNREG();
-    return (Scheme_Object *)self;
+    أرجع (Scheme_Object *)self;
 }
 
 /*
@@ -2350,13 +2350,13 @@ buffer_new(buf_T *buf)
  *
  * Get the size (number of lines) in the current buffer.
  */
-    static Scheme_Object *
-get_buffer_size(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+get_buffer_size(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf = get_buffer_arg(prim->name, 0, argc, argv);
 
-    return scheme_make_integer(buf->buf->b_ml.ml_line_count);
+    أرجع scheme_make_integer(buf->buf->b_ml.ml_line_count);
 }
 
 /*
@@ -2366,12 +2366,12 @@ get_buffer_size(void *data, int argc, Scheme_Object **argv)
  * in Vim format (1-based). The line is returned as a MzScheme
  * string object.
  */
-    static Scheme_Object *
-get_buffer_line(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+get_buffer_line(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf;
-    int		    linenr;
+    صحيح		    linenr;
     char_u	    *line;
 
     buf = get_buffer_arg(prim->name, 1, argc, argv);
@@ -2379,7 +2379,7 @@ get_buffer_line(void *data, int argc, Scheme_Object **argv)
     line = ml_get_buf(buf->buf, (linenr_T)linenr, FALSE);
 
     raise_if_error();
-    return scheme_make_byte_string((char *)line);
+    أرجع scheme_make_byte_string((حرف *)line);
 }
 
 
@@ -2390,13 +2390,13 @@ get_buffer_line(void *data, int argc, Scheme_Object **argv)
  * are in Vim format (1-based). The range is from lo up to, but not
  * including, hi. The list is returned as a list of string objects.
  */
-    static Scheme_Object *
-get_buffer_line_list(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+get_buffer_line_list(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf;
-    int		    i, hi, lo, n;
-    Scheme_Object   *list = NULL;
+    صحيح		    i, hi, lo, n;
+    Scheme_Object   *list = عدم;
 
     MZ_GC_DECL_REG(1);
     MZ_GC_VAR_IN_REG(0, list);
@@ -2410,20 +2410,20 @@ get_buffer_line_list(void *data, int argc, Scheme_Object **argv)
     /*
      * Handle some error conditions
      */
-    if (lo < 0)
+    𐤀𐤌 (lo < 0)
 	lo = 0;
 
-    if (hi < 0)
+    𐤀𐤌 (hi < 0)
 	hi = 0;
-    if (hi < lo)
+    𐤀𐤌 (hi < lo)
 	hi = lo;
 
     n = hi - lo;
 
-    for (i = n; i >= 0; --i)
+    لكل (i = n; i >= 0; --i)
     {
 	Scheme_Object *str = scheme_make_byte_string(
-		       (char *)ml_get_buf(buf->buf, (linenr_T)(lo+i), FALSE));
+		       (حرف *)ml_get_buf(buf->buf, (linenr_T)(lo+i), FALSE));
 	raise_if_error();
 
 	// Set the list item
@@ -2431,7 +2431,7 @@ get_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 	MZ_GC_CHECK();
     }
     MZ_GC_UNREG();
-    return list;
+    أرجع list;
 }
 
 /*
@@ -2446,8 +2446,8 @@ get_buffer_line_list(void *data, int argc, Scheme_Object **argv)
  * It returns a Scheme Object that indicates the length of the
  * string changed.
  */
-    static Scheme_Object *
-set_buffer_line(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+set_buffer_line(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     // First of all, we check the value of the supplied MzScheme object.
     // There are three cases:
@@ -2456,9 +2456,9 @@ set_buffer_line(void *data, int argc, Scheme_Object **argv)
     //	  3. Anything else - this is an error.
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf;
-    Scheme_Object   *line = NULL;
-    char	    *save;
-    int		    n;
+    Scheme_Object   *line = عدم;
+    حرف	    *save;
+    صحيح		    n;
 
     MZ_GC_DECL_REG(1);
     MZ_GC_VAR_IN_REG(0, line);
@@ -2468,30 +2468,30 @@ set_buffer_line(void *data, int argc, Scheme_Object **argv)
     sandbox_check();
 #endif
     n = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
-    if (!SCHEME_STRINGP(argv[1]) && !SCHEME_FALSEP(argv[1]))
+    𐤀𐤌 (!SCHEME_STRINGP(argv[1]) && !SCHEME_FALSEP(argv[1]))
 	scheme_wrong_type(prim->name, "string or #f", 1, argc, argv);
     line = argv[1];
     buf = get_buffer_arg(prim->name, 2, argc, argv);
 
     check_line_range(n, buf->buf);
 
-    if (SCHEME_FALSEP(line))
+    𐤀𐤌 (SCHEME_FALSEP(line))
     {
 	buf_T	    *savebuf = curbuf;
 
 	curbuf = buf->buf;
 
-	if (u_savedel((linenr_T)n, 1L) == FAIL)
+	𐤀𐤌 (u_savedel((linenr_T)n, 1L) == FAIL)
 	{
 	    curbuf = savebuf;
 	    raise_vim_exn(_("cannot save undo information"));
 	}
-	else if (ml_delete((linenr_T)n) == FAIL)
+	وإلا 𐤀𐤌 (ml_delete((linenr_T)n) == FAIL)
 	{
 	    curbuf = savebuf;
 	    raise_vim_exn(_("cannot delete line"));
 	}
-	if (buf->buf == curwin->w_buffer)
+	𐤀𐤌 (buf->buf == curwin->w_buffer)
 	    mz_fix_cursor(n, n + 1, -1);
 	deleted_lines_mark((linenr_T)n, 1L);
 
@@ -2499,9 +2499,9 @@ set_buffer_line(void *data, int argc, Scheme_Object **argv)
 
 	MZ_GC_UNREG();
 	raise_if_error();
-	return scheme_void;
+	أرجع scheme_void;
     }
-    else
+    وإلا
     {
 	// Otherwise it's a line
 	buf_T	    *savebuf = curbuf;
@@ -2510,19 +2510,19 @@ set_buffer_line(void *data, int argc, Scheme_Object **argv)
 
 	curbuf = buf->buf;
 
-	if (u_savesub((linenr_T)n) == FAIL)
+	𐤀𐤌 (u_savesub((linenr_T)n) == FAIL)
 	{
 	    curbuf = savebuf;
 	    vim_free(save);
 	    raise_vim_exn(_("cannot save undo information"));
 	}
-	else if (ml_replace((linenr_T)n, (char_u *)save, TRUE) == FAIL)
+	وإلا 𐤀𐤌 (ml_replace((linenr_T)n, (char_u *)save, TRUE) == FAIL)
 	{
 	    curbuf = savebuf;
 	    vim_free(save);
 	    raise_vim_exn(_("cannot replace line"));
 	}
-	else
+	وإلا
 	{
 	    vim_free(save);
 	    changed_bytes((linenr_T)n, 0);
@@ -2531,20 +2531,20 @@ set_buffer_line(void *data, int argc, Scheme_Object **argv)
 	curbuf = savebuf;
 
 	// Check that the cursor is not beyond the end of the line now.
-	if (buf->buf == curwin->w_buffer)
+	𐤀𐤌 (buf->buf == curwin->w_buffer)
 	    check_cursor_col();
 
 	MZ_GC_UNREG();
 	raise_if_error();
-	return scheme_void;
+	أرجع scheme_void;
     }
 }
 
-    static void
-free_array(char **array)
+    ساكن فراغ
+free_array(حرف **array)
 {
-    char **curr = array;
-    while (*curr != NULL)
+    حرف **curr = array;
+    طالما (*curr != عدم)
 	vim_free(*curr++);
     vim_free(array);
 }
@@ -2561,8 +2561,8 @@ free_array(char **array)
  * If OK is returned and len_change is not NULL, *len_change is set to the
  * change in the buffer length.
  */
-    static Scheme_Object *
-set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+set_buffer_line_list(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     // First of all, we check the type of the supplied MzScheme object.
     // There are three cases:
@@ -2570,9 +2570,9 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
     //	  2. A list	   - this is a replacement.
     //	  3. Anything else - this is an error.
     Vim_Prim	    *prim = (Vim_Prim *)data;
-    vim_mz_buffer   *buf = NULL;
-    Scheme_Object   *line_list = NULL;
-    int		    i, old_len, new_len, hi, lo;
+    vim_mz_buffer   *buf = عدم;
+    Scheme_Object   *line_list = عدم;
+    صحيح		    i, old_len, new_len, hi, lo;
     long	    extra;
 
     MZ_GC_DECL_REG(1);
@@ -2584,13 +2584,13 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 #endif
     lo = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
     hi = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 1));
-    if (!SCHEME_PAIRP(argv[2])
+    𐤀𐤌 (!SCHEME_PAIRP(argv[2])
 	    && !SCHEME_FALSEP(argv[2]) && !SCHEME_NULLP(argv[2]))
 	scheme_wrong_type(prim->name, "list or #f", 2, argc, argv);
     line_list = argv[2];
     buf = get_buffer_arg(prim->name, 3, argc, argv);
     old_len = hi - lo;
-    if (old_len < 0) // process inverse values wisely
+    𐤀𐤌 (old_len < 0) // process inverse values wisely
     {
 	i = lo;
 	lo = hi;
@@ -2602,25 +2602,25 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
     check_line_range(lo, buf->buf);	    // inclusive
     check_line_range(hi - 1, buf->buf);	    // exclusive
 
-    if (SCHEME_FALSEP(line_list) || SCHEME_NULLP(line_list))
+    𐤀𐤌 (SCHEME_FALSEP(line_list) || SCHEME_NULLP(line_list))
     {
 	buf_T	*savebuf = curbuf;
 	curbuf = buf->buf;
 
-	if (u_savedel((linenr_T)lo, (long)old_len) == FAIL)
+	𐤀𐤌 (u_savedel((linenr_T)lo, (long)old_len) == FAIL)
 	{
 	    curbuf = savebuf;
 	    raise_vim_exn(_("cannot save undo information"));
 	}
-	else
+	وإلا
 	{
-	    for (i = 0; i < old_len; i++)
-		if (ml_delete((linenr_T)lo) == FAIL)
+	    لكل (i = 0; i < old_len; i++)
+		𐤀𐤌 (ml_delete((linenr_T)lo) == FAIL)
 		{
 		    curbuf = savebuf;
 		    raise_vim_exn(_("cannot delete line"));
 		}
-	    if (buf->buf == curwin->w_buffer)
+	    𐤀𐤌 (buf->buf == curwin->w_buffer)
 		mz_fix_cursor(lo, hi, -old_len);
 	    deleted_lines_mark((linenr_T)lo, (long)old_len);
 	}
@@ -2629,37 +2629,37 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 
 	MZ_GC_UNREG();
 	raise_if_error();
-	return scheme_void;
+	أرجع scheme_void;
     }
-    else
+    وإلا
     {
 	buf_T	*savebuf = curbuf;
 
 	// List
 	new_len = scheme_proper_list_length(line_list);
 	MZ_GC_CHECK();
-	if (new_len < 0)	// improper or cyclic list
+	𐤀𐤌 (new_len < 0)	// improper or cyclic list
 	    scheme_wrong_type(prim->name, "proper list",
 		    2, argc, argv);
-	else
+	وإلا
 	{
-	    char		**array = NULL;
-	    Scheme_Object   *line = NULL;
-	    Scheme_Object   *rest = NULL;
+	    حرف		**array = عدم;
+	    Scheme_Object   *line = عدم;
+	    Scheme_Object   *rest = عدم;
 
 	    MZ_GC_DECL_REG(2);
 	    MZ_GC_VAR_IN_REG(0, line);
 	    MZ_GC_VAR_IN_REG(1, rest);
 	    MZ_GC_REG();
 
-	    array = ALLOC_CLEAR_MULT(char *, new_len + 1);
+	    array = ALLOC_CLEAR_MULT(حرف *, new_len + 1);
 
 	    rest = line_list;
-	    for (i = 0; i < new_len; ++i)
+	    لكل (i = 0; i < new_len; ++i)
 	    {
 		line = SCHEME_CAR(rest);
 		rest = SCHEME_CDR(rest);
-		if (!SCHEME_STRINGP(line))
+		𐤀𐤌 (!SCHEME_STRINGP(line))
 		{
 		    free_array(array);
 		    scheme_wrong_type(prim->name, "string-list", 2, argc, argv);
@@ -2669,7 +2669,7 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 
 	    curbuf = buf->buf;
 
-	    if (u_save((linenr_T)(lo-1), (linenr_T)hi) == FAIL)
+	    𐤀𐤌 (u_save((linenr_T)(lo-1), (linenr_T)hi) == FAIL)
 	    {
 		curbuf = savebuf;
 		free_array(array);
@@ -2681,9 +2681,9 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 	     * need to delete some old_len. We do this at the start, by
 	     * repeatedly deleting line "lo".
 	     */
-	    for (i = 0; i < old_len - new_len; ++i)
+	    لكل (i = 0; i < old_len - new_len; ++i)
 	    {
-		if (ml_delete((linenr_T)lo) == FAIL)
+		𐤀𐤌 (ml_delete((linenr_T)lo) == FAIL)
 		{
 		    curbuf = savebuf;
 		    free_array(array);
@@ -2697,8 +2697,8 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 	     * new old_len. This is a more efficient operation, as it requires
 	     * less memory allocation and freeing.
 	     */
-	    for (i = 0; i < old_len && i < new_len; i++)
-		if (ml_replace((linenr_T)(lo+i), (char_u *)array[i], TRUE) == FAIL)
+	    لكل (i = 0; i < old_len && i < new_len; i++)
+		𐤀𐤌 (ml_replace((linenr_T)(lo+i), (char_u *)array[i], TRUE) == FAIL)
 		{
 		    curbuf = savebuf;
 		    free_array(array);
@@ -2710,9 +2710,9 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 	     * free the string passed back because MzScheme has control of that
 	     * memory.
 	     */
-	    while (i < new_len)
+	    طالما (i < new_len)
 	    {
-		if (ml_append((linenr_T)(lo + i - 1),
+		𐤀𐤌 (ml_append((linenr_T)(lo + i - 1),
 			    (char_u *)array[i], 0, FALSE) == FAIL)
 		{
 		    curbuf = savebuf;
@@ -2734,13 +2734,13 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 						  (long)MAXLNUM, (long)extra);
 	changed_lines((linenr_T)lo, 0, (linenr_T)hi, (long)extra);
 
-	if (buf->buf == curwin->w_buffer)
+	𐤀𐤌 (buf->buf == curwin->w_buffer)
 	    mz_fix_cursor(lo, hi, extra);
 	curbuf = savebuf;
 
 	MZ_GC_UNREG();
 	raise_if_error();
-	return scheme_void;
+	أرجع scheme_void;
     }
 }
 
@@ -2755,14 +2755,14 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
  * If OK is returned and len_change is not NULL, *len_change
  * is set to the change in the buffer length.
  */
-    static Scheme_Object *
-insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+insert_buffer_line_list(فراغ *data, صحيح argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
-    vim_mz_buffer   *buf = NULL;
-    Scheme_Object   *list = NULL;
-    char	    *str = NULL;
-    int		    i, n, size;
+    vim_mz_buffer   *buf = عدم;
+    Scheme_Object   *list = عدم;
+    حرف	    *str = عدم;
+    صحيح		    i, n, size;
 
     MZ_GC_DECL_REG(1);
     MZ_GC_VAR_IN_REG(0, list);
@@ -2778,32 +2778,32 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
     n = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
     list = argv[1];
 
-    if (!SCHEME_STRINGP(list) && !SCHEME_PAIRP(list))
+    𐤀𐤌 (!SCHEME_STRINGP(list) && !SCHEME_PAIRP(list))
 	scheme_wrong_type(prim->name, "string or list", 1, argc, argv);
     buf = get_buffer_arg(prim->name, 2, argc, argv);
 
-    if (n != 0)	    // 0 can be used in insert
+    𐤀𐤌 (n != 0)	    // 0 can be used in insert
 	check_line_range(n, buf->buf);
-    if (SCHEME_STRINGP(list))
+    𐤀𐤌 (SCHEME_STRINGP(list))
     {
 	buf_T	    *savebuf = curbuf;
 
 	str = string_to_line(list);
 	curbuf = buf->buf;
 
-	if (u_save((linenr_T)n, (linenr_T)(n+1)) == FAIL)
+	𐤀𐤌 (u_save((linenr_T)n, (linenr_T)(n+1)) == FAIL)
 	{
 	    curbuf = savebuf;
 	    vim_free(str);
 	    raise_vim_exn(_("cannot save undo information"));
 	}
-	else if (ml_append((linenr_T)n, (char_u *)str, 0, FALSE) == FAIL)
+	وإلا 𐤀𐤌 (ml_append((linenr_T)n, (char_u *)str, 0, FALSE) == FAIL)
 	{
 	    curbuf = savebuf;
 	    vim_free(str);
 	    raise_vim_exn(_("cannot insert line"));
 	}
-	else
+	وإلا
 	{
 	    vim_free(str);
 	    appended_lines_mark((linenr_T)n, 1L);
@@ -2814,20 +2814,20 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 
 	MZ_GC_UNREG();
 	raise_if_error();
-	return scheme_void;
+	أرجع scheme_void;
     }
 
     // List
     size = scheme_proper_list_length(list);
     MZ_GC_CHECK();
-    if (size < 0)	// improper or cyclic list
+    𐤀𐤌 (size < 0)	// improper or cyclic list
 	scheme_wrong_type(prim->name, "proper list",
 		2, argc, argv);
-    else
+    وإلا
     {
-	Scheme_Object   *line = NULL;
-	Scheme_Object   *rest = NULL;
-	char		**array;
+	Scheme_Object   *line = عدم;
+	Scheme_Object   *rest = عدم;
+	حرف		**array;
 	buf_T		*savebuf = curbuf;
 
 	MZ_GC_DECL_REG(2);
@@ -2835,10 +2835,10 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 	MZ_GC_VAR_IN_REG(1, rest);
 	MZ_GC_REG();
 
-	array = ALLOC_CLEAR_MULT(char *, size + 1);
+	array = ALLOC_CLEAR_MULT(حرف *, size + 1);
 
 	rest = list;
-	for (i = 0; i < size; ++i)
+	لكل (i = 0; i < size; ++i)
 	{
 	    line = SCHEME_CAR(rest);
 	    rest = SCHEME_CDR(rest);
@@ -2847,16 +2847,16 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 
 	curbuf = buf->buf;
 
-	if (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
+	𐤀𐤌 (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
 	{
 	    curbuf = savebuf;
 	    free_array(array);
 	    raise_vim_exn(_("cannot save undo information"));
 	}
-	else
+	وإلا
 	{
-	    for (i = 0; i < size; ++i)
-		if (ml_append((linenr_T)(n + i), (char_u *)array[i],
+	    لكل (i = 0; i < size; ++i)
+		𐤀𐤌 (ml_append((linenr_T)(n + i), (char_u *)array[i],
 			    0, FALSE) == FAIL)
 		{
 		    curbuf = savebuf;
@@ -2864,7 +2864,7 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 		    raise_vim_exn(_("cannot insert line"));
 		}
 
-	    if (i > 0)
+	    𐤀𐤌 (i > 0)
 		appended_lines_mark((linenr_T)n, (long)i);
 	}
 	free_array(array);
@@ -2875,7 +2875,7 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 
     MZ_GC_UNREG();
     raise_if_error();
-    return scheme_void;
+    أرجع scheme_void;
 }
 
 /*
@@ -2884,51 +2884,51 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 /*
  * (buff? obj)
  */
-    static Scheme_Object *
-vim_bufferp(void *data UNUSED, int argc UNUSED, Scheme_Object **argv)
+    ساكن Scheme_Object *
+vim_bufferp(فراغ *data UNUSED, صحيح argc UNUSED, Scheme_Object **argv)
 {
-    if (SCHEME_VIMBUFFERP(argv[0]))
-	return scheme_true;
-    else
-	return scheme_false;
+    𐤀𐤌 (SCHEME_VIMBUFFERP(argv[0]))
+	أرجع scheme_true;
+    وإلا
+	أرجع scheme_false;
 }
 
 /*
  * (win? obj)
  */
-    static Scheme_Object *
-vim_windowp(void *data UNUSED, int argc UNUSED, Scheme_Object **argv)
+    ساكن Scheme_Object *
+vim_windowp(فراغ *data UNUSED, صحيح argc UNUSED, Scheme_Object **argv)
 {
-    if (SCHEME_VIMWINDOWP(argv[0]))
-	return scheme_true;
-    else
-	return scheme_false;
+    𐤀𐤌 (SCHEME_VIMWINDOWP(argv[0]))
+	أرجع scheme_true;
+    وإلا
+	أرجع scheme_false;
 }
 
 /*
  * (buff-valid? obj)
  */
-    static Scheme_Object *
-vim_buffer_validp(void *data UNUSED, int argc UNUSED, Scheme_Object **argv)
+    ساكن Scheme_Object *
+vim_buffer_validp(فراغ *data UNUSED, صحيح argc UNUSED, Scheme_Object **argv)
 {
-    if (SCHEME_VIMBUFFERP(argv[0])
+    𐤀𐤌 (SCHEME_VIMBUFFERP(argv[0])
 	    && ((vim_mz_buffer *)argv[0])->buf != INVALID_BUFFER_VALUE)
-	return scheme_true;
-    else
-	return scheme_false;
+	أرجع scheme_true;
+    وإلا
+	أرجع scheme_false;
 }
 
 /*
  * (win-valid? obj)
  */
-    static Scheme_Object *
-vim_window_validp(void *data UNUSED, int argc UNUSED, Scheme_Object **argv)
+    ساكن Scheme_Object *
+vim_window_validp(فراغ *data UNUSED, صحيح argc UNUSED, Scheme_Object **argv)
 {
-    if (SCHEME_VIMWINDOWP(argv[0])
+    𐤀𐤌 (SCHEME_VIMWINDOWP(argv[0])
 	    && ((vim_mz_window *)argv[0])->win != INVALID_WINDOW_VALUE)
-	return scheme_true;
-    else
-	return scheme_false;
+	أرجع scheme_true;
+    وإلا
+	أرجع scheme_false;
 }
 
 /*
@@ -2945,50 +2945,50 @@ vim_window_validp(void *data UNUSED, int argc UNUSED, Scheme_Object **argv)
  *
  * Returns pointer to Vim allocated memory
  */
-    static char *
+    ساكن حرف *
 string_to_line(Scheme_Object *obj)
 {
-    char	*scheme_str = NULL;
-    char	*vim_str = NULL;
+    حرف	*scheme_str = عدم;
+    حرف	*vim_str = عدم;
     OUTPUT_LEN_TYPE	len;
-    int		i;
+    صحيح		i;
 
     scheme_str = scheme_display_to_string(obj, &len);
 
     // Error checking: String must not contain newlines, as we
     // are replacing a single line, and we must replace it with
     // a single line.
-    if (memchr(scheme_str, '\n', len))
+    𐤀𐤌 (memchr(scheme_str, '\n', len))
 	scheme_signal_error(_("string cannot contain newlines"));
 
     vim_str = alloc(len + 1);
 
     // Create a copy of the string, with internal nulls replaced by
     // newline characters, as is the vim convention.
-    for (i = 0; i < len; ++i)
+    لكل (i = 0; i < len; ++i)
     {
-	if (scheme_str[i] == '\0')
+	𐤀𐤌 (scheme_str[i] == '\0')
 	    vim_str[i] = '\n';
-	else
+	وإلا
 	    vim_str[i] = scheme_str[i];
     }
 
     vim_str[i] = '\0';
 
     MZ_GC_CHECK();
-    return vim_str;
+    أرجع vim_str;
 }
 
 #ifdef FEAT_EVAL
 /*
  * Convert Vim value into MzScheme, adopted from if_python.c
  */
-    static Scheme_Object *
+    ساكن Scheme_Object *
 vim_to_mzscheme(typval_T *vim_value)
 {
-    Scheme_Object	*result = NULL;
+    Scheme_Object	*result = عدم;
     // hash table to store visited values to avoid infinite loops
-    Scheme_Hash_Table	*visited = NULL;
+    Scheme_Hash_Table	*visited = عدم;
 
     MZ_GC_DECL_REG(2);
     MZ_GC_VAR_IN_REG(0, result);
@@ -3001,17 +3001,17 @@ vim_to_mzscheme(typval_T *vim_value)
     result = vim_to_mzscheme_impl(vim_value, 1, visited);
 
     MZ_GC_UNREG();
-    return result;
+    أرجع result;
 }
 
-    static Scheme_Object *
+    ساكن Scheme_Object *
 vim_to_mzscheme_impl(
     typval_T		*vim_value,
-    int			depth,
+    صحيح			depth,
     Scheme_Hash_Table	*visited)
 {
-    Scheme_Object   *result = NULL;
-    int		    new_value = TRUE;
+    Scheme_Object   *result = عدم;
+    صحيح		    new_value = TRUE;
 
     MZ_GC_DECL_REG(2);
     MZ_GC_VAR_IN_REG(0, result);
@@ -3019,43 +3019,43 @@ vim_to_mzscheme_impl(
     MZ_GC_REG();
 
     // Avoid infinite recursion
-    if (depth > 100)
+    𐤀𐤌 (depth > 100)
     {
 	MZ_GC_UNREG();
-	return scheme_void;
+	أرجع scheme_void;
     }
 
     // Check if we run into a recursive loop.  The item must be in visited
     // then and we can use it again.
     result = scheme_hash_get(visited, (Scheme_Object *)vim_value);
     MZ_GC_CHECK();
-    if (result != NULL) // found, do nothing
+    𐤀𐤌 (result != عدم) // found, do nothing
 	new_value = FALSE;
-    else if (vim_value->v_type == VAR_STRING)
+    وإلا 𐤀𐤌 (vim_value->v_type == VAR_STRING)
     {
-	result = scheme_make_byte_string((char *)vim_value->vval.v_string);
+	result = scheme_make_byte_string((حرف *)vim_value->vval.v_string);
 	MZ_GC_CHECK();
     }
-    else if (vim_value->v_type == VAR_NUMBER)
+    وإلا 𐤀𐤌 (vim_value->v_type == VAR_NUMBER)
     {
 	result = scheme_make_integer((long)vim_value->vval.v_number);
 	MZ_GC_CHECK();
     }
-    else if (vim_value->v_type == VAR_FLOAT)
+    وإلا 𐤀𐤌 (vim_value->v_type == VAR_FLOAT)
     {
-	result = scheme_make_double((double)vim_value->vval.v_float);
+	result = scheme_make_double((مزدوج)vim_value->vval.v_float);
 	MZ_GC_CHECK();
     }
-    else if (vim_value->v_type == VAR_LIST)
+    وإلا 𐤀𐤌 (vim_value->v_type == VAR_LIST)
     {
 	list_T		*list = vim_value->vval.v_list;
 	listitem_T	*curr;
 
-	if (list == NULL || list->lv_first == NULL)
+	𐤀𐤌 (list == عدم || list->lv_first == عدم)
 	    result = scheme_null;
-	else
+	وإلا
 	{
-	    Scheme_Object   *obj = NULL;
+	    Scheme_Object   *obj = عدم;
 
 	    MZ_GC_DECL_REG(1);
 	    MZ_GC_VAR_IN_REG(0, obj);
@@ -3066,7 +3066,7 @@ vim_to_mzscheme_impl(
 	    result = scheme_make_pair(obj, scheme_null);
 	    MZ_GC_CHECK();
 
-	    while (curr != list->lv_first)
+	    طالما (curr != list->lv_first)
 	    {
 		curr = curr->li_prev;
 		obj = vim_to_mzscheme_impl(&curr->li_tv, depth + 1, visited);
@@ -3076,10 +3076,10 @@ vim_to_mzscheme_impl(
 	}
 	MZ_GC_UNREG();
     }
-    else if (vim_value->v_type == VAR_DICT)
+    وإلا 𐤀𐤌 (vim_value->v_type == VAR_DICT)
     {
-	Scheme_Object	  *key = NULL;
-	Scheme_Object	  *obj = NULL;
+	Scheme_Object	  *key = عدم;
+	Scheme_Object	  *obj = عدم;
 
 	MZ_GC_DECL_REG(2);
 	MZ_GC_VAR_IN_REG(0, key);
@@ -3088,7 +3088,7 @@ vim_to_mzscheme_impl(
 
 	result = (Scheme_Object *)scheme_make_hash_table(SCHEME_hash_ptr);
 	MZ_GC_CHECK();
-	if (vim_value->vval.v_dict != NULL)
+	𐤀𐤌 (vim_value->vval.v_dict != عدم)
 	{
 	    hashtab_T	*ht = &vim_value->vval.v_dict->dv_hashtab;
 	    long_u	todo = ht->ht_used;
@@ -3097,13 +3097,13 @@ vim_to_mzscheme_impl(
 
 	    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
 	    {
-		if (!HASHITEM_EMPTY(hi))
+		𐤀𐤌 (!HASHITEM_EMPTY(hi))
 		{
 		    --todo;
 
 		    di = dict_lookup(hi);
 		    obj = vim_to_mzscheme_impl(&di->di_tv, depth + 1, visited);
-		    key = scheme_make_byte_string((char *)hi->hi_key);
+		    key = scheme_make_byte_string((حرف *)hi->hi_key);
 		    MZ_GC_CHECK();
 		    scheme_hash_set((Scheme_Hash_Table *)result, key, obj);
 		    MZ_GC_CHECK();
@@ -3112,30 +3112,30 @@ vim_to_mzscheme_impl(
 	}
 	MZ_GC_UNREG();
     }
-    else if (vim_value->v_type == VAR_FUNC)
+    وإلا 𐤀𐤌 (vim_value->v_type == VAR_FUNC)
     {
-	Scheme_Object *funcname = NULL;
+	Scheme_Object *funcname = عدم;
 
 	MZ_GC_DECL_REG(1);
 	MZ_GC_VAR_IN_REG(0, funcname);
 	MZ_GC_REG();
 
 	// FIXME: func_ref() and func_unref() are needed.
-	funcname = scheme_make_byte_string((char *)vim_value->vval.v_string);
+	funcname = scheme_make_byte_string((حرف *)vim_value->vval.v_string);
 	MZ_GC_CHECK();
 	result = scheme_make_closed_prim_w_arity(vim_funcref, funcname,
-		(const char *)BYTE_STRING_VALUE(funcname), 0, -1);
+		(ثابت حرف *)BYTE_STRING_VALUE(funcname), 0, -1);
 	MZ_GC_CHECK();
 
 	MZ_GC_UNREG();
     }
-    else if (vim_value->v_type == VAR_PARTIAL)
+    وإلا 𐤀𐤌 (vim_value->v_type == VAR_PARTIAL)
     {
-	if (vim_value->vval.v_partial == NULL)
+	𐤀𐤌 (vim_value->vval.v_partial == عدم)
 	    result = scheme_null;
-	else
+	وإلا
 	{
-	    Scheme_Object *funcname = NULL;
+	    Scheme_Object *funcname = عدم;
 
 	    MZ_GC_DECL_REG(1);
 	    MZ_GC_VAR_IN_REG(0, funcname);
@@ -3144,42 +3144,42 @@ vim_to_mzscheme_impl(
 	    // FIXME: func_ref() and func_unref() are needed.
 	    // TODO: Support pt_dict and pt_argv.
 	    funcname = scheme_make_byte_string(
-			      (char *)partial_name(vim_value->vval.v_partial));
+			      (حرف *)partial_name(vim_value->vval.v_partial));
 	    MZ_GC_CHECK();
 	    result = scheme_make_closed_prim_w_arity(vim_funcref, funcname,
-		    (const char *)BYTE_STRING_VALUE(funcname), 0, -1);
+		    (ثابت حرف *)BYTE_STRING_VALUE(funcname), 0, -1);
 	    MZ_GC_CHECK();
 
 	    MZ_GC_UNREG();
 	}
     }
-    else if (vim_value->v_type == VAR_BOOL || vim_value->v_type == VAR_SPECIAL)
+    وإلا 𐤀𐤌 (vim_value->v_type == VAR_BOOL || vim_value->v_type == VAR_SPECIAL)
     {
-	if (vim_value->vval.v_number <= VVAL_TRUE)
+	𐤀𐤌 (vim_value->vval.v_number <= VVAL_TRUE)
 	    result = scheme_make_integer((long)vim_value->vval.v_number);
-	else
+	وإلا
 	    result = scheme_null;
 	MZ_GC_CHECK();
     }
-    else
+    وإلا
     {
 	result = scheme_void;
 	new_value = FALSE;
     }
-    if (new_value)
+    𐤀𐤌 (new_value)
     {
 	scheme_hash_set(visited, (Scheme_Object *)vim_value, result);
 	MZ_GC_CHECK();
     }
     MZ_GC_UNREG();
-    return result;
+    أرجع result;
 }
 
-    static int
+    ساكن صحيح
 mzscheme_to_vim(Scheme_Object *obj, typval_T *tv)
 {
-    int i, status;
-    Scheme_Hash_Table	*visited = NULL;
+    صحيح i, status;
+    Scheme_Hash_Table	*visited = عدم;
 
     MZ_GC_DECL_REG(2);
     MZ_GC_VAR_IN_REG(0, obj);
@@ -3190,21 +3190,21 @@ mzscheme_to_vim(Scheme_Object *obj, typval_T *tv)
     MZ_GC_CHECK();
 
     status = mzscheme_to_vim_impl(obj, tv, 1, visited);
-    for (i = 0; i < visited->size; ++i)
+    لكل (i = 0; i < visited->size; ++i)
     {
 	// free up remembered objects
-	if (visited->vals[i] != NULL)
+	𐤀𐤌 (visited->vals[i] != عدم)
 	    free_tv((typval_T *)visited->vals[i]);
     }
 
     MZ_GC_UNREG();
-    return status;
+    أرجع status;
 }
-    static int
-mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
+    ساكن صحيح
+mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, صحيح depth,
 	Scheme_Hash_Table *visited)
 {
-    int		status = OK;
+    صحيح		status = OK;
     typval_T	*found;
 
     MZ_GC_DECL_REG(2);
@@ -3213,45 +3213,45 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
     MZ_GC_REG();
 
     MZ_GC_CHECK();
-    if (depth > 100) // limit the deepest recursion level
+    𐤀𐤌 (depth > 100) // limit the deepest recursion level
     {
 	tv->v_type = VAR_NUMBER;
 	tv->vval.v_number = 0;
-	return FAIL;
+	أرجع FAIL;
     }
 
     found = (typval_T *)scheme_hash_get(visited, obj);
-    if (found != NULL)
+    𐤀𐤌 (found != عدم)
 	copy_tv(found, tv);
-    else if (SCHEME_VOIDP(obj))
+    وإلا 𐤀𐤌 (SCHEME_VOIDP(obj))
     {
 	tv->v_type = VAR_SPECIAL;
 	tv->vval.v_number = VVAL_NULL;
     }
-    else if (SCHEME_INTP(obj))
+    وإلا 𐤀𐤌 (SCHEME_INTP(obj))
     {
 	tv->v_type = VAR_NUMBER;
 	tv->vval.v_number = SCHEME_INT_VAL(obj);
     }
-    else if (SCHEME_BOOLP(obj))
+    وإلا 𐤀𐤌 (SCHEME_BOOLP(obj))
     {
 	tv->v_type = VAR_BOOL;
 	tv->vval.v_number = SCHEME_TRUEP(obj);
     }
-    else if (SCHEME_DBLP(obj))
+    وإلا 𐤀𐤌 (SCHEME_DBLP(obj))
     {
 	tv->v_type = VAR_FLOAT;
 	tv->vval.v_float = SCHEME_DBL_VAL(obj);
     }
-    else if (SCHEME_BYTE_STRINGP(obj))
+    وإلا 𐤀𐤌 (SCHEME_BYTE_STRINGP(obj))
     {
 	tv->v_type = VAR_STRING;
 	tv->vval.v_string = vim_strsave(BYTE_STRING_VALUE(obj));
     }
-# if MZSCHEME_VERSION_MAJOR >= 299
-    else if (SCHEME_CHAR_STRINGP(obj))
+# 𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 299
+    وإلا 𐤀𐤌 (SCHEME_CHAR_STRINGP(obj))
     {
-	Scheme_Object *tmp = NULL;
+	Scheme_Object *tmp = عدم;
 	MZ_GC_DECL_REG(1);
 	MZ_GC_VAR_IN_REG(0, tmp);
 	MZ_GC_REG();
@@ -3262,17 +3262,17 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
 	MZ_GC_UNREG();
     }
 # endif
-    else if (SCHEME_VECTORP(obj) || SCHEME_NULLP(obj)
+    وإلا 𐤀𐤌 (SCHEME_VECTORP(obj) || SCHEME_NULLP(obj)
 	    || SCHEME_PAIRP(obj) || SCHEME_MUTABLE_PAIRP(obj))
     {
 	list_T  *list = list_alloc();
-	if (list == NULL)
+	𐤀𐤌 (list == عدم)
 	    status = FAIL;
-	else
+	وإلا
 	{
-	    int		    i;
-	    Scheme_Object   *curr = NULL;
-	    Scheme_Object   *cval = NULL;
+	    صحيح		    i;
+	    Scheme_Object   *curr = عدم;
+	    Scheme_Object   *cval = عدم;
 	    // temporary var to hold current element of vectors and pairs
 	    typval_T	    *v;
 
@@ -3286,9 +3286,9 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
 	    ++list->lv_refcount;
 
 	    v = ALLOC_ONE(typval_T);
-	    if (v == NULL)
+	    𐤀𐤌 (v == عدم)
 		status = FAIL;
-	    else
+	    وإلا
 	    {
 		// add the value in advance to allow handling of self-referential
 		// data structures
@@ -3296,41 +3296,41 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
 		copy_tv(tv, visited_tv);
 		scheme_hash_set(visited, obj, (Scheme_Object *)visited_tv);
 
-		if (SCHEME_VECTORP(obj))
+		𐤀𐤌 (SCHEME_VECTORP(obj))
 		{
-		    for (i = 0; i < SCHEME_VEC_SIZE(obj); ++i)
+		    لكل (i = 0; i < SCHEME_VEC_SIZE(obj); ++i)
 		    {
 			cval = SCHEME_VEC_ELS(obj)[i];
 			status = mzscheme_to_vim_impl(cval, v, depth + 1, visited);
-			if (status == FAIL)
-			    break;
+			𐤀𐤌 (status == FAIL)
+			    اكسر;
 			status = list_append_tv(list, v);
 			clear_tv(v);
-			if (status == FAIL)
-			    break;
+			𐤀𐤌 (status == FAIL)
+			    اكسر;
 		    }
 		}
-		else if (SCHEME_PAIRP(obj) || SCHEME_MUTABLE_PAIRP(obj))
+		وإلا 𐤀𐤌 (SCHEME_PAIRP(obj) || SCHEME_MUTABLE_PAIRP(obj))
 		{
-		    for (curr = obj;
+		    لكل (curr = obj;
 			    SCHEME_PAIRP(curr) || SCHEME_MUTABLE_PAIRP(curr);
 			    curr = SCHEME_CDR(curr))
 		    {
 			cval = SCHEME_CAR(curr);
 			status = mzscheme_to_vim_impl(cval, v, depth + 1, visited);
-			if (status == FAIL)
-			    break;
+			𐤀𐤌 (status == FAIL)
+			    اكسر;
 			status = list_append_tv(list, v);
 			clear_tv(v);
-			if (status == FAIL)
-			    break;
+			𐤀𐤌 (status == FAIL)
+			    اكسر;
 		    }
 		    // improper list not terminated with null
 		    // need to handle the last element
-		    if (status == OK && !SCHEME_NULLP(curr))
+		    𐤀𐤌 (status == OK && !SCHEME_NULLP(curr))
 		    {
 			status = mzscheme_to_vim_impl(cval, v, depth + 1, visited);
-			if (status == OK)
+			𐤀𐤌 (status == OK)
 			{
 			    status = list_append_tv(list, v);
 			    clear_tv(v);
@@ -3343,12 +3343,12 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
 	    MZ_GC_UNREG();
 	}
     }
-    else if (SCHEME_HASHTP(obj))
+    وإلا 𐤀𐤌 (SCHEME_HASHTP(obj))
     {
-	int		i;
+	صحيح		i;
 	dict_T		*dict;
-	Scheme_Object   *key = NULL;
-	Scheme_Object   *val = NULL;
+	Scheme_Object   *key = عدم;
+	Scheme_Object   *val = عدم;
 
 	MZ_GC_DECL_REG(2);
 	MZ_GC_VAR_IN_REG(0, key);
@@ -3356,9 +3356,9 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
 	MZ_GC_REG();
 
 	dict = dict_alloc();
-	if (dict == NULL)
+	𐤀𐤌 (dict == عدم)
 	    status = FAIL;
-	else
+	وإلا
 	{
 	    typval_T    *visited_tv = ALLOC_ONE(typval_T);
 
@@ -3369,21 +3369,21 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
 	    copy_tv(tv, visited_tv);
 	    scheme_hash_set(visited, obj, (Scheme_Object *)visited_tv);
 
-	    for (i = 0; i < ((Scheme_Hash_Table *)obj)->size; ++i)
+	    لكل (i = 0; i < ((Scheme_Hash_Table *)obj)->size; ++i)
 	    {
-		if (((Scheme_Hash_Table *) obj)->vals[i] != NULL)
+		𐤀𐤌 (((Scheme_Hash_Table *) obj)->vals[i] != عدم)
 		{
 		    // generate item for `display'ed Scheme key
 		    dictitem_T  *item = dictitem_alloc((char_u *)string_to_line(
 				((Scheme_Hash_Table *) obj)->keys[i]));
 		    // convert Scheme val to Vim and add it to the dict
-		    if (mzscheme_to_vim_impl(((Scheme_Hash_Table *) obj)->vals[i],
+		    𐤀𐤌 (mzscheme_to_vim_impl(((Scheme_Hash_Table *) obj)->vals[i],
 				    &item->di_tv, depth + 1, visited) == FAIL
 			    || dict_add(dict, item) == FAIL)
 		    {
 			dictitem_free(item);
 			status = FAIL;
-			break;
+			اكسر;
 		    }
 		}
 
@@ -3391,26 +3391,26 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
 	}
 	MZ_GC_UNREG();
     }
-    else
+    وإلا
     {
 	// `display' any other value to string
 	tv->v_type = VAR_STRING;
 	tv->vval.v_string = (char_u *)string_to_line(obj);
     }
     MZ_GC_UNREG();
-    return status;
+    أرجع status;
 }
 
 /*
  * Scheme prim procedure wrapping Vim funcref
  */
-    static Scheme_Object *
-vim_funcref(void *name, int argc, Scheme_Object **argv)
+    ساكن Scheme_Object *
+vim_funcref(فراغ *name, صحيح argc, Scheme_Object **argv)
 {
-    int i;
+    صحيح i;
     typval_T args;
-    int status = OK;
-    Scheme_Object *result = NULL;
+    صحيح status = OK;
+    Scheme_Object *result = عدم;
     list_T *list = list_alloc();
 
     MZ_GC_DECL_REG(1);
@@ -3418,22 +3418,22 @@ vim_funcref(void *name, int argc, Scheme_Object **argv)
     MZ_GC_REG();
 
     result = scheme_void;
-    if (list == NULL)
+    𐤀𐤌 (list == عدم)
 	status = FAIL;
-    else
+    وإلا
     {
 	args.v_type = VAR_LIST;
 	args.vval.v_list = list;
 	++list->lv_refcount;
-	for (i = 0; status == OK && i < argc; ++i)
+	لكل (i = 0; status == OK && i < argc; ++i)
 	{
 	    typval_T *v = ALLOC_ONE(typval_T);
-	    if (v == NULL)
+	    𐤀𐤌 (v == عدم)
 		status = FAIL;
-	    else
+	    وإلا
 	    {
 		status = mzscheme_to_vim(argv[i], v);
-		if (status == OK)
+		𐤀𐤌 (status == OK)
 		{
 		    status = list_append_tv(list, v);
 		    clear_tv(v);
@@ -3441,7 +3441,7 @@ vim_funcref(void *name, int argc, Scheme_Object **argv)
 		vim_free(v);
 	    }
 	}
-	if (status == OK)
+	𐤀𐤌 (status == OK)
 	{
 	    typval_T ret;
 	    ret.v_type = VAR_UNKNOWN;
@@ -3455,30 +3455,30 @@ vim_funcref(void *name, int argc, Scheme_Object **argv)
     }
     clear_tv(&args);
     MZ_GC_UNREG();
-    if (status != OK)
+    𐤀𐤌 (status != OK)
 	raise_vim_exn(_("error converting Scheme values to Vim"));
-    else
+    وإلا
 	raise_if_error();
-    return result;
+    أرجع result;
 }
 
-    void
+    فراغ
 do_mzeval(char_u *str, typval_T *rettv)
 {
-    Scheme_Object	*ret = NULL;
+    Scheme_Object	*ret = عدم;
 
     MZ_GC_DECL_REG(1);
     MZ_GC_VAR_IN_REG(0, ret);
     MZ_GC_REG();
 
-    if (mzscheme_init())
+    𐤀𐤌 (mzscheme_init())
     {
 	MZ_GC_UNREG();
-	return;
+	أرجع;
     }
 
     MZ_GC_CHECK();
-    if (eval_with_exn_handling(str, do_eval, &ret) == OK)
+    𐤀𐤌 (eval_with_exn_handling(str, do_eval, &ret) == OK)
 	mzscheme_to_vim(ret, rettv);
 
     MZ_GC_UNREG();
@@ -3489,22 +3489,22 @@ do_mzeval(char_u *str, typval_T *rettv)
  * Check to see whether a Vim error has been reported, or a keyboard
  * interrupt (from vim --> got_int) has been detected.
  */
-    static int
-vim_error_check(void)
+    ساكن صحيح
+vim_error_check(فراغ)
 {
-    return (got_int || did_emsg);
+    أرجع (got_int || did_emsg);
 }
 
 /*
  * register Scheme exn:vim
  */
-    static void
-register_vim_exn(void)
+    ساكن فراغ
+register_vim_exn(فراغ)
 {
-    int	nc = 0;
-    int i;
-    Scheme_Object   *struct_exn = NULL;
-    Scheme_Object   *exn_name = NULL;
+    صحيح	nc = 0;
+    صحيح i;
+    Scheme_Object   *struct_exn = عدم;
+    Scheme_Object   *exn_name = عدم;
 
     MZ_GC_DECL_REG(2);
     MZ_GC_VAR_IN_REG(0, struct_exn);
@@ -3516,33 +3516,33 @@ register_vim_exn(void)
     struct_exn = scheme_builtin_value("struct:exn");
     MZ_GC_CHECK();
 
-    if (vim_exn == NULL)
+    𐤀𐤌 (vim_exn == عدم)
 	vim_exn = scheme_make_struct_type(exn_name,
-		struct_exn, NULL, 0, 0, NULL, NULL
-#if MZSCHEME_VERSION_MAJOR >= 299
-		, NULL
+		struct_exn, عدم, 0, 0, عدم, عدم
+#𐤀𐤌 MZSCHEME_VERSION_MAJOR >= 299
+		, عدم
 #endif
 		);
 
 
     {
-	Scheme_Object   **tmp = NULL;
-	Scheme_Object   *exn_names[5] = {NULL, NULL, NULL, NULL, NULL};
-	Scheme_Object   *exn_values[5] = {NULL, NULL, NULL, NULL, NULL};
+	Scheme_Object   **tmp = عدم;
+	Scheme_Object   *exn_names[5] = {عدم, عدم, عدم, عدم, عدم};
+	Scheme_Object   *exn_values[5] = {عدم, عدم, عدم, عدم, عدم};
 	MZ_GC_DECL_REG(6);
 	MZ_GC_ARRAY_VAR_IN_REG(0, exn_names, 5);
 	MZ_GC_ARRAY_VAR_IN_REG(3, exn_values, 5);
 	MZ_GC_REG();
 
 	tmp = scheme_make_struct_names(exn_name, scheme_null, 0, &nc);
-	mch_memmove(exn_names, tmp, nc * sizeof(Scheme_Object *));
+	mch_memmove(exn_names, tmp, nc * حجم(Scheme_Object *));
 	MZ_GC_CHECK();
 
 	tmp = scheme_make_struct_values(vim_exn, exn_names, nc, 0);
-	mch_memmove(exn_values, tmp, nc * sizeof(Scheme_Object *));
+	mch_memmove(exn_values, tmp, nc * حجم(Scheme_Object *));
 	MZ_GC_CHECK();
 
-	for (i = 0; i < nc; i++)
+	لكل (i = 0; i < nc; i++)
 	{
 	    scheme_add_global_symbol(exn_names[i],
 		    exn_values[i], environment);
@@ -3556,13 +3556,13 @@ register_vim_exn(void)
 /*
  * raise exn:vim, may be with additional info string
  */
-    void
-raise_vim_exn(const char *add_info)
+    فراغ
+raise_vim_exn(ثابت حرف *add_info)
 {
-    char	    *fmt = _("Vim error: ~a");
-    Scheme_Object   *argv[2] = {NULL, NULL};
-    Scheme_Object   *exn = NULL;
-    Scheme_Object   *byte_string = NULL;
+    حرف	    *fmt = _("Vim error: ~a");
+    Scheme_Object   *argv[2] = {عدم, عدم};
+    Scheme_Object   *exn = عدم;
+    Scheme_Object   *byte_string = عدم;
 
     MZ_GC_DECL_REG(5);
     MZ_GC_ARRAY_VAR_IN_REG(0, argv, 2);
@@ -3570,10 +3570,10 @@ raise_vim_exn(const char *add_info)
     MZ_GC_VAR_IN_REG(4, byte_string);
     MZ_GC_REG();
 
-    if (add_info != NULL)
+    𐤀𐤌 (add_info != عدم)
     {
-	char		*c_string = NULL;
-	Scheme_Object   *info = NULL;
+	حرف		*c_string = عدم;
+	Scheme_Object   *info = عدم;
 
 	MZ_GC_DECL_REG(3);
 	MZ_GC_VAR_IN_REG(0, c_string);
@@ -3582,7 +3582,7 @@ raise_vim_exn(const char *add_info)
 
 	info = scheme_make_byte_string(add_info);
 	MZ_GC_CHECK();
-	c_string = scheme_format_utf8(fmt, (int)STRLEN(fmt), 1, &info, NULL);
+	c_string = scheme_format_utf8(fmt, (صحيح)STRLEN(fmt), 1, &info, عدم);
 	MZ_GC_CHECK();
 	byte_string = scheme_make_byte_string(c_string);
 	MZ_GC_CHECK();
@@ -3590,7 +3590,7 @@ raise_vim_exn(const char *add_info)
 	SCHEME_SET_IMMUTABLE(argv[0]);
 	MZ_GC_UNREG();
     }
-    else
+    وإلا
     {
 	byte_string = scheme_make_byte_string(_("Vim error"));
 	MZ_GC_CHECK();
@@ -3599,11 +3599,11 @@ raise_vim_exn(const char *add_info)
     }
     MZ_GC_CHECK();
 
-#if MZSCHEME_VERSION_MAJOR < 360
+#𐤀𐤌 MZSCHEME_VERSION_MAJOR < 360
     argv[1] = scheme_current_continuation_marks();
     MZ_GC_CHECK();
-#else
-    argv[1] = scheme_current_continuation_marks(NULL);
+#وإلا
+    argv[1] = scheme_current_continuation_marks(عدم);
     MZ_GC_CHECK();
 #endif
 
@@ -3613,11 +3613,11 @@ raise_vim_exn(const char *add_info)
     MZ_GC_UNREG();
 }
 
-    void
-raise_if_error(void)
+    فراغ
+raise_if_error(فراغ)
 {
-    if (vim_error_check())
-	raise_vim_exn(NULL);
+    𐤀𐤌 (vim_error_check())
+	raise_vim_exn(عدم);
 }
 
 /*
@@ -3625,18 +3625,18 @@ raise_if_error(void)
  * either current
  * or passed as argv[argnum] with checks
  */
-    static vim_mz_buffer *
-get_buffer_arg(const char *fname, int argnum, int argc, Scheme_Object **argv)
+    ساكن vim_mz_buffer *
+get_buffer_arg(ثابت حرف *fname, صحيح argnum, صحيح argc, Scheme_Object **argv)
 {
     vim_mz_buffer *b;
 
-    if (argc < argnum + 1)
-	return get_vim_curr_buffer();
-    if (!SCHEME_VIMBUFFERP(argv[argnum]))
+    𐤀𐤌 (argc < argnum + 1)
+	أرجع get_vim_curr_buffer();
+    𐤀𐤌 (!SCHEME_VIMBUFFERP(argv[argnum]))
 	scheme_wrong_type(fname, "vim-buffer", argnum, argc, argv);
     b = (vim_mz_buffer *)argv[argnum];
-    (void)get_valid_buffer(argv[argnum]);
-    return b;
+    (فراغ)get_valid_buffer(argv[argnum]);
+    أرجع b;
 }
 
 /*
@@ -3644,59 +3644,59 @@ get_buffer_arg(const char *fname, int argnum, int argc, Scheme_Object **argv)
  * either current
  * or passed as argv[argnum] with checks
  */
-    static vim_mz_window *
-get_window_arg(const char *fname, int argnum, int argc, Scheme_Object **argv)
+    ساكن vim_mz_window *
+get_window_arg(ثابت حرف *fname, صحيح argnum, صحيح argc, Scheme_Object **argv)
 {
     vim_mz_window *w;
 
-    if (argc < argnum + 1)
-	return get_vim_curr_window();
+    𐤀𐤌 (argc < argnum + 1)
+	أرجع get_vim_curr_window();
     w = (vim_mz_window *)argv[argnum];
-    if (!SCHEME_VIMWINDOWP(argv[argnum]))
+    𐤀𐤌 (!SCHEME_VIMWINDOWP(argv[argnum]))
 	scheme_wrong_type(fname, "vim-window", argnum, argc, argv);
-    (void)get_valid_window(argv[argnum]);
-    return w;
+    (فراغ)get_valid_window(argv[argnum]);
+    أرجع w;
 }
 
 /*
  * get valid Vim buffer from Scheme_Object*
  */
-buf_T *get_valid_buffer(void *obj)
+buf_T *get_valid_buffer(فراغ *obj)
 {
     buf_T *buf = ((vim_mz_buffer *)obj)->buf;
 
-    if (buf == INVALID_BUFFER_VALUE)
+    𐤀𐤌 (buf == INVALID_BUFFER_VALUE)
 	scheme_signal_error(_("buffer is invalid"));
-    return buf;
+    أرجع buf;
 }
 
 /*
  * get valid Vim window from Scheme_Object*
  */
-win_T *get_valid_window(void *obj)
+win_T *get_valid_window(فراغ *obj)
 {
     win_T *win = ((vim_mz_window *)obj)->win;
-    if (win == INVALID_WINDOW_VALUE)
+    𐤀𐤌 (win == INVALID_WINDOW_VALUE)
 	scheme_signal_error(_("window is invalid"));
-    return win;
+    أرجع win;
 }
 
-    int
-mzthreads_allowed(void)
+    صحيح
+mzthreads_allowed(فراغ)
 {
-    return mz_threads_allow;
+    أرجع mz_threads_allow;
 }
 
-    static int
+    ساكن صحيح
 line_in_range(linenr_T lnum, buf_T *buf)
 {
-    return (lnum > 0 && lnum <= buf->b_ml.ml_line_count);
+    أرجع (lnum > 0 && lnum <= buf->b_ml.ml_line_count);
 }
 
-    static void
+    ساكن فراغ
 check_line_range(linenr_T lnum, buf_T *buf)
 {
-    if (!line_in_range(lnum, buf))
+    𐤀𐤌 (!line_in_range(lnum, buf))
 	scheme_signal_error(_("linenr out of range"));
 }
 
@@ -3706,31 +3706,31 @@ check_line_range(linenr_T lnum, buf_T *buf)
  * Changed the lines from "lo" to "hi" and added "extra" lines (negative if
  * deleted). Got from if_python.c
  */
-    static void
-mz_fix_cursor(int lo, int hi, int extra)
+    ساكن فراغ
+mz_fix_cursor(صحيح lo, صحيح hi, صحيح extra)
 {
-    if (curwin->w_cursor.lnum >= lo)
+    𐤀𐤌 (curwin->w_cursor.lnum >= lo)
     {
 	// Adjust the cursor position if it's in/after the changed
 	// lines.
-	if (curwin->w_cursor.lnum >= hi)
+	𐤀𐤌 (curwin->w_cursor.lnum >= hi)
 	{
 	    curwin->w_cursor.lnum += extra;
 	    check_cursor_col();
 	}
-	else if (extra < 0)
+	وإلا 𐤀𐤌 (extra < 0)
 	{
 	    curwin->w_cursor.lnum = lo;
 	    check_cursor();
 	}
-	else
+	وإلا
 	    check_cursor_col();
 	changed_cline_bef_curs();
     }
     invalidate_botline();
 }
 
-static Vim_Prim prims[]=
+ساكن Vim_Prim prims[]=
 {
     /*
      * Buffer-related commands
@@ -3787,34 +3787,34 @@ static Vim_Prim prims[]=
 /*
  * return MzScheme wrapper for curbuf
  */
-    static vim_mz_buffer *
-get_vim_curr_buffer(void)
+    ساكن vim_mz_buffer *
+get_vim_curr_buffer(فراغ)
 {
-    if (curbuf->b_mzscheme_ref == NULL)
-	return (vim_mz_buffer *)buffer_new(curbuf);
-    else
-	return BUFFER_REF(curbuf);
+    𐤀𐤌 (curbuf->b_mzscheme_ref == عدم)
+	أرجع (vim_mz_buffer *)buffer_new(curbuf);
+    وإلا
+	أرجع BUFFER_REF(curbuf);
 }
 
 /*
  * return MzScheme wrapper for curwin
  */
-    static vim_mz_window *
-get_vim_curr_window(void)
+    ساكن vim_mz_window *
+get_vim_curr_window(فراغ)
 {
-    if (curwin->w_mzscheme_ref == NULL)
-	return (vim_mz_window *)window_new(curwin);
-    else
-	return WINDOW_REF(curwin);
+    𐤀𐤌 (curwin->w_mzscheme_ref == عدم)
+	أرجع (vim_mz_window *)window_new(curwin);
+    وإلا
+	أرجع WINDOW_REF(curwin);
 }
 
-    static void
-make_modules(void)
+    ساكن فراغ
+make_modules(فراغ)
 {
-    int		    i;
-    Scheme_Env	    *mod = NULL;
-    Scheme_Object   *vimext_symbol = NULL;
-    Scheme_Object   *closed_prim = NULL;
+    صحيح		    i;
+    Scheme_Env	    *mod = عدم;
+    Scheme_Object   *vimext_symbol = عدم;
+    Scheme_Object   *closed_prim = عدم;
 
     MZ_GC_DECL_REG(3);
     MZ_GC_VAR_IN_REG(0, mod);
@@ -3827,7 +3827,7 @@ make_modules(void)
     mod = scheme_primitive_module(vimext_symbol, environment);
     MZ_GC_CHECK();
     // all prims made closed so they can access their own names
-    for (i = 0; i < (int)ARRAY_LENGTH(prims); i++)
+    لكل (i = 0; i < (صحيح)ARRAY_LENGTH(prims); i++)
     {
 	Vim_Prim *prim = prims + i;
 	closed_prim = scheme_make_closed_prim_w_arity(prim->prim, prim, prim->name,
@@ -3841,70 +3841,70 @@ make_modules(void)
 }
 
 #ifdef HAVE_SANDBOX
-static Scheme_Object *M_write = NULL;
-static Scheme_Object *M_read = NULL;
-static Scheme_Object *M_execute = NULL;
-static Scheme_Object *M_delete = NULL;
+ساكن Scheme_Object *M_write = عدم;
+ساكن Scheme_Object *M_read = عدم;
+ساكن Scheme_Object *M_execute = عدم;
+ساكن Scheme_Object *M_delete = عدم;
 
-    static void
-sandbox_check(void)
+    ساكن فراغ
+sandbox_check(فراغ)
 {
-    if (sandbox)
+    𐤀𐤌 (sandbox)
 	raise_vim_exn(_("not allowed in the Vim sandbox"));
 }
 
 /*
  * security guards to force Vim's sandbox restrictions on MzScheme level
  */
-    static Scheme_Object *
-sandbox_file_guard(int argc UNUSED, Scheme_Object **argv)
+    ساكن Scheme_Object *
+sandbox_file_guard(صحيح argc UNUSED, Scheme_Object **argv)
 {
-    if (!sandbox)
-	return scheme_void;
+    𐤀𐤌 (!sandbox)
+	أرجع scheme_void;
 
     Scheme_Object *requested_access = argv[2];
 
-    if (M_write == NULL)
+    𐤀𐤌 (M_write == عدم)
     {
 	MZ_REGISTER_STATIC(M_write);
 	M_write = scheme_intern_symbol("write");
 	MZ_GC_CHECK();
     }
-    if (M_read == NULL)
+    𐤀𐤌 (M_read == عدم)
     {
 	MZ_REGISTER_STATIC(M_read);
 	M_read = scheme_intern_symbol("read");
 	MZ_GC_CHECK();
     }
-    if (M_execute == NULL)
+    𐤀𐤌 (M_execute == عدم)
     {
 	MZ_REGISTER_STATIC(M_execute);
 	M_execute = scheme_intern_symbol("execute");
 	MZ_GC_CHECK();
     }
-    if (M_delete == NULL)
+    𐤀𐤌 (M_delete == عدم)
     {
 	MZ_REGISTER_STATIC(M_delete);
 	M_delete = scheme_intern_symbol("delete");
 	MZ_GC_CHECK();
     }
 
-    while (!SCHEME_NULLP(requested_access))
+    طالما (!SCHEME_NULLP(requested_access))
     {
 	Scheme_Object *item = SCHEME_CAR(requested_access);
-	if (scheme_eq(item, M_write) || scheme_eq(item, M_read)
+	𐤀𐤌 (scheme_eq(item, M_write) || scheme_eq(item, M_read)
 		|| scheme_eq(item, M_execute) || scheme_eq(item, M_delete))
 	    raise_vim_exn(_("not allowed in the Vim sandbox"));
 	requested_access = SCHEME_CDR(requested_access);
     }
 
-    return scheme_void;
+    أرجع scheme_void;
 }
 
-    static Scheme_Object *
-sandbox_network_guard(int argc UNUSED, Scheme_Object **argv UNUSED)
+    ساكن Scheme_Object *
+sandbox_network_guard(صحيح argc UNUSED, Scheme_Object **argv UNUSED)
 {
-    return scheme_void;
+    أرجع scheme_void;
 }
 #endif
 
