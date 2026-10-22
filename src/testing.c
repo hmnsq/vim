@@ -11,34 +11,34 @@
  * testing.c: Support for tests.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 
 /*
  * Prepare "gap" for an assert error and add the sourcing position.
  */
-    static void
+    ساكن فراغ
 prepare_assert_error(garray_T *gap)
 {
     char_u  *sname = estack_sfile(ESTACK_NONE);
 
     ga_init2(gap, 1, 100);
-    if (sname != NULL)
+    إذا (sname != عدم)
     {
 	ga_concat(gap, sname);
-	if (SOURCING_LNUM > 0)
+	إذا (SOURCING_LNUM > 0)
 	    GA_CONCAT_LITERAL(gap, " ");
     }
-    if (SOURCING_LNUM > 0)
+    إذا (SOURCING_LNUM > 0)
     {
-	char    buf[NUMBUFLEN];
+	حرف    buf[NUMBUFLEN];
 	size_t	buflen;
 
-	buflen = vim_snprintf_safelen(buf, sizeof(buf), "line %ld", (long)SOURCING_LNUM);
+	buflen = vim_snprintf_safelen(buf, حجم(buf), "line %ld", (long)SOURCING_LNUM);
 	ga_concat_len(gap, (char_u *)buf, buflen);
     }
-    if (sname != NULL || SOURCING_LNUM > 0)
+    إذا (sname != عدم || SOURCING_LNUM > 0)
 	GA_CONCAT_LITERAL(gap, ": ");
     vim_free(sname);
 }
@@ -47,40 +47,40 @@ prepare_assert_error(garray_T *gap)
  * Append "p[clen]" to "gap", escaping unprintable characters.
  * Changes NL to \n, CR to \r, etc.
  */
-    static void
-ga_concat_esc(garray_T *gap, char_u *p, int clen)
+    ساكن فراغ
+ga_concat_esc(garray_T *gap, char_u *p, صحيح clen)
 {
     char_u  buf[NUMBUFLEN];
 
-    if (clen > 1)
+    إذا (clen > 1)
     {
 	mch_memmove(buf, p, clen);
 	buf[clen] = NUL;
 	ga_concat_len(gap, buf, clen);
-	return;
+	أرجع;
     }
 
-    switch (*p)
+    بدل (*p)
     {
-	case BS: GA_CONCAT_LITERAL(gap, "\\b"); break;
-	case ESC: GA_CONCAT_LITERAL(gap, "\\e"); break;
-	case FF: GA_CONCAT_LITERAL(gap, "\\f"); break;
-	case NL: GA_CONCAT_LITERAL(gap, "\\n"); break;
-	case TAB: GA_CONCAT_LITERAL(gap, "\\t"); break;
-	case CAR: GA_CONCAT_LITERAL(gap, "\\r"); break;
-	case '\\': GA_CONCAT_LITERAL(gap, "\\\\"); break;
-	default:
-	   if (*p < ' ' || *p == 0x7f)
+	حالة BS: GA_CONCAT_LITERAL(gap, "\\b"); اكسر;
+	حالة ESC: GA_CONCAT_LITERAL(gap, "\\e"); اكسر;
+	حالة FF: GA_CONCAT_LITERAL(gap, "\\f"); اكسر;
+	حالة NL: GA_CONCAT_LITERAL(gap, "\\n"); اكسر;
+	حالة TAB: GA_CONCAT_LITERAL(gap, "\\t"); اكسر;
+	حالة CAR: GA_CONCAT_LITERAL(gap, "\\r"); اكسر;
+	حالة '\\': GA_CONCAT_LITERAL(gap, "\\\\"); اكسر;
+	افتراضي:
+	   إذا (*p < ' ' || *p == 0x7f)
 	   {
 		size_t	buflen;
 
-		buflen = vim_snprintf_safelen((char *)buf, sizeof(buf),
+		buflen = vim_snprintf_safelen((حرف *)buf, حجم(buf),
 		    "\\x%02x", *p);
 		ga_concat_len(gap, buf, buflen);
 	   }
-	   else
+	   وإلا
 	       ga_append(gap, *p);
-	   break;
+	   اكسر;
     }
 }
 
@@ -88,46 +88,46 @@ ga_concat_esc(garray_T *gap, char_u *p, int clen)
  * Append "str" to "gap", escaping unprintable characters.
  * Changes NL to \n, CR to \r, etc.
  */
-    static void
+    ساكن فراغ
 ga_concat_shorten_esc(garray_T *gap, char_u *str)
 {
     char_u  *p;
     char_u  *s;
-    int	    c;
-    int	    clen;
+    صحيح	    c;
+    صحيح	    clen;
     char_u  buf[NUMBUFLEN];
     size_t  buflen;
-    int	    same_len;
+    صحيح	    same_len;
 
-    if (str == NULL)
+    إذا (str == عدم)
     {
 	GA_CONCAT_LITERAL(gap, "NULL");
-	return;
+	أرجع;
     }
 
-    for (p = str; *p != NUL; )
+    لكل (p = str; *p != NUL; )
     {
 	same_len = 1;
 	s = p;
 	c = mb_cptr2char_adv(&s);
 	clen = s - p;
-	while (*s != NUL && c == mb_ptr2char(s))
+	طالما (*s != NUL && c == mb_ptr2char(s))
 	{
 	    ++same_len;
 	    s += clen;
 	}
-	if (same_len > 20)
+	إذا (same_len > 20)
 	{
 	    GA_CONCAT_LITERAL(gap, "\\[");
 	    ga_concat_esc(gap, p, clen);
 	    GA_CONCAT_LITERAL(gap, " occurs ");
-	    buflen = vim_snprintf_safelen((char *)buf, sizeof(buf),
+	    buflen = vim_snprintf_safelen((حرف *)buf, حجم(buf),
 		"%d", same_len);
 	    ga_concat_len(gap, buf, buflen);
 	    GA_CONCAT_LITERAL(gap, " times]");
 	    p = s;
 	}
-	else
+	وإلا
 	{
 	    ga_concat_esc(gap, p, clen);
 	    p += clen;
@@ -138,10 +138,10 @@ ga_concat_shorten_esc(garray_T *gap, char_u *str)
 /*
  * Fill "gap" with information about an assert error.
  */
-    static void
+    ساكن فراغ
 fill_assert_error(
     garray_T	*gap,
-    typval_T	*opt_msg_tv,
+    typval_T	*opt_پەیام_tv,
     char_u      *exp_str,
     typval_T	*exp_tv_arg,
     typval_T	*got_tv_arg,
@@ -151,84 +151,84 @@ fill_assert_error(
     char_u	*tofree;
     typval_T	*exp_tv = exp_tv_arg;
     typval_T	*got_tv = got_tv_arg;
-    int		did_copy = FALSE;
-    int		omitted = 0;
+    صحيح		did_copy = FALSE;
+    صحيح		omitted = 0;
 
-    if (opt_msg_tv->v_type != VAR_UNKNOWN
-	    && !(opt_msg_tv->v_type == VAR_STRING
-		&& (opt_msg_tv->vval.v_string == NULL
-		    || *opt_msg_tv->vval.v_string == NUL)))
+    إذا (opt_پەیام_tv->v_type != VAR_UNKNOWN
+	    && !(opt_پەیام_tv->v_type == VAR_STRING
+		&& (opt_پەیام_tv->vval.v_string == عدم
+		    || *opt_پەیام_tv->vval.v_string == NUL)))
     {
-	ga_concat(gap, echo_string(opt_msg_tv, &tofree, numbuf, 0));
+	ga_concat(gap, echo_string(opt_پەیام_tv, &tofree, numbuf, 0));
 	vim_free(tofree);
 	GA_CONCAT_LITERAL(gap, ": ");
     }
 
-    if (atype == ASSERT_MATCH || atype == ASSERT_NOTMATCH)
+    إذا (atype == ASSERT_MATCH || atype == ASSERT_NOTMATCH)
 	GA_CONCAT_LITERAL(gap, "Pattern ");
-    else if (atype == ASSERT_NOTEQUAL)
+    وإلا إذا (atype == ASSERT_NOTEQUAL)
 	GA_CONCAT_LITERAL(gap, "Expected not equal to ");
-    else
+    وإلا
 	GA_CONCAT_LITERAL(gap, "Expected ");
-    if (exp_str == NULL)
+    إذا (exp_str == عدم)
     {
 	// When comparing dictionaries, drop the items that are equal, so that
 	// it's a lot easier to see what differs.
-	if (atype != ASSERT_NOTEQUAL
+	إذا (atype != ASSERT_NOTEQUAL
 		&& exp_tv->v_type == VAR_DICT && got_tv->v_type == VAR_DICT
-		&& exp_tv->vval.v_dict != NULL && got_tv->vval.v_dict != NULL)
+		&& exp_tv->vval.v_dict != عدم && got_tv->vval.v_dict != عدم)
 	{
 	    dict_T	*exp_d = exp_tv->vval.v_dict;
 	    dict_T	*got_d = got_tv->vval.v_dict;
 	    hashitem_T	*hi;
 	    dictitem_T	*item2;
-	    int		todo;
+	    صحيح		todo;
 
 	    did_copy = TRUE;
 	    exp_tv->vval.v_dict = dict_alloc();
 	    got_tv->vval.v_dict = dict_alloc();
-	    if (exp_tv->vval.v_dict == NULL || got_tv->vval.v_dict == NULL)
+	    إذا (exp_tv->vval.v_dict == عدم || got_tv->vval.v_dict == عدم)
 	    {
 		dict_unref(exp_tv->vval.v_dict);
-		exp_tv->vval.v_dict = NULL;
+		exp_tv->vval.v_dict = عدم;
 		dict_unref(got_tv->vval.v_dict);
-		got_tv->vval.v_dict = NULL;
-		return;
+		got_tv->vval.v_dict = عدم;
+		أرجع;
 	    }
 
-	    todo = (int)exp_d->dv_hashtab.ht_used;
-	    FOR_ALL_HASHTAB_ITEMS(&exp_d->dv_hashtab, hi, todo)
+	    todo = (صحيح)exp_d->dv_hashtab.ht_used;
+	    FOR_ALL_HASHTAB_کاڵاکان(&exp_d->dv_hashtab, hi, todo)
 	    {
-		if (!HASHITEM_EMPTY(hi))
+		إذا (!HASHITEM_EMPTY(hi))
 		{
-		    item2 = dict_find(got_d, hi->hi_key, -1);
-		    if (item2 == NULL || !tv_equal(&HI2DI(hi)->di_tv,
+		    item2 = dict_find(got_d, hi->hi_کلیل, -1);
+		    إذا (item2 == عدم || !tv_equal(&HI2DI(hi)->di_tv,
 						  &item2->di_tv, FALSE))
 		    {
 			// item of exp_d not present in got_d or values differ.
 			dict_add_tv(exp_tv->vval.v_dict,
-					(char *)hi->hi_key, &HI2DI(hi)->di_tv);
-			if (item2 != NULL)
+					(حرف *)hi->hi_کلیل, &HI2DI(hi)->di_tv);
+			إذا (item2 != عدم)
 			    dict_add_tv(got_tv->vval.v_dict,
-					    (char *)hi->hi_key, &item2->di_tv);
+					    (حرف *)hi->hi_کلیل, &item2->di_tv);
 		    }
-		    else
+		    وإلا
 			++omitted;
 		    --todo;
 		}
 	    }
 
 	    // Add items only present in got_d.
-	    todo = (int)got_d->dv_hashtab.ht_used;
-	    FOR_ALL_HASHTAB_ITEMS(&got_d->dv_hashtab, hi, todo)
+	    todo = (صحيح)got_d->dv_hashtab.ht_used;
+	    FOR_ALL_HASHTAB_کاڵاکان(&got_d->dv_hashtab, hi, todo)
 	    {
-		if (!HASHITEM_EMPTY(hi))
+		إذا (!HASHITEM_EMPTY(hi))
 		{
-		    item2 = dict_find(exp_d, hi->hi_key, -1);
-		    if (item2 == NULL)
+		    item2 = dict_find(exp_d, hi->hi_کلیل, -1);
+		    إذا (item2 == عدم)
 			// item of got_d not present in exp_d
 			dict_add_tv(got_tv->vval.v_dict,
-					(char *)hi->hi_key, &HI2DI(hi)->di_tv);
+					(حرف *)hi->hi_کلیل, &HI2DI(hi)->di_tv);
 		    --todo;
 		}
 	    }
@@ -237,153 +237,153 @@ fill_assert_error(
 	ga_concat_shorten_esc(gap, tv2string(exp_tv, &tofree, numbuf, 0));
 	vim_free(tofree);
     }
-    else
+    وإلا
     {
-	if (atype == ASSERT_FAILS)
+	إذا (atype == ASSERT_FAILS)
 	    GA_CONCAT_LITERAL(gap, "'");
 	ga_concat_shorten_esc(gap, exp_str);
-	if (atype == ASSERT_FAILS)
+	إذا (atype == ASSERT_FAILS)
 	    GA_CONCAT_LITERAL(gap, "'");
     }
-    if (atype != ASSERT_NOTEQUAL)
+    إذا (atype != ASSERT_NOTEQUAL)
     {
-	if (atype == ASSERT_MATCH)
+	إذا (atype == ASSERT_MATCH)
 	    GA_CONCAT_LITERAL(gap, " does not match ");
-	else if (atype == ASSERT_NOTMATCH)
+	وإلا إذا (atype == ASSERT_NOTMATCH)
 	    GA_CONCAT_LITERAL(gap, " does match ");
-	else
+	وإلا
 	    GA_CONCAT_LITERAL(gap, " but got ");
 	ga_concat_shorten_esc(gap, tv2string(got_tv, &tofree, numbuf, 0));
 	vim_free(tofree);
 
-	if (omitted != 0)
+	إذا (omitted != 0)
 	{
-	    char    buf[100];
+	    حرف    buf[100];
 	    size_t  buflen;
 
-	    buflen = vim_snprintf_safelen(buf, sizeof(buf),
+	    buflen = vim_snprintf_safelen(buf, حجم(buf),
 		" - %d equal item%s omitted", omitted, omitted == 1 ? "" : "s");
 	    ga_concat_len(gap, (char_u *)buf, buflen);
 	}
     }
 
-    if (did_copy)
+    إذا (did_copy)
     {
 	clear_tv(exp_tv);
 	clear_tv(got_tv);
     }
 }
 
-    static int
+    ساكن صحيح
 assert_equal_common(typval_T *argvars, assert_type_T atype)
 {
     garray_T	ga;
 
-    if (tv_equal(&argvars[0], &argvars[1], FALSE)
+    إذا (tv_equal(&argvars[0], &argvars[1], FALSE)
 						   != (atype == ASSERT_EQUAL))
     {
 	prepare_assert_error(&ga);
-	fill_assert_error(&ga, &argvars[2], NULL, &argvars[0], &argvars[1],
+	fill_assert_error(&ga, &argvars[2], عدم, &argvars[0], &argvars[1],
 								       atype);
 	assert_error(&ga);
 	ga_clear(&ga);
-	return 1;
+	أرجع 1;
     }
-    return 0;
+    أرجع 0;
 }
 
-    static int
+    ساكن صحيح
 assert_match_common(typval_T *argvars, assert_type_T atype)
 {
     garray_T	ga;
     char_u	buf1[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
 
-    if (in_vim9script()
+    إذا (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return 1;
+	أرجع 1;
 
     char_u *pat = tv_get_string_buf_chk(&argvars[0], buf1);
     char_u *text = tv_get_string_buf_chk(&argvars[1], buf2);
-    if (pat != NULL && text != NULL
+    إذا (pat != عدم && text != عدم
 		 && pattern_match(pat, text, FALSE) != (atype == ASSERT_MATCH))
     {
 	prepare_assert_error(&ga);
-	fill_assert_error(&ga, &argvars[2], NULL, &argvars[0], &argvars[1],
+	fill_assert_error(&ga, &argvars[2], عدم, &argvars[0], &argvars[1],
 									atype);
 	assert_error(&ga);
 	ga_clear(&ga);
-	return 1;
+	أرجع 1;
     }
-    return 0;
+    أرجع 0;
 }
 
 /*
  * Common for assert_true() and assert_false().
  * Return non-zero for failure.
  */
-    static int
-assert_bool(typval_T *argvars, int isTrue)
+    ساكن صحيح
+assert_bool(typval_T *argvars, صحيح isTrue)
 {
-    int		error = FALSE;
+    صحيح		error = FALSE;
     garray_T	ga;
 
-    if (argvars[0].v_type == VAR_BOOL
-	    && argvars[0].vval.v_number == (isTrue ? VVAL_TRUE : VVAL_FALSE))
-	return 0;
-    if (argvars[0].v_type != VAR_NUMBER
-	    || (tv_get_number_chk(&argvars[0], &error) == 0) == isTrue
+    إذا (argvars[0].v_type == VAR_BOOL
+	    && argvars[0].vval.v_ژمار == (isTrue ? VVAL_TRUE : VVAL_FALSE))
+	أرجع 0;
+    إذا (argvars[0].v_type != VAR_ژمار
+	    || (tv_get_ژمار_chk(&argvars[0], &error) == 0) == isTrue
 	    || error)
     {
 	prepare_assert_error(&ga);
 	fill_assert_error(&ga, &argvars[1],
 		(char_u *)(isTrue ? "True" : "False"),
-		NULL, &argvars[0], ASSERT_OTHER);
+		عدم, &argvars[0], ASSERT_OTHER);
 	assert_error(&ga);
 	ga_clear(&ga);
-	return 1;
+	أرجع 1;
     }
-    return 0;
+    أرجع 0;
 }
 
-    static void
+    ساكن فراغ
 assert_append_cmd_or_arg(garray_T *gap, typval_T *argvars, char_u *cmd)
 {
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
 
-    if (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN)
+    إذا (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN)
     {
 	ga_concat(gap, echo_string(&argvars[2], &tofree, numbuf, 0));
 	vim_free(tofree);
     }
-    else
+    وإلا
 	ga_concat(gap, cmd);
 }
 
-    static int
-assert_beeps(typval_T *argvars, int no_beep)
+    ساكن صحيح
+assert_beeps(typval_T *argvars, صحيح no_beep)
 {
     char_u	*cmd;
     garray_T	ga;
-    int		ret = 0;
+    صحيح		ret = 0;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return 0;
+    إذا (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	أرجع 0;
 
     cmd = tv_get_string_chk(&argvars[0]);
     called_vim_beep = FALSE;
     suppress_errthrow = TRUE;
     emsg_silent = FALSE;
     do_cmdline_cmd(cmd);
-    if (no_beep ? called_vim_beep : !called_vim_beep)
+    إذا (no_beep ? called_vim_beep : !called_vim_beep)
     {
 	prepare_assert_error(&ga);
-	if (no_beep)
+	إذا (no_beep)
 	    GA_CONCAT_LITERAL(&ga, "command did beep: ");
-	else
+	وإلا
 	    GA_CONCAT_LITERAL(&ga, "command did not beep: ");
 	ga_concat(&ga, cmd);
 	assert_error(&ga);
@@ -393,43 +393,43 @@ assert_beeps(typval_T *argvars, int no_beep)
 
     suppress_errthrow = FALSE;
     emsg_on_display = FALSE;
-    return ret;
+    أرجع ret;
 }
 
 /*
  * "assert_beeps(cmd)" function
  */
-    void
+    فراغ
 f_assert_beeps(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    rettv->vval.v_number = assert_beeps(argvars, FALSE);
+    rettv->vval.v_ژمار = assert_beeps(argvars, FALSE);
 }
 
 /*
  * "assert_nobeep(cmd)" function
  */
-    void
+    فراغ
 f_assert_nobeep(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    rettv->vval.v_number = assert_beeps(argvars, TRUE);
+    rettv->vval.v_ژمار = assert_beeps(argvars, TRUE);
 }
 
 /*
  * "assert_equal(expected, actual[, msg])" function
  */
-    void
+    فراغ
 f_assert_equal(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = assert_equal_common(argvars, ASSERT_EQUAL);
+    rettv->vval.v_ژمار = assert_equal_common(argvars, ASSERT_EQUAL);
 }
 
-    static int
+    ساكن صحيح
 assert_equalfile(typval_T *argvars)
 {
     char_u	buf1[NUMBUFLEN];
@@ -438,75 +438,75 @@ assert_equalfile(typval_T *argvars)
     char_u	*fname2 = tv_get_string_buf_chk(&argvars[1], buf2);
     FILE	*fd1;
     FILE	*fd2;
-    char	line1[200];
-    char	line2[200];
-    int		lineidx = 0;
+    حرف	line1[200];
+    حرف	line2[200];
+    صحيح		lineidx = 0;
     size_t	IObufflen;
 
-    if (fname1 == NULL || fname2 == NULL)
-	return 0;
+    إذا (fname1 == عدم || fname2 == عدم)
+	أرجع 0;
 
     IObuff[0] = NUL;
     IObufflen = 0;
-    fd1 = mch_fopen((char *)fname1, READBIN);
-    if (fd1 == NULL)
+    fd1 = mch_fopen((حرف *)fname1, READBIN);
+    إذا (fd1 == عدم)
     {
-	IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE,
-	    (char *)e_cant_read_file_str, fname1);
+	IObufflen = vim_snprintf_safelen((حرف *)IObuff, IOSIZE,
+	    (حرف *)e_cant_read_file_str, fname1);
     }
-    else
+    وإلا
     {
-	fd2 = mch_fopen((char *)fname2, READBIN);
-	if (fd2 == NULL)
+	fd2 = mch_fopen((حرف *)fname2, READBIN);
+	إذا (fd2 == عدم)
 	{
 	    fclose(fd1);
-	    IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE,
-		(char *)e_cant_read_file_str, fname2);
+	    IObufflen = vim_snprintf_safelen((حرف *)IObuff, IOSIZE,
+		(حرف *)e_cant_read_file_str, fname2);
 	}
-	else
+	وإلا
 	{
-	    int	    c1, c2;
-	    long    count = 0;
+	    صحيح	    c1, c2;
+	    long    ژماردن = 0;
 	    long    linecount = 1;
 
-	    for (;;)
+	    لكل (;;)
 	    {
 		c1 = fgetc(fd1);
 		c2 = fgetc(fd2);
-		if (c1 == EOF)
+		إذا (c1 == EOF)
 		{
-		    if (c2 != EOF)
+		    إذا (c2 != EOF)
 		    {
 			STRCPY(IObuff, "first file is shorter");
 			IObufflen = 21;
 		    }
-		    break;
+		    اكسر;
 		}
-		else if (c2 == EOF)
+		وإلا إذا (c2 == EOF)
 		{
 		    STRCPY(IObuff, "second file is shorter");
 		    IObufflen = 22;
-		    break;
+		    اكسر;
 		}
-		else
+		وإلا
 		{
 		    line1[lineidx] = c1;
 		    line2[lineidx] = c2;
 		    ++lineidx;
-		    if (c1 != c2)
+		    إذا (c1 != c2)
 		    {
-			IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE,
-			    "difference at byte %ld, line %ld", count, linecount);
-			break;
+			IObufflen = vim_snprintf_safelen((حرف *)IObuff, IOSIZE,
+			    "difference at byte %ld, line %ld", ژماردن, linecount);
+			اكسر;
 		    }
 		}
-		++count;
-		if (c1 == NL)
+		++ژماردن;
+		إذا (c1 == NL)
 		{
 		    ++linecount;
 		    lineidx = 0;
 		}
-		else if (lineidx + 2 == (int)sizeof(line1))
+		وإلا إذا (lineidx + 2 == (صحيح)حجم(line1))
 		{
 		    mch_memmove(line1, line1 + 100, lineidx - 100);
 		    mch_memmove(line2, line2 + 100, lineidx - 100);
@@ -518,11 +518,11 @@ assert_equalfile(typval_T *argvars)
 	}
     }
 
-    if (IObufflen > 0)
+    إذا (IObufflen > 0)
     {
 	garray_T	ga;
 	prepare_assert_error(&ga);
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	إذا (argvars[2].v_type != VAR_UNKNOWN)
 	{
 	    char_u	numbuf[NUMBUFLEN];
 	    char_u	*tofree;
@@ -532,13 +532,13 @@ assert_equalfile(typval_T *argvars)
 	    GA_CONCAT_LITERAL(&ga, ": ");
 	}
 	ga_concat_len(&ga, IObuff, IObufflen);
-	if (lineidx > 0)
+	إذا (lineidx > 0)
 	{
 	    line1[lineidx] = NUL;
 	    line2[lineidx] = NUL;
 	    GA_CONCAT_LITERAL(&ga, " after \"");
 	    ga_concat_len(&ga, (char_u *)line1, lineidx);
-	    if (STRCMP(line1, line2) != 0)
+	    إذا (STRCMP(line1, line2) != 0)
 	    {
 		GA_CONCAT_LITERAL(&ga, "\" vs \"");
 		ga_concat_len(&ga, (char_u *)line2, lineidx);
@@ -547,91 +547,91 @@ assert_equalfile(typval_T *argvars)
 	}
 	assert_error(&ga);
 	ga_clear(&ga);
-	return 1;
+	أرجع 1;
     }
 
-    return 0;
+    أرجع 0;
 }
 
 /*
  * "assert_equalfile(fname-one, fname-two[, msg])" function
  */
-    void
+    فراغ
 f_assert_equalfile(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    إذا (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return;
+	أرجع;
 
-    rettv->vval.v_number = assert_equalfile(argvars);
+    rettv->vval.v_ژمار = assert_equalfile(argvars);
 }
 
 /*
  * "assert_notequal(expected, actual[, msg])" function
  */
-    void
+    فراغ
 f_assert_notequal(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = assert_equal_common(argvars, ASSERT_NOTEQUAL);
+    rettv->vval.v_ژمار = assert_equal_common(argvars, ASSERT_NOTEQUAL);
 }
 
 /*
  * "assert_exception(string[, msg])" function
  */
-    void
+    فراغ
 f_assert_exception(typval_T *argvars, typval_T *rettv)
 {
     garray_T	ga;
     char_u	*error;
 
-    if (in_vim9script()
+    إذا (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	أرجع;
 
     error = tv_get_string_chk(&argvars[0]);
-    if (*get_vim_var_str(VV_EXCEPTION) == NUL)
+    إذا (*get_vim_var_str(VV_EXCEPTION) == NUL)
     {
 	prepare_assert_error(&ga);
 	GA_CONCAT_LITERAL(&ga, "v:exception is not set");
 	assert_error(&ga);
 	ga_clear(&ga);
-	rettv->vval.v_number = 1;
+	rettv->vval.v_ژمار = 1;
     }
-    else if (error != NULL
-	&& strstr((char *)get_vim_var_str(VV_EXCEPTION), (char *)error) == NULL)
+    وإلا إذا (error != عدم
+	&& strstr((حرف *)get_vim_var_str(VV_EXCEPTION), (حرف *)error) == عدم)
     {
 	prepare_assert_error(&ga);
-	fill_assert_error(&ga, &argvars[1], NULL, &argvars[0],
+	fill_assert_error(&ga, &argvars[1], عدم, &argvars[0],
 				  get_vim_var_tv(VV_EXCEPTION), ASSERT_OTHER);
 	assert_error(&ga);
 	ga_clear(&ga);
-	rettv->vval.v_number = 1;
+	rettv->vval.v_ژمار = 1;
     }
 }
 
 /*
  * "assert_fails(cmd [, error[, msg]])" function
  */
-    void
+    فراغ
 f_assert_fails(typval_T *argvars, typval_T *rettv)
 {
     garray_T	ga;
-    int		save_trylevel = trylevel;
-    int		called_emsg_before = called_emsg;
-    char	*wrong_arg_msg = NULL;
-    char_u	*tofree = NULL;
+    صحيح		save_trylevel = trylevel;
+    صحيح		called_emsg_before = called_emsg;
+    حرف	*wrong_arg_پەیام = عدم;
+    char_u	*tofree = عدم;
 
-    if (check_for_string_or_number_arg(argvars, 0) == FAIL
+    إذا (check_for_string_or_ژمار_arg(argvars, 0) == FAIL
 	    || check_for_opt_string_or_list_arg(argvars, 1) == FAIL
 	    || (argvars[1].v_type != VAR_UNKNOWN
 		&& (argvars[2].v_type != VAR_UNKNOWN
-		    && (check_for_opt_number_arg(argvars, 3) == FAIL
+		    && (check_for_opt_ژمار_arg(argvars, 3) == FAIL
 			|| (argvars[3].v_type != VAR_UNKNOWN
 			    && check_for_opt_string_arg(argvars, 4) == FAIL)))))
-	return;
+	أرجع;
 
     // trylevel must be zero for a ":throw" command to be considered failed
     trylevel = 0;
@@ -646,62 +646,62 @@ f_assert_fails(typval_T *argvars, typval_T *rettv)
     trylevel = save_trylevel;
     suppress_errthrow = FALSE;
 
-    if (called_emsg == called_emsg_before)
+    إذا (called_emsg == called_emsg_before)
     {
 	prepare_assert_error(&ga);
 	GA_CONCAT_LITERAL(&ga, "command did not fail: ");
 	assert_append_cmd_or_arg(&ga, argvars, cmd);
 	assert_error(&ga);
 	ga_clear(&ga);
-	rettv->vval.v_number = 1;
+	rettv->vval.v_ژمار = 1;
     }
-    else if (argvars[1].v_type != VAR_UNKNOWN)
+    وإلا إذا (argvars[1].v_type != VAR_UNKNOWN)
     {
 	char_u	buf[NUMBUFLEN];
 	char_u	*expected;
-	char_u	*expected_str = NULL;
-	int	error_found = FALSE;
-	int	error_found_index = 1;
-	char_u	*actual = emsg_assert_fails_msg == NULL ? (char_u *)"[unknown]"
-						       : emsg_assert_fails_msg;
+	char_u	*expected_str = عدم;
+	صحيح	error_found = FALSE;
+	صحيح	error_found_index = 1;
+	char_u	*actual = emsg_assert_fails_پەیام == عدم ? (char_u *)"[unknown]"
+						       : emsg_assert_fails_پەیام;
 
-	if (argvars[1].v_type == VAR_STRING)
+	إذا (argvars[1].v_type == VAR_STRING)
 	{
 	    expected = tv_get_string_buf_chk(&argvars[1], buf);
-	    error_found = expected == NULL
-			   || strstr((char *)actual, (char *)expected) == NULL;
+	    error_found = expected == عدم
+			   || strstr((حرف *)actual, (حرف *)expected) == عدم;
 	}
-	else if (argvars[1].v_type == VAR_LIST)
+	وإلا إذا (argvars[1].v_type == VAR_LIST)
 	{
 	    list_T	*list = argvars[1].vval.v_list;
 	    typval_T	*tv;
 
-	    if (list == NULL || list->lv_len < 1 || list->lv_len > 2)
+	    إذا (list == عدم || list->lv_len < 1 || list->lv_len > 2)
 	    {
-		wrong_arg_msg = e_assert_fails_second_arg;
-		goto theend;
+		wrong_arg_پەیام = e_assert_fails_second_arg;
+		اذهب theend;
 	    }
 	    CHECK_LIST_MATERIALIZE(list);
 	    tv = &list->lv_first->li_tv;
 	    expected = tv_get_string_buf_chk(tv, buf);
-	    if (expected == NULL)
-		goto theend;
-	    if (!pattern_match(expected, actual, FALSE))
+	    إذا (expected == عدم)
+		اذهب theend;
+	    إذا (!pattern_match(expected, actual, FALSE))
 	    {
 		error_found = TRUE;
 		expected_str = expected;
 	    }
-	    else if (list->lv_len == 2)
+	    وإلا إذا (list->lv_len == 2)
 	    {
 		// make a copy, an error in pattern_match() may free it
 		tofree = actual = vim_strsave(get_vim_var_str(VV_ERRMSG));
-		if (actual != NULL)
+		إذا (actual != عدم)
 		{
 		    tv = &list->lv_u.mat.lv_last->li_tv;
 		    expected = tv_get_string_buf_chk(tv, buf);
-		    if (expected == NULL)
-			goto theend;
-		    if (!pattern_match(expected, actual, FALSE))
+		    إذا (expected == عدم)
+			اذهب theend;
+		    إذا (!pattern_match(expected, actual, FALSE))
 		    {
 			error_found = TRUE;
 			expected_str = expected;
@@ -709,34 +709,34 @@ f_assert_fails(typval_T *argvars, typval_T *rettv)
 		}
 	    }
 	}
-	else
+	وإلا
 	{
-	    wrong_arg_msg = e_assert_fails_second_arg;
-	    goto theend;
+	    wrong_arg_پەیام = e_assert_fails_second_arg;
+	    اذهب theend;
 	}
 
-	if (!error_found && argvars[2].v_type != VAR_UNKNOWN
+	إذا (!error_found && argvars[2].v_type != VAR_UNKNOWN
 		&& argvars[3].v_type != VAR_UNKNOWN)
 	{
-	    if (argvars[3].v_type != VAR_NUMBER)
+	    إذا (argvars[3].v_type != VAR_ژمار)
 	    {
-		wrong_arg_msg = e_assert_fails_fourth_argument;
-		goto theend;
+		wrong_arg_پەیام = e_assert_fails_fourth_argument;
+		اذهب theend;
 	    }
-	    else if (argvars[3].vval.v_number >= 0
-			 && argvars[3].vval.v_number != emsg_assert_fails_lnum)
+	    وإلا إذا (argvars[3].vval.v_ژمار >= 0
+			 && argvars[3].vval.v_ژمار != emsg_assert_fails_lnum)
 	    {
 		error_found = TRUE;
 		error_found_index = 3;
 	    }
-	    if (!error_found && argvars[4].v_type != VAR_UNKNOWN)
+	    إذا (!error_found && argvars[4].v_type != VAR_UNKNOWN)
 	    {
-		if (argvars[4].v_type != VAR_STRING)
+		إذا (argvars[4].v_type != VAR_STRING)
 		{
-		    wrong_arg_msg = e_assert_fails_fifth_argument;
-		    goto theend;
+		    wrong_arg_پەیام = e_assert_fails_fifth_argument;
+		    اذهب theend;
 		}
-		else if (argvars[4].vval.v_string != NULL
+		وإلا إذا (argvars[4].vval.v_string != عدم
 		    && !pattern_match(argvars[4].vval.v_string,
 					     emsg_assert_fails_context, FALSE))
 		{
@@ -746,22 +746,22 @@ f_assert_fails(typval_T *argvars, typval_T *rettv)
 	    }
 	}
 
-	if (error_found)
+	إذا (error_found)
 	{
 	    typval_T actual_tv;
 
 	    prepare_assert_error(&ga);
-	    if (error_found_index == 3)
+	    إذا (error_found_index == 3)
 	    {
-		actual_tv.v_type = VAR_NUMBER;
-		actual_tv.vval.v_number = emsg_assert_fails_lnum;
+		actual_tv.v_type = VAR_ژمار;
+		actual_tv.vval.v_ژمار = emsg_assert_fails_lnum;
 	    }
-	    else if (error_found_index == 4)
+	    وإلا إذا (error_found_index == 4)
 	    {
 		actual_tv.v_type = VAR_STRING;
 		actual_tv.vval.v_string = emsg_assert_fails_context;
 	    }
-	    else
+	    وإلا
 	    {
 		actual_tv.v_type = VAR_STRING;
 		actual_tv.vval.v_string = actual;
@@ -772,7 +772,7 @@ f_assert_fails(typval_T *argvars, typval_T *rettv)
 	    assert_append_cmd_or_arg(&ga, argvars, cmd);
 	    assert_error(&ga);
 	    ga_clear(&ga);
-	    rettv->vval.v_number = 1;
+	    rettv->vval.v_ژمار = 1;
 	}
     }
 
@@ -782,36 +782,36 @@ theend:
     in_assert_fails = FALSE;
     did_emsg = FALSE;
     got_int = FALSE;
-    msg_col = 0;
+    پەیام_col = 0;
     --no_wait_return;
     need_wait_return = FALSE;
     emsg_on_display = FALSE;
-    msg_scrolled = 0;
-    lines_left = Rows;
-    VIM_CLEAR(emsg_assert_fails_msg);
+    پەیام_scrolled = 0;
+    هێڵەکان_چەپ = Rows;
+    VIM_CLEAR(emsg_assert_fails_پەیام);
     vim_free(tofree);
-    set_vim_var_string(VV_ERRMSG, NULL, 0);
-    if (wrong_arg_msg != NULL)
-	emsg(_(wrong_arg_msg));
+    set_vim_var_string(VV_ERRMSG, عدم, 0);
+    إذا (wrong_arg_پەیام != عدم)
+	emsg(_(wrong_arg_پەیام));
 }
 
 /*
  * "assert_false(actual[, msg])" function
  */
-    void
+    فراغ
 f_assert_false(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = assert_bool(argvars, FALSE);
+    rettv->vval.v_ژمار = assert_bool(argvars, FALSE);
 }
 
-    static int
+    ساكن صحيح
 assert_inrange(typval_T *argvars)
 {
     garray_T	ga;
-    int		error = FALSE;
+    صحيح		error = FALSE;
     char_u	expected_str[200];
 
-    if (argvars[0].v_type == VAR_FLOAT
+    إذا (argvars[0].v_type == VAR_FLOAT
 	    || argvars[1].v_type == VAR_FLOAT
 	    || argvars[2].v_type == VAR_FLOAT)
     {
@@ -819,137 +819,137 @@ assert_inrange(typval_T *argvars)
 	float_T fupper = tv_get_float(&argvars[1]);
 	float_T factual = tv_get_float(&argvars[2]);
 
-	if (factual < flower || factual > fupper)
+	إذا (factual < flower || factual > fupper)
 	{
 	    prepare_assert_error(&ga);
-	    vim_snprintf((char *)expected_str, 200, "range %g - %g,",
+	    vim_snprintf((حرف *)expected_str, 200, "range %g - %g,",
 							       flower, fupper);
-	    fill_assert_error(&ga, &argvars[3], expected_str, NULL,
+	    fill_assert_error(&ga, &argvars[3], expected_str, عدم,
 						    &argvars[2], ASSERT_OTHER);
 	    assert_error(&ga);
 	    ga_clear(&ga);
-	    return 1;
+	    أرجع 1;
 	}
     }
-    else
+    وإلا
     {
-	varnumber_T	lower = tv_get_number_chk(&argvars[0], &error);
-	varnumber_T	upper = tv_get_number_chk(&argvars[1], &error);
-	varnumber_T	actual = tv_get_number_chk(&argvars[2], &error);
+	varnumber_T	lower = tv_get_ژمار_chk(&argvars[0], &error);
+	varnumber_T	upper = tv_get_ژمار_chk(&argvars[1], &error);
+	varnumber_T	actual = tv_get_ژمار_chk(&argvars[2], &error);
 
-	if (error)
-	    return 0;
-	if (actual < lower || actual > upper)
+	إذا (error)
+	    أرجع 0;
+	إذا (actual < lower || actual > upper)
 	{
 	    prepare_assert_error(&ga);
-	    vim_snprintf((char *)expected_str, 200, "range %ld - %ld,",
+	    vim_snprintf((حرف *)expected_str, 200, "range %ld - %ld,",
 						     (long)lower, (long)upper);
-	    fill_assert_error(&ga, &argvars[3], expected_str, NULL,
+	    fill_assert_error(&ga, &argvars[3], expected_str, عدم,
 						    &argvars[2], ASSERT_OTHER);
 	    assert_error(&ga);
 	    ga_clear(&ga);
-	    return 1;
+	    أرجع 1;
 	}
     }
-    return 0;
+    أرجع 0;
 }
 
 /*
  * "assert_inrange(lower, upper[, msg])" function
  */
-    void
+    فراغ
 f_assert_inrange(typval_T *argvars, typval_T *rettv)
 {
-    if (check_for_float_or_nr_arg(argvars, 0) == FAIL
+    إذا (check_for_float_or_nr_arg(argvars, 0) == FAIL
 	    || check_for_float_or_nr_arg(argvars, 1) == FAIL
 	    || check_for_float_or_nr_arg(argvars, 2) == FAIL
 	    || check_for_opt_string_arg(argvars, 3) == FAIL)
-	return;
+	أرجع;
 
-    rettv->vval.v_number = assert_inrange(argvars);
+    rettv->vval.v_ژمار = assert_inrange(argvars);
 }
 
 /*
  * "assert_match(pattern, actual[, msg])" function
  */
-    void
+    فراغ
 f_assert_match(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = assert_match_common(argvars, ASSERT_MATCH);
+    rettv->vval.v_ژمار = assert_match_common(argvars, ASSERT_MATCH);
 }
 
 /*
  * "assert_notmatch(pattern, actual[, msg])" function
  */
-    void
+    فراغ
 f_assert_notmatch(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = assert_match_common(argvars, ASSERT_NOTMATCH);
+    rettv->vval.v_ژمار = assert_match_common(argvars, ASSERT_NOTMATCH);
 }
 
 /*
  * "assert_report(msg)" function
  */
-    void
+    فراغ
 f_assert_report(typval_T *argvars, typval_T *rettv)
 {
     garray_T	ga;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
     prepare_assert_error(&ga);
     ga_concat(&ga, tv_get_string(&argvars[0]));
     assert_error(&ga);
     ga_clear(&ga);
-    rettv->vval.v_number = 1;
+    rettv->vval.v_ژمار = 1;
 }
 
 /*
  * "assert_true(actual[, msg])" function
  */
-    void
+    فراغ
 f_assert_true(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = assert_bool(argvars, TRUE);
+    rettv->vval.v_ژمار = assert_bool(argvars, TRUE);
 }
 
 /*
  * "test_alloc_fail(id, countdown, repeat)" function
  */
-    void
+    فراغ
 f_test_alloc_fail(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_number_arg(argvars, 2) == FAIL))
-	return;
+    إذا (in_vim9script()
+	    && (check_for_ژمار_arg(argvars, 0) == FAIL
+		|| check_for_ژمار_arg(argvars, 1) == FAIL
+		|| check_for_ژمار_arg(argvars, 2) == FAIL))
+	أرجع;
 
-    if (argvars[0].v_type != VAR_NUMBER
-	    || argvars[0].vval.v_number <= 0
-	    || argvars[1].v_type != VAR_NUMBER
-	    || argvars[1].vval.v_number < 0
-	    || argvars[2].v_type != VAR_NUMBER)
+    إذا (argvars[0].v_type != VAR_ژمار
+	    || argvars[0].vval.v_ژمار <= 0
+	    || argvars[1].v_type != VAR_ژمار
+	    || argvars[1].vval.v_ژمار < 0
+	    || argvars[2].v_type != VAR_ژمار)
 	emsg(_(e_invalid_argument));
-    else
+    وإلا
     {
-	alloc_fail_id = argvars[0].vval.v_number;
-	if (alloc_fail_id >= aid_last)
+	alloc_fail_id = argvars[0].vval.v_ژمار;
+	إذا (alloc_fail_id >= aid_last)
 	    emsg(_(e_invalid_argument));
-	alloc_fail_countdown = argvars[1].vval.v_number;
-	alloc_fail_repeat = argvars[2].vval.v_number;
-	did_outofmem_msg = FALSE;
+	alloc_fail_countdown = argvars[1].vval.v_ژمار;
+	alloc_fail_repeat = argvars[2].vval.v_ژمار;
+	did_outofmem_پەیام = FALSE;
     }
 }
 
 /*
  * "test_autochdir()"
  */
-    void
+    فراغ
 f_test_autochdir(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-#if defined(FEAT_AUTOCHDIR)
+#إذا defined(FEAT_AUTOCHDIR)
     test_autochdir = TRUE;
 #endif
 }
@@ -957,26 +957,26 @@ f_test_autochdir(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 /*
  * "test_feedinput()"
  */
-    void
+    فراغ
 f_test_feedinput(typval_T *argvars, typval_T *rettv UNUSED)
 {
-#ifdef USE_INPUT_BUF
+#ifdef USE_تێخستن_BUF
     char_u	*val;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
     val = tv_get_string_chk(&argvars[0]);
 # ifdef VIMDLL
     // this doesn't work in the console
-    if (!gui.in_use)
-	return;
+    إذا (!gui.in_use)
+	أرجع;
 # endif
 
-    if (val != NULL)
+    إذا (val != عدم)
     {
-	trash_input_buf();
-	add_to_input_buf_csi(val, (int)STRLEN(val));
+	trash_تێخستن_buf();
+	add_to_تێخستن_buf_csi(val, (صحيح)STRLEN(val));
     }
 #endif
 }
@@ -984,100 +984,100 @@ f_test_feedinput(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * "test_getvalue({name})" function
  */
-    void
+    فراغ
 f_test_getvalue(typval_T *argvars, typval_T *rettv)
 {
     char_u *name;
 
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
     name = tv_get_string(&argvars[0]);
 
-    if (STRCMP(name, (char_u *)"need_fileinfo") == 0)
-	rettv->vval.v_number = need_fileinfo;
-    else
+    إذا (STRCMP(name, (char_u *)"need_fileinfo") == 0)
+	rettv->vval.v_ژمار = need_fileinfo;
+    وإلا
 	semsg(_(e_invalid_argument_str), name);
 }
 
 /*
  * "test_option_not_set({name})" function
  */
-    void
+    فراغ
 f_test_option_not_set(typval_T *argvars, typval_T *rettv UNUSED)
 {
     char_u *name = (char_u *)"";
 
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
     name = tv_get_string(&argvars[0]);
-    if (reset_option_was_set(name) == FAIL)
+    إذا (reset_option_was_set(name) == FAIL)
 	semsg(_(e_invalid_argument_str), name);
 }
 
 /*
  * "test_override({name}, {val})" function
  */
-    void
+    فراغ
 f_test_override(typval_T *argvars, typval_T *rettv UNUSED)
 {
     char_u *name = (char_u *)"";
-    int     val;
-    static int save_starting = -1;
+    صحيح     val;
+    ساكن صحيح save_starting = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL)
-	return;
+    إذا (check_for_string_arg(argvars, 0) == FAIL
+		|| check_for_ژمار_arg(argvars, 1) == FAIL)
+	أرجع;
 
     name = tv_get_string(&argvars[0]);
-    val = (int)tv_get_number(&argvars[1]);
+    val = (صحيح)tv_get_ژمار(&argvars[1]);
 
-    if (STRCMP(name, (char_u *)"redraw") == 0)
+    إذا (STRCMP(name, (char_u *)"redraw") == 0)
 	disable_redraw_for_testing = val;
-    else if (STRCMP(name, (char_u *)"redraw_flag") == 0)
+    وإلا إذا (STRCMP(name, (char_u *)"redraw_flag") == 0)
 	ignore_redraw_flag_for_testing = val;
-    else if (STRCMP(name, (char_u *)"char_avail") == 0)
+    وإلا إذا (STRCMP(name, (char_u *)"char_avail") == 0)
 	disable_char_avail_for_testing = val;
-    else if (STRCMP(name, (char_u *)"starting") == 0)
+    وإلا إذا (STRCMP(name, (char_u *)"starting") == 0)
     {
-	if (val)
+	إذا (val)
 	{
-	    if (save_starting < 0)
+	    إذا (save_starting < 0)
 		save_starting = starting;
 	    starting = 0;
 	}
-	else
+	وإلا
 	{
 	    starting = save_starting;
 	    save_starting = -1;
 	}
     }
-    else if (STRCMP(name, (char_u *)"nfa_fail") == 0)
+    وإلا إذا (STRCMP(name, (char_u *)"nfa_fail") == 0)
 	nfa_fail_for_testing = val;
-    else if (STRCMP(name, (char_u *)"syn_idlist_cache") == 0)
+    وإلا إذا (STRCMP(name, (char_u *)"syn_idlist_cache") == 0)
 	disable_syn_idlist_cache_for_testing = val;
-    else if (STRCMP(name, (char_u *)"no_query_mouse") == 0)
+    وإلا إذا (STRCMP(name, (char_u *)"no_query_mouse") == 0)
 	no_query_mouse_for_testing = val;
-    else if (STRCMP(name, (char_u *)"no_wait_return") == 0)
+    وإلا إذا (STRCMP(name, (char_u *)"no_wait_return") == 0)
 	no_wait_return = val;
-    else if (STRCMP(name, (char_u *)"ui_delay") == 0)
+    وإلا إذا (STRCMP(name, (char_u *)"ui_delay") == 0)
 	ui_delay_for_testing = val;
-    else if (STRCMP(name, (char_u *)"unreachable") == 0)
+    وإلا إذا (STRCMP(name, (char_u *)"unreachable") == 0)
 	ignore_unreachable_code_for_testing = val;
-    else if (STRCMP(name, (char_u *)"term_props") == 0)
+    وإلا إذا (STRCMP(name, (char_u *)"term_props") == 0)
 	reset_term_props_on_termresponse = val;
-    else if (STRCMP(name, (char_u *)"vterm_title") == 0)
+    وإلا إذا (STRCMP(name, (char_u *)"vterm_title") == 0)
 	disable_vterm_title_for_testing = val;
-    else if (STRCMP(name, (char_u *)"uptime") == 0)
+    وإلا إذا (STRCMP(name, (char_u *)"uptime") == 0)
 	override_sysinfo_uptime = val;
-    else if (STRCMP(name, (char_u *)"alloc_lines") == 0)
-	ml_get_alloc_lines = val;
-    else if (STRCMP(name, (char_u *)"autoload") == 0)
+    وإلا إذا (STRCMP(name, (char_u *)"alloc_lines") == 0)
+	ml_get_alloc_هێڵەکان = val;
+    وإلا إذا (STRCMP(name, (char_u *)"autoload") == 0)
 	override_autoload = val;
-    else if (STRCMP(name, (char_u *)"defcompile") == 0)
+    وإلا إذا (STRCMP(name, (char_u *)"defcompile") == 0)
 	override_defcompile = val;
-    else if (STRCMP(name, (char_u *)"ALL") == 0)
+    وإلا إذا (STRCMP(name, (char_u *)"ALL") == 0)
     {
 	disable_char_avail_for_testing = FALSE;
 	disable_redraw_for_testing = FALSE;
@@ -1089,116 +1089,116 @@ f_test_override(typval_T *argvars, typval_T *rettv UNUSED)
 	reset_term_props_on_termresponse = FALSE;
 	override_sysinfo_uptime = -1;
 	// ml_get_alloc_lines is not reset by "ALL"
-	if (save_starting >= 0)
+	إذا (save_starting >= 0)
 	{
 	    starting = save_starting;
 	    save_starting = -1;
 	}
     }
-    else
+    وإلا
 	semsg(_(e_invalid_argument_str), name);
 }
 
 /*
  * "test_refcount({expr})" function
  */
-    void
+    فراغ
 f_test_refcount(typval_T *argvars, typval_T *rettv)
 {
-    int retval = -1;
+    صحيح retval = -1;
 
-    switch (argvars[0].v_type)
+    بدل (argvars[0].v_type)
     {
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_NUMBER:
-	case VAR_BOOL:
-	case VAR_FLOAT:
-	case VAR_SPECIAL:
-	case VAR_STRING:
-	case VAR_INSTR:
-	    break;
+	حالة VAR_UNKNOWN:
+	حالة VAR_ANY:
+	حالة VAR_VOID:
+	حالة VAR_ژمار:
+	حالة VAR_BOOL:
+	حالة VAR_FLOAT:
+	حالة VAR_SPECIAL:
+	حالة VAR_STRING:
+	حالة VAR_INSTR:
+	    اكسر;
 
-	case VAR_JOB:
+	حالة VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
-	    if (argvars[0].vval.v_job != NULL)
+	    إذا (argvars[0].vval.v_job != عدم)
 		retval = argvars[0].vval.v_job->jv_refcount - 1;
 #endif
-	    break;
-	case VAR_CHANNEL:
+	    اكسر;
+	حالة VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
-	    if (argvars[0].vval.v_channel != NULL)
+	    إذا (argvars[0].vval.v_channel != عدم)
 		retval = argvars[0].vval.v_channel->ch_refcount - 1;
 #endif
-	    break;
-	case VAR_FUNC:
-	    if (argvars[0].vval.v_string != NULL)
+	    اكسر;
+	حالة VAR_FUNC:
+	    إذا (argvars[0].vval.v_string != عدم)
 	    {
 		ufunc_T *fp;
 
 		fp = find_func(argvars[0].vval.v_string, FALSE);
-		if (fp != NULL)
+		إذا (fp != عدم)
 		    retval = fp->uf_refcount;
 	    }
-	    break;
-	case VAR_PARTIAL:
-	    if (argvars[0].vval.v_partial != NULL)
+	    اكسر;
+	حالة VAR_PARTIAL:
+	    إذا (argvars[0].vval.v_partial != عدم)
 		retval = argvars[0].vval.v_partial->pt_refcount - 1;
-	    break;
-	case VAR_BLOB:
-	    if (argvars[0].vval.v_blob != NULL)
+	    اكسر;
+	حالة VAR_BLOB:
+	    إذا (argvars[0].vval.v_blob != عدم)
 		retval = argvars[0].vval.v_blob->bv_refcount - 1;
-	    break;
-	case VAR_LIST:
-	    if (argvars[0].vval.v_list != NULL)
+	    اكسر;
+	حالة VAR_LIST:
+	    إذا (argvars[0].vval.v_list != عدم)
 		retval = argvars[0].vval.v_list->lv_refcount - 1;
-	    break;
-	case VAR_TUPLE:
-	    if (argvars[0].vval.v_tuple != NULL)
+	    اكسر;
+	حالة VAR_TUPLE:
+	    إذا (argvars[0].vval.v_tuple != عدم)
 		retval = argvars[0].vval.v_tuple->tv_refcount - 1;
-	    break;
-	case VAR_DICT:
-	    if (argvars[0].vval.v_dict != NULL)
+	    اكسر;
+	حالة VAR_DICT:
+	    إذا (argvars[0].vval.v_dict != عدم)
 		retval = argvars[0].vval.v_dict->dv_refcount - 1;
-	    break;
-	case VAR_CLASS:
-	    if (argvars[0].vval.v_class != NULL)
+	    اكسر;
+	حالة VAR_CLASS:
+	    إذا (argvars[0].vval.v_class != عدم)
 		retval = argvars[0].vval.v_class->class_refcount - 1;
-	    break;
-	case VAR_OBJECT:
-	    if (argvars[0].vval.v_object != NULL)
+	    اكسر;
+	حالة VAR_OBJECT:
+	    إذا (argvars[0].vval.v_object != عدم)
 		retval = argvars[0].vval.v_object->obj_refcount - 1;
-	    break;
-	case VAR_TYPEALIAS:
-	    if (argvars[0].vval.v_typealias != NULL)
+	    اكسر;
+	حالة VAR_TYPEALIAS:
+	    إذا (argvars[0].vval.v_typealias != عدم)
 		retval = argvars[0].vval.v_typealias->ta_refcount - 1;
-	    break;
+	    اكسر;
     }
 
-    rettv->v_type = VAR_NUMBER;
-    rettv->vval.v_number = retval;
+    rettv->v_type = VAR_ژمار;
+    rettv->vval.v_ژمار = retval;
 
 }
 
 /*
  * "test_garbagecollect_now()" function
  */
-    void
+    فراغ
 f_test_garbagecollect_now(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
     // This is dangerous, any Lists and Dicts used internally may be freed
     // while still in use.
-    if (!get_vim_var_nr(VV_TESTING))
+    إذا (!get_vim_var_nr(VV_TESTING))
 	emsg(_(e_calling_test_garbagecollect_now_while_v_testing_is_not_set));
-    else
+    وإلا
 	garbage_collect(TRUE);
 }
 
 /*
  * "test_garbagecollect_soon()" function
  */
-    void
+    فراغ
 f_test_garbagecollect_soon(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
     may_garbage_collect = TRUE;
@@ -1207,230 +1207,230 @@ f_test_garbagecollect_soon(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 /*
  * "test_ignore_error()" function
  */
-    void
+    فراغ
 f_test_ignore_error(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
     ignore_error_for_testing(tv_get_string(&argvars[0]));
 }
 
-    void
+    فراغ
 f_test_null_blob(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_BLOB;
-    rettv->vval.v_blob = NULL;
+    rettv->vval.v_blob = عدم;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
-    void
+#إذا defined(FEAT_JOB_CHANNEL)
+    فراغ
 f_test_null_channel(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_CHANNEL;
-    rettv->vval.v_channel = NULL;
+    rettv->vval.v_channel = عدم;
 }
 #endif
 
-    void
+    فراغ
 f_test_null_dict(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv_dict_set(rettv, NULL);
+    rettv_dict_set(rettv, عدم);
 }
 
-#if defined(FEAT_JOB_CHANNEL)
-    void
+#إذا defined(FEAT_JOB_CHANNEL)
+    فراغ
 f_test_null_job(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_JOB;
-    rettv->vval.v_job = NULL;
+    rettv->vval.v_job = عدم;
 }
 #endif
 
-    void
+    فراغ
 f_test_null_list(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv_list_set(rettv, NULL);
+    rettv_list_set(rettv, عدم);
 }
 
-    void
+    فراغ
 f_test_null_function(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_FUNC;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = عدم;
 }
 
-    void
+    فراغ
 f_test_null_partial(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_PARTIAL;
-    rettv->vval.v_partial = NULL;
+    rettv->vval.v_partial = عدم;
 }
 
-    void
+    فراغ
 f_test_null_string(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = عدم;
 }
 
-    void
+    فراغ
 f_test_null_tuple(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv_tuple_set(rettv, NULL);
+    rettv_tuple_set(rettv, عدم);
 }
 
-    void
+    فراغ
 f_test_unknown(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_UNKNOWN;
 }
 
-    void
+    فراغ
 f_test_void(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_VOID;
 }
 
-    void
+    فراغ
 f_test_setmouse(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+    إذا (in_vim9script()
+	    && (check_for_ژمار_arg(argvars, 0) == FAIL
+		|| check_for_ژمار_arg(argvars, 1) == FAIL))
+	أرجع;
 
-    if (argvars[0].v_type != VAR_NUMBER || argvars[1].v_type != VAR_NUMBER)
+    إذا (argvars[0].v_type != VAR_ژمار || argvars[1].v_type != VAR_ژمار)
     {
 	emsg(_(e_invalid_argument));
-	return;
+	أرجع;
     }
 
-    mouse_row = (time_t)tv_get_number(&argvars[0]) - 1;
-    mouse_col = (time_t)tv_get_number(&argvars[1]) - 1;
+    mouse_row = (time_t)tv_get_ژمار(&argvars[0]) - 1;
+    mouse_col = (time_t)tv_get_ژمار(&argvars[1]) - 1;
 }
 
 #ifdef FEAT_GUI
-    static int
+    ساكن صحيح
 test_gui_drop_files(dict_T *args UNUSED)
 {
-# if defined(HAVE_DROP_FILE)
-    int		row;
-    int		col;
+# إذا defined(HAVE_DROP_FILE)
+    صحيح		row;
+    صحيح		col;
     int_u	mods;
     char_u	**fnames;
-    int		count = 0;
+    صحيح		ژماردن = 0;
     typval_T	t;
     list_T	*l;
     listitem_T	*li;
 
-    if (!dict_has_key(args, "files")
-	    || !dict_has_key(args, "row")
-	    || !dict_has_key(args, "col")
-	    || !dict_has_key(args, "modifiers"))
-	return FALSE;
+    إذا (!dict_has_کلیل(args, "files")
+	    || !dict_has_کلیل(args, "row")
+	    || !dict_has_کلیل(args, "col")
+	    || !dict_has_کلیل(args, "modifiers"))
+	أرجع FALSE;
 
-    (void)dict_get_tv(args, "files", &t);
-    row = (int)dict_get_number(args, "row");
-    col = (int)dict_get_number(args, "col");
-    mods = (int)dict_get_number(args, "modifiers");
+    (فراغ)dict_get_tv(args, "files", &t);
+    row = (صحيح)dict_get_ژمار(args, "row");
+    col = (صحيح)dict_get_ژمار(args, "col");
+    mods = (صحيح)dict_get_ژمار(args, "modifiers");
 
-    if (t.v_type != VAR_LIST || list_len(t.vval.v_list) == 0)
-	return FALSE;
+    إذا (t.v_type != VAR_LIST || list_len(t.vval.v_list) == 0)
+	أرجع FALSE;
 
     l = t.vval.v_list;
     fnames = ALLOC_MULT(char_u *, list_len(l));
-    if (fnames == NULL)
-	return FALSE;
+    إذا (fnames == عدم)
+	أرجع FALSE;
 
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_کاڵاکان(l, li)
     {
 	// ignore non-string items
-	if (li->li_tv.v_type != VAR_STRING
-		|| li->li_tv.vval.v_string == NULL)
-	    continue;
+	إذا (li->li_tv.v_type != VAR_STRING
+		|| li->li_tv.vval.v_string == عدم)
+	    استمر;
 
-	fnames[count] = vim_strsave(li->li_tv.vval.v_string);
-	if (fnames[count] == NULL)
+	fnames[ژماردن] = vim_strsave(li->li_tv.vval.v_string);
+	إذا (fnames[ژماردن] == عدم)
 	{
-	    while (--count >= 0)
-		vim_free(fnames[count]);
+	    طالما (--ژماردن >= 0)
+		vim_free(fnames[ژماردن]);
 	    vim_free(fnames);
-	    return FALSE;
+	    أرجع FALSE;
 	}
-	count++;
+	ژماردن++;
     }
 
-    if (count > 0)
-	gui_handle_drop(TEXT_X(col - 1), TEXT_Y(row - 1), mods, fnames, count);
-    else
+    إذا (ژماردن > 0)
+	gui_handle_drop(TEXT_X(col - 1), TEXT_Y(row - 1), mods, fnames, ژماردن);
+    وإلا
 	vim_free(fnames);
 # endif
 
-    return TRUE;
+    أرجع TRUE;
 }
 
-# if defined(FIND_REPLACE_DIALOG)
-    static int
+# إذا defined(FIND_REPLACE_DIALOG)
+    ساكن صحيح
 test_gui_find_repl(dict_T *args)
 {
-    int		flags;
+    صحيح		flags;
     char_u	*find_text;
     char_u	*repl_text;
-    int		forward;
-    int		retval;
+    صحيح		forward;
+    صحيح		retval;
 
-    if (!dict_has_key(args, "find_text")
-	    || !dict_has_key(args, "repl_text")
-	    || !dict_has_key(args, "flags")
-	    || !dict_has_key(args, "forward"))
-	return FALSE;
+    إذا (!dict_has_کلیل(args, "find_text")
+	    || !dict_has_کلیل(args, "repl_text")
+	    || !dict_has_کلیل(args, "flags")
+	    || !dict_has_کلیل(args, "forward"))
+	أرجع FALSE;
 
     find_text = dict_get_string(args, "find_text", TRUE);
     repl_text = dict_get_string(args, "repl_text", TRUE);
-    flags = (int)dict_get_number(args, "flags");
-    forward = (int)dict_get_number(args, "forward");
+    flags = (صحيح)dict_get_ژمار(args, "flags");
+    forward = (صحيح)dict_get_ژمار(args, "forward");
 
     retval = gui_do_findrepl(flags, find_text, repl_text, forward);
     vim_free(find_text);
     vim_free(repl_text);
 
-    return retval;
+    أرجع retval;
 }
 # endif
 
-    static int
+    ساكن صحيح
 test_gui_mouse_event(dict_T *args)
 {
-    int		button;
-    int		row;
-    int		col;
-    int		repeated_click;
+    صحيح		button;
+    صحيح		row;
+    صحيح		col;
+    صحيح		repeated_click;
     int_u	mods;
-    int		move;
+    صحيح		move;
 
-    if (!dict_has_key(args, "row")
-	    || !dict_has_key(args, "col"))
-	return FALSE;
+    إذا (!dict_has_کلیل(args, "row")
+	    || !dict_has_کلیل(args, "col"))
+	أرجع FALSE;
 
     // Note: "move" is optional, requires fewer arguments
-    move = (int)dict_get_bool(args, "move", FALSE);
+    move = (صحيح)dict_get_bool(args, "move", FALSE);
 
-    if (!move && (!dict_has_key(args, "button")
-	    || !dict_has_key(args, "multiclick")
-	    || !dict_has_key(args, "modifiers")))
-	return FALSE;
+    إذا (!move && (!dict_has_کلیل(args, "button")
+	    || !dict_has_کلیل(args, "multiclick")
+	    || !dict_has_کلیل(args, "modifiers")))
+	أرجع FALSE;
 
-    row = (int)dict_get_number(args, "row");
-    col = (int)dict_get_number(args, "col");
+    row = (صحيح)dict_get_ژمار(args, "row");
+    col = (صحيح)dict_get_ژمار(args, "col");
 
-    if (move)
+    إذا (move)
     {
-	int pY = row;
-	int pX = col;
+	صحيح pY = row;
+	صحيح pX = col;
 	// the "move" argument expects row and col coordnates to be in pixels,
 	// unless "cell" is specified and is TRUE.
-	if (dict_get_bool(args, "cell", FALSE))
+	إذا (dict_get_bool(args, "cell", FALSE))
 	{
 	    // calculate the middle of the character cell
 	    // Note: Cell coordinates are 1-based from Vim script
@@ -1439,11 +1439,11 @@ test_gui_mouse_event(dict_T *args)
 	}
 	gui_mouse_moved(pX, pY);
     }
-    else
+    وإلا
     {
-	button = (int)dict_get_number(args, "button");
-	repeated_click = (int)dict_get_number(args, "multiclick");
-	mods = (int)dict_get_number(args, "modifiers");
+	button = (صحيح)dict_get_ژمار(args, "button");
+	repeated_click = (صحيح)dict_get_ژمار(args, "multiclick");
+	mods = (صحيح)dict_get_ژمار(args, "modifiers");
 
 	// Reset the scroll values to known values.
 	// XXX: Remove this when/if the scroll step is made configurable.
@@ -1454,161 +1454,161 @@ test_gui_mouse_event(dict_T *args)
 							repeated_click, mods);
     }
 
-    return TRUE;
+    أرجع TRUE;
 }
 
-    static int
+    ساكن صحيح
 test_gui_scrollbar(dict_T *args)
 {
     char_u	*which;
-    long	value;
-    int		dragging;
-    scrollbar_T *sb = NULL;
+    long	بەها;
+    صحيح		dragging;
+    scrollbar_T *sb = عدم;
 
-    if (!dict_has_key(args, "which")
-	    || !dict_has_key(args, "value")
-	    || !dict_has_key(args, "dragging"))
-	return FALSE;
+    إذا (!dict_has_کلیل(args, "which")
+	    || !dict_has_کلیل(args, "value")
+	    || !dict_has_کلیل(args, "dragging"))
+	أرجع FALSE;
 
     which = dict_get_string(args, "which", FALSE);
-    value = (long)dict_get_number(args, "value");
-    dragging = (int)dict_get_number(args, "dragging");
+    بەها = (long)dict_get_ژمار(args, "value");
+    dragging = (صحيح)dict_get_ژمار(args, "dragging");
 
-    if (STRCMP(which, "left") == 0)
-	sb = &curwin->w_scrollbars[SBAR_LEFT];
-    else if (STRCMP(which, "right") == 0)
-	sb = &curwin->w_scrollbars[SBAR_RIGHT];
-    else if (STRCMP(which, "hor") == 0)
+    إذا (STRCMP(which, "left") == 0)
+	sb = &curwin->w_scrollbars[SBAR_چەپ];
+    وإلا إذا (STRCMP(which, "right") == 0)
+	sb = &curwin->w_scrollbars[SBAR_ڕاست];
+    وإلا إذا (STRCMP(which, "hor") == 0)
 	sb = &gui.bottom_sbar;
-    if (sb == NULL)
+    إذا (sb == عدم)
     {
 	semsg(_(e_invalid_argument_str), which);
-	return FALSE;
+	أرجع FALSE;
     }
-    gui_drag_scrollbar(sb, value, dragging);
+    gui_drag_scrollbar(sb, بەها, dragging);
 # ifndef USE_ON_FLY_SCROLL
     // need to loop through normal_cmd() to handle the scroll events
     exec_normal(FALSE, TRUE, FALSE);
 # endif
 
-    return TRUE;
+    أرجع TRUE;
 }
 
-    static int
+    ساكن صحيح
 test_gui_tabline_event(dict_T *args UNUSED)
 {
 # ifdef FEAT_GUI_TABLINE
-    int		tabnr;
+    صحيح		tabnr;
 
-    if (!dict_has_key(args, "tabnr"))
-	return FALSE;
+    إذا (!dict_has_کلیل(args, "tabnr"))
+	أرجع FALSE;
 
-    tabnr = (int)dict_get_number(args, "tabnr");
+    tabnr = (صحيح)dict_get_ژمار(args, "tabnr");
 
-    return send_tabline_event(tabnr);
-# else
-    return FALSE;
+    أرجع send_tabline_event(tabnr);
+# وإلا
+    أرجع FALSE;
 # endif
 }
 
-    static int
+    ساكن صحيح
 test_gui_tabmenu_event(dict_T *args UNUSED)
 {
 # ifdef FEAT_GUI_TABLINE
-    int	tabnr;
-    int	item;
+    صحيح	tabnr;
+    صحيح	item;
 
-    if (!dict_has_key(args, "tabnr")
-	    || !dict_has_key(args, "item"))
-	return FALSE;
+    إذا (!dict_has_کلیل(args, "tabnr")
+	    || !dict_has_کلیل(args, "item"))
+	أرجع FALSE;
 
-    tabnr = (int)dict_get_number(args, "tabnr");
-    item = (int)dict_get_number(args, "item");
+    tabnr = (صحيح)dict_get_ژمار(args, "tabnr");
+    item = (صحيح)dict_get_ژمار(args, "item");
 
     send_tabline_menu_event(tabnr, item);
 # endif
-    return TRUE;
+    أرجع TRUE;
 }
 #endif
 
-    void
+    فراغ
 f_test_mswin_event(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
 #ifdef MSWIN
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = FALSE;
+    rettv->vval.v_ژمار = FALSE;
 
-    if (sandbox != 0)
+    إذا (sandbox != 0)
     {
 	emsg(_(e_not_allowed_in_sandbox));
-	return;
+	أرجع;
     }
 
-    if (check_for_string_arg(argvars, 0) == FAIL
+    إذا (check_for_string_arg(argvars, 0) == FAIL
 	    || check_for_dict_arg(argvars, 1) == FAIL
-	    || argvars[1].vval.v_dict == NULL)
-	return;
+	    || argvars[1].vval.v_dict == عدم)
+	أرجع;
 
     char_u *event = tv_get_string(&argvars[0]);
-    rettv->vval.v_number = test_mswin_event(event, argvars[1].vval.v_dict);
+    rettv->vval.v_ژمار = test_mswin_event(event, argvars[1].vval.v_dict);
 
 #endif
 }
 
-    void
+    فراغ
 f_test_gui_event(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
 #ifdef FEAT_GUI
     char_u	*event;
 
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = FALSE;
+    rettv->vval.v_ژمار = FALSE;
 
-    if (sandbox != 0)
+    إذا (sandbox != 0)
     {
 	emsg(_(e_not_allowed_in_sandbox));
-	return;
+	أرجع;
     }
 
-    if (check_for_string_arg(argvars, 0) == FAIL
+    إذا (check_for_string_arg(argvars, 0) == FAIL
 	    || check_for_dict_arg(argvars, 1) == FAIL
-	    || argvars[1].vval.v_dict == NULL)
-	return;
+	    || argvars[1].vval.v_dict == عدم)
+	أرجع;
 
     event = tv_get_string(&argvars[0]);
-    if (STRCMP(event, "dropfiles") == 0)
-	rettv->vval.v_number = test_gui_drop_files(argvars[1].vval.v_dict);
-# if defined(FIND_REPLACE_DIALOG)
-    else if (STRCMP(event, "findrepl") == 0)
-	rettv->vval.v_number = test_gui_find_repl(argvars[1].vval.v_dict);
+    إذا (STRCMP(event, "dropfiles") == 0)
+	rettv->vval.v_ژمار = test_gui_drop_files(argvars[1].vval.v_dict);
+# إذا defined(FIND_REPLACE_DIALOG)
+    وإلا إذا (STRCMP(event, "findrepl") == 0)
+	rettv->vval.v_ژمار = test_gui_find_repl(argvars[1].vval.v_dict);
 # endif
 # ifdef MSWIN
-    else if (STRCMP(event, "key") == 0 || STRCMP(event, "mouse") == 0 || STRCMP(event, "set_keycode_trans_strategy") == 0)
-	rettv->vval.v_number = test_mswin_event(event, argvars[1].vval.v_dict);
+    وإلا إذا (STRCMP(event, "key") == 0 || STRCMP(event, "mouse") == 0 || STRCMP(event, "set_keycode_trans_strategy") == 0)
+	rettv->vval.v_ژمار = test_mswin_event(event, argvars[1].vval.v_dict);
 # endif
-    else if (STRCMP(event, "mouse") == 0)
-	rettv->vval.v_number = test_gui_mouse_event(argvars[1].vval.v_dict);
-    else if (STRCMP(event, "scrollbar") == 0)
-	rettv->vval.v_number = test_gui_scrollbar(argvars[1].vval.v_dict);
-    else if (STRCMP(event, "tabline") == 0)
-	rettv->vval.v_number = test_gui_tabline_event(argvars[1].vval.v_dict);
-    else if (STRCMP(event, "tabmenu") == 0)
-	rettv->vval.v_number = test_gui_tabmenu_event(argvars[1].vval.v_dict);
-    else
+    وإلا إذا (STRCMP(event, "mouse") == 0)
+	rettv->vval.v_ژمار = test_gui_mouse_event(argvars[1].vval.v_dict);
+    وإلا إذا (STRCMP(event, "scrollbar") == 0)
+	rettv->vval.v_ژمار = test_gui_scrollbar(argvars[1].vval.v_dict);
+    وإلا إذا (STRCMP(event, "tabline") == 0)
+	rettv->vval.v_ژمار = test_gui_tabline_event(argvars[1].vval.v_dict);
+    وإلا إذا (STRCMP(event, "tabmenu") == 0)
+	rettv->vval.v_ژمار = test_gui_tabmenu_event(argvars[1].vval.v_dict);
+    وإلا
     {
 	semsg(_(e_invalid_argument_str), event);
-	return;
+	أرجع;
     }
 #endif
 }
 
-    void
+    فراغ
 f_test_settime(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    إذا (in_vim9script() && check_for_ژمار_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    time_for_testing = (time_t)tv_get_number(&argvars[0]);
+    time_for_testing = (time_t)tv_get_ژمار(&argvars[0]);
 }
 
 #endif // defined(FEAT_EVAL)

@@ -1,2 +1,2 @@
-import sys
+استورد sys
 print(sys.version)

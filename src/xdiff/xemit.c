@@ -20,25 +20,25 @@
  *
  */
 
-#include "xinclude.h"
+#ضمن "xinclude.h"
 
 
-static int xdl_emit_record(xdfile_t *xdf, long ri, char const *pre, xdemitcb_t *ecb)
+ساكن صحيح xdl_emit_record(xdfile_t *xdf, long ri, حرف ثابت *pre, xdemitcb_t *ecb)
 {
 	xrecord_t *rec = &xdf->recs[ri];
 
-	if (xdl_emit_diffrec(rec->ptr, rec->size, pre, (long)strlen(pre), ecb) < 0)
-		return -1;
+	إذا (xdl_emit_diffrec(rec->ptr, rec->size, pre, (long)strlen(pre), ecb) < 0)
+		أرجع -1;
 
-	return 0;
+	أرجع 0;
 }
 
 #define signed_add_overflows(a, b) \
     ((b) > LONG_MAX - (a))
 
-static long saturating_add(long a, long b)
+ساكن long saturating_add(long a, long b)
 {
-	return signed_add_overflows(a, b) ? LONG_MAX : a + b;
+	أرجع signed_add_overflows(a, b) ? LONG_MAX : a + b;
 }
 
 #undef signed_add_overflows
@@ -48,7 +48,7 @@ static long saturating_add(long a, long b)
  * inside the differential hunk according to the specified configuration.
  * Also advance xscr if the first changes must be discarded.
  */
-xdchange_t *xdl_get_hunk(xdchange_t **xscr, xdemitconf_t const *xecfg)
+xdchange_t *xdl_get_hunk(xdchange_t **xscr, xdemitconf_t ثابت *xecfg)
 {
 	xdchange_t *xch, *xchp, *lxch;
 	long max_common = saturating_add(saturating_add(xecfg->ctxlen,
@@ -58,155 +58,155 @@ xdchange_t *xdl_get_hunk(xdchange_t **xscr, xdemitconf_t const *xecfg)
 	long ignored = 0; /* number of ignored blank lines */
 
 	/* remove ignorable changes that are too far before other changes */
-	for (xchp = *xscr; xchp && xchp->ignore; xchp = xchp->next) {
+	لكل (xchp = *xscr; xchp && xchp->ignore; xchp = xchp->next) {
 		xch = xchp->next;
 
-		if (xch == NULL ||
+		إذا (xch == عدم ||
 		    xch->i1 - (xchp->i1 + xchp->chg1) >= max_ignorable)
 			*xscr = xch;
 	}
 
-	if (!*xscr)
-		return NULL;
+	إذا (!*xscr)
+		أرجع عدم;
 
 	lxch = *xscr;
 
-	for (xchp = *xscr, xch = xchp->next; xch; xchp = xch, xch = xch->next) {
+	لكل (xchp = *xscr, xch = xchp->next; xch; xchp = xch, xch = xch->next) {
 		long distance = xch->i1 - (xchp->i1 + xchp->chg1);
-		if (distance > max_common)
-			break;
+		إذا (distance > max_common)
+			اكسر;
 
-		if (distance < max_ignorable && (!xch->ignore || lxch == xchp)) {
+		إذا (distance < max_ignorable && (!xch->ignore || lxch == xchp)) {
 			lxch = xch;
 			ignored = 0;
-		} else if (distance < max_ignorable && xch->ignore) {
+		} وإلا إذا (distance < max_ignorable && xch->ignore) {
 			ignored += xch->chg2;
-		} else if (lxch != xchp &&
+		} وإلا إذا (lxch != xchp &&
 			   xch->i1 + ignored - (lxch->i1 + lxch->chg1) > max_common) {
-			break;
-		} else if (!xch->ignore) {
+			اكسر;
+		} وإلا إذا (!xch->ignore) {
 			lxch = xch;
 			ignored = 0;
-		} else {
+		} وإلا {
 			ignored += xch->chg2;
 		}
 	}
 
-	return lxch;
+	أرجع lxch;
 }
 
 
-#if 0
-static long def_ff(const char *rec, long len, char *buf, long sz)
+#إذا 0
+ساكن long def_ff(ثابت حرف *rec, long len, حرف *buf, long sz)
 {
-	if (len > 0 &&
-			(isalpha((unsigned char)*rec) || /* identifier? */
+	إذا (len > 0 &&
+			(isalpha((unsigned حرف)*rec) || /* identifier? */
 			 *rec == '_' || /* also identifier? */
 			 *rec == '$')) { /* identifiers from VMS and other esoterico */
-		if (len > sz)
+		إذا (len > sz)
 			len = sz;
-		while (0 < len && isspace((unsigned char)rec[len - 1]))
+		طالما (0 < len && isspace((unsigned حرف)rec[len - 1]))
 			len--;
 		memcpy(buf, rec, len);
-		return len;
+		أرجع len;
 	}
-	return -1;
+	أرجع -1;
 }
 #endif
 
-#if 0
-static long match_func_rec(xdfile_t *xdf, xdemitconf_t const *xecfg, long ri,
-			   char *buf, long sz)
+#إذا 0
+ساكن long match_func_rec(xdfile_t *xdf, xdemitconf_t ثابت *xecfg, long ri,
+			   حرف *buf, long sz)
 {
 	xrecord_t *rec = &xdf->recs[ri];
 
-	if (!xecfg->find_func)
-		return def_ff(rec->ptr, rec->size, buf, sz);
-	return xecfg->find_func(rec->ptr, rec->size, buf, sz, xecfg->find_func_priv);
+	إذا (!xecfg->find_func)
+		أرجع def_ff(rec->ptr, rec->size, buf, sz);
+	أرجع xecfg->find_func(rec->ptr, rec->size, buf, sz, xecfg->find_func_priv);
 }
 #endif
 
-#if 0
-static int is_func_rec(xdfile_t *xdf, xdemitconf_t const *xecfg, long ri)
+#إذا 0
+ساكن صحيح is_func_rec(xdfile_t *xdf, xdemitconf_t ثابت *xecfg, long ri)
 {
-	char dummy[1];
-	return match_func_rec(xdf, xecfg, ri, dummy, sizeof(dummy)) >= 0;
+	حرف dummy[1];
+	أرجع match_func_rec(xdf, xecfg, ri, dummy, حجم(dummy)) >= 0;
 }
 #endif
 
-struct func_line {
+بنية func_هێڵ {
 	long len;
-	char buf[80];
+	حرف buf[80];
 };
 
-#if 0
-static long get_func_line(xdfenv_t *xe, xdemitconf_t const *xecfg,
-			  struct func_line *func_line, long start, long limit)
+#إذا 0
+ساكن long get_func_هێڵ(xdfenv_t *xe, xdemitconf_t ثابت *xecfg,
+			  بنية func_هێڵ *func_هێڵ, long start, long limit)
 {
 	long l, size, step = (start > limit) ? -1 : 1;
-	char *buf, dummy[1];
+	حرف *buf, dummy[1];
 
-	buf = func_line ? func_line->buf : dummy;
-	size = func_line ? sizeof(func_line->buf) : sizeof(dummy);
+	buf = func_هێڵ ? func_هێڵ->buf : dummy;
+	size = func_هێڵ ? حجم(func_هێڵ->buf) : حجم(dummy);
 
-	for (l = start; l != limit && 0 <= l && l < xe->xdf1.nrec; l += step) {
+	لكل (l = start; l != limit && 0 <= l && l < xe->xdf1.nrec; l += step) {
 		long len = match_func_rec(&xe->xdf1, xecfg, l, buf, size);
-		if (len >= 0) {
-			if (func_line)
-				func_line->len = len;
-			return l;
+		إذا (len >= 0) {
+			إذا (func_هێڵ)
+				func_هێڵ->len = len;
+			أرجع l;
 		}
 	}
-	return -1;
+	أرجع -1;
 }
 #endif
 
-#if 0
-static int is_empty_rec(xdfile_t *xdf, long ri)
+#إذا 0
+ساكن صحيح is_empty_rec(xdfile_t *xdf, long ri)
 {
 	xrecord_t *rec = &xdf->recs[ri];
 	long i = 0;
 
-	for (; i < rec->size && XDL_ISSPACE(rec->ptr[i]); i++);
+	لكل (; i < rec->size && XDL_ISSPACE(rec->ptr[i]); i++);
 
-	return i == rec->size;
+	أرجع i == rec->size;
 }
 #endif
 
-int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
-		  xdemitconf_t const *xecfg) {
+صحيح xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
+		  xdemitconf_t ثابت *xecfg) {
 	long s1, s2, e1, e2, lctx;
 	xdchange_t *xch, *xche;
-#if 0
+#إذا 0
 	long funclineprev = -1;
 #endif
-	struct func_line func_line;
+	بنية func_هێڵ func_هێڵ;
 
-	func_line.len = 0;
+	func_هێڵ.len = 0;
 
-	for (xch = xscr; xch; xch = xche->next) {
+	لكل (xch = xscr; xch; xch = xche->next) {
 		xche = xdl_get_hunk(&xch, xecfg);
-		if (!xch)
-			break;
+		إذا (!xch)
+			اكسر;
 
 		s1 = XDL_MAX(xch->i1 - xecfg->ctxlen, 0);
 		s2 = XDL_MAX(xch->i2 - xecfg->ctxlen, 0);
 
-#if 0
-		if (xecfg->flags & XDL_EMIT_FUNCCONTEXT) {
+#إذا 0
+		إذا (xecfg->flags & XDL_EMIT_FUNCCONTEXT) {
 			long fs1, i1 = xch->i1;
 
 			/* Appended chunk? */
-			if (i1 >= xe->xdf1.nrec) {
+			إذا (i1 >= xe->xdf1.nrec) {
 				long i2 = xch->i2;
 
 				/*
 				 * We don't need additional context if
 				 * a whole function was added.
 				 */
-				while (i2 < xe->xdf2.nrec) {
-					if (is_func_rec(&xe->xdf2, xecfg, i2))
-						goto post_context_calculation;
+				طالما (i2 < xe->xdf2.nrec) {
+					إذا (is_func_rec(&xe->xdf2, xecfg, i2))
+						اذهب post_context_calculation;
 					i2++;
 				}
 
@@ -217,13 +217,13 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 				i1 = xe->xdf1.nrec - 1;
 			}
 
-			fs1 = get_func_line(xe, xecfg, NULL, i1, -1);
-			while (fs1 > 0 && !is_empty_rec(&xe->xdf1, fs1 - 1) &&
+			fs1 = get_func_هێڵ(xe, xecfg, عدم, i1, -1);
+			طالما (fs1 > 0 && !is_empty_rec(&xe->xdf1, fs1 - 1) &&
 			       !is_func_rec(&xe->xdf1, xecfg, fs1 - 1))
 				fs1--;
-			if (fs1 < 0)
+			إذا (fs1 < 0)
 				fs1 = 0;
-			if (fs1 < s1) {
+			إذا (fs1 < s1) {
 				s2 = XDL_MAX(s2 - (s1 - fs1), 0);
 				s1 = fs1;
 
@@ -231,15 +231,15 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 				 * Did we extend context upwards into an
 				 * ignored change?
 				 */
-				while (xchp != xch &&
+				طالما (xchp != xch &&
 				       xchp->i1 + xchp->chg1 <= s1 &&
 				       xchp->i2 + xchp->chg2 <= s2)
 					xchp = xchp->next;
 
 				/* If so, show it after all. */
-				if (xchp != xch) {
+				إذا (xchp != xch) {
 					xch = xchp;
-					goto pre_context_calculation;
+					اذهب pre_context_calculation;
 				}
 			}
 		}
@@ -253,16 +253,16 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 		e1 = xche->i1 + xche->chg1 + lctx;
 		e2 = xche->i2 + xche->chg2 + lctx;
 
-#if 0
-		if (xecfg->flags & XDL_EMIT_FUNCCONTEXT) {
-			long fe1 = get_func_line(xe, xecfg, NULL,
+#إذا 0
+		إذا (xecfg->flags & XDL_EMIT_FUNCCONTEXT) {
+			long fe1 = get_func_هێڵ(xe, xecfg, عدم,
 						 xche->i1 + xche->chg1,
 						 xe->xdf1.nrec);
-			while (fe1 > 0 && is_empty_rec(&xe->xdf1, fe1 - 1))
+			طالما (fe1 > 0 && is_empty_rec(&xe->xdf1, fe1 - 1))
 				fe1--;
-			if (fe1 < 0)
+			إذا (fe1 < 0)
 				fe1 = xe->xdf1.nrec;
-			if (fe1 > e1) {
+			إذا (fe1 > e1) {
 				e2 = XDL_MIN(e2 + (fe1 - e1), xe->xdf2.nrec);
 				e1 = fe1;
 			}
@@ -272,13 +272,13 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 			 * in the current hunk and start over to find
 			 * its new end.
 			 */
-			if (xche->next) {
+			إذا (xche->next) {
 				long l = XDL_MIN(xche->next->i1,
 						 xe->xdf1.nrec - 1);
-				if (l - xecfg->ctxlen <= e1 ||
-				    get_func_line(xe, xecfg, NULL, l, e1) < 0) {
+				إذا (l - xecfg->ctxlen <= e1 ||
+				    get_func_هێڵ(xe, xecfg, عدم, l, e1) < 0) {
 					xche = xche->next;
-					goto post_context_calculation;
+					اذهب post_context_calculation;
 				}
 			}
 		}
@@ -288,49 +288,49 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 		 * Emit current hunk header.
 		 */
 
-#if 0
-		if (xecfg->flags & XDL_EMIT_FUNCNAMES) {
-			get_func_line(xe, xecfg, &func_line,
+#إذا 0
+		إذا (xecfg->flags & XDL_EMIT_FUNCNAMES) {
+			get_func_هێڵ(xe, xecfg, &func_هێڵ,
 				      s1 - 1, funclineprev);
 			funclineprev = s1 - 1;
 		}
 #endif
-		if (!(xecfg->flags & XDL_EMIT_NO_HUNK_HDR) &&
+		إذا (!(xecfg->flags & XDL_EMIT_NO_HUNK_HDR) &&
 		    xdl_emit_hunk_hdr(s1 + 1, e1 - s1, s2 + 1, e2 - s2,
-				      func_line.buf, func_line.len, ecb) < 0)
-			return -1;
+				      func_هێڵ.buf, func_هێڵ.len, ecb) < 0)
+			أرجع -1;
 
 		/*
 		 * Emit pre-context.
 		 */
-		for (; s2 < xch->i2; s2++)
-			if (xdl_emit_record(&xe->xdf2, s2, " ", ecb) < 0)
-				return -1;
+		لكل (; s2 < xch->i2; s2++)
+			إذا (xdl_emit_record(&xe->xdf2, s2, " ", ecb) < 0)
+				أرجع -1;
 
-		for (s1 = xch->i1, s2 = xch->i2;; xch = xch->next) {
+		لكل (s1 = xch->i1, s2 = xch->i2;; xch = xch->next) {
 			/*
 			 * Merge previous with current change atom.
 			 */
-			for (; s1 < xch->i1 && s2 < xch->i2; s1++, s2++)
-				if (xdl_emit_record(&xe->xdf2, s2, " ", ecb) < 0)
-					return -1;
+			لكل (; s1 < xch->i1 && s2 < xch->i2; s1++, s2++)
+				إذا (xdl_emit_record(&xe->xdf2, s2, " ", ecb) < 0)
+					أرجع -1;
 
 			/*
 			 * Removes lines from the first file.
 			 */
-			for (s1 = xch->i1; s1 < xch->i1 + xch->chg1; s1++)
-				if (xdl_emit_record(&xe->xdf1, s1, "-", ecb) < 0)
-					return -1;
+			لكل (s1 = xch->i1; s1 < xch->i1 + xch->chg1; s1++)
+				إذا (xdl_emit_record(&xe->xdf1, s1, "-", ecb) < 0)
+					أرجع -1;
 
 			/*
 			 * Adds lines from the second file.
 			 */
-			for (s2 = xch->i2; s2 < xch->i2 + xch->chg2; s2++)
-				if (xdl_emit_record(&xe->xdf2, s2, "+", ecb) < 0)
-					return -1;
+			لكل (s2 = xch->i2; s2 < xch->i2 + xch->chg2; s2++)
+				إذا (xdl_emit_record(&xe->xdf2, s2, "+", ecb) < 0)
+					أرجع -1;
 
-			if (xch == xche)
-				break;
+			إذا (xch == xche)
+				اكسر;
 			s1 = xch->i1 + xch->chg1;
 			s2 = xch->i2 + xch->chg2;
 		}
@@ -338,10 +338,10 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 		/*
 		 * Emit post-context.
 		 */
-		for (s2 = xche->i2 + xche->chg2; s2 < e2; s2++)
-			if (xdl_emit_record(&xe->xdf2, s2, " ", ecb) < 0)
-				return -1;
+		لكل (s2 = xche->i2 + xche->chg2; s2 < e2; s2++)
+			إذا (xdl_emit_record(&xe->xdf2, s2, " ", ecb) < 0)
+				أرجع -1;
 	}
 
-	return 0;
+	أرجع 0;
 }
